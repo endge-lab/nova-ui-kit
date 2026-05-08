@@ -3,6 +3,7 @@ import type {
   NovaUiBorder,
   NovaUiFontStyle,
   NovaUiInheritedTextStyle,
+  NovaUiStyleIdentityProps,
 } from '@/shared/style'
 import type { NovaUiSpacing } from '@/shared/layout'
 import type { NovaUiMotionOptions } from '@/domain/types'
@@ -17,7 +18,7 @@ export type TextBlockWhiteSpace = 'normal' | 'nowrap' | 'pre' | 'pre-wrap'
 export type TextBlockOverflow = 'visible' | 'clip' | 'ellipsis'
 export type TextBlockWordBreak = 'normal' | 'break-word' | 'break-all'
 
-export interface TextBlockProps extends NovaUiMotionOptions {
+export interface TextBlockProps extends NovaUiMotionOptions, NovaUiStyleIdentityProps {
   text?: string
   x?: number
   y?: number
@@ -72,6 +73,8 @@ export interface TextBlockResolvedProps {
   style?: NovaUiInheritedTextStyle
   background?: string
   border?: NovaUiBorder
+  className?: string | string[]
+  attrs?: NovaUiStyleIdentityProps['attrs']
 }
 
 export interface TextBlockLayoutLine {

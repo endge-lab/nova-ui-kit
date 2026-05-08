@@ -74,6 +74,8 @@ export const TEXT_BLOCK_FIELD_DEFINITIONS = {
   wordBreak: { type: 'string' },
   style: { type: 'style' },
   motion: { type: 'motion' },
+  className: { type: 'string' },
+  attrs: { type: 'record' },
 } as const
 
 export function createTextBlockDescriptor(createNode?: TextBlockNodeFactory): TextBlockDescriptor {

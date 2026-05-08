@@ -23,6 +23,7 @@ import type {
   GridProps,
   GridResolvedProps,
 } from '@/components/Grid/types'
+import { requireNovaUiRoot } from '@/components/Root/RootTarget'
 import {
   NOVA_UI_LAYOUT_TARGET,
   applyNodeLayoutRect,
@@ -245,6 +246,10 @@ export class Grid<E extends EventList = Record<string, any>>
 
   getChildRect(id: string): Readonly<NovaUiLayoutRect> | undefined {
     return this.rectsById.get(id)
+  }
+
+  protected override onMount(): void {
+    requireNovaUiRoot(this)
   }
 
   protected override onPropsChanged(changedKeys: (keyof GridResolvedProps)[]): void {

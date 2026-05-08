@@ -1,9 +1,11 @@
 import type { NovaComponentDescriptor, NovaSchemaRegistry } from '@endge/nova'
 import { FLEX_DESCRIPTOR } from '@/components/Flex/Flex.registry'
 import { GRID_DESCRIPTOR } from '@/components/Grid/Grid.registry'
+import { ROOT_DESCRIPTOR } from '@/components/Root/Root.registry'
 import { TEXT_BLOCK_DESCRIPTOR } from '@/components/TextBlock/TextBlock.registry'
 
 const NOVA_UI_KIT_DESCRIPTORS: Array<NovaComponentDescriptor<any, any, any, any>> = [
+  ROOT_DESCRIPTOR,
   FLEX_DESCRIPTOR,
   GRID_DESCRIPTOR,
   TEXT_BLOCK_DESCRIPTOR,

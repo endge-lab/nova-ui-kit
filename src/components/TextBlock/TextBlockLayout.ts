@@ -42,6 +42,8 @@ export function normalizeTextBlockProps(props: TextBlockProps = {}): TextBlockRe
     style: props.style,
     background: props.background,
     border: props.border,
+    className: props.className,
+    attrs: props.attrs,
   }
 }
 

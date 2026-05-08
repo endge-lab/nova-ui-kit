@@ -46,6 +46,8 @@ export const GRID_FIELD_DEFINITIONS = {
   background: { type: 'string' },
   clip: { type: 'boolean' },
   motion: { type: 'motion' },
+  className: { type: 'string' },
+  attrs: { type: 'record' },
 } as const
 
 /** Нормализует props Grid без чтения Nova runtime. */
@@ -76,6 +78,8 @@ export function normalizeGridProps(props: GridProps = {}): GridResolvedProps {
     background: props.background,
     border: props.border,
     clip: props.clip ?? false,
+    className: props.className,
+    attrs: props.attrs,
   }
 }
 
@@ -110,6 +114,8 @@ export function createGridDescriptor(createNode?: GridNodeFactory): GridDescript
         'background',
         'border',
         'clip',
+        'className',
+        'attrs',
       ],
     },
     fields: GRID_FIELD_DEFINITIONS,

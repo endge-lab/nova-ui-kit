@@ -7,9 +7,10 @@ import {
   RendererType,
   type NovaApp,
 } from '@endge/nova'
-import { Flex } from '@/components/Flex/Flex'
 import { FLEX_SCHEMA_TYPE } from '@/components/Flex/types'
 import { GRID_SCHEMA_TYPE } from '@/components/Grid/types'
+import { Root } from '@/components/Root/Root'
+import { ROOT_SCHEMA_TYPE } from '@/components/Root/types'
 import { TextBlock } from '@/components/TextBlock/TextBlock'
 import type { TextBlockApi } from '@/components/TextBlock/types'
 import { TEXT_BLOCK_SCHEMA_TYPE } from '@/components/TextBlock/types'
@@ -100,7 +101,7 @@ describe('Nova UI style propagation', () => {
     const app = createApp()
     const surface = app.createSurface2D('style')
     const root = app.schema.createNode(surface, {
-      type: FLEX_SCHEMA_TYPE,
+      type: ROOT_SCHEMA_TYPE,
       id: 'root',
       props: {
         style: { color: '#111111' },
@@ -117,7 +118,7 @@ describe('Nova UI style propagation', () => {
           props: { text: 'Explicit', color: '#999999' },
         },
       ],
-    }) as Flex<TestEvents>
+    }) as Root<TestEvents>
     const inherited = app.components.require<TextBlock<TestEvents>>('inherited')
     const explicit = app.components.require<TextBlock<TestEvents>>('explicit')
     const inheritedDirty = vi.spyOn(inherited, 'dirty')
@@ -137,11 +138,121 @@ describe('Nova UI style propagation', () => {
     app.destroy()
   })
 
+  it('requires Root for mounted UI Kit components', () => {
+    const app = createApp()
+    const surface = app.createSurface2D('style')
+
+    expect(() => app.schema.createNode(surface, {
+      type: TEXT_BLOCK_SCHEMA_TYPE,
+      id: 'orphan-text',
+      props: { text: 'Orphan' },
+    })).toThrow('[Nova UI Kit]')
+
+    app.destroy()
+  })
+
+  it('applies selector stylesheet by specificity', () => {
+    const app = createApp()
+    const surface = app.createSurface2D('style')
+
+    app.schema.createNode(surface, {
+      type: ROOT_SCHEMA_TYPE,
+      id: 'root',
+      props: {
+        styleSheet: `
+          TextBlock { color: #111111; fontSize: 13; }
+          TextBlock.featured { color: #222222; }
+          #target { color: #333333; fontSize: 18; }
+        `,
+      },
+      children: [
+        {
+          type: TEXT_BLOCK_SCHEMA_TYPE,
+          id: 'target',
+          props: {
+            text: 'Target',
+            className: 'featured',
+          },
+        },
+      ],
+    })
+
+    expect(textApi(app, 'target').getProps().color).toBe('#333333')
+    expect(textApi(app, 'target').getProps().fontSize).toBe(18)
+
+    app.destroy()
+  })
+
+  it('applies descendant and direct-child selectors', () => {
+    const app = createApp()
+    const surface = app.createSurface2D('style')
+
+    app.schema.createNode(surface, {
+      type: ROOT_SCHEMA_TYPE,
+      id: 'root',
+      props: {
+        styleSheet: `
+          Grid.cards TextBlock { color: #445566; }
+          Grid.cards > TextBlock.note { fontWeight: 800; }
+        `,
+      },
+      children: [
+        {
+          type: GRID_SCHEMA_TYPE,
+          id: 'grid',
+          props: {
+            className: 'cards',
+            columns: 1,
+          },
+          children: [
+            {
+              type: TEXT_BLOCK_SCHEMA_TYPE,
+              id: 'note',
+              props: {
+                className: 'note',
+                text: 'Note',
+              },
+            },
+          ],
+        },
+      ],
+    })
+
+    expect(textApi(app, 'note').getProps().color).toBe('#445566')
+    expect(textApi(app, 'note').getProps().fontWeight).toBe('800')
+
+    app.destroy()
+  })
+
+  it('ignores invalid selector stylesheet and exposes diagnostics', () => {
+    const app = createApp()
+    const surface = app.createSurface2D('style')
+    const root = app.schema.createNode(surface, {
+      type: ROOT_SCHEMA_TYPE,
+      id: 'root',
+      props: {
+        styleSheet: 'TextBlock { fontSize: nope; color: #111111; }',
+      },
+      children: [
+        {
+          type: TEXT_BLOCK_SCHEMA_TYPE,
+          id: 'target',
+          props: { text: 'Target' },
+        },
+      ],
+    }) as Root<TestEvents>
+
+    expect(root.getApi().getValidation().ok).toBe(false)
+    expect(textApi(app, 'target').getProps().color).not.toBe('#111111')
+
+    app.destroy()
+  })
+
   it('propagates font size as layout-affecting style', () => {
     const app = createApp()
     const surface = app.createSurface2D('style')
     const root = app.schema.createNode(surface, {
-      type: FLEX_SCHEMA_TYPE,
+      type: ROOT_SCHEMA_TYPE,
       id: 'root',
       children: [
         {
@@ -155,7 +266,7 @@ describe('Nova UI style propagation', () => {
           props: { text: 'Explicit', fontSize: 13 },
         },
       ],
-    }) as Flex<TestEvents>
+    }) as Root<TestEvents>
     const inherited = app.components.require<TextBlock<TestEvents>>('inherited')
     const explicit = app.components.require<TextBlock<TestEvents>>('explicit')
     const inheritedDirty = vi.spyOn(inherited, 'dirty')
@@ -177,17 +288,23 @@ describe('Nova UI style propagation', () => {
     const surface = app.createSurface2D('style')
 
     app.schema.createNode(surface, {
-      type: GRID_SCHEMA_TYPE,
-      id: 'grid',
-      props: {
-        style: { color: '#336699' },
-        columns: 1,
-      },
+      type: ROOT_SCHEMA_TYPE,
+      id: 'root',
       children: [
         {
-          type: TEXT_BLOCK_SCHEMA_TYPE,
-          id: 'grid-text',
-          props: { text: 'Grid text' },
+          type: GRID_SCHEMA_TYPE,
+          id: 'grid',
+          props: {
+            style: { color: '#336699' },
+            columns: 1,
+          },
+          children: [
+            {
+              type: TEXT_BLOCK_SCHEMA_TYPE,
+              id: 'grid-text',
+              props: { text: 'Grid text' },
+            },
+          ],
         },
       ],
     })
@@ -201,7 +318,7 @@ describe('Nova UI style propagation', () => {
     const app = createApp()
     const surface = app.createSurface2D('style')
     const root = app.schema.createNode(surface, {
-      type: FLEX_SCHEMA_TYPE,
+      type: ROOT_SCHEMA_TYPE,
       id: 'root',
       props: {
         style: { color: '#111111' },
@@ -222,7 +339,7 @@ describe('Nova UI style propagation', () => {
           ],
         },
       ],
-    }) as Flex<TestEvents>
+    }) as Root<TestEvents>
     const nestedText = app.components.require<TextBlock<TestEvents>>('nested-text')
     const nestedDirty = vi.spyOn(nestedText, 'dirty')
 

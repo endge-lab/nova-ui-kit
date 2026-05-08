@@ -7,6 +7,7 @@ import type {
 import type {
   NovaUiBorder,
   NovaUiInheritedTextStyle,
+  NovaUiStyleIdentityProps,
 } from '@/shared/style'
 import type { NovaUiMotionOptions } from '@/domain/types'
 
@@ -16,7 +17,7 @@ export const GRID_SCHEMA_TYPE = 'nova-ui.grid'
 export type GridAlign = 'start' | 'center' | 'end' | 'stretch'
 
 /** Параметры Grid контейнера. */
-export interface GridProps extends NovaUiMotionOptions {
+export interface GridProps extends NovaUiMotionOptions, NovaUiStyleIdentityProps {
   x?: number
   y?: number
   width?: number
@@ -61,6 +62,8 @@ export interface GridResolvedProps {
   background?: string
   border?: NovaUiBorder
   clip: boolean
+  className?: string | string[]
+  attrs?: NovaUiStyleIdentityProps['attrs']
 }
 
 /** Layout-намерение ребенка внутри Grid. Потомок сам это не читает. */

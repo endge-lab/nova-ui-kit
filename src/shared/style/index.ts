@@ -1,2 +1,6 @@
 export * from '@/shared/style/BoxStyle'
 export * from '@/shared/style/StyleContext'
+export * from '@/shared/style/cascade/StyleSelectorMatcher'
+export * from '@/shared/style/cascade/StyleSheet'
+export * from '@/shared/style/identity/StyleIdentity'
+export * from '@/shared/style/validation/StyleSheetValidator'

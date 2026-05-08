@@ -23,6 +23,7 @@ import type {
   FlexProps,
   FlexResolvedProps,
 } from '@/components/Flex/types'
+import { requireNovaUiRoot } from '@/components/Root/RootTarget'
 import {
   NOVA_UI_LAYOUT_TARGET,
   applyNodeLayoutRect,
@@ -270,6 +271,10 @@ export class Flex<E extends EventList = Record<string, any>>
 
   getChildRect(id: string): Readonly<NovaUiLayoutRect> | undefined {
     return this.rectsById.get(id)
+  }
+
+  protected override onMount(): void {
+    requireNovaUiRoot(this)
   }
 
   protected override onPropsChanged(_changedKeys: (keyof FlexResolvedProps)[]): void {

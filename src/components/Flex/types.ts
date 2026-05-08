@@ -7,6 +7,7 @@ import type {
 import type {
   NovaUiBorder,
   NovaUiInheritedTextStyle,
+  NovaUiStyleIdentityProps,
 } from '@/shared/style'
 import type { NovaUiMotionOptions } from '@/domain/types'
 
@@ -19,7 +20,7 @@ export type FlexJustify = 'start' | 'center' | 'end' | 'space-between'
 export type FlexAlign = 'start' | 'center' | 'end' | 'stretch'
 
 /** Параметры Flex контейнера. */
-export interface FlexProps extends NovaUiMotionOptions {
+export interface FlexProps extends NovaUiMotionOptions, NovaUiStyleIdentityProps {
   x?: number
   y?: number
   width?: number
@@ -56,6 +57,8 @@ export interface FlexResolvedProps {
   background?: string
   border?: NovaUiBorder
   clip: boolean
+  className?: string | string[]
+  attrs?: NovaUiStyleIdentityProps['attrs']
 }
 
 /** Layout-намерение ребенка внутри Flex. Потомок сам это не читает. */

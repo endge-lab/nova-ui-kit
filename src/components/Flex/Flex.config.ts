@@ -42,6 +42,8 @@ export const FLEX_FIELD_DEFINITIONS = {
   background: { type: 'string' },
   clip: { type: 'boolean' },
   motion: { type: 'motion' },
+  className: { type: 'string' },
+  attrs: { type: 'record' },
 } as const
 
 /** Нормализует props Flex без чтения Nova runtime. */
@@ -65,6 +67,8 @@ export function normalizeFlexProps(props: FlexProps = {}): FlexResolvedProps {
     background: props.background,
     border: props.border,
     clip: props.clip ?? false,
+    className: props.className,
+    attrs: props.attrs,
   }
 }
 
@@ -95,6 +99,8 @@ export function createFlexDescriptor(createNode?: FlexNodeFactory): FlexDescript
         'background',
         'border',
         'clip',
+        'className',
+        'attrs',
       ],
     },
     fields: FLEX_FIELD_DEFINITIONS,

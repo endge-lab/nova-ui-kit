@@ -8,9 +8,13 @@ import {
 import {
   NOVA_UI_STYLE_TARGET,
   NovaUiStyleMask,
+  matchStyleRules,
+  validateNovaUiStyleSheetSource,
+  type NovaUiCompiledStyleSheet,
   type NovaUiStyleContext,
   type NovaUiStyleReceiveResult,
   type NovaUiStyleTarget,
+  type NovaUiStylableNode,
 } from '@/shared/style'
 import {
   copyRect,
@@ -114,6 +118,91 @@ const TEXT_LAYOUT_MASK = (
 const BENCH_ITERATIONS = 6
 
 describe('Nova UI style propagation performance', () => {
+  it('benchmarks stylesheet compile hot path', () => {
+    const results = [100, 1_000].map(size => {
+      const source = createBenchmarkStyleSource(size)
+      return measureBench(`stylesheet compile ${size}`, size, () => {
+        const result = validateNovaUiStyleSheetSource(source)
+        return {
+          renderCount: result.styleSheet?.rules.length ?? 0,
+          updateCount: 0,
+          skippedCount: result.diagnostics.length,
+        }
+      })
+    })
+
+    for (const result of results) {
+      logBench(result)
+      expect(result.renderCount).toBe(result.size)
+      expect(result.skippedCount).toBe(0)
+      expect(result.averageMs).toBeLessThan(100)
+    }
+  })
+
+  it('benchmarks invalid stylesheet validation', () => {
+    const size = 1_000
+    const source = Array.from({ length: size }, (_item, index) => (
+      `TextBlock.invalid-${index} { fontSize: nope; }`
+    )).join('\n')
+    const result = measureBench('invalid stylesheet validation 1000', size, () => {
+      const validation = validateNovaUiStyleSheetSource(source)
+      return {
+        renderCount: 0,
+        updateCount: 0,
+        skippedCount: validation.diagnostics.length,
+      }
+    })
+
+    logBench(result)
+    expect(result.skippedCount).toBeGreaterThanOrEqual(size)
+    expect(result.averageMs).toBeLessThan(100)
+  })
+
+  it('benchmarks selector matching for indexed rules', () => {
+    const source = createBenchmarkStyleSource(1_000)
+    const sheet = validateNovaUiStyleSheetSource(source).styleSheet!
+    const results = [1_000, 5_000, 10_000].map(size => {
+      const nodes = createBenchmarkStyleNodes(size)
+      return measureBench(`selector matching ${size}`, size, () => {
+        let matches = 0
+        for (const node of nodes) matches += matchStyleRules(node, sheet).length
+        return {
+          renderCount: matches,
+          updateCount: 0,
+          skippedCount: size - matches,
+        }
+      })
+    })
+
+    for (const result of results) {
+      logBench(result)
+      expect(result.renderCount).toBe(result.size)
+      expect(result.averageMs).toBeLessThan(100)
+    }
+  })
+
+  it('benchmarks selector cascade style diff budget', () => {
+    const size = 10_000
+    const sheet = validateNovaUiStyleSheetSource('TextBlock.item { color: #123456; }').styleSheet as NovaUiCompiledStyleSheet
+    const nodes = createBenchmarkStyleNodes(size, 'item')
+    const result = measureBench('selector color render-only 10000', size, () => {
+      let renderCount = 0
+      for (const node of nodes) {
+        if (matchStyleRules(node, sheet).length > 0) renderCount += 1
+      }
+      return {
+        renderCount,
+        updateCount: 0,
+        skippedCount: size - renderCount,
+      }
+    })
+
+    logBench(result)
+    expect(result.renderCount).toBe(size)
+    expect(result.updateCount).toBe(0)
+    expect(result.averageMs).toBeLessThan(100)
+  })
+
   it('benchmarks render-only inherited color propagation', () => {
     const results = [1_000, 5_000, 10_000].map(size => {
       const targets = Array.from({ length: size }, () => new BenchTextTarget())
@@ -396,4 +485,25 @@ function rateBench(averageMs: number, size: number): BenchStats['rating'] {
 
 function logBench(result: BenchStats): void {
   console.log(`[nova-ui-kit-bench] ${JSON.stringify(result)}`)
+}
+
+function createBenchmarkStyleSource(size: number): string {
+  return Array.from({ length: size }, (_item, index) => (
+    `TextBlock.item-${index} { color: #123456; fontSize: ${12 + (index % 6)}; }`
+  )).join('\n')
+}
+
+function createBenchmarkStyleNodes(size: number, className?: string): NovaUiStylableNode[] {
+  return Array.from({ length: size }, (_item, index) => ({
+    componentId: `node-${index}`,
+    descriptor: {
+      name: 'TextBlock',
+    },
+    __type: 'TextBlock',
+    parent: null,
+    getProps: () => ({
+      className: className ?? `item-${index % 1000}`,
+      attrs: {},
+    }),
+  })) as NovaUiStylableNode[]
 }
