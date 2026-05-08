@@ -1,7 +1,9 @@
-import type { NovaSchemaRegistry } from '@endge/nova'
+import type { NovaComponentDescriptor, NovaSchemaRegistry } from '@endge/nova'
+import { FLEX_DESCRIPTOR } from '@/components/Flex/Flex.registry'
 import { TEXT_BLOCK_DESCRIPTOR } from '@/components/TextBlock/TextBlock.registry'
 
-const NOVA_UI_KIT_DESCRIPTORS = [
+const NOVA_UI_KIT_DESCRIPTORS: Array<NovaComponentDescriptor<any, any, any, any>> = [
+  FLEX_DESCRIPTOR,
   TEXT_BLOCK_DESCRIPTOR,
 ]
 
