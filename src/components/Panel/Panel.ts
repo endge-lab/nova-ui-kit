@@ -1,0 +1,118 @@
+import type { NovaApp, NovaNode, NovaSchema, NovaSurface } from '@endge/nova'
+import type { EventList } from '@endge/utils'
+import {
+  PANEL_NODE_DESCRIPTOR,
+  normalizePanelProps,
+  type PanelDescriptor,
+} from '@/components/Panel/Panel.config'
+import type {
+  PanelApi,
+  PanelChildSchema,
+  PanelProps,
+  PanelResolvedProps,
+} from '@/components/Panel/types'
+import {
+  NovaUiComponentNode,
+  buildBoxSchema,
+  resolveComponentTextStyle,
+} from '@/shared/component'
+import { pushText } from '@/shared/component'
+import {
+  copyRect,
+  createLayoutRect,
+  resolveSpacing,
+} from '@/shared/layout'
+
+export class Panel<E extends EventList = Record<string, any>>
+  extends NovaUiComponentNode<PanelResolvedProps, PanelApi, PanelProps, E> {
+  private readonly childrenNodes: NovaNode<E>[] = []
+  private readonly bodyRect = createLayoutRect()
+  private readonly api: PanelApi
+
+  constructor(
+    app: NovaApp<E>,
+    surface: NovaSurface<E>,
+    props: PanelProps = {},
+    options: { componentId?: string; children?: PanelChildSchema[] } = {},
+    descriptor: PanelDescriptor = PANEL_NODE_DESCRIPTOR,
+  ) {
+    super(app, surface, descriptor, normalizePanelProps(props), options)
+    this.api = {
+      setChildren: children => this.setChildren(children),
+      setTitle: title => this.setProps({ title }),
+      setProps: patch => this.setProps(patch),
+      getBodyRect: () => this.bodyRect,
+      getProps: () => this.props,
+    }
+    this.setChildren(options.children ?? [])
+  }
+
+  override setProps(patch: PanelProps): this {
+    return super.setProps(patch as Partial<PanelResolvedProps>)
+  }
+
+  override getApi(): PanelApi {
+    return this.api
+  }
+
+  setChildren(children: PanelChildSchema[]): void {
+    for (const child of this.childrenNodes) child.remove()
+    this.childrenNodes.length = 0
+    for (const child of children) {
+      this.childrenNodes.push(this.nova.schema.createChild(this, child) as NovaNode<E>)
+    }
+    this.dirty({ update: true, render: true })
+  }
+
+  update(): void {
+    const padding = resolveSpacing(this.props.padding)
+    const headerHeight = this.props.title || this.props.subtitle
+      ? this.props.density === 'compact' ? 44 : this.props.density === 'spacious' ? 72 : 58
+      : 0
+    copyRect(this.bodyRect, {
+      x: padding.left,
+      y: padding.top + headerHeight,
+      width: Math.max(0, this.width - padding.left - padding.right),
+      height: Math.max(0, this.height - padding.top - padding.bottom - headerHeight),
+    })
+    for (const child of this.childrenNodes) {
+      child.options({
+        x: this.bodyRect.x,
+        y: this.bodyRect.y,
+        width: this.bodyRect.width,
+        height: this.bodyRect.height,
+      })
+      child.dirty({ matrix: true, update: true, render: true })
+    }
+  }
+
+  render(): void {
+    const schema: NovaSchema = buildBoxSchema(this.props, this.width, this.height)
+    const padding = resolveSpacing(this.props.padding)
+    const textStyle = resolveComponentTextStyle(this.props, this.inheritedStyleContext)
+    if (this.props.title) {
+      pushText(schema, this.props.title, padding.left, padding.top, Math.max(0, this.width - padding.left - padding.right), 24, {
+        ...textStyle,
+        fontSize: Math.max(textStyle.fontSize, 16),
+        fontWeight: '800',
+        lineHeight: 22,
+      })
+    }
+    if (this.props.subtitle) {
+      pushText(schema, this.props.subtitle, padding.left, padding.top + 25, Math.max(0, this.width - padding.left - padding.right), 20, {
+        ...textStyle,
+        color: '#64748b',
+        fontSize: Math.max(11, textStyle.fontSize - 1),
+        lineHeight: 18,
+      })
+    }
+    this.renderer.schema(schema)
+    if (this.props.clip) this.renderer.clip(0, 0, this.width, this.height)
+  }
+
+  protected override onPropsChanged(changedKeys: (keyof PanelResolvedProps)[]): void {
+    this.props = normalizePanelProps(this.props)
+    this.applyCommonPropsChanged(changedKeys)
+    this.dirty({ update: true, render: true })
+  }
+}

@@ -6,10 +6,16 @@ import type { EventList } from '@endge/utils'
 import { resolveNovaUiMotionOptions } from '@/shared/motion'
 
 export class RowResizer<E extends EventList> extends NovaNode<E> {
-  //
   private _color: string
+  private _hoverColor: string
+  private _activeColor: string
+  private _overlayColor: string
   private _lineWidth: number
+  private _hitSize: number
+  private _disabled = false
+  private _motionEnabled = true
   private _isDragging = false
+  private _isHover = false
   private _blurSecondY: number | null = null
 
   //
@@ -24,23 +30,33 @@ export class RowResizer<E extends EventList> extends NovaNode<E> {
     lineWidth: number = 1,
   ) {
     super(app, surface)
+    this.__type = 'RowResizer'
     this._color = color
+    this._hoverColor = color
+    this._activeColor = color
+    this._overlayColor = 'rgba(37,99,235,0.14)'
     this._lineWidth = lineWidth
+    this._hitSize = Math.max(6, lineWidth)
+    this.options({ width: 0, height: this._hitSize })
     this.setupEvents()
   }
 
   private setupEvents(): void {
     this.on('dragstart', (e) => {
+      if (this._disabled) return false
       this._onChangeStart(e)
       if (e.defaultPrevented) return false
       this._isDragging = true
-      this.nova.motion.to(this, { scaleY: 1.08, opacity: 0.85 }, resolveNovaUiMotionOptions('pressFeedback'))
+      if (this._motionEnabled) {
+        this.nova.motion.to(this, { scaleY: 1.08, opacity: 0.85 }, resolveNovaUiMotionOptions('pressFeedback'))
+      }
       this.nova.renderer.cursor('row-resize')
       this.nova.invalidate()
       return false
     })
 
     this.on('dragmove', (e, _dx, dy) => {
+      if (this._disabled) return false
       this._onChangeMove(e, dy)
       if (e.defaultPrevented) return false
 
@@ -50,21 +66,27 @@ export class RowResizer<E extends EventList> extends NovaNode<E> {
     })
 
     this.on('dragend', (e) => {
+      if (this._disabled) return false
       this._onChangeEnd(e)
       if (e.defaultPrevented) return false
       this._isDragging = false
-      this.nova.motion.to(this, { scaleY: 1, opacity: 1 }, resolveNovaUiMotionOptions('pressFeedback'))
+      if (this._motionEnabled) {
+        this.nova.motion.to(this, { scaleY: 1, opacity: 1 }, resolveNovaUiMotionOptions('pressFeedback'))
+      }
       this.nova.renderer.cursor('default')
       this.nova.invalidate()
       return false
     })
 
     this.on('mouseenter', () => {
+      if (this._disabled) return
+      this._isHover = true
       this.nova.renderer.cursor('row-resize')
       this.nova.invalidate()
     })
 
     this.on('mouseleave', () => {
+      this._isHover = false
       if (!this._isDragging) {
         this.nova.renderer.cursor('default')
         this.nova.invalidate()
@@ -88,10 +110,34 @@ export class RowResizer<E extends EventList> extends NovaNode<E> {
   }
 
   options(opts: Partial<ResizerOptions>): this {
-    super.options(opts)
-    this._color = opts.color || this._color
-    this._lineWidth = opts.lineWidth || this._lineWidth
-    this._blurSecondY = opts.blurSecondY || this._blurSecondY
+    const {
+      color,
+      hoverColor,
+      activeColor,
+      overlayColor,
+      lineWidth,
+      hitSize,
+      blurSecondY,
+      disabled,
+      motion,
+      ...rest
+    } = opts
+
+    super.options({
+      ...rest,
+      interactive: disabled === true ? false : true,
+      active: disabled === true ? false : true,
+    })
+    this._color = color ?? this._color
+    this._hoverColor = hoverColor ?? this._hoverColor ?? this._color
+    this._activeColor = activeColor ?? this._activeColor ?? this._hoverColor
+    this._overlayColor = overlayColor ?? this._overlayColor
+    this._lineWidth = lineWidth ?? this._lineWidth
+    this._hitSize = hitSize ?? this._hitSize
+    this._blurSecondY = blurSecondY ?? this._blurSecondY
+    this._disabled = disabled ?? this._disabled
+    this._motionEnabled = motion !== false
+    this.setLocalRenderBounds({ x: 0, y: 0, width: this.width, height: Math.max(this.height, this._hitSize) })
     return this
   }
 
@@ -106,8 +152,9 @@ export class RowResizer<E extends EventList> extends NovaNode<E> {
         x2: this.width,
         y2: centerY,
         styles: {
-          color: this._color,
+          color: this._isDragging ? this._activeColor : this._isHover ? this._hoverColor : this._color,
           width: this._lineWidth,
+          opacity: this._disabled ? 0.45 : 1,
         },
       },
       {
@@ -117,7 +164,7 @@ export class RowResizer<E extends EventList> extends NovaNode<E> {
         width: this.width,
         height: Math.abs(centerY - (this._blurSecondY || 0)),
         styles: {
-          background: 'rgba(0,0,0,0.3)',
+          background: this._overlayColor,
         },
         active: this._isDragging && this._blurSecondY !== null,
       },
@@ -139,6 +186,7 @@ export class RowResizer<E extends EventList> extends NovaNode<E> {
     } = params
 
     const resizer = new RowResizer<E>(app, surface, color, lineWidth)
+    resizer.options(params)
     resizer.setPosition(x, y)
     resizer.setSize(width, height)
     return resizer

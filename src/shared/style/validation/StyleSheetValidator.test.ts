@@ -52,7 +52,7 @@ describe('Nova UI stylesheet validator', () => {
 
   it('returns error for unknown component selector type', () => {
     const result = validateNovaUiStyleSheetSource(`
-      Button {
+      UnknownComponent {
         color: #111111;
       }
     `)

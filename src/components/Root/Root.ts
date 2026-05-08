@@ -289,6 +289,10 @@ export class Root<E extends EventList = Record<string, any>>
       nextKeys.add('background')
       patch.background = declarations.box.background
     }
+    if (declarations.box?.opacity !== undefined) {
+      nextKeys.add('opacity')
+      patch.opacity = declarations.box.opacity
+    }
     if (declarations.box?.border !== undefined) {
       nextKeys.add('border')
       patch.border = {
@@ -307,6 +311,22 @@ export class Root<E extends EventList = Record<string, any>>
     if (supportsLayoutDeclarations(node)) {
       for (const key of ['gap', 'rowGap', 'columnGap'] as const) {
         const value = declarations.layout?.[key]
+        if (value === undefined) continue
+        nextKeys.add(key)
+        patch[key] = value
+      }
+    }
+    if (declarations.visual) {
+      for (const key of [
+        'accentColor',
+        'trackColor',
+        'thumbColor',
+        'hoverBackground',
+        'pressedBackground',
+        'activeBackground',
+        'disabledOpacity',
+      ] as const) {
+        const value = declarations.visual[key]
         if (value === undefined) continue
         nextKeys.add(key)
         patch[key] = value
@@ -331,12 +351,20 @@ export class Root<E extends EventList = Record<string, any>>
       baseline: {
         style: props.style,
         background: props.background,
+        opacity: props.opacity,
         border: props.border,
         clip: props.clip,
         padding: props.padding,
         gap: props.gap,
         rowGap: props.rowGap,
         columnGap: props.columnGap,
+        accentColor: props.accentColor,
+        trackColor: props.trackColor,
+        thumbColor: props.thumbColor,
+        hoverBackground: props.hoverBackground,
+        pressedBackground: props.pressedBackground,
+        activeBackground: props.activeBackground,
+        disabledOpacity: props.disabledOpacity,
       },
       keys: new Set(),
     }
@@ -396,6 +424,10 @@ function mergeRuleDeclarations(declarations: NovaUiStyleDeclarations[]): NovaUiS
       ...target.layout,
       ...source.layout,
     }
+    target.visual = {
+      ...target.visual,
+      ...source.visual,
+    }
     target.mask |= source.mask
     return target
   }, { mask: NovaUiStyleMask.None })
@@ -409,10 +441,20 @@ function fallbackCascadeValue(key: string, value: unknown): unknown {
   if (value !== undefined) return value
   if (key === 'style') return {}
   if (key === 'background') return ''
+  if (key === 'opacity') return 1
   if (key === 'border') return { width: 0 }
   if (key === 'clip') return false
   if (key === 'padding') return 0
   if (key === 'gap' || key === 'rowGap' || key === 'columnGap') return 0
+  if (key === 'disabledOpacity') return 0.45
+  if (
+    key === 'accentColor'
+    || key === 'trackColor'
+    || key === 'thumbColor'
+    || key === 'hoverBackground'
+    || key === 'pressedBackground'
+    || key === 'activeBackground'
+  ) return ''
   return value
 }
 

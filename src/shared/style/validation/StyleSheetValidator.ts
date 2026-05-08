@@ -20,7 +20,24 @@ import type {
   NovaUiStyleValidationResult,
 } from '@/shared/style/cascade/StyleSheet'
 
-const COMPONENT_NAMES: NovaUiStyleComponentName[] = ['Root', 'Flex', 'Grid', 'TextBlock']
+const COMPONENT_NAMES: NovaUiStyleComponentName[] = [
+  'Root',
+  'Flex',
+  'Grid',
+  'TextBlock',
+  'Surface',
+  'Button',
+  'Tag',
+  'SplitPane',
+  'ScrollArea',
+  'Scrollbar',
+  'Slider',
+  'Checkbox',
+  'Toggle',
+  'Tooltip',
+  'SegmentedControl',
+  'Panel',
+]
 const COMPONENT_NAME_MAP = new Map(COMPONENT_NAMES.map(name => [name.toLowerCase(), name]))
 
 /** Валидирует CSS-подобный stylesheet и возвращает compiled rules для Root. */
@@ -321,6 +338,10 @@ function applyParsedDeclaration(
     target.box = { ...target.box, background: value as string }
     return
   }
+  if (key === 'opacity') {
+    target.box = { ...target.box, opacity: value as number }
+    return
+  }
   if (key === 'clip') {
     target.box = { ...target.box, clip: value as boolean }
     return
@@ -352,6 +373,18 @@ function applyParsedDeclaration(
   }
   if (key === 'gap' || key === 'rowGap' || key === 'columnGap') {
     target.layout = { ...target.layout, [key]: value as number }
+    return
+  }
+  if (
+    key === 'accentColor'
+    || key === 'trackColor'
+    || key === 'thumbColor'
+    || key === 'hoverBackground'
+    || key === 'pressedBackground'
+    || key === 'activeBackground'
+    || key === 'disabledOpacity'
+  ) {
+    target.visual = { ...target.visual, [key]: value as never }
   }
 }
 
@@ -462,14 +495,22 @@ const STRING_KEYS = new Set([
   'fontStyle',
   'background',
   'borderColor',
+  'accentColor',
+  'trackColor',
+  'thumbColor',
+  'hoverBackground',
+  'pressedBackground',
+  'activeBackground',
 ])
 
 const NUMERIC_KEYS = new Set([
   'fontSize',
   'lineHeight',
+  'opacity',
   'borderWidth',
   'borderRadius',
   'gap',
   'rowGap',
   'columnGap',
+  'disabledOpacity',
 ])

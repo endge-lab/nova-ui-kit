@@ -6,7 +6,23 @@ import type {
   NovaUiStyleMask,
 } from '@/shared/style'
 
-export type NovaUiStyleComponentName = 'Root' | 'Flex' | 'Grid' | 'TextBlock'
+export type NovaUiStyleComponentName =
+  | 'Root'
+  | 'Flex'
+  | 'Grid'
+  | 'TextBlock'
+  | 'Surface'
+  | 'Button'
+  | 'Tag'
+  | 'SplitPane'
+  | 'ScrollArea'
+  | 'Scrollbar'
+  | 'Slider'
+  | 'Checkbox'
+  | 'Toggle'
+  | 'Tooltip'
+  | 'SegmentedControl'
+  | 'Panel'
 export type NovaUiStyleSelectorCombinator = 'descendant' | 'child'
 
 /** Один segment CSS-подобного selector. */
@@ -32,6 +48,7 @@ export interface NovaUiStyleDeclarations {
     background?: string
     border?: NovaUiBorder
     clip?: boolean
+    opacity?: number
   }
   spacing?: {
     padding?: NovaUiSpacing
@@ -40,6 +57,15 @@ export interface NovaUiStyleDeclarations {
     gap?: number
     rowGap?: number
     columnGap?: number
+  }
+  visual?: {
+    accentColor?: string
+    trackColor?: string
+    thumbColor?: string
+    hoverBackground?: string
+    pressedBackground?: string
+    activeBackground?: string
+    disabledOpacity?: number
   }
   mask: NovaUiStyleMask
 }

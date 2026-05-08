@@ -15,14 +15,21 @@ export interface NovaUiMotionOptions {
   motion?: false | NovaUiMotionPreset
 }
 
-export interface ResizerOptions {
-  color: string
-  lineWidth: number
-  x: number
-  y: number
-  width: number
-  height: number
-  blurSecondY: number
+export interface ResizerOptions extends NovaUiMotionOptions {
+  color?: string
+  lineWidth?: number
+  x?: number
+  y?: number
+  width?: number
+  height?: number
+  blurSecondY?: number
+  hitSize?: number
+  hoverColor?: string
+  activeColor?: string
+  overlayColor?: string
+  minSize?: number
+  maxSize?: number
+  disabled?: boolean
 }
 
 export interface LazyResizerOptions extends Partial<NovaNodeProperties>, NovaUiMotionOptions {
