@@ -12,6 +12,7 @@ import {
   type ButtonApi,
   type CheckboxApi,
   type PanelApi,
+  type FlexApi,
   type ScrollAreaApi,
   type ScrollbarApi,
   type SegmentedControlApi,
@@ -252,6 +253,43 @@ describe('Nova UI Kit components', () => {
     `)
     expect(validation.ok).toBe(true)
     expect(validation.styleSheet?.rules.length).toBe(4)
+  })
+
+  it('relayouts layout-target children inside visual containers', () => {
+    const app = createApp()
+    const surface = app.createSurface2D('containers')
+
+    app.schema.createNode(surface, {
+      type: NovaUiKit.Root,
+      id: 'layout-root',
+      props: { width: 520, height: 320, padding: 0 },
+      children: [
+        {
+          type: NovaUiKit.Panel,
+          id: 'layout-panel',
+          props: { title: 'Panel', width: 520, height: 320, padding: 16 },
+          children: [
+            {
+              type: NovaUiKit.Flex,
+              id: 'layout-flow',
+              props: { direction: 'row', wrap: 'wrap', gap: 10 },
+              children: [
+                { type: NovaUiKit.Surface, id: 'layout-card-a', props: {}, layout: { width: 100, height: 60, flexShrink: 0 } },
+                { type: NovaUiKit.Surface, id: 'layout-card-b', props: {}, layout: { width: 100, height: 60, flexShrink: 0 } },
+              ],
+            },
+          ],
+        },
+      ],
+    })
+    app.raph.run()
+    app.raph.run()
+
+    const flow = app.components.requireApi<FlexApi>('layout-flow')
+    expect(flow.getChildRect('layout-card-a')).toEqual({ x: 0, y: 0, width: 100, height: 60 })
+    expect(flow.getChildRect('layout-card-b')).toEqual({ x: 110, y: 0, width: 100, height: 60 })
+
+    app.destroy()
   })
 
   it('keeps RowResizer and ColResizer legacy creation signatures while accepting professional options', () => {
