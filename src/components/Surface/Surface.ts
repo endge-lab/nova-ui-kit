@@ -16,6 +16,7 @@ import {
   buildBoxSchema,
 } from '@/shared/component/ComponentProps'
 import {
+  applyNodeLayoutRect,
   copyRect,
   createLayoutRect,
   resolveSpacing,
@@ -103,12 +104,7 @@ export class Surface<E extends EventList = Record<string, any>>
     })
 
     for (const child of this.managedChildren) {
-      child.options({
-        x: this.childRect.x,
-        y: this.childRect.y,
-        width: this.childRect.width,
-        height: this.childRect.height,
-      })
+      applyNodeLayoutRect(child as NovaNode<any>, this.childRect)
       child.dirty({ matrix: true, update: true, render: true })
     }
 

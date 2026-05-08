@@ -18,6 +18,7 @@ import {
   buildBoxSchema,
   clamp,
 } from '@/shared/component'
+import { applyNodeLayoutRect } from '@/shared/layout'
 
 export class ScrollArea<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<ScrollAreaResolvedProps, ScrollAreaApi, ScrollAreaProps, E> {
@@ -90,7 +91,7 @@ export class ScrollArea<E extends EventList = Record<string, any>>
 
   update(): void {
     for (const child of this.contentChildren) {
-      child.options({
+      applyNodeLayoutRect(child as NovaNode<any>, {
         x: -this.props.scrollX,
         y: -this.props.scrollY,
         width: this.props.contentWidth,

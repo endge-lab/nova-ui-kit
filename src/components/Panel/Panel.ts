@@ -18,6 +18,7 @@ import {
 } from '@/shared/component'
 import { pushText } from '@/shared/component'
 import {
+  applyNodeLayoutRect,
   copyRect,
   createLayoutRect,
   resolveSpacing,
@@ -76,12 +77,7 @@ export class Panel<E extends EventList = Record<string, any>>
       height: Math.max(0, this.height - padding.top - padding.bottom - headerHeight),
     })
     for (const child of this.childrenNodes) {
-      child.options({
-        x: this.bodyRect.x,
-        y: this.bodyRect.y,
-        width: this.bodyRect.width,
-        height: this.bodyRect.height,
-      })
+      applyNodeLayoutRect(child as NovaNode<any>, this.bodyRect)
       child.dirty({ matrix: true, update: true, render: true })
     }
   }
