@@ -25,7 +25,7 @@ export interface ResizerOptions {
   blurSecondY: number
 }
 
-export interface LazyResizerOptions extends NovaNodeProperties, NovaUiMotionOptions {
+export interface LazyResizerOptions extends Partial<NovaNodeProperties>, NovaUiMotionOptions {
   color?: string
   lineWidth?: number
   lineWidthHover?: number
