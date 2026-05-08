@@ -5,6 +5,7 @@ import type { EventList } from '@endge/utils'
 import type { LazyResizerOptions } from '@/domain/types'
 import type { Side } from '@endge/utils'
 import type { NovaSchemaItem } from '@endge/nova'
+import { resolveNovaUiMotionOptions } from '@/shared/motion'
 
 export class LazyResizer<E extends EventList> extends NovaNode<E> {
   private _isDragging = false
@@ -14,8 +15,12 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
   private _lineWidth: number = 1
   private _lineWidthHover: number = 10
   private _activeOverlayColor: string = 'rgba(26,75,179,0.2)'
+  private _motionLineWidth: number | null = null
+  private _motionColor: string | null = null
+  private _overlayOpacity = 0
   private _minSize: number = 20
   private _maxSize: number = Infinity
+  private _motionEnabled = true
 
   private _initialX = 0
   private _initialY = 0
@@ -38,7 +43,7 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
   }
 
   options(opts: Partial<LazyResizerOptions>): this {
-    const { color, direction, activeOverlayColor, lineWidth, minSize, maxSize, lineWidthHover, ...rest } = opts
+    const { color, direction, activeOverlayColor, lineWidth, minSize, maxSize, lineWidthHover, motion, ...rest } = opts
     this._color = color ?? this._color
     this._direction = direction ?? this._direction
     this._activeOverlayColor = activeOverlayColor ?? this._activeOverlayColor
@@ -46,6 +51,7 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
     this._lineWidthHover = lineWidthHover ?? this._lineWidthHover
     this._minSize = minSize ?? this._minSize
     this._maxSize = maxSize ?? this._maxSize
+    this._motionEnabled = motion !== false
 
     super.options({
       ...rest,
@@ -121,6 +127,7 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
       if (e.defaultPrevented) return false
 
       this._isDragging = true
+      this.animateDragOverlay(1)
       this.nova.renderer.cursor(this.getCursorByDirection())
       this.dirty({ render: true })
       return false
@@ -212,6 +219,7 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
       if (e.defaultPrevented) return false
 
       this._isDragging = false
+      this.animateDragOverlay(0)
       this.nova.renderer.cursor('default')
       this.dirty({ render: true })
       return false
@@ -246,12 +254,14 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
         this.nova.renderer.cursor(this.getCursorByDirection())
       }
       this._isHover = isNearLine
+      this.animateHoverLine(isNearLine)
       this.dirty({ render: true })
     })
 
     this.on('mouseleave', () => {
       this.nova.renderer.cursor('default')
       this._isHover = false
+      this.animateHoverLine(false)
       this.dirty({ render: true })
     })
   }
@@ -264,8 +274,34 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
     this.height = this._initialHeight
     this._isDragging = false
     this._isHover = false
+    this._overlayOpacity = 0
+    this._motionLineWidth = null
     this.nova.renderer.cursor('default')
     this.dirty({ render: true })
+  }
+
+  get motionLineWidth(): number {
+    return this._motionLineWidth ?? this._lineWidth
+  }
+
+  set motionLineWidth(value: number) {
+    this._motionLineWidth = value
+  }
+
+  get motionColor(): string {
+    return this._motionColor ?? this._color
+  }
+
+  set motionColor(value: string) {
+    this._motionColor = value
+  }
+
+  get overlayOpacity(): number {
+    return this._overlayOpacity
+  }
+
+  set overlayOpacity(value: number) {
+    this._overlayOpacity = Math.max(0, Math.min(1, value))
   }
 
   onChangeStart(handler: (e: MouseEvent) => void): LazyResizer<E> {
@@ -285,11 +321,11 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
 
   render(): void {
     const t = this._lineWidthHover
-    const lineWidth = this._isHover ? this._lineWidthHover : this._lineWidth
+    const lineWidth = this._motionLineWidth ?? (this._isHover ? this._lineWidthHover : this._lineWidth)
     const halfWidth = lineWidth / 2
 
     const styles = {
-      color: this._color,
+      color: this._motionColor ?? this._color,
       width: lineWidth,
     }
 
@@ -344,8 +380,8 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
             y: 0,
             width: this.width + t,
             height: this.height,
-            styles: { background: this._activeOverlayColor },
-            active: this._isDragging,
+            styles: { background: this._activeOverlayColor, opacity: this._overlayOpacity },
+            active: this._isDragging || this._overlayOpacity > 0,
           }
         case 'top':
           return {
@@ -354,8 +390,8 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
             y: t,
             width: this.width,
             height: this.height - t,
-            styles: { background: this._activeOverlayColor },
-            active: this._isDragging,
+            styles: { background: this._activeOverlayColor, opacity: this._overlayOpacity },
+            active: this._isDragging || this._overlayOpacity > 0,
           }
         case 'bottom':
           return {
@@ -364,13 +400,36 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
             y: 0,
             width: this.width,
             height: this.height - t,
-            styles: { background: this._activeOverlayColor },
-            active: this._isDragging,
+            styles: { background: this._activeOverlayColor, opacity: this._overlayOpacity },
+            active: this._isDragging || this._overlayOpacity > 0,
           }
       }
     })()
 
     this.renderer.schema([line, rect])
+  }
+
+  private animateHoverLine(active: boolean): void {
+    if (!this._motionEnabled) {
+      this._motionLineWidth = active ? this._lineWidthHover : this._lineWidth
+      return
+    }
+
+    this.nova.motion.to(this, {
+      motionLineWidth: active ? this._lineWidthHover : this._lineWidth,
+      motionColor: active ? '#4f7cff' : this._color,
+    }, resolveNovaUiMotionOptions('hoverLine'))
+  }
+
+  private animateDragOverlay(opacity: number): void {
+    if (!this._motionEnabled) {
+      this._overlayOpacity = opacity
+      return
+    }
+
+    this.nova.motion.to(this, {
+      overlayOpacity: opacity,
+    }, resolveNovaUiMotionOptions('dragOverlay'))
   }
 
   private getCursorByDirection(): string {

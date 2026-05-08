@@ -5,6 +5,7 @@ import type {
   NovaUiInheritedTextStyle,
 } from '@/shared/style'
 import type { NovaUiSpacing } from '@/shared/layout'
+import type { NovaUiMotionOptions } from '@/domain/types'
 
 export const TEXT_BLOCK_SCHEMA_TYPE = 'nova-ui.text-block'
 
@@ -16,7 +17,7 @@ export type TextBlockWhiteSpace = 'normal' | 'nowrap' | 'pre' | 'pre-wrap'
 export type TextBlockOverflow = 'visible' | 'clip' | 'ellipsis'
 export type TextBlockWordBreak = 'normal' | 'break-word' | 'break-all'
 
-export interface TextBlockProps {
+export interface TextBlockProps extends NovaUiMotionOptions {
   text?: string
   x?: number
   y?: number

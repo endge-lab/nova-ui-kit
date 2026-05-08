@@ -8,6 +8,7 @@ import type {
   NovaUiBorder,
   NovaUiInheritedTextStyle,
 } from '@/shared/style'
+import type { NovaUiMotionOptions } from '@/domain/types'
 
 /** Schema type для сеточного layout-компонента. */
 export const GRID_SCHEMA_TYPE = 'nova-ui.grid'
@@ -15,7 +16,7 @@ export const GRID_SCHEMA_TYPE = 'nova-ui.grid'
 export type GridAlign = 'start' | 'center' | 'end' | 'stretch'
 
 /** Параметры Grid контейнера. */
-export interface GridProps {
+export interface GridProps extends NovaUiMotionOptions {
   x?: number
   y?: number
   width?: number

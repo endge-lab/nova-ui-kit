@@ -46,6 +46,7 @@ import {
   type NovaUiStyleReceiveResult,
   type NovaUiStyleTarget,
 } from '@/shared/style'
+import { resolveNovaUiMotionOptions } from '@/shared/motion'
 
 /** Сеточный layout-компонент с fixed и responsive режимом колонок. */
 export class Grid<E extends EventList = Record<string, any>>
@@ -100,6 +101,13 @@ export class Grid<E extends EventList = Record<string, any>>
 
   override getApi(): GridApi {
     return this.api
+  }
+
+  responsiveReflow(columns: number, gap = this.props.gap): void {
+    this.transitionTo(
+      { columns, gap, rowGap: gap, columnGap: gap },
+      resolveNovaUiMotionOptions('responsiveReflow'),
+    )
   }
 
   /** Принимает итоговый rect от layout-родителя и запускает пересчет детей. */

@@ -8,6 +8,7 @@ import type {
   NovaUiBorder,
   NovaUiInheritedTextStyle,
 } from '@/shared/style'
+import type { NovaUiMotionOptions } from '@/domain/types'
 
 /** Schema type для адаптивного flex-layout компонента. */
 export const FLEX_SCHEMA_TYPE = 'nova-ui.flex'
@@ -18,7 +19,7 @@ export type FlexJustify = 'start' | 'center' | 'end' | 'space-between'
 export type FlexAlign = 'start' | 'center' | 'end' | 'stretch'
 
 /** Параметры Flex контейнера. */
-export interface FlexProps {
+export interface FlexProps extends NovaUiMotionOptions {
   x?: number
   y?: number
   width?: number

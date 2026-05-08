@@ -41,6 +41,7 @@ export const FLEX_FIELD_DEFINITIONS = {
   style: { type: 'style' },
   background: { type: 'string' },
   clip: { type: 'boolean' },
+  motion: { type: 'motion' },
 } as const
 
 /** Нормализует props Flex без чтения Nova runtime. */

@@ -45,6 +45,7 @@ export const GRID_FIELD_DEFINITIONS = {
   style: { type: 'style' },
   background: { type: 'string' },
   clip: { type: 'boolean' },
+  motion: { type: 'motion' },
 } as const
 
 /** Нормализует props Grid без чтения Nova runtime. */

@@ -3,6 +3,7 @@ import type { NovaApp } from '@endge/nova'
 import type { NovaSurface } from '@endge/nova'
 import type { ResizerOptions } from '@/domain/types'
 import type { EventList } from '@endge/utils'
+import { resolveNovaUiMotionOptions } from '@/shared/motion'
 
 export class RowResizer<E extends EventList> extends NovaNode<E> {
   //
@@ -33,6 +34,7 @@ export class RowResizer<E extends EventList> extends NovaNode<E> {
       this._onChangeStart(e)
       if (e.defaultPrevented) return false
       this._isDragging = true
+      this.nova.motion.to(this, { scaleY: 1.08, opacity: 0.85 }, resolveNovaUiMotionOptions('pressFeedback'))
       this.nova.renderer.cursor('row-resize')
       this.nova.invalidate()
       return false
@@ -51,6 +53,7 @@ export class RowResizer<E extends EventList> extends NovaNode<E> {
       this._onChangeEnd(e)
       if (e.defaultPrevented) return false
       this._isDragging = false
+      this.nova.motion.to(this, { scaleY: 1, opacity: 1 }, resolveNovaUiMotionOptions('pressFeedback'))
       this.nova.renderer.cursor('default')
       this.nova.invalidate()
       return false

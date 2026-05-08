@@ -73,6 +73,7 @@ export const TEXT_BLOCK_FIELD_DEFINITIONS = {
   maxLines: { type: 'number' },
   wordBreak: { type: 'string' },
   style: { type: 'style' },
+  motion: { type: 'motion' },
 } as const
 
 export function createTextBlockDescriptor(createNode?: TextBlockNodeFactory): TextBlockDescriptor {

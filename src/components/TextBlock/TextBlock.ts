@@ -43,6 +43,7 @@ import {
   type NovaUiStyleReceiveResult,
   type NovaUiStyleTarget,
 } from '@/shared/style'
+import { isNovaUiMotionEnabled, resolveNovaUiMotionOptions } from '@/shared/motion'
 
 const TEXT_BLOCK_LAYOUT_STYLE_MASK = (
   NovaUiStyleMask.FontFamily
@@ -80,7 +81,10 @@ export class TextBlock<E extends EventList = Record<string, any>>
     descriptor: TextBlockDescriptor = TEXT_BLOCK_NODE_DESCRIPTOR,
   ) {
     const resolvedProps = normalizeTextBlockProps(props)
-    super(app, surface, descriptor, resolvedProps, options)
+    const initialProps = isNovaUiMotionEnabled(props) && props.motion === 'fadeIn'
+      ? { ...resolvedProps, opacity: 0 }
+      : resolvedProps
+    super(app, surface, descriptor, initialProps, options)
     this.__type = 'TextBlock'
     this.explicitTopLevelStyleMask = textBlockTopLevelStyleMask(props)
     this.localStyleMask = inheritedTextStyleMask(resolvedProps.style)
@@ -99,6 +103,9 @@ export class TextBlock<E extends EventList = Record<string, any>>
       getLines: () => this.ensureLayout().lines,
       isOverflowed: () => this.ensureLayout().overflowed,
     }
+    if (isNovaUiMotionEnabled(props) && props.motion === 'fadeIn') {
+      this.fadeIn({ to: resolvedProps.opacity })
+    }
   }
 
   override setProps(patch: TextBlockProps): this {
@@ -108,6 +115,26 @@ export class TextBlock<E extends EventList = Record<string, any>>
 
   override getApi(): TextBlockApi {
     return this._api
+  }
+
+  fadeIn(options: { to?: number } = {}): void {
+    this.transitionTo(
+      { opacity: options.to ?? 1 },
+      resolveNovaUiMotionOptions('fadeIn'),
+    )
+  }
+
+  textColorPulse(accent = '#4f7cff'): void {
+    const current = this.props.color
+    this.transitionTo(
+      { color: accent },
+      { ...resolveNovaUiMotionOptions('textColorPulse'), duration: 180 },
+    )
+    this.nova.motion.to(this, { color: current }, {
+      ...resolveNovaUiMotionOptions('textColorPulse'),
+      delay: 180,
+      overwrite: false,
+    })
   }
 
   /** Принимает итоговый rect от Flex и сбрасывает layout cache только при изменении. */

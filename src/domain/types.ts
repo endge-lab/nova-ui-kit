@@ -1,6 +1,20 @@
 import type { NovaNodeProperties } from '@endge/nova'
 import type { Side } from '@endge/utils'
 
+export type NovaUiMotionPreset =
+  | 'fadeIn'
+  | 'textColorPulse'
+  | 'expandCollapse'
+  | 'gapShift'
+  | 'responsiveReflow'
+  | 'hoverLine'
+  | 'dragOverlay'
+  | 'pressFeedback'
+
+export interface NovaUiMotionOptions {
+  motion?: false | NovaUiMotionPreset
+}
+
 export interface ResizerOptions {
   color: string
   lineWidth: number
@@ -11,7 +25,7 @@ export interface ResizerOptions {
   blurSecondY: number
 }
 
-export interface LazyResizerOptions extends NovaNodeProperties {
+export interface LazyResizerOptions extends NovaNodeProperties, NovaUiMotionOptions {
   color?: string
   lineWidth?: number
   lineWidthHover?: number

@@ -3,6 +3,7 @@ import type { NovaApp } from '@endge/nova'
 import type { NovaSurface } from '@endge/nova'
 import type { ResizerOptions } from '@/domain/types'
 import type { EventList } from '@endge/utils'
+import { resolveNovaUiMotionOptions } from '@/shared/motion'
 
 export class ColResizer<E extends EventList> extends NovaNode<E> {
   private color: string
@@ -32,6 +33,7 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
       }
 
       this.isDragging = true
+      this.nova.motion.to(this, { scaleX: 1.08, opacity: 0.85 }, resolveNovaUiMotionOptions('pressFeedback'))
       this.nova.renderer.cursor('col-resize')
       this.nova.invalidate()
       return false
@@ -55,6 +57,7 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
       }
 
       this.isDragging = false
+      this.nova.motion.to(this, { scaleX: 1, opacity: 1 }, resolveNovaUiMotionOptions('pressFeedback'))
       this.nova.renderer.cursor('default')
       this.nova.invalidate()
       return false

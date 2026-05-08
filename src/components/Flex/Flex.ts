@@ -46,6 +46,7 @@ import {
   type NovaUiStyleReceiveResult,
   type NovaUiStyleTarget,
 } from '@/shared/style'
+import { resolveNovaUiMotionOptions } from '@/shared/motion'
 
 /** Layout-компонент, который резолвит adaptive values и назначает rect детям. */
 export class Flex<E extends EventList = Record<string, any>>
@@ -98,6 +99,26 @@ export class Flex<E extends EventList = Record<string, any>>
 
   override getApi(): FlexApi {
     return this.api
+  }
+
+  expandCollapse(expandedHeight: number, collapsedHeight = 0): void {
+    const nextHeight = this.props.height === expandedHeight ? collapsedHeight : expandedHeight
+    this.transitionTo(
+      { height: nextHeight },
+      resolveNovaUiMotionOptions('expandCollapse'),
+    )
+  }
+
+  gapShift(to = 20, backTo = 8): void {
+    this.transitionTo(
+      { gap: to, rowGap: to, columnGap: to },
+      { ...resolveNovaUiMotionOptions('gapShift'), duration: 130 },
+    )
+    this.nova.motion.to(this, { gap: backTo, rowGap: backTo, columnGap: backTo }, {
+      ...resolveNovaUiMotionOptions('gapShift'),
+      delay: 130,
+      overwrite: false,
+    })
   }
 
   /** Принимает итоговый rect от layout-родителя и запускает пересчет детей. */
