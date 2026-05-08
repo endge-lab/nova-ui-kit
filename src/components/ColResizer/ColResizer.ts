@@ -8,7 +8,6 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
   private color: string
   private lineWidth: number
   private isDragging = false
-  private hasFocus = false
   private _onChangeStart: (e: MouseEvent) => void = () => {}
   private _onChangeMove: (e: MouseEvent, dx: number) => void = () => {}
   private _onChangeEnd: (e: MouseEvent) => void = () => {}
@@ -56,20 +55,17 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
       }
 
       this.isDragging = false
-      this.hasFocus = false
       this.nova.renderer.cursor('default')
       this.nova.invalidate()
       return false
     })
 
     this.on('mouseenter', () => {
-      this.hasFocus = true
       this.nova.renderer.cursor('col-resize')
       this.nova.invalidate()
     })
 
     this.on('mouseleave', () => {
-      this.hasFocus = false
       if (!this.isDragging) {
         this.nova.renderer.cursor('default')
         this.nova.invalidate()
@@ -112,7 +108,7 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
     ])
   }
 
-  options(opts: Partial<ResizerOptions>): ColResizer<E> {
+  options(opts: Partial<ResizerOptions>): this {
     super.options(opts)
     this.color = opts.color || this.color
     this.lineWidth = opts.lineWidth || this.lineWidth

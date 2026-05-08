@@ -37,7 +37,7 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
     return this._isDragging
   }
 
-  options(opts: Partial<LazyResizerOptions>): LazyResizer<E> {
+  options(opts: Partial<LazyResizerOptions>): this {
     const { color, direction, activeOverlayColor, lineWidth, minSize, maxSize, lineWidthHover, ...rest } = opts
     this._color = color ?? this._color
     this._direction = direction ?? this._direction
@@ -168,7 +168,7 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
       return false
     })
 
-    const dragEnd = (e) => {
+    const dragEnd = (e: MouseEvent) => {
       if (!this._isDragging) return false
 
       let isValid = true

@@ -42,8 +42,6 @@ export class RowResizer<E extends EventList> extends NovaNode<E> {
       this._onChangeMove(e, dy)
       if (e.defaultPrevented) return false
 
-      console.log('HELLO')
-
       this.nova.renderer.cursor('row-resize')
       this.nova.invalidate()
       return false
@@ -86,7 +84,7 @@ export class RowResizer<E extends EventList> extends NovaNode<E> {
     return this
   }
 
-  options(opts: Partial<ResizerOptions>): RowResizer<E> {
+  options(opts: Partial<ResizerOptions>): this {
     super.options(opts)
     this._color = opts.color || this._color
     this._lineWidth = opts.lineWidth || this._lineWidth
