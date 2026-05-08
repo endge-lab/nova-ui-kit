@@ -1,0 +1,236 @@
+// @vitest-environment jsdom
+
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import {
+  Nova,
+  RaphSchedulerType,
+  RendererType,
+  type NovaApp,
+} from '@endge/nova'
+import { Flex } from '@/components/Flex/Flex'
+import { FLEX_SCHEMA_TYPE } from '@/components/Flex/types'
+import { GRID_SCHEMA_TYPE } from '@/components/Grid/types'
+import { TextBlock } from '@/components/TextBlock/TextBlock'
+import type { TextBlockApi } from '@/components/TextBlock/types'
+import { TEXT_BLOCK_SCHEMA_TYPE } from '@/components/TextBlock/types'
+import { registerNovaUiKit } from '@/registerNovaUiKit'
+
+type TestEvents = Record<string, any>
+
+function create2DContextStub(): CanvasRenderingContext2D {
+  const state: Record<PropertyKey, any> = {
+    measureText: vi.fn((text: string) => ({ width: text.length * 8 })),
+    createPattern: vi.fn(() => ({})),
+  }
+
+  return new Proxy(state, {
+    get(target, prop) {
+      if (!(prop in target)) {
+        target[prop] = vi.fn()
+      }
+      return target[prop]
+    },
+    set(target, prop, value) {
+      target[prop] = value
+      return true
+    },
+  }) as CanvasRenderingContext2D
+}
+
+function installCanvasMocks(): void {
+  Object.defineProperty(window, 'devicePixelRatio', {
+    value: 1,
+    configurable: true,
+  })
+
+  vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation((type: string) => {
+    if (type === RendererType.Web2D) return create2DContextStub()
+    return null
+  })
+
+  vi.spyOn(HTMLCanvasElement.prototype, 'getBoundingClientRect').mockImplementation(function getRect(this: HTMLCanvasElement) {
+    const width = this.width || 800
+    const height = this.height || 480
+    return {
+      x: 0,
+      y: 0,
+      top: 0,
+      left: 0,
+      right: width,
+      bottom: height,
+      width,
+      height,
+      toJSON: () => ({}),
+    } as DOMRect
+  })
+}
+
+function createApp(): NovaApp<TestEvents> {
+  const canvas = document.createElement('canvas')
+  document.body.appendChild(canvas)
+
+  const app = Nova.createApp<TestEvents>({
+    target: canvas,
+    size: { width: 800, height: 480, dpr: 1 },
+    renderer: {
+      main: RendererType.Web2D,
+      defaultSurface: RendererType.Web2D,
+    },
+    scheduler: {
+      type: RaphSchedulerType.Sync,
+      loop: false,
+    },
+  })
+  registerNovaUiKit(app.schema)
+  return app
+}
+
+function textApi(app: NovaApp<TestEvents>, id: string): TextBlockApi {
+  return app.components.requireApi<TextBlockApi>(id)
+}
+
+describe('Nova UI style propagation', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks()
+    document.body.innerHTML = ''
+    installCanvasMocks()
+  })
+
+  it('propagates color as render-only style and skips explicit color overrides', () => {
+    const app = createApp()
+    const surface = app.createSurface2D('style')
+    const root = app.schema.createNode(surface, {
+      type: FLEX_SCHEMA_TYPE,
+      id: 'root',
+      props: {
+        style: { color: '#111111' },
+      },
+      children: [
+        {
+          type: TEXT_BLOCK_SCHEMA_TYPE,
+          id: 'inherited',
+          props: { text: 'Inherited' },
+        },
+        {
+          type: TEXT_BLOCK_SCHEMA_TYPE,
+          id: 'explicit',
+          props: { text: 'Explicit', color: '#999999' },
+        },
+      ],
+    }) as Flex<TestEvents>
+    const inherited = app.components.require<TextBlock<TestEvents>>('inherited')
+    const explicit = app.components.require<TextBlock<TestEvents>>('explicit')
+    const inheritedDirty = vi.spyOn(inherited, 'dirty')
+    const explicitDirty = vi.spyOn(explicit, 'dirty')
+
+    expect(textApi(app, 'inherited').getProps().color).toBe('#111111')
+    expect(textApi(app, 'explicit').getProps().color).toBe('#999999')
+
+    root.setProps({ style: { color: '#222222' } })
+
+    expect(textApi(app, 'inherited').getProps().color).toBe('#222222')
+    expect(textApi(app, 'explicit').getProps().color).toBe('#999999')
+    expect(inheritedDirty).toHaveBeenCalledWith({ render: true })
+    expect(inheritedDirty).not.toHaveBeenCalledWith({ update: true, render: true })
+    expect(explicitDirty).not.toHaveBeenCalled()
+
+    app.destroy()
+  })
+
+  it('propagates font size as layout-affecting style', () => {
+    const app = createApp()
+    const surface = app.createSurface2D('style')
+    const root = app.schema.createNode(surface, {
+      type: FLEX_SCHEMA_TYPE,
+      id: 'root',
+      children: [
+        {
+          type: TEXT_BLOCK_SCHEMA_TYPE,
+          id: 'inherited',
+          props: { text: 'Inherited' },
+        },
+        {
+          type: TEXT_BLOCK_SCHEMA_TYPE,
+          id: 'explicit',
+          props: { text: 'Explicit', fontSize: 13 },
+        },
+      ],
+    }) as Flex<TestEvents>
+    const inherited = app.components.require<TextBlock<TestEvents>>('inherited')
+    const explicit = app.components.require<TextBlock<TestEvents>>('explicit')
+    const inheritedDirty = vi.spyOn(inherited, 'dirty')
+    const explicitDirty = vi.spyOn(explicit, 'dirty')
+
+    root.setProps({ style: { fontSize: 18, lineHeight: 24 } })
+
+    expect(textApi(app, 'inherited').getProps().fontSize).toBe(18)
+    expect(textApi(app, 'inherited').getProps().lineHeight).toBe(24)
+    expect(textApi(app, 'explicit').getProps().fontSize).toBe(13)
+    expect(inheritedDirty).toHaveBeenCalledWith({ update: true, render: true })
+    expect(explicitDirty).toHaveBeenCalledWith({ update: true, render: true })
+
+    app.destroy()
+  })
+
+  it('propagates style through Grid children', () => {
+    const app = createApp()
+    const surface = app.createSurface2D('style')
+
+    app.schema.createNode(surface, {
+      type: GRID_SCHEMA_TYPE,
+      id: 'grid',
+      props: {
+        style: { color: '#336699' },
+        columns: 1,
+      },
+      children: [
+        {
+          type: TEXT_BLOCK_SCHEMA_TYPE,
+          id: 'grid-text',
+          props: { text: 'Grid text' },
+        },
+      ],
+    })
+
+    expect(textApi(app, 'grid-text').getProps().color).toBe('#336699')
+
+    app.destroy()
+  })
+
+  it('skips subtree when nested container overrides changed style key', () => {
+    const app = createApp()
+    const surface = app.createSurface2D('style')
+    const root = app.schema.createNode(surface, {
+      type: FLEX_SCHEMA_TYPE,
+      id: 'root',
+      props: {
+        style: { color: '#111111' },
+      },
+      children: [
+        {
+          type: FLEX_SCHEMA_TYPE,
+          id: 'nested',
+          props: {
+            style: { color: '#abcdef' },
+          },
+          children: [
+            {
+              type: TEXT_BLOCK_SCHEMA_TYPE,
+              id: 'nested-text',
+              props: { text: 'Nested text' },
+            },
+          ],
+        },
+      ],
+    }) as Flex<TestEvents>
+    const nestedText = app.components.require<TextBlock<TestEvents>>('nested-text')
+    const nestedDirty = vi.spyOn(nestedText, 'dirty')
+
+    root.setProps({ style: { color: '#222222' } })
+
+    expect(textApi(app, 'nested-text').getProps().color).toBe('#abcdef')
+    expect(nestedDirty).not.toHaveBeenCalled()
+
+    app.destroy()
+  })
+})

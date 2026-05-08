@@ -52,6 +52,7 @@ export const TEXT_BLOCK_RENDER_DIRTY_KEYS: readonly (keyof TextBlockResolvedProp
   'opacity',
   'background',
   'border',
+  'style',
 ]
 
 export const TEXT_BLOCK_FIELD_DEFINITIONS = {
@@ -71,6 +72,7 @@ export const TEXT_BLOCK_FIELD_DEFINITIONS = {
   overflow: { type: 'string' },
   maxLines: { type: 'number' },
   wordBreak: { type: 'string' },
+  style: { type: 'style' },
 } as const
 
 export function createTextBlockDescriptor(createNode?: TextBlockNodeFactory): TextBlockDescriptor {

@@ -6,6 +6,7 @@ import type {
   TextBlockResolvedPadding,
   TextBlockResolvedProps,
 } from '@/components/TextBlock/types'
+import { resolveSpacing } from '@/shared/layout'
 
 const DEFAULT_WIDTH = 180
 const DEFAULT_HEIGHT = 56
@@ -16,7 +17,7 @@ const MAX_LAYOUT_LINES = 1000
 const ELLIPSIS = '...'
 
 export function normalizeTextBlockProps(props: TextBlockProps = {}): TextBlockResolvedProps {
-  const fontSize = positiveNumber(props.fontSize, DEFAULT_FONT_SIZE)
+  const fontSize = positiveNumber(props.fontSize ?? props.style?.fontSize, DEFAULT_FONT_SIZE)
 
   return {
     text: props.text ?? '',
@@ -24,13 +25,13 @@ export function normalizeTextBlockProps(props: TextBlockProps = {}): TextBlockRe
     y: finiteNumber(props.y, 0),
     width: Math.max(0, finiteNumber(props.width, DEFAULT_WIDTH)),
     height: Math.max(0, finiteNumber(props.height, DEFAULT_HEIGHT)),
-    color: props.color ?? '#172033',
+    color: props.color ?? props.style?.color ?? '#172033',
     opacity: clamp01(props.opacity ?? 1),
-    fontFamily: props.fontFamily ?? 'Inter, Arial, sans-serif',
+    fontFamily: props.fontFamily ?? props.style?.fontFamily ?? 'Inter, Arial, sans-serif',
     fontSize,
-    fontWeight: props.fontWeight ?? 'normal',
-    fontStyle: props.fontStyle ?? 'normal',
-    lineHeight: positiveNumber(props.lineHeight, fontSize * DEFAULT_LINE_HEIGHT_RATIO),
+    fontWeight: props.fontWeight ?? props.style?.fontWeight ?? 'normal',
+    fontStyle: props.fontStyle ?? props.style?.fontStyle ?? 'normal',
+    lineHeight: positiveNumber(props.lineHeight ?? props.style?.lineHeight, fontSize * DEFAULT_LINE_HEIGHT_RATIO),
     padding: resolvePadding(props.padding),
     align: props.align ?? 'left',
     verticalAlign: props.verticalAlign ?? 'top',
@@ -38,6 +39,7 @@ export function normalizeTextBlockProps(props: TextBlockProps = {}): TextBlockRe
     overflow: props.overflow ?? 'clip',
     maxLines: normalizeMaxLines(props.maxLines),
     wordBreak: props.wordBreak ?? 'normal',
+    style: props.style,
     background: props.background,
     border: props.border,
   }
@@ -244,52 +246,7 @@ function measurePlain(text: string, props: TextBlockResolvedProps, measureText: 
   })
 }
 
-function resolvePadding(padding?: TextBlockProps['padding']): TextBlockResolvedPadding {
-  if (typeof padding === 'number') {
-    return {
-      left: padding,
-      right: padding,
-      top: padding,
-      bottom: padding,
-    }
-  }
-
-  if (!padding) {
-    return {
-      left: 0,
-      right: 0,
-      top: 0,
-      bottom: 0,
-    }
-  }
-
-  if ('all' in padding) {
-    const value = finiteNumber(padding.all, 0)
-    return {
-      left: value,
-      right: value,
-      top: value,
-      bottom: value,
-    }
-  }
-
-  if ('horizontal' in padding || 'vertical' in padding) {
-    return {
-      left: finiteNumber(padding.horizontal, 0),
-      right: finiteNumber(padding.horizontal, 0),
-      top: finiteNumber(padding.vertical, 0),
-      bottom: finiteNumber(padding.vertical, 0),
-    }
-  }
-
-  const edgePadding = padding as { left?: number; right?: number; top?: number; bottom?: number }
-  return {
-    left: finiteNumber(edgePadding.left, 0),
-    right: finiteNumber(edgePadding.right, 0),
-    top: finiteNumber(edgePadding.top, 0),
-    bottom: finiteNumber(edgePadding.bottom, 0),
-  }
-}
+const resolvePadding = resolveSpacing as (padding?: TextBlockProps['padding']) => TextBlockResolvedPadding
 
 function resolveVerticalOffset(align: TextBlockResolvedProps['verticalAlign'], innerHeight: number, contentHeight: number): number {
   const free = Math.max(0, innerHeight - contentHeight)

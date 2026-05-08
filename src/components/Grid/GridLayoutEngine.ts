@@ -82,6 +82,7 @@ export class GridLayoutEngine {
   private readonly sortedEntries: GridChildEntry[] = []
   private readonly measuredItems: GridMeasuredItem[] = []
   private readonly rowHeights: number[] = []
+  private readonly rowOffsets: number[] = []
 
   compute(context: GridLayoutContext): GridLayoutResult {
     const props = context.props
@@ -90,6 +91,7 @@ export class GridLayoutEngine {
     const innerHeight = Math.max(0, context.height - padding.top - padding.bottom)
     const columnCount = this.resolveColumnCount(props, innerWidth)
     const columnWidth = this.resolveColumnWidth(innerWidth, columnCount, props.columnGap)
+    const rowHeight = compileLayoutValue(props.rowHeight, 'auto')
 
     this.prepareSortedEntries(context.entries)
     this.collectMeasuredItems({
@@ -98,6 +100,7 @@ export class GridLayoutEngine {
       innerHeight,
       columnCount,
       columnWidth,
+      rowHeight,
     })
     this.placeMeasuredItems({
       props,
@@ -114,6 +117,11 @@ export class GridLayoutEngine {
 
   private prepareSortedEntries(entries: GridChildEntry[]): void {
     this.sortedEntries.length = 0
+    if (isAlreadyOrdered(entries)) {
+      this.sortedEntries.push(...entries)
+      return
+    }
+
     this.sortedEntries.push(...entries)
     this.sortedEntries.sort((a, b) => {
       const orderDiff = a.compiledLayout.order - b.compiledLayout.order
@@ -128,12 +136,13 @@ export class GridLayoutEngine {
     innerHeight: number
     columnCount: number
     columnWidth: number
+    rowHeight: NovaUiCompiledLayoutValue
   }): void {
-    this.measuredItems.length = 0
     this.rowHeights.length = 0
 
     let row = 0
     let column = 0
+    let itemIndex = 0
 
     for (const entry of this.sortedEntries) {
       const layout = entry.compiledLayout
@@ -146,23 +155,24 @@ export class GridLayoutEngine {
 
       const cellX = context.padding.left + column * (context.columnWidth + context.props.columnGap)
       const cellWidth = colSpan * context.columnWidth + Math.max(0, colSpan - 1) * context.props.columnGap
-      const preferredHeight = this.resolveItemHeight(entry, context.props, cellWidth, context.innerHeight)
+      const preferredHeight = this.resolveItemHeight(entry, context.rowHeight, cellWidth, context.innerHeight)
       const outerHeight = preferredHeight + layout.margin.top + layout.margin.bottom
+      const item = this.measuredItems[itemIndex] ?? createMeasuredItem()
 
       this.rowHeights[row] = Math.max(this.rowHeights[row] ?? 0, outerHeight)
-      this.measuredItems.push({
-        entry,
-        row,
-        column,
-        colSpan,
-        cellX,
-        cellWidth,
-        preferredWidth: Math.max(0, cellWidth - layout.margin.left - layout.margin.right),
-        preferredHeight,
-        margin: layout.margin,
-        alignSelf: layout.alignSelf,
-        justifySelf: layout.justifySelf,
-      })
+      item.entry = entry
+      item.row = row
+      item.column = column
+      item.colSpan = colSpan
+      item.cellX = cellX
+      item.cellWidth = cellWidth
+      item.preferredWidth = Math.max(0, cellWidth - layout.margin.left - layout.margin.right)
+      item.preferredHeight = preferredHeight
+      item.margin = layout.margin
+      item.alignSelf = layout.alignSelf
+      item.justifySelf = layout.justifySelf
+      this.measuredItems[itemIndex] = item
+      itemIndex += 1
 
       column += colSpan
       if (column >= context.columnCount) {
@@ -170,6 +180,8 @@ export class GridLayoutEngine {
         column = 0
       }
     }
+
+    this.measuredItems.length = itemIndex
   }
 
   private placeMeasuredItems(context: {
@@ -178,8 +190,10 @@ export class GridLayoutEngine {
     columnWidth: number
     columnGap: number
   }): void {
+    this.resolveRowOffsets(context.props.rowGap)
+
     for (const item of this.measuredItems) {
-      const rowY = context.padding.top + this.resolveRowOffset(item.row, context.props.rowGap)
+      const rowY = context.padding.top + this.rowOffsets[item.row]
       const rowHeight = this.rowHeights[item.row] ?? 0
       const align = item.alignSelf ?? context.props.alignItems
       const justify = item.justifySelf ?? context.props.justifyItems
@@ -219,13 +233,12 @@ export class GridLayoutEngine {
 
   private resolveItemHeight(
     entry: GridChildEntry,
-    props: GridResolvedProps,
+    rowHeight: NovaUiCompiledLayoutValue,
     cellWidth: number,
     innerHeight: number,
   ): number {
     const layout = entry.compiledLayout
     const measured = this.measureAutoItem(entry, cellWidth, innerHeight)
-    const rowHeight = compileLayoutValue(props.rowHeight, 'auto')
     const rawHeight = !isAutoLayoutValue(layout.height)
       ? resolveLayoutValue(layout.height, innerHeight, 0)
       : !isAutoLayoutValue(rowHeight)
@@ -249,14 +262,14 @@ export class GridLayoutEngine {
     })
   }
 
-  private resolveRowOffset(row: number, rowGap: number): number {
+  private resolveRowOffsets(rowGap: number): void {
+    this.rowOffsets.length = this.rowHeights.length
     let offset = 0
 
-    for (let index = 0; index < row; index += 1) {
+    for (let index = 0; index < this.rowHeights.length; index += 1) {
+      this.rowOffsets[index] = offset
       offset += (this.rowHeights[index] ?? 0) + rowGap
     }
-
-    return offset
   }
 
   private resolveOffset(align: GridAlign, available: number, target: number): number {
@@ -285,4 +298,30 @@ export function createGridChildEntry(
 
 function finiteMax(value: number | undefined): number {
   return typeof value === 'number' && Number.isFinite(value) ? Math.max(0, value) : Number.POSITIVE_INFINITY
+}
+
+function createMeasuredItem(): GridMeasuredItem {
+  return {
+    entry: undefined as unknown as GridChildEntry,
+    row: 0,
+    column: 0,
+    colSpan: 1,
+    cellX: 0,
+    cellWidth: 0,
+    preferredWidth: 0,
+    preferredHeight: 0,
+    margin: { left: 0, right: 0, top: 0, bottom: 0 },
+  }
+}
+
+function isAlreadyOrdered(entries: GridChildEntry[]): boolean {
+  let previousOrder = Number.NEGATIVE_INFINITY
+
+  for (const entry of entries) {
+    const order = entry.compiledLayout.order
+    if (order < previousOrder) return false
+    previousOrder = order
+  }
+
+  return true
 }

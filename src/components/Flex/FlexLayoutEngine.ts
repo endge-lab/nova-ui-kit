@@ -137,6 +137,11 @@ export class FlexLayoutEngine {
 
   private prepareSortedEntries(entries: FlexChildEntry[]): void {
     this.sortedEntries.length = 0
+    if (isAlreadyOrdered(entries)) {
+      this.sortedEntries.push(...entries)
+      return
+    }
+
     this.sortedEntries.push(...entries)
     this.sortedEntries.sort((a, b) => {
       const orderDiff = a.compiledLayout.order - b.compiledLayout.order
@@ -448,4 +453,16 @@ function resolveAxisSpacing(spacing: NovaUiResolvedSpacing, isRow: boolean): Axi
 
 function finiteMax(value: number | undefined): number {
   return typeof value === 'number' && Number.isFinite(value) ? Math.max(0, value) : Number.POSITIVE_INFINITY
+}
+
+function isAlreadyOrdered(entries: FlexChildEntry[]): boolean {
+  let previousOrder = Number.NEGATIVE_INFINITY
+
+  for (const entry of entries) {
+    const order = entry.compiledLayout.order
+    if (order < previousOrder) return false
+    previousOrder = order
+  }
+
+  return true
 }

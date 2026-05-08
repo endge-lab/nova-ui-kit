@@ -42,6 +42,7 @@ export const GRID_FIELD_DEFINITIONS = {
   rowHeight: { type: 'layout-value' },
   alignItems: { type: 'string' },
   justifyItems: { type: 'string' },
+  style: { type: 'style' },
   background: { type: 'string' },
   clip: { type: 'boolean' },
 } as const
@@ -70,6 +71,7 @@ export function normalizeGridProps(props: GridProps = {}): GridResolvedProps {
     rowHeight: props.rowHeight ?? 'auto',
     alignItems: props.alignItems ?? 'stretch',
     justifyItems: props.justifyItems ?? 'stretch',
+    style: props.style,
     background: props.background,
     border: props.border,
     clip: props.clip ?? false,
@@ -103,6 +105,7 @@ export function createGridDescriptor(createNode?: GridNodeFactory): GridDescript
         'justifyItems',
       ],
       render: [
+        'style',
         'background',
         'border',
         'clip',

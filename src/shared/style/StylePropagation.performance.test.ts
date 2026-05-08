@@ -1,0 +1,399 @@
+import { describe, expect, it } from 'vitest'
+import type { NovaNode } from '@endge/nova'
+import { normalizeGridProps } from '@/components/Grid/Grid.config'
+import {
+  GridLayoutEngine,
+  createGridChildEntry,
+} from '@/components/Grid/GridLayoutEngine'
+import {
+  NOVA_UI_STYLE_TARGET,
+  NovaUiStyleMask,
+  type NovaUiStyleContext,
+  type NovaUiStyleReceiveResult,
+  type NovaUiStyleTarget,
+} from '@/shared/style'
+import {
+  copyRect,
+  rectEquals,
+  type NovaUiLayoutRect,
+} from '@/shared/layout'
+
+interface BenchStats {
+  scenario: string
+  size: number
+  averageMs: number
+  worstMs: number
+  renderCount: number
+  updateCount: number
+  skippedCount: number
+  rating: 'плохо' | 'приемлемо' | 'хорошо' | 'отлично' | 'идеально'
+}
+
+class BenchTextTarget implements NovaUiStyleTarget {
+  readonly [NOVA_UI_STYLE_TARGET] = true as const
+  renderCount = 0
+  updateCount = 0
+  receiveCount = 0
+
+  constructor(private readonly explicitMask = NovaUiStyleMask.None) {}
+
+  receiveStyleContext(_context: NovaUiStyleContext, changedMask: NovaUiStyleMask): NovaUiStyleReceiveResult {
+    this.receiveCount += 1
+    const affected = changedMask & this.getSubtreeStyleMask()
+
+    if (affected === NovaUiStyleMask.None) {
+      return { update: false, render: false, layout: false }
+    }
+
+    if ((affected & TEXT_LAYOUT_MASK) !== 0) {
+      this.updateCount += 1
+      this.renderCount += 1
+      return { update: true, render: true, layout: true }
+    }
+
+    if ((affected & NovaUiStyleMask.Color) !== 0) {
+      this.renderCount += 1
+      return { update: false, render: true, layout: false }
+    }
+
+    return { update: false, render: false, layout: false }
+  }
+
+  getSubtreeStyleMask(): NovaUiStyleMask {
+    return NovaUiStyleMask.AllText & ~this.explicitMask
+  }
+}
+
+class BenchContainerTarget implements NovaUiStyleTarget {
+  readonly [NOVA_UI_STYLE_TARGET] = true as const
+  receiveCount = 0
+  skippedCount = 0
+
+  constructor(
+    private readonly children: NovaUiStyleTarget[],
+    private readonly ownStyleMask = NovaUiStyleMask.None,
+  ) {}
+
+  receiveStyleContext(context: NovaUiStyleContext, changedMask: NovaUiStyleMask): NovaUiStyleReceiveResult {
+    this.receiveCount += 1
+    const result: NovaUiStyleReceiveResult = { update: false, render: false, layout: false }
+
+    for (const child of this.children) {
+      const childMask = child.getSubtreeStyleMask()
+      if ((changedMask & childMask) === 0) {
+        this.skippedCount += 1
+        continue
+      }
+
+      const childResult = child.receiveStyleContext(context, changedMask & childMask)
+      result.update ||= childResult.update
+      result.render ||= childResult.render
+      result.layout ||= childResult.layout
+    }
+
+    return result
+  }
+
+  getSubtreeStyleMask(): NovaUiStyleMask {
+    let mask = NovaUiStyleMask.None
+    for (const child of this.children) {
+      mask |= child.getSubtreeStyleMask()
+    }
+    return mask & ~this.ownStyleMask
+  }
+}
+
+const TEXT_LAYOUT_MASK = (
+  NovaUiStyleMask.FontFamily
+  | NovaUiStyleMask.FontSize
+  | NovaUiStyleMask.FontWeight
+  | NovaUiStyleMask.FontStyle
+  | NovaUiStyleMask.LineHeight
+)
+
+const BENCH_ITERATIONS = 6
+
+describe('Nova UI style propagation performance', () => {
+  it('benchmarks render-only inherited color propagation', () => {
+    const results = [1_000, 5_000, 10_000].map(size => {
+      const targets = Array.from({ length: size }, () => new BenchTextTarget())
+      const root = new BenchContainerTarget(targets)
+      return measureBench(`style color render-only ${size}`, size, () => {
+        resetBenchTargets(targets, root)
+        root.receiveStyleContext(createContext('#ff0000'), NovaUiStyleMask.Color)
+        return collectStats(targets, root)
+      })
+    })
+
+    for (const result of results) {
+      logBench(result)
+      expect(result.renderCount).toBe(result.size)
+      expect(result.updateCount).toBe(0)
+      expect(result.averageMs).toBeLessThan(100)
+    }
+  })
+
+  it('benchmarks layout-affecting inherited font propagation', () => {
+    const results = [1_000, 5_000].map(size => {
+      const targets = Array.from({ length: size }, () => new BenchTextTarget())
+      const root = new BenchContainerTarget(targets)
+      return measureBench(`font layout-affecting ${size}`, size, () => {
+        resetBenchTargets(targets, root)
+        root.receiveStyleContext(createContext('#000000', 18), NovaUiStyleMask.FontSize)
+        return collectStats(targets, root)
+      })
+    })
+
+    for (const result of results) {
+      logBench(result)
+      expect(result.renderCount).toBe(result.size)
+      expect(result.updateCount).toBe(result.size)
+      expect(result.averageMs).toBeLessThan(100)
+    }
+  })
+
+  it('benchmarks explicit override skip for inherited color', () => {
+    const size = 10_000
+    const explicitCount = 8_000
+    const targets = Array.from({ length: size }, (_item, index) => (
+      new BenchTextTarget(index < explicitCount ? NovaUiStyleMask.Color : NovaUiStyleMask.None)
+    ))
+    const root = new BenchContainerTarget(targets)
+    const result = measureBench('explicit override skip 10000', size, () => {
+      resetBenchTargets(targets, root)
+      root.receiveStyleContext(createContext('#00aa00'), NovaUiStyleMask.Color)
+      return collectStats(targets, root)
+    })
+
+    logBench(result)
+    expect(result.renderCount).toBe(size - explicitCount)
+    expect(result.updateCount).toBe(0)
+    expect(result.skippedCount).toBeGreaterThanOrEqual(explicitCount)
+    expect(result.averageMs).toBeLessThan(100)
+  })
+
+  it('benchmarks subtree skip for overridden branch style', () => {
+    const branchCount = 10
+    const branchSize = 1_000
+    const branches: BenchContainerTarget[] = []
+    const branchTargets: BenchTextTarget[][] = []
+
+    for (let index = 0; index < branchCount; index += 1) {
+      const targets = Array.from({ length: branchSize }, () => new BenchTextTarget())
+      branchTargets.push(targets)
+      branches.push(new BenchContainerTarget(
+        targets,
+        index < 8 ? NovaUiStyleMask.Color : NovaUiStyleMask.None,
+      ))
+    }
+
+    const root = new BenchContainerTarget(branches)
+    const result = measureBench('subtree skip 10000', branchCount * branchSize, () => {
+      for (const targets of branchTargets) resetBenchTargets(targets)
+      resetBenchContainer(root)
+      for (const branch of branches) resetBenchContainer(branch)
+
+      root.receiveStyleContext(createContext('#334455'), NovaUiStyleMask.Color)
+      const branchStats = branches.reduce((acc, branch) => {
+        acc.skippedCount += branch.skippedCount
+        return acc
+      }, { skippedCount: root.skippedCount })
+      const leafStats = branchTargets.flat()
+      return {
+        ...collectStats(leafStats, root),
+        skippedCount: branchStats.skippedCount,
+      }
+    })
+
+    logBench(result)
+    expect(result.renderCount).toBe(2_000)
+    expect(result.updateCount).toBe(0)
+    expect(result.skippedCount).toBeGreaterThanOrEqual(8)
+    expect(result.averageMs).toBeLessThan(100)
+  })
+
+  it('benchmarks responsive grid resize hot path and unchanged rect skip', () => {
+    const size = 5_000
+    const engine = new GridLayoutEngine()
+    const entries = Array.from({ length: size }, (item, index) => (
+      createGridChildEntry(`item-${index}`, createBenchNode(0, 96), { height: 96 })
+    ))
+    const prevRects = entries.map(() => ({ x: 0, y: 0, width: 0, height: 0 }))
+    const wideProps = normalizeGridProps({
+      responsive: true,
+      minColumnWidth: 220,
+      maxColumns: 5,
+      gap: 12,
+      rowHeight: 96,
+      padding: 24,
+    })
+    const narrowProps = normalizeGridProps({
+      responsive: true,
+      minColumnWidth: 220,
+      maxColumns: 5,
+      gap: 12,
+      rowHeight: 96,
+      padding: 24,
+    })
+
+    const result = measureBench('resize layout grid 5000', size, () => {
+      resetRects(prevRects)
+      engine.compute({
+        props: wideProps,
+        width: 1440,
+        height: 900,
+        entries,
+      })
+      const firstChangedRects = applyEntryRects(entries, prevRects)
+      engine.compute({
+        props: wideProps,
+        width: 1440,
+        height: 900,
+        entries,
+      })
+      const unchangedRects = countUnchangedEntryRects(entries, prevRects)
+      engine.compute({
+        props: narrowProps,
+        width: 1040,
+        height: 900,
+        entries,
+      })
+      const resizedChangedRects = applyEntryRects(entries, prevRects)
+
+      return {
+        renderCount: firstChangedRects + resizedChangedRects,
+        updateCount: firstChangedRects + resizedChangedRects,
+        skippedCount: unchangedRects,
+      }
+    })
+
+    logBench(result)
+    expect(result.renderCount).toBeGreaterThanOrEqual(size)
+    expect(result.skippedCount).toBeGreaterThanOrEqual(size)
+    expect(result.averageMs).toBeLessThan(100)
+  })
+})
+
+function createContext(color: string, fontSize?: number): NovaUiStyleContext {
+  return {
+    values: {
+      color,
+      fontSize,
+    },
+    mask: fontSize === undefined
+      ? NovaUiStyleMask.Color
+      : NovaUiStyleMask.Color | NovaUiStyleMask.FontSize,
+    version: 1,
+  }
+}
+
+function measureBench(
+  scenario: string,
+  size: number,
+  run: () => { renderCount: number; updateCount: number; skippedCount: number },
+): BenchStats {
+  const times: number[] = []
+  let stats = { renderCount: 0, updateCount: 0, skippedCount: 0 }
+
+  for (let index = 0; index < BENCH_ITERATIONS; index += 1) {
+    const start = performance.now()
+    stats = run()
+    times.push(performance.now() - start)
+  }
+
+  const averageMs = times.reduce((sum, value) => sum + value, 0) / times.length
+  const worstMs = Math.max(...times)
+
+  return {
+    scenario,
+    size,
+    averageMs: roundMs(averageMs),
+    worstMs: roundMs(worstMs),
+    renderCount: stats.renderCount,
+    updateCount: stats.updateCount,
+    skippedCount: stats.skippedCount,
+    rating: rateBench(averageMs, size),
+  }
+}
+
+function collectStats(targets: BenchTextTarget[], root: BenchContainerTarget): { renderCount: number; updateCount: number; skippedCount: number } {
+  return targets.reduce((acc, target) => {
+    acc.renderCount += target.renderCount
+    acc.updateCount += target.updateCount
+    return acc
+  }, {
+    renderCount: 0,
+    updateCount: 0,
+    skippedCount: root.skippedCount,
+  })
+}
+
+function resetBenchTargets(targets: BenchTextTarget[], root?: BenchContainerTarget): void {
+  for (const target of targets) {
+    target.renderCount = 0
+    target.updateCount = 0
+    target.receiveCount = 0
+  }
+  if (root) resetBenchContainer(root)
+}
+
+function resetBenchContainer(container: BenchContainerTarget): void {
+  container.receiveCount = 0
+  container.skippedCount = 0
+}
+
+function createBenchNode(width: number, height: number): NovaNode<any> {
+  return {
+    width,
+    height,
+  } as NovaNode<any>
+}
+
+function resetRects(rects: NovaUiLayoutRect[]): void {
+  for (const rect of rects) {
+    rect.x = 0
+    rect.y = 0
+    rect.width = 0
+    rect.height = 0
+  }
+}
+
+function applyEntryRects(entries: Array<{ nextRect: NovaUiLayoutRect }>, prevRects: NovaUiLayoutRect[]): number {
+  let changed = 0
+
+  for (let index = 0; index < entries.length; index += 1) {
+    const nextRect = entries[index].nextRect
+    if (rectEquals(nextRect, prevRects[index])) continue
+    copyRect(prevRects[index], nextRect)
+    changed += 1
+  }
+
+  return changed
+}
+
+function countUnchangedEntryRects(entries: Array<{ nextRect: NovaUiLayoutRect }>, prevRects: NovaUiLayoutRect[]): number {
+  let unchanged = 0
+
+  for (let index = 0; index < entries.length; index += 1) {
+    if (rectEquals(entries[index].nextRect, prevRects[index])) unchanged += 1
+  }
+
+  return unchanged
+}
+
+function roundMs(value: number): number {
+  return Math.round(value * 1000) / 1000
+}
+
+function rateBench(averageMs: number, size: number): BenchStats['rating'] {
+  const perThousand = averageMs / Math.max(1, size / 1000)
+  if (perThousand <= 0.05) return 'идеально'
+  if (perThousand <= 0.15) return 'отлично'
+  if (perThousand <= 0.5) return 'хорошо'
+  if (perThousand <= 1.5) return 'приемлемо'
+  return 'плохо'
+}
+
+function logBench(result: BenchStats): void {
+  console.log(`[nova-ui-kit-bench] ${JSON.stringify(result)}`)
+}

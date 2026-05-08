@@ -32,12 +32,27 @@ import {
   type NovaUiLayoutRect,
   type NovaUiLayoutTarget,
 } from '@/shared/layout'
+import {
+  EMPTY_STYLE_CONTEXT,
+  NOVA_UI_STYLE_TARGET,
+  NovaUiStyleMask,
+  borderRadiusToRendererValue,
+  inheritedTextStyleMask,
+  isNovaUiStyleTarget,
+  mergeStyleContext,
+  mergeStyleReceiveResult,
+  styleContextChangedMask,
+  type NovaUiStyleContext,
+  type NovaUiStyleReceiveResult,
+  type NovaUiStyleTarget,
+} from '@/shared/style'
 
 /** Сеточный layout-компонент с fixed и responsive режимом колонок. */
 export class Grid<E extends EventList = Record<string, any>>
   extends NovaComponentNode<GridResolvedProps, GridApi, Record<string, never>, GridProps, E>
-  implements NovaUiLayoutTarget {
+  implements NovaUiLayoutTarget, NovaUiStyleTarget {
   readonly [NOVA_UI_LAYOUT_TARGET] = true as const
+  readonly [NOVA_UI_STYLE_TARGET] = true as const
 
   private readonly engine = new GridLayoutEngine()
   private readonly ownRect = createLayoutRect()
@@ -48,6 +63,9 @@ export class Grid<E extends EventList = Record<string, any>>
   private layoutDirty = true
   private externalLayout = false
   private columnCount = 1
+  private inheritedStyleContext = EMPTY_STYLE_CONTEXT
+  private effectiveStyleContext = EMPTY_STYLE_CONTEXT
+  private subtreeStyleMask = NovaUiStyleMask.None
 
   constructor(
     app: NovaApp<E>,
@@ -72,6 +90,7 @@ export class Grid<E extends EventList = Record<string, any>>
       width: resolvedProps.width,
       height: resolvedProps.height,
     })
+    this.effectiveStyleContext = mergeStyleContext(this.inheritedStyleContext, resolvedProps.style)
     this.setChildren(options.children ?? [])
   }
 
@@ -87,6 +106,32 @@ export class Grid<E extends EventList = Record<string, any>>
   applyLayoutRect(rect: NovaUiLayoutRect): boolean {
     this.externalLayout = true
     return this.applyResolvedRect(rect)
+  }
+
+  /** Принимает style context от родителя и точечно проталкивает его детям. */
+  receiveStyleContext(context: NovaUiStyleContext, _changedMask: NovaUiStyleMask): NovaUiStyleReceiveResult {
+    this.inheritedStyleContext = context
+    const previousContext = this.effectiveStyleContext
+    this.effectiveStyleContext = mergeStyleContext(context, this.props.style)
+    const changedMask = styleContextChangedMask(previousContext, this.effectiveStyleContext)
+
+    if (changedMask === NovaUiStyleMask.None) return {
+      update: false,
+      render: false,
+      layout: false,
+    }
+
+    const result = this.propagateStyleContext(changedMask)
+    if (result.layout) {
+      this.layoutDirty = true
+      this.dirty({ update: true, render: true })
+    }
+    return result
+  }
+
+  getSubtreeStyleMask(): NovaUiStyleMask {
+    this.recomputeSubtreeStyleMask()
+    return this.subtreeStyleMask & ~inheritedTextStyleMask(this.props.style)
   }
 
   /** Пересчитывает сетку только если изменились размеры, props или children. */
@@ -140,7 +185,7 @@ export class Grid<E extends EventList = Record<string, any>>
         styles: {
           color: this.props.border.color ?? '#d6d9e2',
           width: this.props.border.width,
-          radius: this.props.border.radius,
+          radius: borderRadiusToRendererValue(this.props.border.radius),
         },
       })
     }
@@ -167,6 +212,8 @@ export class Grid<E extends EventList = Record<string, any>>
       this.childEntriesById.set(id, entry)
     }
 
+    this.recomputeSubtreeStyleMask()
+    this.propagateStyleContext(NovaUiStyleMask.AllText)
     this.layoutDirty = true
     this.dirty({ update: true, render: true })
   }
@@ -194,7 +241,7 @@ export class Grid<E extends EventList = Record<string, any>>
 
   protected override onPropsChanged(changedKeys: (keyof GridResolvedProps)[]): void {
     this.props = normalizeGridProps(this.props)
-    this.layoutDirty = true
+    if (hasGridLayoutChanges(changedKeys)) this.layoutDirty = true
     if (!this.externalLayout && hasGridGeometryChanges(changedKeys)) {
       this.applyResolvedRect({
         x: this.props.x,
@@ -202,6 +249,17 @@ export class Grid<E extends EventList = Record<string, any>>
         width: this.props.width,
         height: this.props.height,
       })
+    }
+    if (changedKeys.includes('style')) {
+      const previousContext = this.effectiveStyleContext
+      this.effectiveStyleContext = mergeStyleContext(this.inheritedStyleContext, this.props.style)
+      const changedMask = styleContextChangedMask(previousContext, this.effectiveStyleContext)
+
+      this.recomputeSubtreeStyleMask()
+      if (changedMask !== NovaUiStyleMask.None) {
+        const result = this.propagateStyleContext(changedMask)
+        if (result.layout) this.layoutDirty = true
+      }
     }
   }
 
@@ -225,8 +283,62 @@ export class Grid<E extends EventList = Record<string, any>>
       entry.node.remove()
     }
   }
+
+  private propagateStyleContext(changedMask: NovaUiStyleMask): NovaUiStyleReceiveResult {
+    const result: NovaUiStyleReceiveResult = {
+      update: false,
+      render: false,
+      layout: false,
+    }
+
+    for (const entry of this.childEntries) {
+      const node = entry.node
+      if (!isNovaUiStyleTarget(node)) continue
+
+      const childMask = node.getSubtreeStyleMask()
+      if ((changedMask & childMask) === 0) continue
+
+      mergeStyleReceiveResult(
+        result,
+        node.receiveStyleContext(this.effectiveStyleContext, changedMask & childMask),
+      )
+    }
+
+    return result
+  }
+
+  private recomputeSubtreeStyleMask(): void {
+    let mask = NovaUiStyleMask.None
+
+    for (const entry of this.childEntries) {
+      if (isNovaUiStyleTarget(entry.node)) {
+        mask |= entry.node.getSubtreeStyleMask()
+      }
+    }
+
+    this.subtreeStyleMask = mask
+  }
 }
 
 function hasGridGeometryChanges(keys: (keyof GridResolvedProps)[]): boolean {
   return keys.includes('x') || keys.includes('y') || keys.includes('width') || keys.includes('height')
+}
+
+function hasGridLayoutChanges(keys: (keyof GridResolvedProps)[]): boolean {
+  return (
+    keys.includes('width')
+    || keys.includes('height')
+    || keys.includes('responsive')
+    || keys.includes('columns')
+    || keys.includes('minColumns')
+    || keys.includes('maxColumns')
+    || keys.includes('minColumnWidth')
+    || keys.includes('gap')
+    || keys.includes('rowGap')
+    || keys.includes('columnGap')
+    || keys.includes('padding')
+    || keys.includes('rowHeight')
+    || keys.includes('alignItems')
+    || keys.includes('justifyItems')
+  )
 }

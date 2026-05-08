@@ -4,6 +4,10 @@ import type {
   NovaUiLayoutValue,
   NovaUiSpacing,
 } from '@/shared/layout'
+import type {
+  NovaUiBorder,
+  NovaUiInheritedTextStyle,
+} from '@/shared/style'
 
 /** Schema type для адаптивного flex-layout компонента. */
 export const FLEX_SCHEMA_TYPE = 'nova-ui.flex'
@@ -27,8 +31,9 @@ export interface FlexProps {
   padding?: NovaUiSpacing
   justifyContent?: FlexJustify
   alignItems?: FlexAlign
+  style?: NovaUiInheritedTextStyle
   background?: string
-  border?: { color?: string; width?: number; radius?: number }
+  border?: NovaUiBorder
   clip?: boolean
 }
 
@@ -46,8 +51,9 @@ export interface FlexResolvedProps {
   padding: NovaUiSpacing
   justifyContent: FlexJustify
   alignItems: FlexAlign
+  style?: NovaUiInheritedTextStyle
   background?: string
-  border?: { color?: string; width?: number; radius?: number }
+  border?: NovaUiBorder
   clip: boolean
 }
 

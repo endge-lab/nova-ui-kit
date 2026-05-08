@@ -4,6 +4,7 @@ import type {
   TextBlockMeasureFn,
   TextBlockResolvedProps,
 } from '@/components/TextBlock/types'
+import { borderRadiusToRendererValue } from '@/shared/style'
 
 export function buildTextBlockSchema(
   props: TextBlockResolvedProps,
@@ -38,7 +39,7 @@ export function buildTextBlockSchema(
       styles: {
         color: props.border.color ?? '#d6d9e2',
         width: props.border.width,
-        radius: props.border.radius,
+        radius: borderRadiusToRendererValue(props.border.radius),
       },
     })
   }

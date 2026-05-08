@@ -32,18 +32,45 @@ import {
   type NovaUiLayoutRect,
   type NovaUiLayoutTarget,
 } from '@/shared/layout'
+import {
+  EMPTY_STYLE_CONTEXT,
+  NOVA_UI_STYLE_TARGET,
+  NovaUiStyleMask,
+  diffInheritedTextStyle,
+  inheritedTextStyleMask,
+  type NovaUiInheritedTextStyle,
+  type NovaUiStyleContext,
+  type NovaUiStyleReceiveResult,
+  type NovaUiStyleTarget,
+} from '@/shared/style'
+
+const TEXT_BLOCK_LAYOUT_STYLE_MASK = (
+  NovaUiStyleMask.FontFamily
+  | NovaUiStyleMask.FontSize
+  | NovaUiStyleMask.FontWeight
+  | NovaUiStyleMask.FontStyle
+  | NovaUiStyleMask.LineHeight
+)
+
+const TEXT_BLOCK_RENDER_STYLE_MASK = NovaUiStyleMask.Color
+const TEXT_BLOCK_CONSUMED_STYLE_MASK = TEXT_BLOCK_LAYOUT_STYLE_MASK | TEXT_BLOCK_RENDER_STYLE_MASK
 
 /** Текстовый блок, который может работать standalone и внутри layout-родителя. */
 export class TextBlock<E extends EventList = Record<string, any>>
   extends NovaComponentNode<TextBlockResolvedProps, TextBlockApi, Record<string, never>, TextBlockProps, E>
-  implements NovaUiLayoutTarget {
+  implements NovaUiLayoutTarget, NovaUiStyleTarget {
   readonly [NOVA_UI_LAYOUT_TARGET] = true as const
+  readonly [NOVA_UI_STYLE_TARGET] = true as const
 
   private readonly layoutRect = createLayoutRect()
   private readonly textMeasureCache = new TextMeasureCache()
   private _layout: TextBlockLayout | null = null
   private readonly _api: TextBlockApi
   private externalLayout = false
+  private inheritedStyleContext = EMPTY_STYLE_CONTEXT
+  private explicitTopLevelStyleMask = NovaUiStyleMask.None
+  private localStyleMask = NovaUiStyleMask.None
+  private effectiveTextStyle: NovaUiInheritedTextStyle = {}
 
   constructor(
     app: NovaApp<E>,
@@ -55,12 +82,19 @@ export class TextBlock<E extends EventList = Record<string, any>>
     const resolvedProps = normalizeTextBlockProps(props)
     super(app, surface, descriptor, resolvedProps, options)
     this.__type = 'TextBlock'
+    this.explicitTopLevelStyleMask = textBlockTopLevelStyleMask(props)
+    this.localStyleMask = inheritedTextStyleMask(resolvedProps.style)
+    this.effectiveTextStyle = resolveTextBlockEffectiveStyle(
+      resolvedProps,
+      this.inheritedStyleContext,
+      this.explicitTopLevelStyleMask,
+    )
     this.applyInitialLayoutRect(resolvedProps)
     this._layout = this.computeLayout()
     this._api = {
       setText: text => this.setProps({ text }),
       setProps: patch => this.setProps(patch),
-      getProps: () => this.getProps(),
+      getProps: () => this.resolveCurrentLayoutProps(),
       measure: () => this.ensureLayout(),
       getLines: () => this.ensureLayout().lines,
       isOverflowed: () => this.ensureLayout().overflowed,
@@ -68,6 +102,7 @@ export class TextBlock<E extends EventList = Record<string, any>>
   }
 
   override setProps(patch: TextBlockProps): this {
+    this.explicitTopLevelStyleMask |= textBlockTopLevelStyleMask(patch)
     return super.setProps(patch as Partial<TextBlockResolvedProps>)
   }
 
@@ -79,6 +114,52 @@ export class TextBlock<E extends EventList = Record<string, any>>
   applyLayoutRect(rect: NovaUiLayoutRect): boolean {
     this.externalLayout = true
     return this.applyResolvedRect(rect)
+  }
+
+  /** Принимает inherited style context и выбирает update/render по bitmask. */
+  receiveStyleContext(context: NovaUiStyleContext, changedMask: NovaUiStyleMask): NovaUiStyleReceiveResult {
+    this.inheritedStyleContext = context
+    const previousStyle = this.effectiveTextStyle
+    const nextStyle = resolveTextBlockEffectiveStyle(this.props, context, this.explicitTopLevelStyleMask)
+    const affectedMask = changedMask & this.getSubtreeStyleMask()
+    const effectiveChangedMask = diffInheritedTextStyle(previousStyle, nextStyle, affectedMask)
+
+    if (effectiveChangedMask === NovaUiStyleMask.None) return {
+      update: false,
+      render: false,
+      layout: false,
+    }
+
+    this.effectiveTextStyle = nextStyle
+
+    if ((effectiveChangedMask & TEXT_BLOCK_LAYOUT_STYLE_MASK) !== 0) {
+      this._layout = null
+      this.dirty({ update: true, render: true })
+      return {
+        update: true,
+        render: true,
+        layout: true,
+      }
+    }
+
+    if ((effectiveChangedMask & TEXT_BLOCK_RENDER_STYLE_MASK) !== 0) {
+      this.dirty({ render: true })
+      return {
+        update: false,
+        render: true,
+        layout: false,
+      }
+    }
+
+    return {
+      update: false,
+      render: false,
+      layout: false,
+    }
+  }
+
+  getSubtreeStyleMask(): NovaUiStyleMask {
+    return TEXT_BLOCK_CONSUMED_STYLE_MASK & ~(this.explicitTopLevelStyleMask | this.localStyleMask)
   }
 
   /** Измеряет preferred size для auto layout с учетом constraints. */
@@ -115,8 +196,21 @@ export class TextBlock<E extends EventList = Record<string, any>>
   }
 
   protected override onPropsChanged(changedKeys: (keyof TextBlockResolvedProps)[]): void {
+    const previousStyle = this.effectiveTextStyle
     this.props = normalizeTextBlockProps(this.props)
-    this._layout = null
+    this.localStyleMask = inheritedTextStyleMask(this.props.style)
+    this.effectiveTextStyle = resolveTextBlockEffectiveStyle(
+      this.props,
+      this.inheritedStyleContext,
+      this.explicitTopLevelStyleMask,
+    )
+    const styleChangedMask = diffInheritedTextStyle(previousStyle, this.effectiveTextStyle)
+    if (hasTextBlockLayoutChanges(changedKeys) || (styleChangedMask & TEXT_BLOCK_LAYOUT_STYLE_MASK) !== 0) {
+      this._layout = null
+    }
+    if ((styleChangedMask & TEXT_BLOCK_LAYOUT_STYLE_MASK) !== 0) {
+      this.dirty({ update: true, render: true })
+    }
     if (!this.externalLayout && hasGeometryChanges(changedKeys)) {
       this.applyResolvedRect({
         x: this.props.x,
@@ -178,6 +272,12 @@ export class TextBlock<E extends EventList = Record<string, any>>
       y: 0,
       width: Math.max(0, width),
       height: Math.max(0, height),
+      color: this.effectiveTextStyle.color ?? this.props.color,
+      fontFamily: this.effectiveTextStyle.fontFamily ?? this.props.fontFamily,
+      fontSize: this.effectiveTextStyle.fontSize ?? this.props.fontSize,
+      fontWeight: this.effectiveTextStyle.fontWeight ?? this.props.fontWeight,
+      fontStyle: this.effectiveTextStyle.fontStyle ?? this.props.fontStyle,
+      lineHeight: this.effectiveTextStyle.lineHeight ?? this.props.lineHeight,
     }
   }
 
@@ -191,4 +291,101 @@ export class TextBlock<E extends EventList = Record<string, any>>
 
 function hasGeometryChanges(keys: (keyof TextBlockResolvedProps)[]): boolean {
   return keys.includes('x') || keys.includes('y') || keys.includes('width') || keys.includes('height')
+}
+
+function hasTextBlockLayoutChanges(keys: (keyof TextBlockResolvedProps)[]): boolean {
+  return (
+    keys.includes('text')
+    || keys.includes('width')
+    || keys.includes('height')
+    || keys.includes('fontFamily')
+    || keys.includes('fontSize')
+    || keys.includes('fontWeight')
+    || keys.includes('fontStyle')
+    || keys.includes('lineHeight')
+    || keys.includes('padding')
+    || keys.includes('whiteSpace')
+    || keys.includes('overflow')
+    || keys.includes('maxLines')
+    || keys.includes('wordBreak')
+    || keys.includes('align')
+    || keys.includes('verticalAlign')
+  )
+}
+
+function textBlockTopLevelStyleMask(props: TextBlockProps | Partial<TextBlockResolvedProps>): NovaUiStyleMask {
+  let mask = NovaUiStyleMask.None
+
+  if (props.color !== undefined) mask |= NovaUiStyleMask.Color
+  if (props.fontFamily !== undefined) mask |= NovaUiStyleMask.FontFamily
+  if (props.fontSize !== undefined) mask |= NovaUiStyleMask.FontSize
+  if (props.fontWeight !== undefined) mask |= NovaUiStyleMask.FontWeight
+  if (props.fontStyle !== undefined) mask |= NovaUiStyleMask.FontStyle
+  if (props.lineHeight !== undefined) mask |= NovaUiStyleMask.LineHeight
+
+  return mask
+}
+
+function resolveTextBlockEffectiveStyle(
+  props: TextBlockResolvedProps,
+  context: NovaUiStyleContext,
+  explicitTopLevelMask: NovaUiStyleMask,
+): NovaUiInheritedTextStyle {
+  const localStyle = props.style
+
+  return {
+    color: resolveStyleValue(
+      explicitTopLevelMask,
+      NovaUiStyleMask.Color,
+      props.color,
+      localStyle?.color,
+      context.values.color,
+    ),
+    fontFamily: resolveStyleValue(
+      explicitTopLevelMask,
+      NovaUiStyleMask.FontFamily,
+      props.fontFamily,
+      localStyle?.fontFamily,
+      context.values.fontFamily,
+    ),
+    fontSize: resolveStyleValue(
+      explicitTopLevelMask,
+      NovaUiStyleMask.FontSize,
+      props.fontSize,
+      localStyle?.fontSize,
+      context.values.fontSize,
+    ),
+    fontWeight: resolveStyleValue(
+      explicitTopLevelMask,
+      NovaUiStyleMask.FontWeight,
+      props.fontWeight,
+      localStyle?.fontWeight,
+      context.values.fontWeight,
+    ),
+    fontStyle: resolveStyleValue(
+      explicitTopLevelMask,
+      NovaUiStyleMask.FontStyle,
+      props.fontStyle,
+      localStyle?.fontStyle,
+      context.values.fontStyle,
+    ),
+    lineHeight: resolveStyleValue(
+      explicitTopLevelMask,
+      NovaUiStyleMask.LineHeight,
+      props.lineHeight,
+      localStyle?.lineHeight,
+      context.values.lineHeight,
+    ),
+  }
+}
+
+function resolveStyleValue<T>(
+  explicitTopLevelMask: NovaUiStyleMask,
+  keyMask: NovaUiStyleMask,
+  explicitValue: T,
+  localStyleValue: T | undefined,
+  inheritedValue: T | undefined,
+): T {
+  if ((explicitTopLevelMask & keyMask) !== 0) return explicitValue
+  return localStyleValue ?? inheritedValue ?? explicitValue
 }

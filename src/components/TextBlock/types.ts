@@ -1,20 +1,20 @@
-import type { NovaBounds, NovaComponentSchema, NovaStylePadding, NovaText } from '@endge/nova'
+import type { NovaBounds, NovaComponentSchema, NovaText } from '@endge/nova'
+import type {
+  NovaUiBorder,
+  NovaUiFontStyle,
+  NovaUiInheritedTextStyle,
+} from '@/shared/style'
+import type { NovaUiSpacing } from '@/shared/layout'
 
 export const TEXT_BLOCK_SCHEMA_TYPE = 'nova-ui.text-block'
 
 export type TextBlockFontWeight = NonNullable<NonNullable<NovaText['styles']>['font']>['weight']
-export type TextBlockFontStyle = 'normal' | 'italic'
+export type TextBlockFontStyle = NovaUiFontStyle
 export type TextBlockAlign = 'left' | 'center' | 'right'
 export type TextBlockVerticalAlign = 'top' | 'middle' | 'bottom'
 export type TextBlockWhiteSpace = 'normal' | 'nowrap' | 'pre' | 'pre-wrap'
 export type TextBlockOverflow = 'visible' | 'clip' | 'ellipsis'
 export type TextBlockWordBreak = 'normal' | 'break-word' | 'break-all'
-
-export interface TextBlockBorder {
-  color?: string
-  width?: number
-  radius?: number
-}
 
 export interface TextBlockProps {
   text?: string
@@ -29,15 +29,16 @@ export interface TextBlockProps {
   fontWeight?: TextBlockFontWeight
   fontStyle?: TextBlockFontStyle
   lineHeight?: number
-  padding?: NovaStylePadding | number
+  padding?: NovaUiSpacing
   align?: TextBlockAlign
   verticalAlign?: TextBlockVerticalAlign
   whiteSpace?: TextBlockWhiteSpace
   overflow?: TextBlockOverflow
   maxLines?: number
   wordBreak?: TextBlockWordBreak
+  style?: NovaUiInheritedTextStyle
   background?: string
-  border?: TextBlockBorder
+  border?: NovaUiBorder
 }
 
 export interface TextBlockResolvedPadding {
@@ -67,8 +68,9 @@ export interface TextBlockResolvedProps {
   overflow: TextBlockOverflow
   maxLines: number
   wordBreak: TextBlockWordBreak
+  style?: NovaUiInheritedTextStyle
   background?: string
-  border?: TextBlockBorder
+  border?: NovaUiBorder
 }
 
 export interface TextBlockLayoutLine {

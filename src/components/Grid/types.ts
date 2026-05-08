@@ -4,6 +4,10 @@ import type {
   NovaUiLayoutValue,
   NovaUiSpacing,
 } from '@/shared/layout'
+import type {
+  NovaUiBorder,
+  NovaUiInheritedTextStyle,
+} from '@/shared/style'
 
 /** Schema type для сеточного layout-компонента. */
 export const GRID_SCHEMA_TYPE = 'nova-ui.grid'
@@ -28,8 +32,9 @@ export interface GridProps {
   rowHeight?: NovaUiLayoutValue
   alignItems?: GridAlign
   justifyItems?: GridAlign
+  style?: NovaUiInheritedTextStyle
   background?: string
-  border?: { color?: string; width?: number; radius?: number }
+  border?: NovaUiBorder
   clip?: boolean
 }
 
@@ -51,8 +56,9 @@ export interface GridResolvedProps {
   rowHeight: NovaUiLayoutValue
   alignItems: GridAlign
   justifyItems: GridAlign
+  style?: NovaUiInheritedTextStyle
   background?: string
-  border?: { color?: string; width?: number; radius?: number }
+  border?: NovaUiBorder
   clip: boolean
 }
 

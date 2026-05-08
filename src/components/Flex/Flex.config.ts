@@ -38,6 +38,7 @@ export const FLEX_FIELD_DEFINITIONS = {
   padding: { type: 'spacing' },
   justifyContent: { type: 'string' },
   alignItems: { type: 'string' },
+  style: { type: 'style' },
   background: { type: 'string' },
   clip: { type: 'boolean' },
 } as const
@@ -59,6 +60,7 @@ export function normalizeFlexProps(props: FlexProps = {}): FlexResolvedProps {
     padding: props.padding ?? 0,
     justifyContent: props.justifyContent ?? 'start',
     alignItems: props.alignItems ?? 'stretch',
+    style: props.style,
     background: props.background,
     border: props.border,
     clip: props.clip ?? false,
@@ -88,6 +90,7 @@ export function createFlexDescriptor(createNode?: FlexNodeFactory): FlexDescript
         'alignItems',
       ],
       render: [
+        'style',
         'background',
         'border',
         'clip',
