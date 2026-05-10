@@ -9,11 +9,13 @@ import {
   NOVA_UI_STYLE_TARGET,
   NovaUiStyleMask,
   matchStyleRules,
+  resolveNovaUiStyleSheetTokens,
   validateNovaUiStyleSheetSource,
   type NovaUiCompiledStyleSheet,
   type NovaUiStyleContext,
   type NovaUiStyleReceiveResult,
   type NovaUiStyleTarget,
+  type NovaUiStyleTokenResolver,
   type NovaUiStylableNode,
 } from '@/shared/style'
 import {
@@ -137,6 +139,25 @@ describe('Nova UI style propagation performance', () => {
       expect(result.skippedCount).toBe(0)
       expect(result.averageMs).toBeLessThan(100)
     }
+  })
+
+  it('benchmarks NovaCSS theme token resolution hot path', () => {
+    const size = 100
+    const sheet = validateNovaUiStyleSheetSource(createBenchmarkTokenStyleSource(size)).styleSheet as NovaUiCompiledStyleSheet
+    const resolver = createBenchmarkTokenResolver()
+    const result = measureBench('stylesheet token resolve 100', size, () => {
+      const resolved = resolveNovaUiStyleSheetTokens(sheet, resolver)
+      return {
+        renderCount: resolved.rules.length,
+        updateCount: 0,
+        skippedCount: resolved.tokenDependencies?.length ?? 0,
+      }
+    })
+
+    logBench(result)
+    expect(result.renderCount).toBe(size)
+    expect(result.skippedCount).toBeGreaterThan(0)
+    expect(result.averageMs).toBeLessThan(150)
   })
 
   it('benchmarks invalid stylesheet validation', () => {
@@ -516,6 +537,27 @@ function createBenchmarkStyleSource(size: number): string {
   return Array.from({ length: size }, (_item, index) => (
     `TextBlock.item-${index} { color: #123456; fontSize: ${12 + (index % 6)}; }`
   )).join('\n')
+}
+
+function createBenchmarkTokenStyleSource(size: number): string {
+  return Array.from({ length: size }, (_item, index) => (
+    `TextBlock.theme-${index} { color: var(--nova-text-${index % 16}, #111111); fontSize: var(--nova-font-${index % 4}, 13); }`
+  )).join('\n')
+}
+
+function createBenchmarkTokenResolver(): NovaUiStyleTokenResolver {
+  const values = new Map<string, string>()
+  for (let index = 0; index < 16; index += 1) {
+    values.set(`--nova-text-${index}`, `#${(index + 1).toString(16).padStart(6, '0')}`)
+  }
+  for (let index = 0; index < 4; index += 1) {
+    values.set(`--nova-font-${index}`, String(12 + index))
+  }
+
+  return {
+    version: 1,
+    resolve: (name, fallback) => values.get(name) ?? fallback,
+  }
 }
 
 function createBenchmarkStyleNodes(size: number, className?: string): Array<NovaUiStylableNode> {

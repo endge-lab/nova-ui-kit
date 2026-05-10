@@ -10,9 +10,31 @@ export type NovaUiMotionPreset =
   | 'hoverLine'
   | 'dragOverlay'
   | 'pressFeedback'
+  | 'radialReveal'
+  | 'dockMagnify'
+  | 'slideFade'
+  | 'maskFade'
+  | 'shimmer'
+  | 'meterSweep'
+  | 'thumbSpring'
+  | 'activeIndicator'
+  | 'stepAdvance'
 
 export interface NovaUiMotionOptions {
   motion?: false | NovaUiMotionPreset
+}
+
+export interface NovaUiPartStyle {
+  background?: string
+  color?: string
+  borderColor?: string
+  borderWidth?: number
+  borderRadius?: number
+  opacity?: number
+}
+
+export interface NovaUiPartStyleOptions {
+  parts?: Record<string, NovaUiPartStyle>
 }
 
 export interface ResizerOptions extends NovaUiMotionOptions {

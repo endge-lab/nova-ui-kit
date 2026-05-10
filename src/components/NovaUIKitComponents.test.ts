@@ -14,12 +14,14 @@ import {
   type FlexApi,
   type GridApi,
   type PanelApi,
+  type RootApi,
   type ScrollAreaApi,
   type ScrollbarApi,
   type SegmentedControlApi,
   type SliderApi,
   type SplitPaneApi,
   type TagApi,
+  type TextBlockApi,
   type ToggleApi,
   type TooltipApi,
   registerNovaUiGlobalStyleSheet,
@@ -291,6 +293,67 @@ describe('Nova UI Kit components', () => {
 
     expect(app.components.requireApi<ButtonApi>('global-button-a').getProps().accentColor).toBe('#abcdef')
     expect(app.components.requireApi<ButtonApi>('global-button-b').getProps().accentColor).toBe('#abcdef')
+
+    app.destroy()
+  })
+
+  it('refreshes NovaCSS theme tokens through Nova Raph theme events', () => {
+    const app = createApp()
+    app.theme.registerMany([
+      {
+        id: 'light',
+        tokens: {
+          '--nova-scene-text': '#111111',
+          '--nova-accent': '#2563eb',
+          '--nova-label-size': 14,
+        },
+      },
+      {
+        id: 'dark',
+        tokens: {
+          '--nova-scene-text': '#f7f8ff',
+          '--nova-accent': '#9b7cff',
+          '--nova-label-size': 16,
+        },
+      },
+    ])
+    const surface = app.createSurface('theme-styles')
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'theme-root',
+      props: {
+        styleSheet: `
+          TextBlock.theme-label {
+            color: var(--nova-scene-text, #111111);
+            fontSize: var(--nova-label-size, 12);
+          }
+
+          Button.theme-action {
+            accentColor: var(--nova-accent, #2563eb);
+          }
+        `,
+      },
+      children: [
+        { type: NovaUIKit.TextBlock, id: 'theme-label', props: { className: 'theme-label', text: 'Theme' } },
+        { type: NovaUIKit.Button, id: 'theme-button', props: { className: 'theme-action', text: 'Apply' } },
+      ],
+    })
+    app.raph.run()
+    app.raph.run()
+
+    expect(app.components.requireApi<TextBlockApi>('theme-label').getProps().color).toBe('#111111')
+    expect(app.components.requireApi<TextBlockApi>('theme-label').getProps().fontSize).toBe(14)
+    expect(app.components.requireApi<ButtonApi>('theme-button').getProps().accentColor).toBe('#2563eb')
+
+    app.theme.use('dark')
+    app.raph.run()
+    app.raph.run()
+
+    expect(app.components.requireApi<TextBlockApi>('theme-label').getProps().color).toBe('#f7f8ff')
+    expect(app.components.requireApi<TextBlockApi>('theme-label').getProps().fontSize).toBe(16)
+    expect(app.components.requireApi<ButtonApi>('theme-button').getProps().accentColor).toBe('#9b7cff')
+    expect(app.components.requireApi<RootApi>('theme-root').getDiagnostics()).toHaveLength(0)
 
     app.destroy()
   })

@@ -10,6 +10,15 @@ export const NOVA_UI_MOTION_DEFAULTS: Record<NovaUiMotionPreset, NovaMotionOptio
   hoverLine: { duration: 120, easing: 'outCubic' },
   dragOverlay: { duration: 120, easing: 'outCubic' },
   pressFeedback: { duration: 100, easing: 'outCubic' },
+  radialReveal: { duration: 260, easing: 'outCubic' },
+  dockMagnify: { duration: 180, easing: 'outCubic' },
+  slideFade: { duration: 240, easing: 'outCubic' },
+  maskFade: { duration: 180, easing: 'outCubic' },
+  shimmer: { duration: 1200, easing: 'linear', repeat: Infinity },
+  meterSweep: { duration: 520, easing: 'outCubic' },
+  thumbSpring: { duration: 180, easing: 'outCubic' },
+  activeIndicator: { duration: 220, easing: 'outCubic' },
+  stepAdvance: { duration: 260, easing: 'outCubic' },
 }
 
 export function isNovaUiMotionEnabled(options?: NovaUiMotionOptions): boolean {

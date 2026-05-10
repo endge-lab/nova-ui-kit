@@ -1,4 +1,5 @@
 import type { NovaComponentDescriptor, NovaSchemaRegistry } from '@endge/nova'
+import { ADVANCED_COMPONENT_DESCRIPTORS } from '@/components/Advanced/Advanced.registry'
 import { BUTTON_DESCRIPTOR } from '@/components/Button/Button.registry'
 import { CHECKBOX_DESCRIPTOR } from '@/components/Checkbox/Checkbox.registry'
 import { FLEX_DESCRIPTOR } from '@/components/Flex/Flex.registry'
@@ -33,6 +34,7 @@ const NOVA_UI_KIT_DESCRIPTORS: Array<NovaComponentDescriptor<any, any, any, any>
   SPLIT_PANE_DESCRIPTOR,
   TOOLTIP_DESCRIPTOR,
   PANEL_DESCRIPTOR,
+  ...ADVANCED_COMPONENT_DESCRIPTORS,
 ]
 
 export function registerNovaUIKit(registry: NovaSchemaRegistry): void {

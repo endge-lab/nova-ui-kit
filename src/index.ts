@@ -1,3 +1,7 @@
+export * from '@/components/Advanced/Advanced'
+export * from '@/components/Advanced/Advanced.config'
+export * from '@/components/Advanced/Advanced.registry'
+export * from '@/components/Advanced/Advanced.types'
 export * from '@/components/Button/Button'
 export * from '@/components/Button/Button.config'
 export * from '@/components/Button/Button.registry'

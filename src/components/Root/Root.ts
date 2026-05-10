@@ -40,7 +40,6 @@ import {
   borderRadiusToRendererValue,
   createEmptyStyleSheet,
   createEmptyStyleSheetValidationResult,
-  createNovaUiCssVariableTokenResolver,
   getNovaUiGlobalStyleSheet,
   isNovaUiStyleTarget,
   isNovaUiStyleSheetAsset,
@@ -86,6 +85,7 @@ export class Root<E extends EventList = Record<string, any>>
   private validation: NovaUiStyleValidationResult = createEmptyStyleSheetValidationResult()
   private effectiveStyleContext = EMPTY_STYLE_CONTEXT
   private tokenResolver: NovaUiStyleTokenResolver | null = null
+  private resolvedTokenVersion: number | null = null
   private readonly disposeGlobalStylesSubscription: () => void
 
   constructor(
@@ -113,9 +113,8 @@ export class Root<E extends EventList = Record<string, any>>
       relayout: () => this.relayout(),
       getChildRect: () => this.childRect,
     }
-    this.tokenResolver = typeof window === 'undefined'
-      ? null
-      : createNovaUiCssVariableTokenResolver(app.canvas.element)
+    this.tokenResolver = app.theme.createTokenResolver()
+    this.addDisposer(app.theme.observe(this, { phase: 'update' }))
     this.disposeGlobalStylesSubscription = subscribeNovaUiGlobalStyleSheets(app, () => {
       this.refreshCombinedStyleSheet()
     })
@@ -183,13 +182,14 @@ export class Root<E extends EventList = Record<string, any>>
 
   /** Обновляет token-resolved stylesheet после смены темы или token context. */
   refreshStyleTokens(): void {
-    this.styleSheet = resolveNovaUiStyleSheetTokens(this.rawStyleSheet, this.tokenResolver)
+    this.styleSheet = this.resolveStyleSheetTokens(this.rawStyleSheet)
     this.applyCascade()
   }
 
   /** Задает resolver theme/CSS tokens для Nova stylesheet. */
   setStyleTokenResolver(resolver: NovaUiStyleTokenResolver | null): void {
     this.tokenResolver = resolver
+    this.resolvedTokenVersion = null
     this.refreshStyleTokens()
   }
 
@@ -251,6 +251,7 @@ export class Root<E extends EventList = Record<string, any>>
   }
 
   update(): void {
+    this.refreshStyleTokensIfNeeded()
     if (!this.layoutDirty) return
 
     const padding = resolveSpacing(this.props.padding)
@@ -362,8 +363,20 @@ export class Root<E extends EventList = Record<string, any>>
       globalAsset.source,
       this.localRawStyleSheet.source,
     ].filter(Boolean).join('\n'))
-    this.styleSheet = resolveNovaUiStyleSheetTokens(this.rawStyleSheet, this.tokenResolver)
+    this.styleSheet = this.resolveStyleSheetTokens(this.rawStyleSheet)
     this.applyCascade()
+  }
+
+  private refreshStyleTokensIfNeeded(): void {
+    const version = this.tokenResolver?.version ?? null
+    if (version === this.resolvedTokenVersion) return
+
+    this.refreshStyleTokens()
+  }
+
+  private resolveStyleSheetTokens(sheet: NovaUiCompiledStyleSheet): NovaUiCompiledStyleSheet {
+    this.resolvedTokenVersion = this.tokenResolver?.version ?? null
+    return resolveNovaUiStyleSheetTokens(sheet, this.tokenResolver)
   }
 
   private applyCascade(): void {
