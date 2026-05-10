@@ -1,4 +1,4 @@
-import type { NovaComponentSchema, NovaSchema } from '@endge/nova'
+import type { NovaComponentSchema, NovaCursorContext, NovaCursorDeclaration, NovaSchema } from '@endge/nova'
 import type { EventList } from '@endge/utils'
 import type { NovaUiMotionOptions } from '@/domain/domain.types'
 import {
@@ -60,6 +60,8 @@ export interface NovaUiCommonProps extends NovaUiMotionOptions, NovaUiStyleIdent
   activeBackground?: string
   disabled?: boolean
   disabledOpacity?: number
+  cursor?: NovaCursorDeclaration
+  cursorContext?: NovaCursorContext
 }
 
 export interface NovaUiCommonResolvedProps extends NovaUiStyleIdentityProps {
@@ -87,6 +89,8 @@ export interface NovaUiCommonResolvedProps extends NovaUiStyleIdentityProps {
   activeBackground?: string
   disabled: boolean
   disabledOpacity: number
+  cursor?: NovaCursorDeclaration
+  cursorContext?: NovaCursorContext
 }
 
 export interface NovaUiInteractionState {
@@ -138,6 +142,8 @@ export const NOVA_UI_COMMON_FIELD_DEFINITIONS = {
   activeBackground: { type: 'string' },
   disabled: { type: 'boolean' },
   disabledOpacity: { type: 'number' },
+  cursor: { type: 'cursor' },
+  cursorContext: { type: 'record' },
   motion: { type: 'motion' },
   className: { type: 'string' },
   attrs: { type: 'record' },
@@ -166,6 +172,8 @@ export const NOVA_UI_COMMON_DIRTY_POLICY = {
     'activeBackground',
     'disabled',
     'disabledOpacity',
+    'cursor',
+    'cursorContext',
     'className',
     'attrs',
   ] as const,
@@ -200,6 +208,8 @@ export function normalizeCommonProps<TProps extends NovaUiCommonProps>(
     activeBackground: props.activeBackground ?? defaults.activeBackground,
     disabled: props.disabled ?? defaults.disabled ?? false,
     disabledOpacity: clamp01(finiteNumber(props.disabledOpacity, defaults.disabledOpacity ?? 0.45)),
+    cursor: props.cursor ?? defaults.cursor,
+    cursorContext: props.cursorContext ?? defaults.cursorContext,
     className: props.className ?? defaults.className,
     attrs: props.attrs ?? defaults.attrs,
   }
@@ -378,6 +388,11 @@ export abstract class NovaUiComponentNode<
   protected applyCommonPropsChanged(changedKeys: (keyof TProps)[]): void {
     this.options({
       opacity: this.props.disabled ? this.props.disabledOpacity : this.props.opacity,
+      cursor: this.props.cursor ?? null,
+      cursorContext: {
+        ...(this.props.cursorContext ?? {}),
+        disabled: this.props.disabled,
+      },
     })
 
     if (!this.externalLayout && hasGeometryChanges(changedKeys)) {
@@ -402,6 +417,11 @@ export abstract class NovaUiComponentNode<
       y: props.y,
       width: props.width,
       height: props.height,
+      cursor: props.cursor ?? null,
+      cursorContext: {
+        ...(props.cursorContext ?? {}),
+        disabled: props.disabled,
+      },
     })
   }
 

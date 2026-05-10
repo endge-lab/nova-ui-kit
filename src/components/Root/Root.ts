@@ -1,6 +1,7 @@
 import {
   NovaComponentNode,
   type NovaApp,
+  type NovaCursorDeclaration,
   type NovaNode,
   type NovaSurface,
 } from '@endge/nova'
@@ -96,6 +97,10 @@ export class Root<E extends EventList = Record<string, any>>
       y: resolvedProps.y,
       width: resolvedProps.width,
       height: resolvedProps.height,
+    })
+    this.options({
+      cursor: resolvedProps.cursor ?? null,
+      cursorContext: resolvedProps.cursorContext ?? null,
     })
     this.effectiveStyleContext = mergeStyleContext(EMPTY_STYLE_CONTEXT, resolvedProps.style)
     this.setStyleSheetSource(resolvedProps.styleSheet)
@@ -232,6 +237,12 @@ export class Root<E extends EventList = Record<string, any>>
       this.effectiveStyleContext = mergeStyleContext(EMPTY_STYLE_CONTEXT, this.props.style)
       this.propagateStyleContext(styleContextChangedMask(previous, this.effectiveStyleContext))
     }
+    if (changedKeys.includes('cursor') || changedKeys.includes('cursorContext')) {
+      this.options({
+        cursor: this.props.cursor ?? null,
+        cursorContext: this.props.cursorContext ?? null,
+      })
+    }
   }
 
   private applyResolvedRect(rect: NovaUiLayoutRect): boolean {
@@ -243,6 +254,8 @@ export class Root<E extends EventList = Record<string, any>>
       y: rect.y,
       width: rect.width,
       height: rect.height,
+      cursor: this.props.cursor ?? null,
+      cursorContext: this.props.cursorContext ?? null,
     })
     this.layoutDirty = true
     this.dirty({ update: true, matrix: true, render: true })
@@ -263,7 +276,7 @@ export class Root<E extends EventList = Record<string, any>>
 
   private applyCascadeToNode(node: NovaUiStylableNode): void {
     const rules = matchStyleRules(node, this.styleSheet)
-    const declarations = mergeRuleDeclarations(rules.map(rule => rule.declarations))
+    const declarations = mergeRuleDeclarations(rules)
     const patch = this.createCascadePatch(node, declarations)
     if (!patch) return
 
@@ -307,6 +320,10 @@ export class Root<E extends EventList = Record<string, any>>
     if (declarations.spacing?.padding !== undefined) {
       nextKeys.add('padding')
       patch.padding = declarations.spacing.padding
+    }
+    if (declarations.cursor !== undefined) {
+      nextKeys.add('cursor')
+      patch.cursor = declarations.cursor
     }
     if (supportsLayoutDeclarations(node)) {
       for (const key of ['gap', 'rowGap', 'columnGap'] as const) {
@@ -365,6 +382,8 @@ export class Root<E extends EventList = Record<string, any>>
         pressedBackground: props.pressedBackground,
         activeBackground: props.activeBackground,
         disabledOpacity: props.disabledOpacity,
+        cursor: props.cursor,
+        cursorContext: props.cursorContext,
       },
       keys: new Set(),
     }
@@ -402,8 +421,17 @@ export class Root<E extends EventList = Record<string, any>>
   }
 }
 
-function mergeRuleDeclarations(declarations: NovaUiStyleDeclarations[]): NovaUiStyleDeclarations {
-  return declarations.reduce<NovaUiStyleDeclarations>((target, source) => {
+function mergeRuleDeclarations(rules: ReturnType<typeof matchStyleRules>): NovaUiStyleDeclarations {
+  return rules.reduce<NovaUiStyleDeclarations>((target, rule) => {
+    const source = rule.declarations
+    const pseudoState = rule.selector.parts[rule.selector.parts.length - 1]?.pseudos[0]
+    if (pseudoState && source.cursor !== undefined) {
+      target.cursor = mergeCursorDeclaration(target.cursor, source.cursor, pseudoState)
+    }
+    if (pseudoState) {
+      return target
+    }
+
     target.inheritedText = {
       ...target.inheritedText,
       ...source.inheritedText,
@@ -428,9 +456,30 @@ function mergeRuleDeclarations(declarations: NovaUiStyleDeclarations[]): NovaUiS
       ...target.visual,
       ...source.visual,
     }
+    if (source.cursor !== undefined) target.cursor = source.cursor
     target.mask |= source.mask
     return target
   }, { mask: NovaUiStyleMask.None })
+}
+
+function mergeCursorDeclaration(
+  target: NovaCursorDeclaration | undefined,
+  source: NovaCursorDeclaration,
+  state: string,
+): NovaCursorDeclaration {
+  if (Array.isArray(source)) return source
+  const stateKey = state as keyof NonNullable<Exclude<NovaCursorDeclaration, string | any[]>>
+  const base = normalizeCursorStateMap(target)
+  base[stateKey as 'hover' | 'pressed' | 'dragging' | 'disabled'] = source as never
+  return base
+}
+
+function normalizeCursorStateMap(source: NovaCursorDeclaration | undefined): Record<string, unknown> {
+  if (!source) return {}
+  if (typeof source === 'string' || Array.isArray(source) || 'type' in source) {
+    return { default: source }
+  }
+  return { ...source }
 }
 
 function readBaselineValue<T>(state: AppliedCascadeState, key: string, fallback: T): T {
@@ -447,6 +496,8 @@ function fallbackCascadeValue(key: string, value: unknown): unknown {
   if (key === 'padding') return 0
   if (key === 'gap' || key === 'rowGap' || key === 'columnGap') return 0
   if (key === 'disabledOpacity') return 0.45
+  if (key === 'cursor') return null
+  if (key === 'cursorContext') return null
   if (
     key === 'accentColor'
     || key === 'trackColor'

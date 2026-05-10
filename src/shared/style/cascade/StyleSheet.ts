@@ -1,4 +1,4 @@
-import type { NovaComponentNode } from '@endge/nova'
+import type { NovaComponentNode, NovaCursorDeclaration } from '@endge/nova'
 import type { NovaUiSpacing } from '@/shared/layout'
 import type {
   NovaUiBorder,
@@ -31,6 +31,7 @@ export interface NovaUiStyleSelectorPart {
   id?: string
   classes: string[]
   attrs: Record<string, string | true>
+  pseudos: string[]
 }
 
 /** Скомпилированный selector с specificity и связями между segment. */
@@ -67,6 +68,7 @@ export interface NovaUiStyleDeclarations {
     activeBackground?: string
     disabledOpacity?: number
   }
+  cursor?: NovaCursorDeclaration
   mask: NovaUiStyleMask
 }
 

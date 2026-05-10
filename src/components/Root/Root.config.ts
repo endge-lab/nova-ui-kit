@@ -36,6 +36,8 @@ export const ROOT_FIELD_DEFINITIONS = {
   background: { type: 'string' },
   border: { type: 'border' },
   clip: { type: 'boolean' },
+  cursor: { type: 'cursor' },
+  cursorContext: { type: 'record' },
   className: { type: 'string' },
   attrs: { type: 'record' },
 } as const
@@ -53,6 +55,8 @@ export function normalizeRootProps(props: RootProps = {}): RootResolvedProps {
     background: props.background,
     border: props.border,
     clip: props.clip ?? false,
+    cursor: props.cursor,
+    cursorContext: props.cursorContext,
     className: props.className,
     attrs: props.attrs,
   }
@@ -79,6 +83,8 @@ export function createRootDescriptor(createNode?: RootNodeFactory): RootDescript
         'background',
         'border',
         'clip',
+        'cursor',
+        'cursorContext',
         'className',
         'attrs',
       ],

@@ -1,4 +1,4 @@
-import type { NovaComponentSchema } from '@endge/nova'
+import type { NovaComponentSchema, NovaCursorContext, NovaCursorDeclaration } from '@endge/nova'
 import type {
   NovaUiLayoutRect,
   NovaUiSpacing,
@@ -26,6 +26,8 @@ export interface RootProps extends NovaUiStyleIdentityProps {
   background?: string
   border?: NovaUiBorder
   clip?: boolean
+  cursor?: NovaCursorDeclaration
+  cursorContext?: NovaCursorContext
 }
 
 /** Нормализованные параметры Root. */
@@ -40,6 +42,8 @@ export interface RootResolvedProps extends NovaUiStyleIdentityProps {
   background?: string
   border?: NovaUiBorder
   clip: boolean
+  cursor?: NovaCursorDeclaration
+  cursorContext?: NovaCursorContext
 }
 
 /** Schema ребенка Root. Каждый ребенок получает внутренний rect Root. */

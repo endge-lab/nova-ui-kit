@@ -140,6 +140,10 @@ function parseSelector(
     diagnostics.push(createDiagnostic('error', 'invalid-selector-chain', `Невалидная цепочка selector "${raw}".`, source, offset))
     return null
   }
+  if (parts.slice(0, -1).some(part => part.pseudos.length > 0)) {
+    diagnostics.push(createDiagnostic('error', 'invalid-pseudo-selector', `Pseudo selector поддерживается только справа "${raw}".`, source, offset))
+    return null
+  }
 
   return {
     raw,
@@ -209,6 +213,7 @@ function parseSelectorPart(raw: string): NovaUiStyleSelectorPart | null {
     type,
     classes: [],
     attrs: {},
+    pseudos: [],
   }
 
   while (cursor < raw.length) {
@@ -231,6 +236,13 @@ function parseSelectorPart(raw: string): NovaUiStyleSelectorPart | null {
     if (attrMatch) {
       part.attrs[attrMatch[1]] = attrMatch[2] ?? attrMatch[3] ?? attrMatch[4]?.trim() ?? true
       cursor += attrMatch[0].length
+      continue
+    }
+
+    const pseudoMatch = rest.match(/^:(hover|pressed|dragging|disabled)/)
+    if (pseudoMatch) {
+      part.pseudos.push(pseudoMatch[1])
+      cursor += pseudoMatch[0].length
       continue
     }
 
@@ -291,6 +303,7 @@ function parseDeclarationValue(
   }
 
   if (key === 'clip') return parseBoolean(value, diagnostics, source, offset)
+  if (key === 'cursor') return parseCursor(value, diagnostics, source, offset)
   if (NUMERIC_KEYS.has(key)) return parseFiniteNumber(value, diagnostics, source, offset)
   if (key === 'padding') return parseSpacing(value, diagnostics, source, offset)
   if (STRING_KEYS.has(key)) return stripQuotes(value)
@@ -385,6 +398,10 @@ function applyParsedDeclaration(
     || key === 'disabledOpacity'
   ) {
     target.visual = { ...target.visual, [key]: value as never }
+    return
+  }
+  if (key === 'cursor') {
+    target.cursor = value as never
   }
 }
 
@@ -448,8 +465,104 @@ function parseNumberToken(value: string): number | null {
 
 function selectorPartSpecificity(part: NovaUiStyleSelectorPart): number {
   return (part.id ? 100 : 0)
-    + (part.classes.length + Object.keys(part.attrs).length) * 10
+    + (part.classes.length + Object.keys(part.attrs).length + part.pseudos.length) * 10
     + (part.type ? 1 : 0)
+}
+
+function parseCursor(
+  value: string,
+  diagnostics: NovaUiStyleDiagnostic[],
+  source: string,
+  offset: number,
+): unknown {
+  const urlMatch = value.match(/^url\((.*)\)$/)
+  if (urlMatch) {
+    const parts = splitFunctionArgs(urlMatch[1])
+    const src = stripQuotes(parts[0] ?? '')
+    if (!src) {
+      diagnostics.push(createDiagnostic('error', 'invalid-cursor', `Невалидный cursor "${value}".`, source, offset))
+      return null
+    }
+    const hotspot = parseHotspot(parts[1])
+    return {
+      type: 'url',
+      src,
+      hotspot,
+      fallback: parts[2]?.trim() || 'default',
+    }
+  }
+
+  const componentMatch = value.match(/^component\((.*)\)$/)
+  if (componentMatch) {
+    const parts = splitFunctionArgs(componentMatch[1])
+    const component = stripQuotes(parts[0] ?? '')
+    if (!component) {
+      diagnostics.push(createDiagnostic('error', 'invalid-cursor', `Невалидный cursor "${value}".`, source, offset))
+      return null
+    }
+    return {
+      type: 'component',
+      component,
+      props: parseCursorProps(parts[1], diagnostics, source, offset),
+      hotspot: parseHotspot(parts[2]),
+    }
+  }
+
+  return stripQuotes(value)
+}
+
+function splitFunctionArgs(source: string): string[] {
+  const result: string[] = []
+  let buffer = ''
+  let depth = 0
+  let quote = ''
+
+  for (const char of source) {
+    if (quote) {
+      buffer += char
+      if (char === quote) quote = ''
+      continue
+    }
+    if (char === '"' || char === '\'') {
+      quote = char
+      buffer += char
+      continue
+    }
+    if (char === '{' || char === '[' || char === '(') depth += 1
+    if (char === '}' || char === ']' || char === ')') depth -= 1
+    if (char === ',' && depth === 0) {
+      result.push(buffer.trim())
+      buffer = ''
+      continue
+    }
+    buffer += char
+  }
+
+  if (buffer.trim()) result.push(buffer.trim())
+  return result
+}
+
+function parseHotspot(value: string | undefined): { x: number; y: number } | undefined {
+  if (!value) return undefined
+  const [x, y] = value.split(/\s+/).map(item => Number(item))
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return undefined
+  return { x, y }
+}
+
+function parseCursorProps(
+  value: string | undefined,
+  diagnostics: NovaUiStyleDiagnostic[],
+  source: string,
+  offset: number,
+): Record<string, unknown> | undefined {
+  if (!value) return undefined
+  try {
+    const parsed = JSON.parse(value)
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : undefined
+  } catch {
+    diagnostics.push(createDiagnostic('error', 'invalid-cursor-props', `Невалидные props cursor "${value}".`, source, offset))
+    return undefined
+  }
 }
 
 function stripCommentsPreservePositions(source: string): string {
