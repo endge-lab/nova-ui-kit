@@ -6,16 +6,14 @@ import type {
 } from '@endge/nova'
 import type { EventList } from '@endge/utils'
 import { normalizeTextBlockProps } from '@/components/TextBlock/TextBlockLayout'
-import {
-  buildTextBlockSchema,
-  toTextBlockMeasureSchema,
-} from '@/components/TextBlock/TextBlock.schema'
+import { buildTextBlockSchema } from '@/components/TextBlock/TextBlock.schema'
 import {
   TEXT_BLOCK_SCHEMA_TYPE,
   type TextBlockApi,
   type TextBlockProps,
   type TextBlockResolvedProps,
 } from '@/components/TextBlock/TextBlock.types'
+import { measureNovaUiTextWidth } from '@/shared/layout'
 
 export type TextBlockDescriptor = NovaComponentDescriptor<
   TextBlockResolvedProps,
@@ -92,9 +90,9 @@ export function createTextBlockDescriptor(createNode?: TextBlockNodeFactory): Te
     },
     fields: TEXT_BLOCK_FIELD_DEFINITIONS,
     normalize: schema => normalizeTextBlockProps(schema.props),
-    renderSchema: (context, schema) => buildTextBlockSchema(
+    renderSchema: (_context, schema) => buildTextBlockSchema(
       normalizeTextBlockProps(schema.props),
-      (text, options) => context.renderer.measureText(toTextBlockMeasureSchema(text, options)).width,
+      (text, options) => measureNovaUiTextWidth(text, options),
       'schema',
     ),
     measureBounds: (_context, schema) => {

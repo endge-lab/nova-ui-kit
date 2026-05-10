@@ -8,10 +8,7 @@ import {
   TEXT_BLOCK_NODE_DESCRIPTOR,
   type TextBlockDescriptor,
 } from '@/components/TextBlock/TextBlock.config'
-import {
-  buildTextBlockSchema,
-  toTextBlockMeasureSchema,
-} from '@/components/TextBlock/TextBlock.schema'
+import { buildTextBlockSchema } from '@/components/TextBlock/TextBlock.schema'
 import { layoutTextBlock, normalizeTextBlockProps } from '@/components/TextBlock/TextBlockLayout'
 import {
   type TextBlockApi,
@@ -27,6 +24,7 @@ import {
   clampLayoutNumber,
   copyRect,
   createLayoutRect,
+  measureNovaUiTextWidth,
   rectEquals,
   type NovaUiLayoutConstraints,
   type NovaUiLayoutMeasure,
@@ -316,7 +314,7 @@ export class TextBlock<E extends EventList = Record<string, any>>
   private readonly measureText: TextBlockMeasureFn = (text, options) => (
     this.textMeasureCache.get(
       `${options.fontFamily}|${options.fontSize}|${options.fontWeight}|${options.fontStyle}|${text}`,
-      () => this.renderer.measureText(toTextBlockMeasureSchema(text, options)).width,
+      () => measureNovaUiTextWidth(text, options),
     )
   )
 }
