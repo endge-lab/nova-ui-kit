@@ -72,9 +72,10 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
 
   toggle(event?: Event): void {
     if (this.props.kind === 'ToggleSwitch') {
-      this.setProps({ checked: !this.props.checked, value: !this.props.checked })
+      const next = !this.props.checked
+      this.setProps({ checked: next, value: next })
       this.playUiSound('change')
-      this.props.onChange?.(!this.props.checked, event)
+      this.props.onChange?.(next, event)
       return
     }
     this.setProps({ open: !this.props.open, expanded: !this.props.expanded })
