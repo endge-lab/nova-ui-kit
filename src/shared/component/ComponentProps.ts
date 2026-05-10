@@ -27,13 +27,15 @@ import {
   type NovaUiStyleReceiveResult,
   type NovaUiStyleTarget,
 } from '@/shared/style'
-import { NovaComponentNode, type NovaApp, type NovaSurface } from '@endge/nova'
+import { NovaComponentNode, type NovaApp, type NovaSoundCueInput, type NovaSurface } from '@endge/nova'
 import type { NovaComponentDescriptor } from '@endge/nova'
 import { requireNovaUiRoot } from '@/components/Root/RootTarget'
 
 export type NovaUiComponentSize = 'sm' | 'md' | 'lg'
 export type NovaUiOrientation = 'horizontal' | 'vertical'
 export type NovaUiIconSource = CanvasImageSource | string
+export type NovaUiSoundEventName = 'hover' | 'press' | 'change' | 'disabledPress'
+export type NovaUiSoundMap = Partial<Record<NovaUiSoundEventName, NovaSoundCueInput>>
 
 export interface NovaUiCommonProps extends NovaUiMotionOptions, NovaUiStyleIdentityProps {
   x?: number
@@ -60,6 +62,7 @@ export interface NovaUiCommonProps extends NovaUiMotionOptions, NovaUiStyleIdent
   activeBackground?: string
   disabled?: boolean
   disabledOpacity?: number
+  sound?: NovaUiSoundMap
   cursor?: NovaCursorDeclaration
   cursorContext?: NovaCursorContext
 }
@@ -89,6 +92,7 @@ export interface NovaUiCommonResolvedProps extends NovaUiStyleIdentityProps {
   activeBackground?: string
   disabled: boolean
   disabledOpacity: number
+  sound?: NovaUiSoundMap
   cursor?: NovaCursorDeclaration
   cursorContext?: NovaCursorContext
 }
@@ -142,6 +146,7 @@ export const NOVA_UI_COMMON_FIELD_DEFINITIONS = {
   activeBackground: { type: 'string' },
   disabled: { type: 'boolean' },
   disabledOpacity: { type: 'number' },
+  sound: { type: 'record' },
   cursor: { type: 'cursor' },
   cursorContext: { type: 'record' },
   motion: { type: 'motion' },
@@ -172,6 +177,7 @@ export const NOVA_UI_COMMON_DIRTY_POLICY = {
     'activeBackground',
     'disabled',
     'disabledOpacity',
+    'sound',
     'cursor',
     'cursorContext',
     'className',
@@ -208,6 +214,7 @@ export function normalizeCommonProps<TProps extends NovaUiCommonProps>(
     activeBackground: props.activeBackground ?? defaults.activeBackground,
     disabled: props.disabled ?? defaults.disabled ?? false,
     disabledOpacity: clamp01(finiteNumber(props.disabledOpacity, defaults.disabledOpacity ?? 0.45)),
+    sound: props.sound ?? defaults.sound,
     cursor: props.cursor ?? defaults.cursor,
     cursorContext: props.cursorContext ?? defaults.cursorContext,
     className: props.className ?? defaults.className,
@@ -383,6 +390,13 @@ export abstract class NovaUiComponentNode<
 
   protected override onMount(): void {
     requireNovaUiRoot(this)
+  }
+
+  /**
+   * Проигрывает декларативный sound cue компонента.
+   */
+  protected playUiSound(eventName: NovaUiSoundEventName): void {
+    this.nova.sound.playCue(this.props.sound?.[eventName])
   }
 
   protected applyCommonPropsChanged(changedKeys: (keyof TProps)[]): void {

@@ -29,6 +29,7 @@ export function createEmptyStyleSheet(source = ''): NovaUiCompiledStyleSheet {
     universal: [],
     version: 0,
     source,
+    tokenDependencies: [],
   }
 }
 
@@ -45,6 +46,7 @@ export function compileStyleSheetIndexes(
     universal: [],
     version: Date.now(),
     source,
+    tokenDependencies: [],
   }
 
   for (const rule of rules) {

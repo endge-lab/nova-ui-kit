@@ -209,6 +209,23 @@ describe('Nova UI Kit components', () => {
   })
 
   it('normalizes component props and stylesheet declarations under load', () => {
+    const cursor = {
+      hover: 'pointer',
+      dragging: { type: 'component', component: 'ResizeCursor', props: { axis: 'x' }, hotspot: { x: 8, y: 8 } },
+      disabled: 'not-allowed',
+    } as const
+    const buttonProps = normalizeButtonProps({ cursor, cursorContext: { axis: 'x' } })
+    const verticalSliderProps = normalizeSliderProps({ orientation: 'vertical' })
+
+    expect(buttonProps.cursor).toBe(cursor)
+    expect(buttonProps.cursorContext).toEqual({ axis: 'x' })
+    expect(verticalSliderProps.cursor).toEqual({
+      hover: 'ns-resize',
+      pressed: 'ns-resize',
+      dragging: 'ns-resize',
+      disabled: 'not-allowed',
+    })
+
     const normalizers = [
       normalizeSurfaceProps,
       normalizeButtonProps,
@@ -252,6 +269,41 @@ describe('Nova UI Kit components', () => {
     `)
     expect(validation.ok).toBe(true)
     expect(validation.styleSheet?.rules.length).toBe(4)
+  })
+
+  it('creates schema nodes with common cursor props', () => {
+    const app = createApp()
+    const surface = app.createSurface2D('cursor-props')
+    app.schema.createNode(surface, {
+      type: NovaUiKit.Root,
+      id: 'cursor-root',
+      props: {
+        cursor: { default: 'default' },
+        cursorContext: { scope: 'root' },
+      },
+      children: [
+        {
+          type: NovaUiKit.Button,
+          id: 'cursor-button',
+          props: {
+            text: 'Cursor',
+            cursor: {
+              hover: 'pointer',
+              pressed: { type: 'component', component: 'PressCursor' },
+            },
+            cursorContext: { axis: 'x' },
+          },
+        },
+      ],
+    })
+
+    expect(app.components.requireApi<ButtonApi>('cursor-button').getProps().cursor).toEqual({
+      hover: 'pointer',
+      pressed: { type: 'component', component: 'PressCursor' },
+    })
+    expect(app.components.requireApi<ButtonApi>('cursor-button').getProps().cursorContext).toEqual({ axis: 'x' })
+
+    app.destroy()
   })
 
   it('relayouts layout-target children inside visual containers', () => {

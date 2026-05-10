@@ -1,4 +1,11 @@
-import type { NovaApp, NovaComponentSchema, NovaNode, NovaSchema, NovaSurface } from '@endge/nova'
+import {
+  reconcileNovaTemplateChildren,
+  type NovaApp,
+  type NovaComponentSchema,
+  type NovaNode,
+  type NovaSchema,
+  type NovaSurface,
+} from '@endge/nova'
 import type { EventList } from '@endge/utils'
 import {
   TOOLTIP_NODE_DESCRIPTOR,
@@ -49,8 +56,12 @@ export class Tooltip<E extends EventList = Record<string, any>>
   }
 
   setTrigger(schema: NovaComponentSchema | undefined): void {
-    this.triggerNode?.remove()
-    this.triggerNode = schema ? this.nova.schema.createChild(this, schema) as NovaNode<E> : null
+    const reconciled = reconcileNovaTemplateChildren(
+      this,
+      this.triggerNode ? [this.triggerNode] : [],
+      schema ? [schema] : [],
+    )
+    this.triggerNode = reconciled.nodes[0] ?? null
     this.dirty({ update: true, render: true })
   }
 

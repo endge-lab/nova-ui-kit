@@ -1,4 +1,4 @@
-import type { NovaApp, NovaNode, NovaSchema, NovaSurface } from '@endge/nova'
+import { reconcileNovaTemplateChildren, type NovaApp, type NovaNode, type NovaSchema, type NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
 import {
   PANEL_NODE_DESCRIPTOR,
@@ -57,11 +57,9 @@ export class Panel<E extends EventList = Record<string, any>>
   }
 
   setChildren(children: PanelChildSchema[]): void {
-    for (const child of this.childrenNodes) child.remove()
+    const reconciled = reconcileNovaTemplateChildren(this, this.childrenNodes, children)
     this.childrenNodes.length = 0
-    for (const child of children) {
-      this.childrenNodes.push(this.nova.schema.createChild(this, child) as NovaNode<E>)
-    }
+    this.childrenNodes.push(...reconciled.nodes)
     this.dirty({ update: true, render: true })
   }
 

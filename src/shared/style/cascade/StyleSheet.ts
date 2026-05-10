@@ -91,12 +91,32 @@ export interface NovaUiCompiledStyleSheet {
   universal: NovaUiCompiledStyleRule[]
   version: number
   source?: string
+  tokenDependencies?: string[]
+}
+
+/** Precompiled stylesheet asset для `.novacss` и `<style>` блоков `.nova`. */
+export interface NovaUiStyleSheetAsset {
+  ok: boolean
+  source: string
+  styleSheet: NovaUiCompiledStyleSheet | null
+  diagnostics: NovaUiStyleDiagnostic[]
+  tokenDependencies: string[]
+  scopeId?: string
+}
+
+/** Runtime resolver theme/CSS tokens вне render hot path. */
+export interface NovaUiStyleTokenResolver {
+  resolve: (name: string, fallback?: string) => string | undefined
+  version?: number
 }
 
 /** Публичный API Root style engine. */
 export interface NovaUiRootStyleApi {
-  setStyleSheetSource: (source: string) => void
+  setStyleSheetSource: (source: string | NovaUiStyleSheetAsset) => void
+  setStyleSheetAsset: (asset: NovaUiStyleSheetAsset) => void
   resetStyleSheet: () => void
+  refreshStyleTokens: () => void
+  setStyleTokenResolver: (resolver: NovaUiStyleTokenResolver | null) => void
   validateStyleSheet: (source: string) => NovaUiStyleValidationResult
 }
 

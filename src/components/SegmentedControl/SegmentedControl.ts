@@ -49,10 +49,14 @@ export class SegmentedControl<E extends EventList = Record<string, any>>
   }
 
   setValue(value: string, event?: Event): void {
-    if (this.props.disabled) return
+    if (this.props.disabled) {
+      this.playUiSound('disabledPress')
+      return
+    }
     const item = this.props.items.find(candidate => candidate.value === value)
     if (!item || item.disabled || value === this.props.value) return
     this.setProps({ value })
+    this.playUiSound('change')
     this.props.onChange?.(value, event)
   }
 
@@ -111,7 +115,9 @@ export class SegmentedControl<E extends EventList = Record<string, any>>
   private setupEvents(): void {
     this.on('mousemove', event => {
       if (this.props.disabled) return
+      const previous = this.hoveredIndex
       this.hoveredIndex = this.indexFromEvent(event)
+      if (this.hoveredIndex >= 0 && this.hoveredIndex !== previous) this.playUiSound('hover')
       this.dirty({ render: true })
     })
     this.on('mouseleave', () => {
@@ -120,7 +126,10 @@ export class SegmentedControl<E extends EventList = Record<string, any>>
       this.dirty({ render: true })
     })
     this.on('mousedown', event => {
-      if (this.props.disabled) return false
+      if (this.props.disabled) {
+        this.playUiSound('disabledPress')
+        return false
+      }
       this.focus(event)
       this.pressedIndex = this.indexFromEvent(event)
       this.dirty({ render: true })

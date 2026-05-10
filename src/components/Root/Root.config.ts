@@ -32,7 +32,7 @@ export const ROOT_FIELD_DEFINITIONS = {
   height: { type: 'number' },
   padding: { type: 'spacing' },
   style: { type: 'style' },
-  styleSheet: { type: 'string' },
+  styleSheet: { type: 'stylesheet' },
   background: { type: 'string' },
   border: { type: 'border' },
   clip: { type: 'boolean' },

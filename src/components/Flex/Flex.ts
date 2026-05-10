@@ -1,5 +1,6 @@
 import {
   NovaComponentNode,
+  reconcileNovaTemplateChildren,
   type NovaApp,
   type NovaNode,
   type NovaSurface,
@@ -233,18 +234,19 @@ export class Flex<E extends EventList = Record<string, any>>
 
   /** Заменяет managed children и пересчитывает layout одним dirty pass. */
   setChildren(children: FlexChildSchema[]): void {
-    this.removeManagedChildren()
+    const previousNodes = this.childEntries.map(entry => entry.node as NovaNode<E>)
+    const reconciled = reconcileNovaTemplateChildren(this, previousNodes, children)
     this.childEntries.length = 0
     this.childEntriesById.clear()
     this.rectsById.clear()
 
-    for (const child of children) {
-      const node = this.nova.schema.createChild(this, child)
+    children.forEach((child, index) => {
+      const node = reconciled.nodes[index]
       const id = child.id ?? node.componentId
       const entry = createFlexChildEntry(id, node, child.layout)
       this.childEntries.push(entry)
       this.childEntriesById.set(id, entry)
-    }
+    })
 
     this.recomputeSubtreeStyleMask()
     this.propagateStyleContext(NovaUiStyleMask.AllText)
@@ -298,12 +300,6 @@ export class Flex<E extends EventList = Record<string, any>>
         const result = this.propagateStyleContext(changedMask)
         if (result.layout) this.layoutDirty = true
       }
-    }
-  }
-
-  private removeManagedChildren(): void {
-    for (const entry of this.childEntries) {
-      entry.node.remove()
     }
   }
 

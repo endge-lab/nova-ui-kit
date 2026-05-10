@@ -9,6 +9,7 @@ import {
   compileStyleSheetIndexes,
   createEmptyStyleSheet,
 } from '@/shared/style/cascade/StyleSelectorMatcher'
+import { extractNovaUiStyleTokenDependencies } from '@/shared/style/cascade/StyleTokenResolver'
 import type {
   NovaUiCompiledStyleRule,
   NovaUiStyleComponentName,
@@ -40,37 +41,25 @@ const COMPONENT_NAMES: NovaUiStyleComponentName[] = [
 ]
 const COMPONENT_NAME_MAP = new Map(COMPONENT_NAMES.map(name => [name.toLowerCase(), name]))
 
+interface ParsedStyleRule {
+  selector: string
+  body: string
+  offset: number
+}
+
 /** Валидирует CSS-подобный stylesheet и возвращает compiled rules для Root. */
 export function validateNovaUiStyleSheetSource(source: string): NovaUiStyleValidationResult {
   const diagnostics: NovaUiStyleDiagnostic[] = []
   const rules: NovaUiCompiledStyleRule[] = []
   const cleanedSource = stripCommentsPreservePositions(source)
-  const rulePattern = /([^{}]+)\{([^{}]*)\}/g
   let order = 0
-  let consumed = ''
-  let match: RegExpExecArray | null
 
-  while ((match = rulePattern.exec(cleanedSource)) !== null) {
-    consumed += cleanedSource.slice(consumed.length, match.index).replace(/[^\s]/g, ' ')
-    consumed += cleanedSource.slice(match.index, rulePattern.lastIndex)
-
-    const rawSelectors = match[1].trim()
-    const rawBody = match[2]
-    const selectors = rawSelectors
-      .split(',')
-      .map(selector => selector.trim())
-      .filter(Boolean)
-
-    if (selectors.length === 0) {
-      diagnostics.push(createDiagnostic('error', 'empty-selector', 'Пустой selector.', source, match.index))
-      continue
-    }
-
-    const declarations = parseDeclarations(rawBody, source, match.index + match[1].length + 1, diagnostics)
+  for (const parsedRule of parseStyleRules(cleanedSource, source, diagnostics)) {
+    const declarations = parseDeclarations(parsedRule.body, source, parsedRule.offset, diagnostics)
     if (!declarations) continue
 
-    for (const selectorSource of selectors) {
-      const selector = parseSelector(selectorSource, source, match.index, diagnostics)
+    for (const selectorSource of splitSelectorList(parsedRule.selector)) {
+      const selector = parseSelector(selectorSource, source, parsedRule.offset, diagnostics)
       if (!selector) continue
 
       rules.push({
@@ -83,17 +72,13 @@ export function validateNovaUiStyleSheetSource(source: string): NovaUiStyleValid
     }
   }
 
-  const rest = cleanedSource.slice(consumed.length).trim()
-  if (rest.length > 0) {
-    const restIndex = cleanedSource.indexOf(rest, consumed.length)
-    diagnostics.push(createDiagnostic('error', 'invalid-rule', 'Невалидный блок stylesheet.', source, restIndex))
-  }
-
   const ok = !diagnostics.some(item => item.severity === 'error')
+  const styleSheet = ok ? compileStyleSheetIndexes(rules, source) : null
+  if (styleSheet) styleSheet.tokenDependencies = extractNovaUiStyleTokenDependencies(source)
 
   return {
     ok,
-    styleSheet: ok ? compileStyleSheetIndexes(rules, source) : null,
+    styleSheet,
     diagnostics,
   }
 }
@@ -105,6 +90,230 @@ export function createEmptyStyleSheetValidationResult(source = ''): NovaUiStyleV
     styleSheet: createEmptyStyleSheet(source),
     diagnostics: [],
   }
+}
+
+function parseStyleRules(
+  cleanedSource: string,
+  originalSource: string,
+  diagnostics: NovaUiStyleDiagnostic[],
+  parentSelectors: string[] = [],
+  baseOffset = 0,
+): ParsedStyleRule[] {
+  const rules: ParsedStyleRule[] = []
+  let cursor = 0
+
+  while (cursor < cleanedSource.length) {
+    cursor = skipWhitespace(cleanedSource, cursor)
+    if (cursor >= cleanedSource.length) break
+
+    const preludeStart = cursor
+    const blockStart = findNextTopLevel(cleanedSource, cursor, ['{', ';'])
+    if (blockStart < 0) {
+      diagnostics.push(createDiagnostic('error', 'invalid-rule', 'Невалидный блок stylesheet.', originalSource, baseOffset + cursor))
+      break
+    }
+
+    const separator = cleanedSource[blockStart]
+    const prelude = cleanedSource.slice(preludeStart, blockStart).trim()
+    if (!prelude) {
+      diagnostics.push(createDiagnostic('error', 'empty-selector', 'Пустой selector.', originalSource, baseOffset + preludeStart))
+      cursor = blockStart + 1
+      continue
+    }
+
+    if (prelude.startsWith('@import')) {
+      cursor = separator === ';' ? blockStart + 1 : skipBalancedBlock(cleanedSource, blockStart)
+      continue
+    }
+
+    if (separator === ';') {
+      diagnostics.push(createDiagnostic('error', 'invalid-rule', `Невалидная декларация вне selector "${prelude}".`, originalSource, baseOffset + preludeStart))
+      cursor = blockStart + 1
+      continue
+    }
+
+    const blockEnd = findMatchingBrace(cleanedSource, blockStart)
+    if (blockEnd < 0) {
+      diagnostics.push(createDiagnostic('error', 'unclosed-rule', `Незакрытый selector "${prelude}".`, originalSource, baseOffset + blockStart))
+      break
+    }
+
+    const selectors = combineSelectors(parentSelectors, splitSelectorList(prelude))
+    const body = cleanedSource.slice(blockStart + 1, blockEnd)
+    const split = splitRuleBody(body)
+    if (split.declarations.trim()) {
+      for (const selector of selectors) {
+        rules.push({
+          selector,
+          body: split.declarations,
+          offset: baseOffset + blockStart + 1,
+        })
+      }
+    }
+
+    for (const nested of split.nested) {
+      const nestedSource = `${nested.selector}{${nested.body}}`
+      rules.push(...parseStyleRules(
+        nestedSource,
+        originalSource,
+        diagnostics,
+        selectors,
+        baseOffset + blockStart + 1 + nested.offset,
+      ))
+    }
+
+    cursor = blockEnd + 1
+  }
+
+  return rules
+}
+
+function splitRuleBody(body: string): {
+  declarations: string
+  nested: Array<{ selector: string; body: string; offset: number }>
+} {
+  const nested: Array<{ selector: string; body: string; offset: number }> = []
+  let declarations = ''
+  let cursor = 0
+
+  while (cursor < body.length) {
+    cursor = skipWhitespace(body, cursor)
+    if (cursor >= body.length) break
+
+    const start = cursor
+    const next = findNextTopLevel(body, cursor, ['{', ';'])
+    if (next < 0) {
+      declarations += `${body.slice(start).trim()};`
+      break
+    }
+
+    if (body[next] === ';') {
+      declarations += `${body.slice(start, next).trim()};`
+      cursor = next + 1
+      continue
+    }
+
+    const end = findMatchingBrace(body, next)
+    if (end < 0) {
+      declarations += body.slice(start)
+      break
+    }
+
+    nested.push({
+      selector: body.slice(start, next).trim(),
+      body: body.slice(next + 1, end),
+      offset: start,
+    })
+    cursor = end + 1
+  }
+
+  return { declarations, nested }
+}
+
+function splitSelectorList(source: string): string[] {
+  return splitTopLevel(source, ',')
+    .map(selector => selector.trim())
+    .filter(Boolean)
+}
+
+function combineSelectors(parentSelectors: string[], selectors: string[]): string[] {
+  if (parentSelectors.length === 0) return selectors
+
+  const result: string[] = []
+  for (const parent of parentSelectors) {
+    for (const selector of selectors) {
+      result.push(selector.includes('&') ? selector.replace(/&/g, parent) : `${parent} ${selector}`)
+    }
+  }
+  return result
+}
+
+function splitTopLevel(source: string, separator: string): string[] {
+  const result: string[] = []
+  let buffer = ''
+  let depth = 0
+  let quote = ''
+
+  for (const char of source) {
+    if (quote) {
+      buffer += char
+      if (char === quote) quote = ''
+      continue
+    }
+    if (char === '"' || char === '\'') {
+      quote = char
+      buffer += char
+      continue
+    }
+    if (char === '(' || char === '[') depth += 1
+    if (char === ')' || char === ']') depth -= 1
+    if (char === separator && depth === 0) {
+      result.push(buffer)
+      buffer = ''
+      continue
+    }
+    buffer += char
+  }
+
+  result.push(buffer)
+  return result
+}
+
+function skipWhitespace(source: string, cursor: number): number {
+  let index = cursor
+  while (index < source.length && /\s/.test(source[index])) index += 1
+  return index
+}
+
+function findNextTopLevel(source: string, cursor: number, chars: string[]): number {
+  let depth = 0
+  let quote = ''
+
+  for (let index = cursor; index < source.length; index += 1) {
+    const char = source[index]
+    if (quote) {
+      if (char === quote) quote = ''
+      continue
+    }
+    if (char === '"' || char === '\'') {
+      quote = char
+      continue
+    }
+    if (char === '(' || char === '[') depth += 1
+    if (char === ')' || char === ']') depth -= 1
+    if (depth === 0 && chars.includes(char)) return index
+  }
+
+  return -1
+}
+
+function findMatchingBrace(source: string, openIndex: number): number {
+  let depth = 0
+  let quote = ''
+
+  for (let index = openIndex; index < source.length; index += 1) {
+    const char = source[index]
+    if (quote) {
+      if (char === quote) quote = ''
+      continue
+    }
+    if (char === '"' || char === '\'') {
+      quote = char
+      continue
+    }
+    if (char === '{') depth += 1
+    if (char === '}') {
+      depth -= 1
+      if (depth === 0) return index
+    }
+  }
+
+  return -1
+}
+
+function skipBalancedBlock(source: string, openIndex: number): number {
+  const end = findMatchingBrace(source, openIndex)
+  return end < 0 ? source.length : end + 1
 }
 
 function parseSelector(
@@ -276,7 +485,7 @@ function parseDeclarations(
     const key = declaration.slice(0, separatorIndex).trim()
     const value = declaration.slice(separatorIndex + 1).trim()
     const parsed = parseDeclarationValue(key, value, diagnostics, source, offset)
-    if (!parsed) continue
+    if (parsed === null) continue
 
     applyParsedDeclaration(declarations, key, parsed)
     applied += 1
@@ -304,6 +513,7 @@ function parseDeclarationValue(
 
   if (key === 'clip') return parseBoolean(value, diagnostics, source, offset)
   if (key === 'cursor') return parseCursor(value, diagnostics, source, offset)
+  if (value.startsWith('var(') && NUMERIC_KEYS.has(key)) return value
   if (NUMERIC_KEYS.has(key)) return parseFiniteNumber(value, diagnostics, source, offset)
   if (key === 'padding') return parseSpacing(value, diagnostics, source, offset)
   if (STRING_KEYS.has(key)) return stripQuotes(value)

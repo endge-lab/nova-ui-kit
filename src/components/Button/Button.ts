@@ -56,7 +56,11 @@ export class Button<E extends EventList = Record<string, any>>
   }
 
   press(event?: Event): void {
-    if (this.props.disabled || this.props.loading) return
+    if (this.props.disabled || this.props.loading) {
+      this.playUiSound('disabledPress')
+      return
+    }
+    this.playUiSound('press')
     this.props.onPress?.(event)
   }
 
@@ -108,6 +112,7 @@ export class Button<E extends EventList = Record<string, any>>
     this.on('mouseenter', () => {
       if (this.props.disabled) return
       this.hovered = true
+      this.playUiSound('hover')
       this.dirty({ render: true })
     })
     this.on('mouseleave', () => {
@@ -116,7 +121,10 @@ export class Button<E extends EventList = Record<string, any>>
       this.dirty({ render: true })
     })
     this.on('mousedown', event => {
-      if (this.props.disabled || this.props.loading) return false
+      if (this.props.disabled || this.props.loading) {
+        this.playUiSound('disabledPress')
+        return false
+      }
       this.focus(event)
       this.pressed = true
       this.dirty({ render: true })

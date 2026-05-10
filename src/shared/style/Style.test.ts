@@ -7,6 +7,7 @@ import {
   mergeStyleContext,
   normalizeBorderRadius,
   styleContextChangedMask,
+  validateNovaUiStyleSheetSource,
 } from '@/shared/style'
 
 describe('Nova UI style primitives', () => {
@@ -68,5 +69,38 @@ describe('Nova UI style primitives', () => {
     })
     expect(next.mask).toBe(NovaUiStyleMask.Color | NovaUiStyleMask.FontSize | NovaUiStyleMask.FontFamily)
     expect(styleContextChangedMask(parent, next)).toBe(NovaUiStyleMask.Color | NovaUiStyleMask.FontFamily)
+  })
+
+  it('parses cursor declarations and right-most pseudo selectors', () => {
+    const result = validateNovaUiStyleSheetSource(`
+      Root {
+        cursor: url("/cursors/cursor-pointer.svg", 2 2, default);
+      }
+
+      Surface.resize-x:hover {
+        cursor: component("ResizeCursor", { "axis": "x" }, 8 8);
+      }
+
+      Surface.resize-x:dragging {
+        cursor: component("ResizeCursor", { "axis": "x", "active": true }, 8 8);
+      }
+    `)
+
+    expect(result.diagnostics).toEqual([])
+    expect(result.ok).toBe(true)
+    expect(result.styleSheet?.rules[0]?.declarations.cursor).toEqual({
+      type: 'url',
+      src: '/cursors/cursor-pointer.svg',
+      hotspot: { x: 2, y: 2 },
+      fallback: 'default',
+    })
+    expect(result.styleSheet?.rules[1]?.selector.parts[0]?.pseudos).toEqual(['hover'])
+    expect(result.styleSheet?.rules[1]?.declarations.cursor).toEqual({
+      type: 'component',
+      component: 'ResizeCursor',
+      props: { axis: 'x' },
+      hotspot: { x: 8, y: 8 },
+    })
+    expect(result.styleSheet?.rules[2]?.selector.parts[0]?.pseudos).toEqual(['dragging'])
   })
 })

@@ -1,5 +1,6 @@
 import {
   NovaComponentNode,
+  reconcileNovaTemplateChildren,
   type NovaApp,
   type NovaCursorDeclaration,
   type NovaCursorStateMap,
@@ -39,13 +40,18 @@ import {
   borderRadiusToRendererValue,
   createEmptyStyleSheet,
   createEmptyStyleSheetValidationResult,
+  createNovaUiCssVariableTokenResolver,
   isNovaUiStyleTarget,
+  isNovaUiStyleSheetAsset,
   matchStyleRules,
   mergeStyleContext,
+  resolveNovaUiStyleSheetTokens,
   styleContextChangedMask,
   validateNovaUiStyleSheetSource,
   type NovaUiCompiledStyleSheet,
   type NovaUiStyleDeclarations,
+  type NovaUiStyleSheetAsset,
+  type NovaUiStyleTokenResolver,
   type NovaUiStyleReceiveResult,
   type NovaUiStyleValidationResult,
   type NovaUiStylableNode,
@@ -71,8 +77,10 @@ export class Root<E extends EventList = Record<string, any>>
   private layoutDirty = true
   private externalLayout = false
   private styleSheet: NovaUiCompiledStyleSheet = createEmptyStyleSheet()
+  private rawStyleSheet: NovaUiCompiledStyleSheet = createEmptyStyleSheet()
   private validation: NovaUiStyleValidationResult = createEmptyStyleSheetValidationResult()
   private effectiveStyleContext = EMPTY_STYLE_CONTEXT
+  private tokenResolver: NovaUiStyleTokenResolver | null = null
 
   constructor(
     app: NovaApp<E>,
@@ -86,7 +94,10 @@ export class Root<E extends EventList = Record<string, any>>
     this.__type = 'Root'
     this.api = {
       setStyleSheetSource: source => this.setStyleSheetSource(source),
+      setStyleSheetAsset: asset => this.setStyleSheetAsset(asset),
       resetStyleSheet: () => this.resetStyleSheet(),
+      refreshStyleTokens: () => this.refreshStyleTokens(),
+      setStyleTokenResolver: resolver => this.setStyleTokenResolver(resolver),
       validateStyleSheet: source => validateNovaUiStyleSheetSource(source),
       setChildren: children => this.setChildren(children),
       getValidation: () => this.validation,
@@ -94,6 +105,9 @@ export class Root<E extends EventList = Record<string, any>>
       relayout: () => this.relayout(),
       getChildRect: () => this.childRect,
     }
+    this.tokenResolver = typeof window === 'undefined'
+      ? null
+      : createNovaUiCssVariableTokenResolver(app.canvas.element)
     this.applyResolvedRect({
       x: resolvedProps.x,
       y: resolvedProps.y,
@@ -124,17 +138,50 @@ export class Root<E extends EventList = Record<string, any>>
   }
 
   /** Валидирует stylesheet source и применяет пустую схему при ошибке. */
-  setStyleSheetSource(source: string): void {
+  setStyleSheetSource(source: string | NovaUiStyleSheetAsset): void {
+    if (isNovaUiStyleSheetAsset(source)) {
+      this.setStyleSheetAsset(source)
+      return
+    }
+
     const validation = source.trim()
       ? validateNovaUiStyleSheetSource(source)
       : createEmptyStyleSheetValidationResult(source)
 
     this.validation = validation
-    this.styleSheet = validation.ok && validation.styleSheet
+    this.rawStyleSheet = validation.ok && validation.styleSheet
       ? validation.styleSheet
       : createEmptyStyleSheet(source)
+    this.styleSheet = resolveNovaUiStyleSheetTokens(this.rawStyleSheet, this.tokenResolver)
     this.props.styleSheet = source
     this.applyCascade()
+  }
+
+  /** Применяет precompiled stylesheet asset без повторного parse source. */
+  setStyleSheetAsset(asset: NovaUiStyleSheetAsset): void {
+    this.validation = {
+      ok: asset.ok,
+      styleSheet: asset.styleSheet,
+      diagnostics: asset.diagnostics,
+    }
+    this.rawStyleSheet = asset.ok && asset.styleSheet
+      ? asset.styleSheet
+      : createEmptyStyleSheet(asset.source)
+    this.styleSheet = resolveNovaUiStyleSheetTokens(this.rawStyleSheet, this.tokenResolver)
+    this.props.styleSheet = asset
+    this.applyCascade()
+  }
+
+  /** Обновляет token-resolved stylesheet после смены темы или token context. */
+  refreshStyleTokens(): void {
+    this.styleSheet = resolveNovaUiStyleSheetTokens(this.rawStyleSheet, this.tokenResolver)
+    this.applyCascade()
+  }
+
+  /** Задает resolver theme/CSS tokens для Nova stylesheet. */
+  setStyleTokenResolver(resolver: NovaUiStyleTokenResolver | null): void {
+    this.tokenResolver = resolver
+    this.refreshStyleTokens()
   }
 
   /** Сбрасывает selector stylesheet без пересоздания дерева. */
@@ -144,13 +191,9 @@ export class Root<E extends EventList = Record<string, any>>
 
   /** Заменяет managed children и применяет layout/style одним проходом. */
   setChildren(children: RootChildSchema[]): void {
-    this.removeManagedChildren()
+    const reconciled = reconcileNovaTemplateChildren(this, this.managedChildren, children)
     this.managedChildren.length = 0
-
-    for (const child of children) {
-      const node = this.nova.schema.createChild(this, child)
-      this.managedChildren.push(node)
-    }
+    this.managedChildren.push(...reconciled.nodes)
 
     this.layoutDirty = true
     this.applyCascade()
@@ -416,11 +459,6 @@ export class Root<E extends EventList = Record<string, any>>
     return result
   }
 
-  private removeManagedChildren(): void {
-    for (const child of this.managedChildren) {
-      child.remove()
-    }
-  }
 }
 
 function mergeRuleDeclarations(rules: ReturnType<typeof matchStyleRules>): NovaUiStyleDeclarations {

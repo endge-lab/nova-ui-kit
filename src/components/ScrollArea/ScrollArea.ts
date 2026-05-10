@@ -1,4 +1,4 @@
-import type { NovaApp, NovaNode, NovaSurface } from '@endge/nova'
+import { reconcileNovaTemplateChildren, type NovaApp, type NovaNode, type NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
 import {
   SCROLL_AREA_NODE_DESCRIPTOR,
@@ -58,11 +58,9 @@ export class ScrollArea<E extends EventList = Record<string, any>>
   }
 
   setChildren(children: ScrollAreaChildSchema[]): void {
-    for (const child of this.contentChildren) child.remove()
+    const reconciled = reconcileNovaTemplateChildren(this, this.contentChildren, children)
     this.contentChildren.length = 0
-    for (const child of children) {
-      this.contentChildren.push(this.nova.schema.createChild(this, child) as NovaNode<E>)
-    }
+    this.contentChildren.push(...reconciled.nodes)
     this.dirty({ update: true, render: true })
   }
 

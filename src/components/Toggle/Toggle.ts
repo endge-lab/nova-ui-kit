@@ -45,9 +45,13 @@ export class Toggle<E extends EventList = Record<string, any>>
   }
 
   toggle(event?: Event): void {
-    if (this.props.disabled) return
+    if (this.props.disabled) {
+      this.playUiSound('disabledPress')
+      return
+    }
     const checked = !this.props.checked
     this.setProps({ checked })
+    this.playUiSound('change')
     this.props.onChange?.(checked, event)
   }
 
@@ -92,12 +96,19 @@ export class Toggle<E extends EventList = Record<string, any>>
   }
 
   private setupEvents(): void {
+    this.on('mouseenter', () => {
+      if (this.props.disabled) return
+      this.playUiSound('hover')
+    })
     this.on('mouseleave', () => {
       this.pressed = false
       this.dirty({ render: true })
     })
     this.on('mousedown', event => {
-      if (this.props.disabled) return false
+      if (this.props.disabled) {
+        this.playUiSound('disabledPress')
+        return false
+      }
       this.focus(event)
       this.pressed = true
       this.dirty({ render: true })

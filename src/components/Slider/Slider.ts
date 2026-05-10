@@ -42,10 +42,14 @@ export class Slider<E extends EventList = Record<string, any>>
   }
 
   setValue(value: number, event?: Event): void {
-    if (this.props.disabled) return
+    if (this.props.disabled) {
+      this.playUiSound('disabledPress')
+      return
+    }
     const next = normalizeSliderProps({ ...this.props, value }).value
     if (next === this.props.value) return
     this.setProps({ value: next })
+    this.playUiSound('change')
     this.props.onChange?.(next, event)
   }
 
@@ -109,8 +113,15 @@ export class Slider<E extends EventList = Record<string, any>>
   }
 
   private setupEvents(): void {
+    this.on('mouseenter', () => {
+      if (this.props.disabled) return
+      this.playUiSound('hover')
+    })
     this.on('mousedown', event => {
-      if (this.props.disabled) return false
+      if (this.props.disabled) {
+        this.playUiSound('disabledPress')
+        return false
+      }
       this.focus(event)
       this.dragging = true
       this.setValue(this.valueFromEvent(event), event)

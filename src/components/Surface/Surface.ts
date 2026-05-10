@@ -1,4 +1,4 @@
-import type { NovaNode } from '@endge/nova'
+import { reconcileNovaTemplateChildren, type NovaNode } from '@endge/nova'
 import type { EventList } from '@endge/utils'
 import {
   SURFACE_NODE_DESCRIPTOR,
@@ -66,12 +66,9 @@ export class Surface<E extends EventList = Record<string, any>>
   }
 
   setChildren(children: SurfaceChildSchema[]): void {
-    this.removeManagedChildren()
+    const reconciled = reconcileNovaTemplateChildren(this, this.managedChildren, children)
     this.managedChildren.length = 0
-
-    for (const child of children) {
-      this.managedChildren.push(this.nova.schema.createChild(this, child) as NovaNode<E>)
-    }
+    this.managedChildren.push(...reconciled.nodes)
 
     this.propagateStyleContext(NovaUiStyleMask.AllText)
     this.relayout()
@@ -137,7 +134,4 @@ export class Surface<E extends EventList = Record<string, any>>
     return result
   }
 
-  private removeManagedChildren(): void {
-    for (const child of this.managedChildren) child.remove()
-  }
 }

@@ -181,6 +181,31 @@ describe('Nova UI style propagation performance', () => {
     }
   })
 
+  it('benchmarks cursor pseudo selector compile and matching', () => {
+    const source = Array.from({ length: 1_000 }, (_item, index) => (
+      `TextBlock.item-${index}:hover { cursor: component("ResizeCursor", { "axis": "x" }, 8 8); }`
+    )).join('\n')
+    const sheet = validateNovaUiStyleSheetSource(source).styleSheet!
+    const nodes = createBenchmarkStyleNodes(10_000)
+    const result = measureBench('cursor pseudo selector matching 10000', nodes.length, () => {
+      let matches = 0
+      for (const node of nodes) {
+        const rules = matchStyleRules(node, sheet)
+        if (rules[0]?.declarations.cursor !== undefined) matches += 1
+      }
+      return {
+        renderCount: matches,
+        updateCount: 0,
+        skippedCount: nodes.length - matches,
+      }
+    })
+
+    logBench(result)
+    expect(sheet.rules).toHaveLength(1_000)
+    expect(result.renderCount).toBe(nodes.length)
+    expect(result.averageMs).toBeLessThan(100)
+  })
+
   it('benchmarks selector cascade style diff budget', () => {
     const size = 10_000
     const sheet = validateNovaUiStyleSheetSource('TextBlock.item { color: #123456; }').styleSheet as NovaUiCompiledStyleSheet

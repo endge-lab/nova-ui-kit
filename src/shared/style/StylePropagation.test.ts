@@ -7,6 +7,8 @@ import {
   RendererType,
   type NovaApp,
 } from '@endge/nova'
+import type { ButtonApi } from '@/components/Button/Button.types'
+import { BUTTON_SCHEMA_TYPE } from '@/components/Button/Button.types'
 import { FLEX_SCHEMA_TYPE } from '@/components/Flex/Flex.types'
 import { GRID_SCHEMA_TYPE } from '@/components/Grid/Grid.types'
 import { Root } from '@/components/Root/Root'
@@ -87,6 +89,10 @@ function createApp(): NovaApp<TestEvents> {
 
 function textApi(app: NovaApp<TestEvents>, id: string): TextBlockApi {
   return app.components.requireApi<TextBlockApi>(id)
+}
+
+function buttonApi(app: NovaApp<TestEvents>, id: string): ButtonApi {
+  return app.components.requireApi<ButtonApi>(id)
 }
 
 describe('Nova UI style propagation', () => {
@@ -178,6 +184,53 @@ describe('Nova UI style propagation', () => {
 
     expect(textApi(app, 'target').getProps().color).toBe('#333333')
     expect(textApi(app, 'target').getProps().fontSize).toBe(18)
+
+    app.destroy()
+  })
+
+  it('compiles pseudo cursor rules into node cursor declarations', () => {
+    const app = createApp()
+    const surface = app.createSurface2D('style')
+
+    const root = app.schema.createNode(surface, {
+      type: ROOT_SCHEMA_TYPE,
+      id: 'root',
+      props: {
+        styleSheet: `
+          Root { cursor: url("/cursors/cursor-pointer.svg", 2 2, default); }
+          Button.resize:hover { cursor: component("ResizeCursor", { "axis": "x" }, 8 8); }
+          Button.resize:pressed { cursor: pointer; }
+          Button.resize { color: #334455; }
+        `,
+      },
+      children: [
+        {
+          type: BUTTON_SCHEMA_TYPE,
+          id: 'resize-button',
+          props: {
+            className: 'resize',
+            text: 'Resize',
+          },
+        },
+      ],
+    }) as Root<TestEvents>
+
+    expect(root.getProps().cursor).toEqual({
+      type: 'url',
+      src: '/cursors/cursor-pointer.svg',
+      hotspot: { x: 2, y: 2 },
+      fallback: 'default',
+    })
+    expect(buttonApi(app, 'resize-button').getProps().cursor).toEqual({
+      hover: {
+        type: 'component',
+        component: 'ResizeCursor',
+        props: { axis: 'x' },
+        hotspot: { x: 8, y: 8 },
+      },
+      pressed: 'pointer',
+    })
+    expect(buttonApi(app, 'resize-button').getProps().color).toBe('#334455')
 
     app.destroy()
   })

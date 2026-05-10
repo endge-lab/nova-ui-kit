@@ -1,4 +1,4 @@
-import type { NovaApp, NovaNode, NovaSurface } from '@endge/nova'
+import { reconcileNovaTemplateChildren, type NovaApp, type NovaNode, type NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
 import { ColResizer } from '@/components/ColResizer/ColResizer'
 import { RowResizer } from '@/components/RowResizer/RowResizer'
@@ -53,11 +53,10 @@ export class SplitPane<E extends EventList = Record<string, any>>
   }
 
   setChildren(children: SplitPaneChildSchema[]): void {
-    for (const pane of this.panes) pane.remove()
+    const nextSchemas = children.slice(0, 2)
+    const reconciled = reconcileNovaTemplateChildren(this, this.panes, nextSchemas)
     this.panes.length = 0
-    for (const child of children.slice(0, 2)) {
-      this.panes.push(this.nova.schema.createChild(this, child) as NovaNode<E>)
-    }
+    this.panes.push(...reconciled.nodes)
     this.dirty({ update: true, render: true })
   }
 

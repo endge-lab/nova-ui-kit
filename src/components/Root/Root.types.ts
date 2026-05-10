@@ -7,6 +7,8 @@ import type {
   NovaUiBorder,
   NovaUiInheritedTextStyle,
   NovaUiStyleDiagnostic,
+  NovaUiStyleSheetAsset,
+  NovaUiStyleTokenResolver,
   NovaUiStyleIdentityProps,
   NovaUiStyleValidationResult,
 } from '@/shared/style'
@@ -22,7 +24,7 @@ export interface RootProps extends NovaUiStyleIdentityProps {
   height?: number
   padding?: NovaUiSpacing
   style?: NovaUiInheritedTextStyle
-  styleSheet?: string
+  styleSheet?: string | NovaUiStyleSheetAsset
   background?: string
   border?: NovaUiBorder
   clip?: boolean
@@ -38,7 +40,7 @@ export interface RootResolvedProps extends NovaUiStyleIdentityProps {
   height: number
   padding: NovaUiSpacing
   style?: NovaUiInheritedTextStyle
-  styleSheet: string
+  styleSheet: string | NovaUiStyleSheetAsset
   background?: string
   border?: NovaUiBorder
   clip: boolean
@@ -56,8 +58,11 @@ export interface RootSchema extends NovaComponentSchema<RootProps> {
 
 /** Публичный API Root для runtime-управления stylesheet. */
 export interface RootApi {
-  setStyleSheetSource: (source: string) => void
+  setStyleSheetSource: (source: string | NovaUiStyleSheetAsset) => void
+  setStyleSheetAsset: (asset: NovaUiStyleSheetAsset) => void
   resetStyleSheet: () => void
+  refreshStyleTokens: () => void
+  setStyleTokenResolver: (resolver: NovaUiStyleTokenResolver | null) => void
   validateStyleSheet: (source: string) => NovaUiStyleValidationResult
   setChildren: (children: RootChildSchema[]) => void
   getValidation: () => NovaUiStyleValidationResult

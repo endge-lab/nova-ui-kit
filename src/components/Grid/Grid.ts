@@ -1,5 +1,6 @@
 import {
   NovaComponentNode,
+  reconcileNovaTemplateChildren,
   type NovaApp,
   type NovaNode,
   type NovaSurface,
@@ -208,18 +209,19 @@ export class Grid<E extends EventList = Record<string, any>>
 
   /** Заменяет managed children и пересчитывает layout одним dirty pass. */
   setChildren(children: GridChildSchema[]): void {
-    this.removeManagedChildren()
+    const previousNodes = this.childEntries.map(entry => entry.node as NovaNode<E>)
+    const reconciled = reconcileNovaTemplateChildren(this, previousNodes, children)
     this.childEntries.length = 0
     this.childEntriesById.clear()
     this.rectsById.clear()
 
-    for (const child of children) {
-      const node = this.nova.schema.createChild(this, child)
+    children.forEach((child, index) => {
+      const node = reconciled.nodes[index]
       const id = child.id ?? node.componentId
       const entry = createGridChildEntry(id, node, child.layout)
       this.childEntries.push(entry)
       this.childEntriesById.set(id, entry)
-    }
+    })
 
     this.recomputeSubtreeStyleMask()
     this.propagateStyleContext(NovaUiStyleMask.AllText)
@@ -289,12 +291,6 @@ export class Grid<E extends EventList = Record<string, any>>
     this.layoutDirty = true
     this.dirty({ update: true, matrix: true, render: true })
     return true
-  }
-
-  private removeManagedChildren(): void {
-    for (const entry of this.childEntries) {
-      entry.node.remove()
-    }
   }
 
   private propagateStyleContext(changedMask: NovaUiStyleMask): NovaUiStyleReceiveResult {
