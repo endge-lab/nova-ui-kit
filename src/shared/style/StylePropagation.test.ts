@@ -104,7 +104,7 @@ describe('Nova UI style propagation', () => {
 
   it('propagates color as render-only style and skips explicit color overrides', () => {
     const app = createApp()
-    const surface = app.createSurface2D('style')
+    const surface = app.createSurface('style')
     const root = app.schema.createNode(surface, {
       type: ROOT_SCHEMA_TYPE,
       id: 'root',
@@ -145,7 +145,7 @@ describe('Nova UI style propagation', () => {
 
   it('requires Root for mounted UI Kit components', () => {
     const app = createApp()
-    const surface = app.createSurface2D('style')
+    const surface = app.createSurface('style')
 
     expect(() => app.schema.createNode(surface, {
       type: TEXT_BLOCK_SCHEMA_TYPE,
@@ -158,7 +158,7 @@ describe('Nova UI style propagation', () => {
 
   it('applies selector stylesheet by specificity', () => {
     const app = createApp()
-    const surface = app.createSurface2D('style')
+    const surface = app.createSurface('style')
 
     app.schema.createNode(surface, {
       type: ROOT_SCHEMA_TYPE,
@@ -190,7 +190,7 @@ describe('Nova UI style propagation', () => {
 
   it('compiles pseudo cursor rules into node cursor declarations', () => {
     const app = createApp()
-    const surface = app.createSurface2D('style')
+    const surface = app.createSurface('style')
 
     const root = app.schema.createNode(surface, {
       type: ROOT_SCHEMA_TYPE,
@@ -237,7 +237,7 @@ describe('Nova UI style propagation', () => {
 
   it('applies descendant and direct-child selectors', () => {
     const app = createApp()
-    const surface = app.createSurface2D('style')
+    const surface = app.createSurface('style')
 
     app.schema.createNode(surface, {
       type: ROOT_SCHEMA_TYPE,
@@ -278,7 +278,7 @@ describe('Nova UI style propagation', () => {
 
   it('ignores invalid selector stylesheet and exposes diagnostics', () => {
     const app = createApp()
-    const surface = app.createSurface2D('style')
+    const surface = app.createSurface('style')
     const root = app.schema.createNode(surface, {
       type: ROOT_SCHEMA_TYPE,
       id: 'root',
@@ -302,7 +302,7 @@ describe('Nova UI style propagation', () => {
 
   it('propagates font size as layout-affecting style', () => {
     const app = createApp()
-    const surface = app.createSurface2D('style')
+    const surface = app.createSurface('style')
     const root = app.schema.createNode(surface, {
       type: ROOT_SCHEMA_TYPE,
       id: 'root',
@@ -337,7 +337,7 @@ describe('Nova UI style propagation', () => {
 
   it('propagates style through Grid children', () => {
     const app = createApp()
-    const surface = app.createSurface2D('style')
+    const surface = app.createSurface('style')
 
     app.schema.createNode(surface, {
       type: ROOT_SCHEMA_TYPE,
@@ -368,7 +368,7 @@ describe('Nova UI style propagation', () => {
 
   it('skips subtree when nested container overrides changed style key', () => {
     const app = createApp()
-    const surface = app.createSurface2D('style')
+    const surface = app.createSurface('style')
     const root = app.schema.createNode(surface, {
       type: ROOT_SCHEMA_TYPE,
       id: 'root',

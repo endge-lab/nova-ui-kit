@@ -112,7 +112,7 @@ describe('Nova UI Kit components', () => {
 
   it('registers and exposes APIs for all new component schemas', () => {
     const app = createApp()
-    const surface = app.createSurface2D('components')
+    const surface = app.createSurface('components')
 
     app.schema.createNode(surface, {
       type: NovaUIKit.Root,
@@ -211,7 +211,7 @@ describe('Nova UI Kit components', () => {
 
   it('preserves keyed children and forwards schema context through UI Kit containers', () => {
     const app = createApp()
-    const surface = app.createSurface2D('context')
+    const surface = app.createSurface('context')
 
     app.schema.createNode(surface, {
       type: NovaUIKit.Root,
@@ -319,7 +319,7 @@ describe('Nova UI Kit components', () => {
 
   it('creates schema nodes with common cursor props', () => {
     const app = createApp()
-    const surface = app.createSurface2D('cursor-props')
+    const surface = app.createSurface('cursor-props')
     app.schema.createNode(surface, {
       type: NovaUIKit.Root,
       id: 'cursor-root',
@@ -355,7 +355,7 @@ describe('Nova UI Kit components', () => {
   it('plays declarative sound props for core controls', async () => {
     vi.useFakeTimers()
     const app = createApp()
-    const surface = app.createSurface2D('sound-props')
+    const surface = app.createSurface('sound-props')
     await app.sound.load([
       { id: 'ui.press', src: 'press.ogg' },
       { id: 'ui.hover', src: 'hover.ogg' },
@@ -428,7 +428,7 @@ describe('Nova UI Kit components', () => {
 
   it('relayouts layout-target children inside visual containers', () => {
     const app = createApp()
-    const surface = app.createSurface2D('containers')
+    const surface = app.createSurface('containers')
 
     app.schema.createNode(surface, {
       type: NovaUIKit.Root,
@@ -465,7 +465,7 @@ describe('Nova UI Kit components', () => {
 
   it('keeps RowResizer and ColResizer legacy creation signatures while accepting professional options', () => {
     const app = createApp()
-    const surface = app.createSurface2D('resizers')
+    const surface = app.createSurface('resizers')
     const row = RowResizer.create(app, surface, {
       x: 10,
       y: 20,
