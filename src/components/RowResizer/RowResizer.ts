@@ -1,7 +1,7 @@
 import { NovaNode } from '@endge/nova'
 import type { NovaApp } from '@endge/nova'
 import type { NovaSurface } from '@endge/nova'
-import type { ResizerOptions } from '@/domain/types'
+import type { ResizerOptions } from '@/domain/domain.types'
 import type { EventList } from '@endge/utils'
 import { resolveNovaUiMotionOptions } from '@/shared/motion'
 

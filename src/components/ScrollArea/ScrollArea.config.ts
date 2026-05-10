@@ -13,7 +13,7 @@ import {
   type ScrollAreaApi,
   type ScrollAreaProps,
   type ScrollAreaResolvedProps,
-} from '@/components/ScrollArea/types'
+} from '@/components/ScrollArea/ScrollArea.types'
 
 export type ScrollAreaDescriptor = NovaComponentDescriptor<ScrollAreaResolvedProps, ScrollAreaApi, Record<string, never>, ScrollAreaProps>
 

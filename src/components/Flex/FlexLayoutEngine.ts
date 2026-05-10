@@ -15,7 +15,7 @@ import type {
   FlexAlign,
   FlexChildLayout,
   FlexResolvedProps,
-} from '@/components/Flex/types'
+} from '@/components/Flex/Flex.types'
 
 interface AxisSpacing {
   mainStart: number

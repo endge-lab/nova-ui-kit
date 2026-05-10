@@ -22,7 +22,7 @@ import type {
   GridChildSchema,
   GridProps,
   GridResolvedProps,
-} from '@/components/Grid/types'
+} from '@/components/Grid/Grid.types'
 import { requireNovaUiRoot } from '@/components/Root/RootTarget'
 import {
   NOVA_UI_LAYOUT_TARGET,

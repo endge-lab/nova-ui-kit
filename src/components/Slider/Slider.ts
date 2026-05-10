@@ -5,7 +5,7 @@ import {
   normalizeSliderProps,
   type SliderDescriptor,
 } from '@/components/Slider/Slider.config'
-import type { SliderApi, SliderProps, SliderResolvedProps } from '@/components/Slider/types'
+import type { SliderApi, SliderProps, SliderResolvedProps } from '@/components/Slider/Slider.types'
 import {
   NovaUiComponentNode,
   clamp,

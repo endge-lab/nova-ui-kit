@@ -9,7 +9,7 @@ import type {
   SegmentedControlApi,
   SegmentedControlProps,
   SegmentedControlResolvedProps,
-} from '@/components/SegmentedControl/types'
+} from '@/components/SegmentedControl/SegmentedControl.types'
 import {
   NovaUiComponentNode,
   buildBoxSchema,

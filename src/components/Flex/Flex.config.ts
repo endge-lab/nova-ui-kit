@@ -10,7 +10,7 @@ import {
   type FlexApi,
   type FlexProps,
   type FlexResolvedProps,
-} from '@/components/Flex/types'
+} from '@/components/Flex/Flex.types'
 
 export type FlexDescriptor = NovaComponentDescriptor<
   FlexResolvedProps,

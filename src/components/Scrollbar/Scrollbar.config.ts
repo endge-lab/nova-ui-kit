@@ -13,7 +13,7 @@ import {
   type ScrollbarApi,
   type ScrollbarProps,
   type ScrollbarResolvedProps,
-} from '@/components/Scrollbar/types'
+} from '@/components/Scrollbar/Scrollbar.types'
 
 export type ScrollbarDescriptor = NovaComponentDescriptor<ScrollbarResolvedProps, ScrollbarApi, Record<string, never>, ScrollbarProps>
 

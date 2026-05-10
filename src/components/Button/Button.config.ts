@@ -17,7 +17,7 @@ import {
   type ButtonApi,
   type ButtonProps,
   type ButtonResolvedProps,
-} from '@/components/Button/types'
+} from '@/components/Button/Button.types'
 
 export type ButtonDescriptor = NovaComponentDescriptor<
   ButtonResolvedProps,

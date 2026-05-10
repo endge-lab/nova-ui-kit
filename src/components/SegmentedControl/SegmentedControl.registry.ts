@@ -6,7 +6,7 @@ import {
   normalizeSegmentedControlProps,
   type SegmentedControlDescriptor,
 } from '@/components/SegmentedControl/SegmentedControl.config'
-import type { SegmentedControlSchema } from '@/components/SegmentedControl/types'
+import type { SegmentedControlSchema } from '@/components/SegmentedControl/SegmentedControl.types'
 
 export const SEGMENTED_CONTROL_DESCRIPTOR: SegmentedControlDescriptor = createSegmentedControlDescriptor((context, schema) => {
   const segmentedSchema = schema as SegmentedControlSchema

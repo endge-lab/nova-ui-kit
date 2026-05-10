@@ -6,7 +6,7 @@ import {
   normalizeSplitPaneProps,
   type SplitPaneDescriptor,
 } from '@/components/SplitPane/SplitPane.config'
-import type { SplitPaneSchema } from '@/components/SplitPane/types'
+import type { SplitPaneSchema } from '@/components/SplitPane/SplitPane.types'
 
 export const SPLIT_PANE_DESCRIPTOR: SplitPaneDescriptor = createSplitPaneDescriptor((context, schema) => {
   const splitPaneSchema = schema as SplitPaneSchema

@@ -15,7 +15,7 @@ import {
   type TextBlockApi,
   type TextBlockProps,
   type TextBlockResolvedProps,
-} from '@/components/TextBlock/types'
+} from '@/components/TextBlock/TextBlock.types'
 
 export type TextBlockDescriptor = NovaComponentDescriptor<
   TextBlockResolvedProps,

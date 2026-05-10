@@ -14,7 +14,7 @@ import {
   type SliderApi,
   type SliderProps,
   type SliderResolvedProps,
-} from '@/components/Slider/types'
+} from '@/components/Slider/Slider.types'
 
 export type SliderDescriptor = NovaComponentDescriptor<SliderResolvedProps, SliderApi, Record<string, never>, SliderProps>
 

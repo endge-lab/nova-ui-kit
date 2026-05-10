@@ -10,7 +10,7 @@ import {
   type RootApi,
   type RootProps,
   type RootResolvedProps,
-} from '@/components/Root/types'
+} from '@/components/Root/Root.types'
 
 export type RootDescriptor = NovaComponentDescriptor<
   RootResolvedProps,

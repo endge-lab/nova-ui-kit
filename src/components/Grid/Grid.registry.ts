@@ -6,7 +6,7 @@ import {
   normalizeGridProps,
   type GridDescriptor,
 } from '@/components/Grid/Grid.config'
-import type { GridSchema } from '@/components/Grid/types'
+import type { GridSchema } from '@/components/Grid/Grid.types'
 
 export const GRID_DESCRIPTOR: GridDescriptor = createGridDescriptor((context, schema) => {
   const gridSchema = schema as GridSchema

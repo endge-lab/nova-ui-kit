@@ -6,7 +6,7 @@ import {
   normalizeScrollAreaProps,
   type ScrollAreaDescriptor,
 } from '@/components/ScrollArea/ScrollArea.config'
-import type { ScrollAreaSchema } from '@/components/ScrollArea/types'
+import type { ScrollAreaSchema } from '@/components/ScrollArea/ScrollArea.types'
 
 export const SCROLL_AREA_DESCRIPTOR: ScrollAreaDescriptor = createScrollAreaDescriptor((context, schema) => {
   const scrollAreaSchema = schema as ScrollAreaSchema

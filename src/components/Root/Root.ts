@@ -19,7 +19,7 @@ import type {
   RootChildSchema,
   RootProps,
   RootResolvedProps,
-} from '@/components/Root/types'
+} from '@/components/Root/Root.types'
 import {
   NOVA_UI_LAYOUT_TARGET,
   applyNodeLayoutRect,

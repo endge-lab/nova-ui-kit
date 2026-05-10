@@ -9,7 +9,7 @@ import type {
   NovaUiInheritedTextStyle,
   NovaUiStyleIdentityProps,
 } from '@/shared/style'
-import type { NovaUiMotionOptions } from '@/domain/types'
+import type { NovaUiMotionOptions } from '@/domain/domain.types'
 
 /** Schema type для адаптивного flex-layout компонента. */
 export const FLEX_SCHEMA_TYPE = 'nova-ui.flex'

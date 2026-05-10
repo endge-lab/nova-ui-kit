@@ -10,7 +10,7 @@ import type {
   SurfaceChildSchema,
   SurfaceProps,
   SurfaceResolvedProps,
-} from '@/components/Surface/types'
+} from '@/components/Surface/Surface.types'
 import {
   NovaUiComponentNode,
   buildBoxSchema,

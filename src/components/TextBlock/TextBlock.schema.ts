@@ -3,7 +3,7 @@ import { layoutTextBlock } from '@/components/TextBlock/TextBlockLayout'
 import type {
   TextBlockMeasureFn,
   TextBlockResolvedProps,
-} from '@/components/TextBlock/types'
+} from '@/components/TextBlock/TextBlock.types'
 import { borderRadiusToRendererValue } from '@/shared/style'
 
 export function buildTextBlockSchema(

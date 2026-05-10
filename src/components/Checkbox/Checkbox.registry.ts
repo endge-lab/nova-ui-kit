@@ -6,7 +6,7 @@ import {
   normalizeCheckboxProps,
   type CheckboxDescriptor,
 } from '@/components/Checkbox/Checkbox.config'
-import type { CheckboxSchema } from '@/components/Checkbox/types'
+import type { CheckboxSchema } from '@/components/Checkbox/Checkbox.types'
 
 export const CHECKBOX_DESCRIPTOR: CheckboxDescriptor = createCheckboxDescriptor((context, schema) => {
   const checkboxSchema = schema as CheckboxSchema

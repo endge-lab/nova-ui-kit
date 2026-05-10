@@ -92,7 +92,6 @@ function createApp(): NovaApp<TestEvents> {
     size: { width: 900, height: 560, dpr: 1 },
     renderer: {
       main: RendererType.Web2D,
-      defaultSurface: RendererType.Web2D,
     },
     scheduler: {
       type: RaphSchedulerType.Sync,

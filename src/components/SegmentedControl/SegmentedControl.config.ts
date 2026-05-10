@@ -12,7 +12,7 @@ import {
   type SegmentedControlApi,
   type SegmentedControlProps,
   type SegmentedControlResolvedProps,
-} from '@/components/SegmentedControl/types'
+} from '@/components/SegmentedControl/SegmentedControl.types'
 
 export type SegmentedControlDescriptor = NovaComponentDescriptor<SegmentedControlResolvedProps, SegmentedControlApi, Record<string, never>, SegmentedControlProps>
 

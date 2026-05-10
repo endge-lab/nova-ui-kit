@@ -9,7 +9,7 @@ import type {
   NovaUiInheritedTextStyle,
   NovaUiStyleIdentityProps,
 } from '@/shared/style'
-import type { NovaUiMotionOptions } from '@/domain/types'
+import type { NovaUiMotionOptions } from '@/domain/domain.types'
 
 /** Schema type для сеточного layout-компонента. */
 export const GRID_SCHEMA_TYPE = 'nova-ui.grid'

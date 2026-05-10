@@ -1,6 +1,6 @@
 import type { NovaComponentSchema } from '@endge/nova'
 import type { NovaUiCommonProps, NovaUiCommonResolvedProps } from '@/shared/component'
-import type { ScrollbarProps, ScrollbarState } from '@/components/Scrollbar/types'
+import type { ScrollbarProps, ScrollbarState } from '@/components/Scrollbar/Scrollbar.types'
 
 export const SCROLL_AREA_SCHEMA_TYPE = 'nova-ui.scroll-area'
 

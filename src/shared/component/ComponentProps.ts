@@ -1,6 +1,6 @@
 import type { NovaComponentSchema, NovaSchema } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import type { NovaUiMotionOptions } from '@/domain/types'
+import type { NovaUiMotionOptions } from '@/domain/domain.types'
 import {
   NOVA_UI_LAYOUT_TARGET,
   applyNodeLayoutRect,

@@ -10,7 +10,7 @@ import type {
   PanelChildSchema,
   PanelProps,
   PanelResolvedProps,
-} from '@/components/Panel/types'
+} from '@/components/Panel/Panel.types'
 import {
   NovaUiComponentNode,
   buildBoxSchema,

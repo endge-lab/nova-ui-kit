@@ -6,7 +6,7 @@ import {
   normalizeFlexProps,
   type FlexDescriptor,
 } from '@/components/Flex/Flex.config'
-import type { FlexSchema } from '@/components/Flex/types'
+import type { FlexSchema } from '@/components/Flex/Flex.types'
 
 export const FLEX_DESCRIPTOR: FlexDescriptor = createFlexDescriptor((context, schema) => {
   const flexSchema = schema as FlexSchema

@@ -6,7 +6,7 @@ import {
   normalizeTagProps,
   type TagDescriptor,
 } from '@/components/Tag/Tag.config'
-import type { TagSchema } from '@/components/Tag/types'
+import type { TagSchema } from '@/components/Tag/Tag.types'
 
 export const TAG_DESCRIPTOR: TagDescriptor = createTagDescriptor((context, schema) => {
   const tagSchema = schema as TagSchema

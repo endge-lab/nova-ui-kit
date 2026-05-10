@@ -11,7 +11,7 @@ import {
   type PanelApi,
   type PanelProps,
   type PanelResolvedProps,
-} from '@/components/Panel/types'
+} from '@/components/Panel/Panel.types'
 
 export type PanelDescriptor = NovaComponentDescriptor<PanelResolvedProps, PanelApi, Record<string, never>, PanelProps>
 

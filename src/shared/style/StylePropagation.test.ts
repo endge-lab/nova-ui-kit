@@ -7,13 +7,13 @@ import {
   RendererType,
   type NovaApp,
 } from '@endge/nova'
-import { FLEX_SCHEMA_TYPE } from '@/components/Flex/types'
-import { GRID_SCHEMA_TYPE } from '@/components/Grid/types'
+import { FLEX_SCHEMA_TYPE } from '@/components/Flex/Flex.types'
+import { GRID_SCHEMA_TYPE } from '@/components/Grid/Grid.types'
 import { Root } from '@/components/Root/Root'
-import { ROOT_SCHEMA_TYPE } from '@/components/Root/types'
+import { ROOT_SCHEMA_TYPE } from '@/components/Root/Root.types'
 import { TextBlock } from '@/components/TextBlock/TextBlock'
-import type { TextBlockApi } from '@/components/TextBlock/types'
-import { TEXT_BLOCK_SCHEMA_TYPE } from '@/components/TextBlock/types'
+import type { TextBlockApi } from '@/components/TextBlock/TextBlock.types'
+import { TEXT_BLOCK_SCHEMA_TYPE } from '@/components/TextBlock/TextBlock.types'
 import { registerNovaUiKit } from '@/registerNovaUiKit'
 
 type TestEvents = Record<string, any>
@@ -75,7 +75,6 @@ function createApp(): NovaApp<TestEvents> {
     size: { width: 800, height: 480, dpr: 1 },
     renderer: {
       main: RendererType.Web2D,
-      defaultSurface: RendererType.Web2D,
     },
     scheduler: {
       type: RaphSchedulerType.Sync,

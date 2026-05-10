@@ -10,7 +10,7 @@ import type {
   ScrollbarProps,
   ScrollbarResolvedProps,
   ScrollbarState,
-} from '@/components/Scrollbar/types'
+} from '@/components/Scrollbar/Scrollbar.types'
 import {
   NovaUiComponentNode,
   clamp,

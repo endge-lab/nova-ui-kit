@@ -1,5 +1,5 @@
 import type { NovaMotionOptions } from '@endge/nova'
-import type { NovaUiMotionOptions, NovaUiMotionPreset } from '@/domain/types'
+import type { NovaUiMotionOptions, NovaUiMotionPreset } from '@/domain/domain.types'
 
 export const NOVA_UI_MOTION_DEFAULTS: Record<NovaUiMotionPreset, NovaMotionOptions> = {
   fadeIn: { duration: 180, easing: 'outCubic' },

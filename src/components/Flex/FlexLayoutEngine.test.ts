@@ -5,7 +5,7 @@ import {
   FlexLayoutEngine,
   createFlexChildEntry,
 } from '@/components/Flex/FlexLayoutEngine'
-import type { FlexChildLayout } from '@/components/Flex/types'
+import type { FlexChildLayout } from '@/components/Flex/Flex.types'
 import { NOVA_UI_LAYOUT_TARGET } from '@/shared/layout'
 
 function createNode(width = 0, height = 0): NovaNode<any> {

@@ -11,8 +11,8 @@ import type {
   ScrollAreaProps,
   ScrollAreaResolvedProps,
   ScrollAreaState,
-} from '@/components/ScrollArea/types'
-import { SCROLLBAR_SCHEMA_TYPE, type ScrollbarApi } from '@/components/Scrollbar/types'
+} from '@/components/ScrollArea/ScrollArea.types'
+import { SCROLLBAR_SCHEMA_TYPE, type ScrollbarApi } from '@/components/Scrollbar/Scrollbar.types'
 import {
   NovaUiComponentNode,
   buildBoxSchema,

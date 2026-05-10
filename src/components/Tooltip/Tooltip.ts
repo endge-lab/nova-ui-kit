@@ -5,7 +5,7 @@ import {
   normalizeTooltipProps,
   type TooltipDescriptor,
 } from '@/components/Tooltip/Tooltip.config'
-import type { TooltipApi, TooltipProps, TooltipResolvedProps } from '@/components/Tooltip/types'
+import type { TooltipApi, TooltipProps, TooltipResolvedProps } from '@/components/Tooltip/Tooltip.types'
 import {
   NovaUiComponentNode,
   buildBoxSchema,

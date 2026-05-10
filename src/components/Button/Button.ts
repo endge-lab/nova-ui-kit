@@ -8,7 +8,7 @@ import type {
   ButtonApi,
   ButtonProps,
   ButtonResolvedProps,
-} from '@/components/Button/types'
+} from '@/components/Button/Button.types'
 import {
   NovaUiComponentNode,
   buildBoxSchema,

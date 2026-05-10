@@ -19,7 +19,7 @@ import {
   type TextBlockMeasureFn,
   type TextBlockProps,
   type TextBlockResolvedProps,
-} from '@/components/TextBlock/types'
+} from '@/components/TextBlock/TextBlock.types'
 import { requireNovaUiRoot } from '@/components/Root/RootTarget'
 import {
   NOVA_UI_LAYOUT_TARGET,

@@ -5,7 +5,7 @@ import {
   normalizeCheckboxProps,
   type CheckboxDescriptor,
 } from '@/components/Checkbox/Checkbox.config'
-import type { CheckboxApi, CheckboxProps, CheckboxResolvedProps } from '@/components/Checkbox/types'
+import type { CheckboxApi, CheckboxProps, CheckboxResolvedProps } from '@/components/Checkbox/Checkbox.types'
 import {
   NovaUiComponentNode,
   buildBoxSchema,

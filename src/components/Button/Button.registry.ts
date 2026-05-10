@@ -6,7 +6,7 @@ import {
   normalizeButtonProps,
   type ButtonDescriptor,
 } from '@/components/Button/Button.config'
-import type { ButtonSchema } from '@/components/Button/types'
+import type { ButtonSchema } from '@/components/Button/Button.types'
 
 export const BUTTON_DESCRIPTOR: ButtonDescriptor = createButtonDescriptor((context, schema) => {
   const buttonSchema = schema as ButtonSchema

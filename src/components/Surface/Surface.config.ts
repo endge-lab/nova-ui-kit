@@ -16,7 +16,7 @@ import {
   type SurfaceApi,
   type SurfaceProps,
   type SurfaceResolvedProps,
-} from '@/components/Surface/types'
+} from '@/components/Surface/Surface.types'
 
 export type SurfaceDescriptor = NovaComponentDescriptor<
   SurfaceResolvedProps,

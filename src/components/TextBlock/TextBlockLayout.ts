@@ -5,7 +5,7 @@ import type {
   TextBlockProps,
   TextBlockResolvedPadding,
   TextBlockResolvedProps,
-} from '@/components/TextBlock/types'
+} from '@/components/TextBlock/TextBlock.types'
 import { resolveSpacing } from '@/shared/layout'
 
 const DEFAULT_WIDTH = 180

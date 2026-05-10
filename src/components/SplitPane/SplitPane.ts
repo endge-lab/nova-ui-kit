@@ -12,7 +12,7 @@ import type {
   SplitPaneChildSchema,
   SplitPaneProps,
   SplitPaneResolvedProps,
-} from '@/components/SplitPane/types'
+} from '@/components/SplitPane/SplitPane.types'
 import {
   NovaUiComponentNode,
   buildBoxSchema,

@@ -6,7 +6,7 @@ import {
   normalizeSliderProps,
   type SliderDescriptor,
 } from '@/components/Slider/Slider.config'
-import type { SliderSchema } from '@/components/Slider/types'
+import type { SliderSchema } from '@/components/Slider/Slider.types'
 
 export const SLIDER_DESCRIPTOR: SliderDescriptor = createSliderDescriptor((context, schema) => {
   const sliderSchema = schema as SliderSchema

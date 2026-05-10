@@ -6,7 +6,7 @@ import {
   normalizeRootProps,
   type RootDescriptor,
 } from '@/components/Root/Root.config'
-import type { RootSchema } from '@/components/Root/types'
+import type { RootSchema } from '@/components/Root/Root.types'
 
 export const ROOT_DESCRIPTOR: RootDescriptor = createRootDescriptor((context, schema) => {
   const rootSchema = schema as RootSchema

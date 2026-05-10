@@ -6,7 +6,7 @@ import type {
   NovaUiStyleIdentityProps,
 } from '@/shared/style'
 import type { NovaUiSpacing } from '@/shared/layout'
-import type { NovaUiMotionOptions } from '@/domain/types'
+import type { NovaUiMotionOptions } from '@/domain/domain.types'
 
 export const TEXT_BLOCK_SCHEMA_TYPE = 'nova-ui.text-block'
 

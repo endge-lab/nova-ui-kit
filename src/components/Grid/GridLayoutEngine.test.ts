@@ -5,7 +5,7 @@ import {
   GridLayoutEngine,
   createGridChildEntry,
 } from '@/components/Grid/GridLayoutEngine'
-import type { GridChildLayout } from '@/components/Grid/types'
+import type { GridChildLayout } from '@/components/Grid/Grid.types'
 import { NOVA_UI_LAYOUT_TARGET } from '@/shared/layout'
 
 function createNode(width = 0, height = 0): NovaNode<any> {
