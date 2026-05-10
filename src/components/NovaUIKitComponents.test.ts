@@ -22,6 +22,7 @@ import {
   type TagApi,
   type ToggleApi,
   type TooltipApi,
+  registerNovaUiGlobalStyleSheet,
   validateNovaUiStyleSheetSource,
 } from '@/index'
 import { registerNovaUIKit } from '@/registerNovaUIKit'
@@ -250,6 +251,46 @@ describe('Nova UI Kit components', () => {
     expect(app.components.require('row-a')).toBe(first)
     expect(first.getContext<{ rowId: string }>().rowId).toBe('a2')
     expect((first.getApi() as { getProps: () => { text: string } }).getProps().text).toBe('A2')
+
+    app.destroy()
+  })
+
+  it('applies global styles to multiple Root trees', () => {
+    const app = createApp()
+    const validation = validateNovaUiStyleSheetSource(`
+      Button.global-action {
+        accentColor: #abcdef;
+      }
+    `)
+    registerNovaUiGlobalStyleSheet(app, {
+      ok: validation.ok,
+      source: validation.styleSheet?.source ?? '',
+      styleSheet: validation.styleSheet,
+      diagnostics: validation.diagnostics,
+      tokenDependencies: [],
+    })
+    const surface = app.createSurface('global-styles')
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'global-root-a',
+      children: [
+        { type: NovaUIKit.Button, id: 'global-button-a', props: { className: 'global-action', text: 'A' } },
+      ],
+    })
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'global-root-b',
+      props: { y: 80 },
+      children: [
+        { type: NovaUIKit.Button, id: 'global-button-b', props: { className: 'global-action', text: 'B' } },
+      ],
+    })
+    app.raph.run()
+    app.raph.run()
+
+    expect(app.components.requireApi<ButtonApi>('global-button-a').getProps().accentColor).toBe('#abcdef')
+    expect(app.components.requireApi<ButtonApi>('global-button-b').getProps().accentColor).toBe('#abcdef')
 
     app.destroy()
   })

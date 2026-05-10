@@ -136,6 +136,28 @@ export interface NovaUiStyleValidationResult {
   diagnostics: Array<NovaUiStyleDiagnostic>
 }
 
+/** Debug-снимок matched rule для Nova DevTools. */
+export interface NovaUiStyleMatchedRuleDebug {
+  selector: string
+  specificity: number
+  order: number
+  declarations: NovaUiStyleDeclarations
+}
+
+/** Debug-снимок cascade state для выбранной UI Kit node. */
+export interface NovaUiStyleInspectionDebug {
+  rootComponentId: string
+  nodeComponentId: string
+  nodeType: string
+  styleSheetSource: string
+  matchedRules: Array<NovaUiStyleMatchedRuleDebug>
+  mergedDeclarations: NovaUiStyleDeclarations
+  baselineProps: Record<string, unknown>
+  currentProps: Record<string, unknown>
+  appliedKeys: Array<string>
+  diagnostics: Array<NovaUiStyleDiagnostic>
+}
+
 /** Минимальный контракт node, которую cascade engine может стилизовать. */
 export type NovaUiStylableNode = NovaComponentNode<any, any, any, any> & {
   componentId: string

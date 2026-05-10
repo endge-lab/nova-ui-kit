@@ -7,10 +7,12 @@ import type {
   NovaUiBorder,
   NovaUiInheritedTextStyle,
   NovaUiStyleDiagnostic,
+  NovaUiStyleInspectionDebug,
   NovaUiStyleSheetAsset,
   NovaUiStyleTokenResolver,
   NovaUiStyleIdentityProps,
   NovaUiStyleValidationResult,
+  NovaUiStylableNode,
 } from '@/shared/style'
 
 /** Schema type корневого компонента Nova UI Kit. */
@@ -67,6 +69,8 @@ export interface RootApi {
   setChildren: (children: Array<RootChildSchema>) => void
   getValidation: () => NovaUiStyleValidationResult
   getDiagnostics: () => ReadonlyArray<NovaUiStyleDiagnostic>
+  getStyleSheetSource: () => string
+  inspectStyleNode: (node: string | NovaUiStylableNode) => NovaUiStyleInspectionDebug | null
   relayout: () => void
   getChildRect: () => Readonly<NovaUiLayoutRect>
 }

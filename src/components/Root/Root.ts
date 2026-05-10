@@ -41,15 +41,19 @@ import {
   createEmptyStyleSheet,
   createEmptyStyleSheetValidationResult,
   createNovaUiCssVariableTokenResolver,
+  getNovaUiGlobalStyleSheet,
   isNovaUiStyleTarget,
   isNovaUiStyleSheetAsset,
   matchStyleRules,
+  mergeNovaUiStyleSheets,
   mergeStyleContext,
   resolveNovaUiStyleSheetTokens,
   styleContextChangedMask,
+  subscribeNovaUiGlobalStyleSheets,
   validateNovaUiStyleSheetSource,
   type NovaUiCompiledStyleSheet,
   type NovaUiStyleDeclarations,
+  type NovaUiStyleInspectionDebug,
   type NovaUiStyleSheetAsset,
   type NovaUiStyleTokenResolver,
   type NovaUiStyleReceiveResult,
@@ -77,10 +81,12 @@ export class Root<E extends EventList = Record<string, any>>
   private layoutDirty = true
   private externalLayout = false
   private styleSheet: NovaUiCompiledStyleSheet = createEmptyStyleSheet()
+  private localRawStyleSheet: NovaUiCompiledStyleSheet = createEmptyStyleSheet()
   private rawStyleSheet: NovaUiCompiledStyleSheet = createEmptyStyleSheet()
   private validation: NovaUiStyleValidationResult = createEmptyStyleSheetValidationResult()
   private effectiveStyleContext = EMPTY_STYLE_CONTEXT
   private tokenResolver: NovaUiStyleTokenResolver | null = null
+  private readonly disposeGlobalStylesSubscription: () => void
 
   constructor(
     app: NovaApp<E>,
@@ -102,12 +108,17 @@ export class Root<E extends EventList = Record<string, any>>
       setChildren: children => this.setChildren(children),
       getValidation: () => this.validation,
       getDiagnostics: () => this.validation.diagnostics,
+      getStyleSheetSource: () => this.getStyleSheetSource(),
+      inspectStyleNode: node => this.inspectStyleNode(node),
       relayout: () => this.relayout(),
       getChildRect: () => this.childRect,
     }
     this.tokenResolver = typeof window === 'undefined'
       ? null
       : createNovaUiCssVariableTokenResolver(app.canvas.element)
+    this.disposeGlobalStylesSubscription = subscribeNovaUiGlobalStyleSheets(app, () => {
+      this.refreshCombinedStyleSheet()
+    })
     this.applyResolvedRect({
       x: resolvedProps.x,
       y: resolvedProps.y,
@@ -149,12 +160,11 @@ export class Root<E extends EventList = Record<string, any>>
       : createEmptyStyleSheetValidationResult(source)
 
     this.validation = validation
-    this.rawStyleSheet = validation.ok && validation.styleSheet
+    this.localRawStyleSheet = validation.ok && validation.styleSheet
       ? validation.styleSheet
       : createEmptyStyleSheet(source)
-    this.styleSheet = resolveNovaUiStyleSheetTokens(this.rawStyleSheet, this.tokenResolver)
     this.props.styleSheet = source
-    this.applyCascade()
+    this.refreshCombinedStyleSheet()
   }
 
   /** Применяет precompiled stylesheet asset без повторного parse source. */
@@ -164,12 +174,11 @@ export class Root<E extends EventList = Record<string, any>>
       styleSheet: asset.styleSheet,
       diagnostics: asset.diagnostics,
     }
-    this.rawStyleSheet = asset.ok && asset.styleSheet
+    this.localRawStyleSheet = asset.ok && asset.styleSheet
       ? asset.styleSheet
       : createEmptyStyleSheet(asset.source)
-    this.styleSheet = resolveNovaUiStyleSheetTokens(this.rawStyleSheet, this.tokenResolver)
     this.props.styleSheet = asset
-    this.applyCascade()
+    this.refreshCombinedStyleSheet()
   }
 
   /** Обновляет token-resolved stylesheet после смены темы или token context. */
@@ -187,6 +196,41 @@ export class Root<E extends EventList = Record<string, any>>
   /** Сбрасывает selector stylesheet без пересоздания дерева. */
   resetStyleSheet(): void {
     this.setStyleSheetSource('')
+  }
+
+  /** Возвращает source активного stylesheet для debug-инспектора. */
+  getStyleSheetSource(): string {
+    return this.rawStyleSheet.source ?? ''
+  }
+
+  /** Возвращает trace selector cascade для выбранной UI Kit node. */
+  inspectStyleNode(node: string | NovaUiStylableNode): NovaUiStyleInspectionDebug | null {
+    const target = typeof node === 'string'
+      ? this.nova.components.get(node)
+      : node
+
+    if (!isStylableNode(target)) return null
+
+    const rules = matchStyleRules(target, this.styleSheet)
+    const state = this.resolveAppliedState(target)
+
+    return {
+      rootComponentId: this.componentId,
+      nodeComponentId: target.componentId,
+      nodeType: target.descriptor.name,
+      styleSheetSource: this.getStyleSheetSource(),
+      matchedRules: rules.map(rule => ({
+        selector: rule.selector.raw,
+        specificity: rule.selector.specificity,
+        order: rule.order,
+        declarations: rule.declarations,
+      })),
+      mergedDeclarations: mergeRuleDeclarations(rules),
+      baselineProps: { ...state.baseline },
+      currentProps: { ...target.getProps() },
+      appliedKeys: [...state.keys],
+      diagnostics: this.validation.diagnostics.map(item => ({ ...item })),
+    }
   }
 
   /** Заменяет managed children и применяет layout/style одним проходом. */
@@ -305,6 +349,21 @@ export class Root<E extends EventList = Record<string, any>>
     this.layoutDirty = true
     this.dirty({ update: true, matrix: true, render: true })
     return true
+  }
+
+  private refreshCombinedStyleSheet(): void {
+    const globalAsset = getNovaUiGlobalStyleSheet(this.nova)
+    const styleSheets = [
+      globalAsset.styleSheet,
+      this.localRawStyleSheet,
+    ].filter((sheet): sheet is NovaUiCompiledStyleSheet => !!sheet)
+
+    this.rawStyleSheet = mergeNovaUiStyleSheets(styleSheets, [
+      globalAsset.source,
+      this.localRawStyleSheet.source,
+    ].filter(Boolean).join('\n'))
+    this.styleSheet = resolveNovaUiStyleSheetTokens(this.rawStyleSheet, this.tokenResolver)
+    this.applyCascade()
   }
 
   private applyCascade(): void {
@@ -457,6 +516,11 @@ export class Root<E extends EventList = Record<string, any>>
     }
 
     return result
+  }
+
+  override dispose(): void {
+    this.disposeGlobalStylesSubscription()
+    super.dispose()
   }
 
 }
