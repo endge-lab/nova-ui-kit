@@ -74,7 +74,7 @@ class BenchContainerTarget implements NovaUiStyleTarget {
   skippedCount = 0
 
   constructor(
-    private readonly children: NovaUiStyleTarget[],
+    private readonly children: Array<NovaUiStyleTarget>,
     private readonly ownStyleMask = NovaUiStyleMask.None,
   ) {}
 
@@ -289,8 +289,8 @@ describe('Nova UI style propagation performance', () => {
   it('benchmarks subtree skip for overridden branch style', () => {
     const branchCount = 10
     const branchSize = 1_000
-    const branches: BenchContainerTarget[] = []
-    const branchTargets: BenchTextTarget[][] = []
+    const branches: Array<BenchContainerTarget> = []
+    const branchTargets: Array<Array<BenchTextTarget>> = []
 
     for (let index = 0; index < branchCount; index += 1) {
       const targets = Array.from({ length: branchSize }, () => new BenchTextTarget())
@@ -406,7 +406,7 @@ function measureBench(
   size: number,
   run: () => { renderCount: number; updateCount: number; skippedCount: number },
 ): BenchStats {
-  const times: number[] = []
+  const times: Array<number> = []
   let stats = { renderCount: 0, updateCount: 0, skippedCount: 0 }
 
   for (let index = 0; index < BENCH_ITERATIONS; index += 1) {
@@ -430,7 +430,7 @@ function measureBench(
   }
 }
 
-function collectStats(targets: BenchTextTarget[], root: BenchContainerTarget): { renderCount: number; updateCount: number; skippedCount: number } {
+function collectStats(targets: Array<BenchTextTarget>, root: BenchContainerTarget): { renderCount: number; updateCount: number; skippedCount: number } {
   return targets.reduce((acc, target) => {
     acc.renderCount += target.renderCount
     acc.updateCount += target.updateCount
@@ -442,7 +442,7 @@ function collectStats(targets: BenchTextTarget[], root: BenchContainerTarget): {
   })
 }
 
-function resetBenchTargets(targets: BenchTextTarget[], root?: BenchContainerTarget): void {
+function resetBenchTargets(targets: Array<BenchTextTarget>, root?: BenchContainerTarget): void {
   for (const target of targets) {
     target.renderCount = 0
     target.updateCount = 0
@@ -463,7 +463,7 @@ function createBenchNode(width: number, height: number): NovaNode<any> {
   } as NovaNode<any>
 }
 
-function resetRects(rects: NovaUiLayoutRect[]): void {
+function resetRects(rects: Array<NovaUiLayoutRect>): void {
   for (const rect of rects) {
     rect.x = 0
     rect.y = 0
@@ -472,7 +472,7 @@ function resetRects(rects: NovaUiLayoutRect[]): void {
   }
 }
 
-function applyEntryRects(entries: Array<{ nextRect: NovaUiLayoutRect }>, prevRects: NovaUiLayoutRect[]): number {
+function applyEntryRects(entries: Array<{ nextRect: NovaUiLayoutRect }>, prevRects: Array<NovaUiLayoutRect>): number {
   let changed = 0
 
   for (let index = 0; index < entries.length; index += 1) {
@@ -485,7 +485,7 @@ function applyEntryRects(entries: Array<{ nextRect: NovaUiLayoutRect }>, prevRec
   return changed
 }
 
-function countUnchangedEntryRects(entries: Array<{ nextRect: NovaUiLayoutRect }>, prevRects: NovaUiLayoutRect[]): number {
+function countUnchangedEntryRects(entries: Array<{ nextRect: NovaUiLayoutRect }>, prevRects: Array<NovaUiLayoutRect>): number {
   let unchanged = 0
 
   for (let index = 0; index < entries.length; index += 1) {
@@ -518,7 +518,7 @@ function createBenchmarkStyleSource(size: number): string {
   )).join('\n')
 }
 
-function createBenchmarkStyleNodes(size: number, className?: string): NovaUiStylableNode[] {
+function createBenchmarkStyleNodes(size: number, className?: string): Array<NovaUiStylableNode> {
   return Array.from({ length: size }, (_item, index) => ({
     componentId: `node-${index}`,
     descriptor: {
@@ -530,5 +530,5 @@ function createBenchmarkStyleNodes(size: number, className?: string): NovaUiStyl
       className: className ?? `item-${index % 1000}`,
       attrs: {},
     }),
-  })) as NovaUiStylableNode[]
+  })) as Array<NovaUiStylableNode>
 }

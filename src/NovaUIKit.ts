@@ -16,7 +16,7 @@ import { TOGGLE_SCHEMA_TYPE } from '@/components/Toggle/Toggle.types'
 import { TOOLTIP_SCHEMA_TYPE } from '@/components/Tooltip/Tooltip.types'
 
 /** Группировка schema type для более читаемого UI Kit DSL. */
-export const NovaUiKit = {
+export const NovaUIKit = {
   Root: ROOT_SCHEMA_TYPE,
   Flex: FLEX_SCHEMA_TYPE,
   Grid: GRID_SCHEMA_TYPE,

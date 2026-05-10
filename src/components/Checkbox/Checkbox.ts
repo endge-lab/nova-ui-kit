@@ -11,8 +11,7 @@ import {
   buildBoxSchema,
   resolveComponentTextStyle,
   resolveInteractionBackground,
-} from '@/shared/component'
-import { pushText } from '@/shared/component'
+ pushText } from '@/shared/component'
 
 export class Checkbox<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<CheckboxResolvedProps, CheckboxApi, CheckboxProps, E> {
@@ -73,7 +72,7 @@ export class Checkbox<E extends EventList = Record<string, any>>
     }
 
     schema.push(...buildBoxSchema(boxProps, boxSize, boxSize))
-    schema[0] && Object.assign(schema[0], { x: 0, y: boxY })
+    if (schema[0]) Object.assign(schema[0], { x: 0, y: boxY })
 
     if (this.props.checked) {
       schema.push(
@@ -88,7 +87,7 @@ export class Checkbox<E extends EventList = Record<string, any>>
     this.renderer.schema(schema)
   }
 
-  protected override onPropsChanged(changedKeys: (keyof CheckboxResolvedProps)[]): void {
+  protected override onPropsChanged(changedKeys: Array<keyof CheckboxResolvedProps>): void {
     this.props = normalizeCheckboxProps(this.props)
     this.options({ interactive: !this.props.disabled })
     this.applyCommonPropsChanged(changedKeys)

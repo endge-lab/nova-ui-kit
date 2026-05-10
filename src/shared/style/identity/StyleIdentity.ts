@@ -4,12 +4,12 @@ export type NovaUiStyleAttrValue = string | number | boolean
 
 /** Метаданные компонента, по которым selector engine сопоставляет правила. */
 export interface NovaUiStyleIdentityProps {
-  className?: string | string[]
+  className?: string | Array<string>
   attrs?: Record<string, NovaUiStyleAttrValue>
 }
 
 /** Нормализованное имя класса для быстрых selector checks. */
-export function normalizeStyleClasses(className?: string | string[]): string[] {
+export function normalizeStyleClasses(className?: string | Array<string>): Array<string> {
   if (!className) return []
   if (Array.isArray(className)) return className.filter(Boolean)
 

@@ -10,8 +10,7 @@ import {
   NovaUiComponentNode,
   buildBoxSchema,
   resolveComponentTextStyle,
-} from '@/shared/component'
-import { pushIcon, pushText, sizeTokenPadding } from '@/shared/component'
+ pushIcon, pushText, sizeTokenPadding } from '@/shared/component'
 
 export class Tag<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<TagResolvedProps, TagApi, TagProps, E> {
@@ -53,7 +52,7 @@ export class Tag<E extends EventList = Record<string, any>>
     this.renderer.schema(schema)
   }
 
-  protected override onPropsChanged(changedKeys: (keyof TagResolvedProps)[]): void {
+  protected override onPropsChanged(changedKeys: Array<keyof TagResolvedProps>): void {
     this.props = normalizeTagProps(this.props)
     this.applyCommonPropsChanged(changedKeys)
   }

@@ -27,7 +27,7 @@ export interface ScrollAreaResolvedProps extends NovaUiCommonResolvedProps {
 export interface ScrollAreaChildSchema<TProps = Record<string, any>> extends NovaComponentSchema<TProps> {}
 
 export interface ScrollAreaSchema extends NovaComponentSchema<ScrollAreaProps> {
-  children?: ScrollAreaChildSchema[]
+  children?: Array<ScrollAreaChildSchema>
 }
 
 export interface ScrollAreaState {
@@ -39,7 +39,7 @@ export interface ScrollAreaApi {
   scrollTo: (x: number, y: number) => void
   scrollBy: (dx: number, dy: number) => void
   getScrollState: () => ScrollAreaState
-  setChildren: (children: ScrollAreaChildSchema[]) => void
+  setChildren: (children: Array<ScrollAreaChildSchema>) => void
   setProps: (patch: ScrollAreaProps) => void
   getProps: () => Readonly<ScrollAreaResolvedProps>
 }

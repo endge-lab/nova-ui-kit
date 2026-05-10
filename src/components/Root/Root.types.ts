@@ -53,7 +53,7 @@ export interface RootChildSchema<TProps = Record<string, any>> extends NovaCompo
 
 /** Schema корня UI Kit дерева. */
 export interface RootSchema extends NovaComponentSchema<RootProps> {
-  children?: RootChildSchema[]
+  children?: Array<RootChildSchema>
 }
 
 /** Публичный API Root для runtime-управления stylesheet. */
@@ -64,9 +64,9 @@ export interface RootApi {
   refreshStyleTokens: () => void
   setStyleTokenResolver: (resolver: NovaUiStyleTokenResolver | null) => void
   validateStyleSheet: (source: string) => NovaUiStyleValidationResult
-  setChildren: (children: RootChildSchema[]) => void
+  setChildren: (children: Array<RootChildSchema>) => void
   getValidation: () => NovaUiStyleValidationResult
-  getDiagnostics: () => readonly NovaUiStyleDiagnostic[]
+  getDiagnostics: () => ReadonlyArray<NovaUiStyleDiagnostic>
   relayout: () => void
   getChildRect: () => Readonly<NovaUiLayoutRect>
 }

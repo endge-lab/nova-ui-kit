@@ -15,7 +15,7 @@ import type {
 interface StyleNodeIdentity {
   type: NovaUiStyleComponentName
   id: string
-  classes: string[]
+  classes: Array<string>
   attrs: Record<string, string | number | boolean>
 }
 
@@ -35,7 +35,7 @@ export function createEmptyStyleSheet(source = ''): NovaUiCompiledStyleSheet {
 
 /** Индексирует rules по правой части selector для O(1) выбора кандидатов. */
 export function compileStyleSheetIndexes(
-  rules: NovaUiCompiledStyleRule[],
+  rules: Array<NovaUiCompiledStyleRule>,
   source = '',
 ): NovaUiCompiledStyleSheet {
   const sheet: NovaUiCompiledStyleSheet = {
@@ -82,11 +82,11 @@ export function compileStyleSheetIndexes(
 export function matchStyleRules(
   node: NovaUiStylableNode,
   styleSheet: NovaUiCompiledStyleSheet,
-): NovaUiCompiledStyleRule[] {
+): Array<NovaUiCompiledStyleRule> {
   if (styleSheet.rules.length === 0) return []
 
   const identity = readStyleNodeIdentity(node)
-  const candidates: NovaUiCompiledStyleRule[] = []
+  const candidates: Array<NovaUiCompiledStyleRule> = []
   const seen = new Set<NovaUiCompiledStyleRule>()
 
   collectCandidates(candidates, seen, styleSheet.universal)
@@ -199,9 +199,9 @@ function resolveComponentName(node: NovaUiStylableNode): NovaUiStyleComponentNam
 }
 
 function collectCandidates(
-  target: NovaUiCompiledStyleRule[],
+  target: Array<NovaUiCompiledStyleRule>,
   seen: Set<NovaUiCompiledStyleRule>,
-  source?: NovaUiCompiledStyleRule[],
+  source?: Array<NovaUiCompiledStyleRule>,
 ): void {
   if (!source) return
 
@@ -213,7 +213,7 @@ function collectCandidates(
 }
 
 function appendIndexedRule<K>(
-  index: Map<K, NovaUiCompiledStyleRule[]>,
+  index: Map<K, Array<NovaUiCompiledStyleRule>>,
   key: K,
   rule: NovaUiCompiledStyleRule,
 ): void {

@@ -59,7 +59,7 @@ export class Grid<E extends EventList = Record<string, any>>
 
   private readonly engine = new GridLayoutEngine()
   private readonly ownRect = createLayoutRect()
-  private readonly childEntries: GridChildEntry[] = []
+  private readonly childEntries: Array<GridChildEntry> = []
   private readonly childEntriesById = new Map<string, GridChildEntry>()
   private readonly rectsById = new Map<string, NovaUiLayoutRect>()
   private readonly api: GridApi
@@ -74,7 +74,7 @@ export class Grid<E extends EventList = Record<string, any>>
     app: NovaApp<E>,
     surface: NovaSurface<E>,
     props: GridProps = {},
-    options: { componentId?: string; children?: GridChildSchema[] } = {},
+    options: { componentId?: string; children?: Array<GridChildSchema> } = {},
     descriptor: GridDescriptor = GRID_NODE_DESCRIPTOR,
   ) {
     const resolvedProps = normalizeGridProps(props)
@@ -125,11 +125,11 @@ export class Grid<E extends EventList = Record<string, any>>
     this.effectiveStyleContext = mergeStyleContext(context, this.props.style)
     const changedMask = styleContextChangedMask(previousContext, this.effectiveStyleContext)
 
-    if (changedMask === NovaUiStyleMask.None) return {
+    if (changedMask === NovaUiStyleMask.None) {return {
       update: false,
       render: false,
       layout: false,
-    }
+    }}
 
     const result = this.propagateStyleContext(changedMask)
     if (result.layout) {
@@ -208,7 +208,7 @@ export class Grid<E extends EventList = Record<string, any>>
   }
 
   /** Заменяет managed children и пересчитывает layout одним dirty pass. */
-  setChildren(children: GridChildSchema[]): void {
+  setChildren(children: Array<GridChildSchema>): void {
     const previousNodes = this.childEntries.map(entry => entry.node as NovaNode<E>)
     const reconciled = reconcileNovaTemplateChildren(this, previousNodes, children)
     this.childEntries.length = 0
@@ -254,7 +254,7 @@ export class Grid<E extends EventList = Record<string, any>>
     requireNovaUiRoot(this)
   }
 
-  protected override onPropsChanged(changedKeys: (keyof GridResolvedProps)[]): void {
+  protected override onPropsChanged(changedKeys: Array<keyof GridResolvedProps>): void {
     this.props = normalizeGridProps(this.props)
     if (hasGridLayoutChanges(changedKeys)) this.layoutDirty = true
     if (!this.externalLayout && hasGridGeometryChanges(changedKeys)) {
@@ -329,11 +329,11 @@ export class Grid<E extends EventList = Record<string, any>>
   }
 }
 
-function hasGridGeometryChanges(keys: (keyof GridResolvedProps)[]): boolean {
+function hasGridGeometryChanges(keys: Array<keyof GridResolvedProps>): boolean {
   return keys.includes('x') || keys.includes('y') || keys.includes('width') || keys.includes('height')
 }
 
-function hasGridLayoutChanges(keys: (keyof GridResolvedProps)[]): boolean {
+function hasGridLayoutChanges(keys: Array<keyof GridResolvedProps>): boolean {
   return (
     keys.includes('width')
     || keys.includes('height')

@@ -22,7 +22,7 @@ import { applyNodeLayoutRect } from '@/shared/layout'
 
 export class ScrollArea<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<ScrollAreaResolvedProps, ScrollAreaApi, ScrollAreaProps, E> {
-  private readonly contentChildren: NovaNode<E>[] = []
+  private readonly contentChildren: Array<NovaNode<E>> = []
   private verticalScrollbar: NovaNode<E> | null = null
   private horizontalScrollbar: NovaNode<E> | null = null
   private readonly api: ScrollAreaApi
@@ -31,7 +31,7 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     app: NovaApp<E>,
     surface: NovaSurface<E>,
     props: ScrollAreaProps = {},
-    options: { componentId?: string; children?: ScrollAreaChildSchema[] } = {},
+    options: { componentId?: string; children?: Array<ScrollAreaChildSchema> } = {},
     descriptor: ScrollAreaDescriptor = SCROLL_AREA_NODE_DESCRIPTOR,
   ) {
     super(app, surface, descriptor, normalizeScrollAreaProps(props), options)
@@ -57,7 +57,7 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     return this.api
   }
 
-  setChildren(children: ScrollAreaChildSchema[]): void {
+  setChildren(children: Array<ScrollAreaChildSchema>): void {
     const reconciled = reconcileNovaTemplateChildren(this, this.contentChildren, children)
     this.contentChildren.length = 0
     this.contentChildren.push(...reconciled.nodes)
@@ -106,7 +106,7 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     this.renderer.clip(0, 0, this.width, this.height)
   }
 
-  protected override onPropsChanged(changedKeys: (keyof ScrollAreaResolvedProps)[]): void {
+  protected override onPropsChanged(changedKeys: Array<keyof ScrollAreaResolvedProps>): void {
     this.props = normalizeScrollAreaProps(this.props)
     this.options({ interactive: !this.props.disabled })
     this.applyCommonPropsChanged(changedKeys)

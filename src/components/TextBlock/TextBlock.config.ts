@@ -29,7 +29,7 @@ export type TextBlockNodeFactory = <E extends EventList>(
   schema: NovaComponentSchema<TextBlockProps>,
 ) => NovaComponentNode<TextBlockResolvedProps, TextBlockApi, Record<string, never>, TextBlockProps, E>
 
-export const TEXT_BLOCK_LAYOUT_DIRTY_KEYS: readonly (keyof TextBlockResolvedProps)[] = [
+export const TEXT_BLOCK_LAYOUT_DIRTY_KEYS: ReadonlyArray<keyof TextBlockResolvedProps> = [
   'text',
   'width',
   'height',
@@ -47,7 +47,7 @@ export const TEXT_BLOCK_LAYOUT_DIRTY_KEYS: readonly (keyof TextBlockResolvedProp
   'verticalAlign',
 ]
 
-export const TEXT_BLOCK_RENDER_DIRTY_KEYS: readonly (keyof TextBlockResolvedProps)[] = [
+export const TEXT_BLOCK_RENDER_DIRTY_KEYS: ReadonlyArray<keyof TextBlockResolvedProps> = [
   'color',
   'opacity',
   'background',

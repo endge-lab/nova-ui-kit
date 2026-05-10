@@ -67,7 +67,7 @@ interface FlexMeasuredItem {
 }
 
 interface FlexLine {
-  items: FlexMeasuredItem[]
+  items: Array<FlexMeasuredItem>
   main: number
   cross: number
   totalGrow: number
@@ -78,7 +78,7 @@ export interface FlexLayoutContext {
   props: FlexResolvedProps
   width: number
   height: number
-  entries: FlexChildEntry[]
+  entries: Array<FlexChildEntry>
 }
 
 /** Компилирует layout ребенка, чтобы update работал только с числами и enum. */
@@ -101,8 +101,8 @@ export function compileFlexChildLayout(layout: FlexChildLayout = {}): CompiledFl
 
 /** Считает rect детей Flex без создания Nova nodes и без render side effects. */
 export class FlexLayoutEngine {
-  private readonly sortedEntries: FlexChildEntry[] = []
-  private readonly lines: FlexLine[] = []
+  private readonly sortedEntries: Array<FlexChildEntry> = []
+  private readonly lines: Array<FlexLine> = []
 
   compute(context: FlexLayoutContext): void {
     const props = context.props
@@ -135,7 +135,7 @@ export class FlexLayoutEngine {
     })
   }
 
-  private prepareSortedEntries(entries: FlexChildEntry[]): void {
+  private prepareSortedEntries(entries: Array<FlexChildEntry>): void {
     this.sortedEntries.length = 0
     if (isAlreadyOrdered(entries)) {
       this.sortedEntries.push(...entries)
@@ -151,7 +151,7 @@ export class FlexLayoutEngine {
   }
 
   private collectLines(context: {
-    entries: FlexChildEntry[]
+    entries: Array<FlexChildEntry>
     props: FlexResolvedProps
     isRow: boolean
     mainSize: number
@@ -455,7 +455,7 @@ function finiteMax(value: number | undefined): number {
   return typeof value === 'number' && Number.isFinite(value) ? Math.max(0, value) : Number.POSITIVE_INFINITY
 }
 
-function isAlreadyOrdered(entries: FlexChildEntry[]): boolean {
+function isAlreadyOrdered(entries: Array<FlexChildEntry>): boolean {
   let previousOrder = Number.NEGATIVE_INFINITY
 
   for (const entry of entries) {

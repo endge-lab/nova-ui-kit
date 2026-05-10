@@ -1,4 +1,14 @@
-import type { NovaComponentSchema, NovaCursorContext, NovaCursorDeclaration, NovaSchema } from '@endge/nova'
+import { NovaComponentNode } from '@endge/nova'
+import type {
+  NovaApp,
+  NovaComponentDescriptor,
+  NovaComponentSchema,
+  NovaCursorContext,
+  NovaCursorDeclaration,
+  NovaSchema,
+  NovaSoundCueInput,
+  NovaSurface,
+} from '@endge/nova'
 import type { EventList } from '@endge/utils'
 import type { NovaUiMotionOptions } from '@/domain/domain.types'
 import {
@@ -27,8 +37,6 @@ import {
   type NovaUiStyleReceiveResult,
   type NovaUiStyleTarget,
 } from '@/shared/style'
-import { NovaComponentNode, type NovaApp, type NovaSoundCueInput, type NovaSurface } from '@endge/nova'
-import type { NovaComponentDescriptor } from '@endge/nova'
 import { requireNovaUiRoot } from '@/components/Root/RootTarget'
 
 export type NovaUiComponentSize = 'sm' | 'md' | 'lg'
@@ -399,7 +407,7 @@ export abstract class NovaUiComponentNode<
     this.nova.sound.playCue(this.props.sound?.[eventName])
   }
 
-  protected applyCommonPropsChanged(changedKeys: (keyof TProps)[]): void {
+  protected applyCommonPropsChanged(changedKeys: Array<keyof TProps>): void {
     this.options({
       opacity: this.props.disabled ? this.props.disabledOpacity : this.props.opacity,
       cursor: this.props.cursor ?? null,
@@ -485,6 +493,6 @@ export function roundToStep(value: number, min: number, step: number): number {
   return min + Math.round((value - min) / step) * step
 }
 
-function hasGeometryChanges(keys: readonly PropertyKey[]): boolean {
+function hasGeometryChanges(keys: ReadonlyArray<PropertyKey>): boolean {
   return keys.includes('x') || keys.includes('y') || keys.includes('width') || keys.includes('height')
 }

@@ -59,7 +59,7 @@ export class Flex<E extends EventList = Record<string, any>>
 
   private readonly engine = new FlexLayoutEngine()
   private readonly ownRect = createLayoutRect()
-  private readonly childEntries: FlexChildEntry[] = []
+  private readonly childEntries: Array<FlexChildEntry> = []
   private readonly childEntriesById = new Map<string, FlexChildEntry>()
   private readonly rectsById = new Map<string, NovaUiLayoutRect>()
   private readonly api: FlexApi
@@ -73,7 +73,7 @@ export class Flex<E extends EventList = Record<string, any>>
     app: NovaApp<E>,
     surface: NovaSurface<E>,
     props: FlexProps = {},
-    options: { componentId?: string; children?: FlexChildSchema[] } = {},
+    options: { componentId?: string; children?: Array<FlexChildSchema> } = {},
     descriptor: FlexDescriptor = FLEX_NODE_DESCRIPTOR,
   ) {
     const resolvedProps = normalizeFlexProps(props)
@@ -136,11 +136,11 @@ export class Flex<E extends EventList = Record<string, any>>
     this.effectiveStyleContext = mergeStyleContext(context, this.props.style)
     const changedMask = styleContextChangedMask(previousContext, this.effectiveStyleContext)
 
-    if (changedMask === NovaUiStyleMask.None) return {
+    if (changedMask === NovaUiStyleMask.None) {return {
       update: false,
       render: false,
       layout: false,
-    }
+    }}
 
     const result = this.propagateStyleContext(changedMask)
     if (result.layout) {
@@ -233,7 +233,7 @@ export class Flex<E extends EventList = Record<string, any>>
   }
 
   /** Заменяет managed children и пересчитывает layout одним dirty pass. */
-  setChildren(children: FlexChildSchema[]): void {
+  setChildren(children: Array<FlexChildSchema>): void {
     const previousNodes = this.childEntries.map(entry => entry.node as NovaNode<E>)
     const reconciled = reconcileNovaTemplateChildren(this, previousNodes, children)
     this.childEntries.length = 0
@@ -279,7 +279,7 @@ export class Flex<E extends EventList = Record<string, any>>
     requireNovaUiRoot(this)
   }
 
-  protected override onPropsChanged(_changedKeys: (keyof FlexResolvedProps)[]): void {
+  protected override onPropsChanged(_changedKeys: Array<keyof FlexResolvedProps>): void {
     this.props = normalizeFlexProps(this.props)
     if (hasFlexLayoutChanges(_changedKeys)) this.layoutDirty = true
     if (!this.externalLayout && hasFlexGeometryChanges(_changedKeys)) {
@@ -339,11 +339,11 @@ export class Flex<E extends EventList = Record<string, any>>
   }
 }
 
-function hasFlexGeometryChanges(keys: (keyof FlexResolvedProps)[]): boolean {
+function hasFlexGeometryChanges(keys: Array<keyof FlexResolvedProps>): boolean {
   return keys.includes('x') || keys.includes('y') || keys.includes('width') || keys.includes('height')
 }
 
-function hasFlexLayoutChanges(keys: (keyof FlexResolvedProps)[]): boolean {
+function hasFlexLayoutChanges(keys: Array<keyof FlexResolvedProps>): boolean {
   return (
     keys.includes('width')
     || keys.includes('height')

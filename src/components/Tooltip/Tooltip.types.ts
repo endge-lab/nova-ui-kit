@@ -21,7 +21,7 @@ export interface TooltipResolvedProps extends NovaUiCommonResolvedProps {
 
 export interface TooltipSchema extends NovaComponentSchema<TooltipProps> {
   trigger?: NovaComponentSchema
-  children?: NovaComponentSchema[]
+  children?: Array<NovaComponentSchema>
 }
 
 export interface TooltipApi {

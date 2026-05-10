@@ -97,7 +97,7 @@ export class Scrollbar<E extends EventList = Record<string, any>>
     this.renderer.schema(schema)
   }
 
-  protected override onPropsChanged(changedKeys: (keyof ScrollbarResolvedProps)[]): void {
+  protected override onPropsChanged(changedKeys: Array<keyof ScrollbarResolvedProps>): void {
     this.props = normalizeScrollbarProps(this.props)
     this.options({ interactive: !this.props.disabled })
     this.applyCommonPropsChanged(changedKeys)

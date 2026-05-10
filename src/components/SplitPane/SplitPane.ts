@@ -21,7 +21,7 @@ import {
 
 export class SplitPane<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<SplitPaneResolvedProps, SplitPaneApi, SplitPaneProps, E> {
-  private readonly panes: NovaNode<E>[] = []
+  private readonly panes: Array<NovaNode<E>> = []
   private resizerNode: RowResizer<E> | ColResizer<E> | null = null
   private readonly api: SplitPaneApi
 
@@ -29,7 +29,7 @@ export class SplitPane<E extends EventList = Record<string, any>>
     app: NovaApp<E>,
     surface: NovaSurface<E>,
     props: SplitPaneProps = {},
-    options: { componentId?: string; children?: SplitPaneChildSchema[] } = {},
+    options: { componentId?: string; children?: Array<SplitPaneChildSchema> } = {},
     descriptor: SplitPaneDescriptor = SPLIT_PANE_NODE_DESCRIPTOR,
   ) {
     super(app, surface, descriptor, normalizeSplitPaneProps(props), options)
@@ -52,7 +52,7 @@ export class SplitPane<E extends EventList = Record<string, any>>
     return this.api
   }
 
-  setChildren(children: SplitPaneChildSchema[]): void {
+  setChildren(children: Array<SplitPaneChildSchema>): void {
     const nextSchemas = children.slice(0, 2)
     const reconciled = reconcileNovaTemplateChildren(this, this.panes, nextSchemas)
     this.panes.length = 0
@@ -84,7 +84,7 @@ export class SplitPane<E extends EventList = Record<string, any>>
     if (this.props.clip) this.renderer.clip(0, 0, this.width, this.height)
   }
 
-  protected override onPropsChanged(changedKeys: (keyof SplitPaneResolvedProps)[]): void {
+  protected override onPropsChanged(changedKeys: Array<keyof SplitPaneResolvedProps>): void {
     const previousDirection = this.props.direction
     this.props = normalizeSplitPaneProps(this.props)
     this.applyCommonPropsChanged(changedKeys)

@@ -25,11 +25,11 @@ export interface PanelResolvedProps extends NovaUiCommonResolvedProps {
 export interface PanelChildSchema<TProps = Record<string, any>> extends NovaComponentSchema<TProps> {}
 
 export interface PanelSchema extends NovaComponentSchema<PanelProps> {
-  children?: PanelChildSchema[]
+  children?: Array<PanelChildSchema>
 }
 
 export interface PanelApi {
-  setChildren: (children: PanelChildSchema[]) => void
+  setChildren: (children: Array<PanelChildSchema>) => void
   setTitle: (title: string) => void
   setProps: (patch: PanelProps) => void
   getBodyRect: () => Readonly<NovaUiLayoutRect>

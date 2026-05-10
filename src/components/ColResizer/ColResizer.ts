@@ -1,8 +1,7 @@
 import { NovaNode } from '@endge/nova'
-import type { NovaApp } from '@endge/nova'
-import type { NovaSurface } from '@endge/nova'
-import type { ResizerOptions } from '@/domain/domain.types'
+import type { NovaApp , NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
+import type { ResizerOptions } from '@/domain/domain.types'
 import { resolveNovaUiMotionOptions } from '@/shared/motion'
 
 export class ColResizer<E extends EventList> extends NovaNode<E> {
@@ -39,7 +38,7 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
   }
 
   private setupEvents(): void {
-    this.on('dragstart', (e) => {
+    this.on('dragstart', e => {
       if (this.disabled) return false
       this._onChangeStart(e)
       if (e.defaultPrevented) {
@@ -64,7 +63,7 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
       return false
     })
 
-    this.on('dragend', (e) => {
+    this.on('dragend', e => {
       if (this.disabled) return false
       this._onChangeEnd(e)
       if (e.defaultPrevented) {

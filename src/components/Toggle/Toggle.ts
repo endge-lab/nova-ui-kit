@@ -10,8 +10,7 @@ import {
   NovaUiComponentNode,
   buildBoxSchema,
   resolveComponentTextStyle,
-} from '@/shared/component'
-import { pushText } from '@/shared/component'
+ pushText } from '@/shared/component'
 
 export class Toggle<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<ToggleResolvedProps, ToggleApi, ToggleProps, E> {
@@ -89,7 +88,7 @@ export class Toggle<E extends EventList = Record<string, any>>
     this.renderer.schema(schema)
   }
 
-  protected override onPropsChanged(changedKeys: (keyof ToggleResolvedProps)[]): void {
+  protected override onPropsChanged(changedKeys: Array<keyof ToggleResolvedProps>): void {
     this.props = normalizeToggleProps(this.props)
     this.options({ interactive: !this.props.disabled })
     this.applyCommonPropsChanged(changedKeys)

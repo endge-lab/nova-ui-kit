@@ -15,8 +15,7 @@ import {
   NovaUiComponentNode,
   buildBoxSchema,
   resolveComponentTextStyle,
-} from '@/shared/component'
-import { pushText } from '@/shared/component'
+ pushText } from '@/shared/component'
 import {
   applyNodeLayoutRect,
   copyRect,
@@ -26,7 +25,7 @@ import {
 
 export class Panel<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<PanelResolvedProps, PanelApi, PanelProps, E> {
-  private readonly childrenNodes: NovaNode<E>[] = []
+  private readonly childrenNodes: Array<NovaNode<E>> = []
   private readonly bodyRect = createLayoutRect()
   private readonly api: PanelApi
 
@@ -34,7 +33,7 @@ export class Panel<E extends EventList = Record<string, any>>
     app: NovaApp<E>,
     surface: NovaSurface<E>,
     props: PanelProps = {},
-    options: { componentId?: string; children?: PanelChildSchema[] } = {},
+    options: { componentId?: string; children?: Array<PanelChildSchema> } = {},
     descriptor: PanelDescriptor = PANEL_NODE_DESCRIPTOR,
   ) {
     super(app, surface, descriptor, normalizePanelProps(props), options)
@@ -56,7 +55,7 @@ export class Panel<E extends EventList = Record<string, any>>
     return this.api
   }
 
-  setChildren(children: PanelChildSchema[]): void {
+  setChildren(children: Array<PanelChildSchema>): void {
     const reconciled = reconcileNovaTemplateChildren(this, this.childrenNodes, children)
     this.childrenNodes.length = 0
     this.childrenNodes.push(...reconciled.nodes)
@@ -104,7 +103,7 @@ export class Panel<E extends EventList = Record<string, any>>
     if (this.props.clip) this.renderer.clip(0, 0, this.width, this.height)
   }
 
-  protected override onPropsChanged(changedKeys: (keyof PanelResolvedProps)[]): void {
+  protected override onPropsChanged(changedKeys: Array<keyof PanelResolvedProps>): void {
     this.props = normalizePanelProps(this.props)
     this.applyCommonPropsChanged(changedKeys)
     this.dirty({ update: true, render: true })

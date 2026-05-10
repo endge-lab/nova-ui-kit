@@ -106,7 +106,7 @@ export class Slider<E extends EventList = Record<string, any>>
     this.renderer.schema(schema)
   }
 
-  protected override onPropsChanged(changedKeys: (keyof SliderResolvedProps)[]): void {
+  protected override onPropsChanged(changedKeys: Array<keyof SliderResolvedProps>): void {
     this.props = normalizeSliderProps(this.props)
     this.options({ interactive: !this.props.disabled })
     this.applyCommonPropsChanged(changedKeys)

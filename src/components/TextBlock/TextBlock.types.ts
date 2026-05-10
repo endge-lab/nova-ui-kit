@@ -73,7 +73,7 @@ export interface TextBlockResolvedProps {
   style?: NovaUiInheritedTextStyle
   background?: string
   border?: NovaUiBorder
-  className?: string | string[]
+  className?: string | Array<string>
   attrs?: NovaUiStyleIdentityProps['attrs']
 }
 
@@ -90,7 +90,7 @@ export interface TextBlockLayout {
   bounds: NovaBounds
   contentWidth: number
   contentHeight: number
-  lines: TextBlockLayoutLine[]
+  lines: Array<TextBlockLayoutLine>
   sourceLineCount: number
   overflowed: boolean
 }
@@ -109,7 +109,7 @@ export interface TextBlockApi {
   setProps: (patch: TextBlockProps) => void
   getProps: () => Readonly<TextBlockResolvedProps>
   measure: () => TextBlockLayout
-  getLines: () => readonly TextBlockLayoutLine[]
+  getLines: () => ReadonlyArray<TextBlockLayoutLine>
   isOverflowed: () => boolean
 }
 

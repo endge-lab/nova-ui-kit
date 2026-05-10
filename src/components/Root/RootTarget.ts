@@ -29,7 +29,7 @@ export function findNovaUiRoot(node: NovaNode<any>): (NovaNode<any> & NovaUiRoot
 export function requireNovaUiRoot(node: NovaNode<any>): NovaNode<any> & NovaUiRootTarget {
   const root = findNovaUiRoot(node)
   if (!root) {
-    throw new Error('[Nova UI Kit] Flex, Grid и TextBlock должны быть смонтированы внутри NovaUiKit.Root')
+    throw new Error('[Nova UI Kit] Flex, Grid и TextBlock должны быть смонтированы внутри NovaUIKit.Root')
   }
 
   return root

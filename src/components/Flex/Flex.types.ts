@@ -57,7 +57,7 @@ export interface FlexResolvedProps {
   background?: string
   border?: NovaUiBorder
   clip: boolean
-  className?: string | string[]
+  className?: string | Array<string>
   attrs?: NovaUiStyleIdentityProps['attrs']
 }
 
@@ -84,12 +84,12 @@ export interface FlexChildSchema<TProps = Record<string, any>> extends NovaCompo
 
 /** Schema Flex контейнера с вложенными детьми. */
 export interface FlexSchema extends NovaComponentSchema<FlexProps> {
-  children?: FlexChildSchema[]
+  children?: Array<FlexChildSchema>
 }
 
 /** Публичный API Flex для runtime-управления детьми и relayout. */
 export interface FlexApi {
-  setChildren: (children: FlexChildSchema[]) => void
+  setChildren: (children: Array<FlexChildSchema>) => void
   setChildLayout: (id: string, layout: FlexChildLayout) => void
   relayout: () => void
   getChildRect: (id: string) => Readonly<NovaUiLayoutRect> | undefined

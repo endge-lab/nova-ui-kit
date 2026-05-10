@@ -11,12 +11,12 @@ import type { ButtonApi } from '@/components/Button/Button.types'
 import { BUTTON_SCHEMA_TYPE } from '@/components/Button/Button.types'
 import { FLEX_SCHEMA_TYPE } from '@/components/Flex/Flex.types'
 import { GRID_SCHEMA_TYPE } from '@/components/Grid/Grid.types'
-import { Root } from '@/components/Root/Root'
+import type { Root } from '@/components/Root/Root'
 import { ROOT_SCHEMA_TYPE } from '@/components/Root/Root.types'
-import { TextBlock } from '@/components/TextBlock/TextBlock'
+import type { TextBlock } from '@/components/TextBlock/TextBlock'
 import type { TextBlockApi } from '@/components/TextBlock/TextBlock.types'
 import { TEXT_BLOCK_SCHEMA_TYPE } from '@/components/TextBlock/TextBlock.types'
-import { registerNovaUiKit } from '@/registerNovaUiKit'
+import { registerNovaUIKit } from '@/registerNovaUIKit'
 
 type TestEvents = Record<string, any>
 
@@ -83,7 +83,7 @@ function createApp(): NovaApp<TestEvents> {
       loop: false,
     },
   })
-  registerNovaUiKit(app.schema)
+  registerNovaUIKit(app.schema)
   return app
 }
 

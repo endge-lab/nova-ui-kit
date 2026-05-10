@@ -14,7 +14,7 @@ export interface SliderProps extends NovaUiCommonProps {
   step?: number
   value?: number
   orientation?: NovaUiOrientation
-  marks?: SliderMark[]
+  marks?: Array<SliderMark>
   onChange?: (value: number, event?: Event) => void
 }
 
@@ -24,7 +24,7 @@ export interface SliderResolvedProps extends NovaUiCommonResolvedProps {
   step: number
   value: number
   orientation: NovaUiOrientation
-  marks: SliderMark[]
+  marks: Array<SliderMark>
   onChange?: (value: number, event?: Event) => void
 }
 

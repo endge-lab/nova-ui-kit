@@ -34,7 +34,7 @@ export interface SplitPaneResolvedProps extends NovaUiCommonResolvedProps {
 export interface SplitPaneChildSchema<TProps = Record<string, any>> extends NovaComponentSchema<TProps> {}
 
 export interface SplitPaneSchema extends NovaComponentSchema<SplitPaneProps> {
-  children?: [SplitPaneChildSchema, SplitPaneChildSchema] | SplitPaneChildSchema[]
+  children?: [SplitPaneChildSchema, SplitPaneChildSchema] | Array<SplitPaneChildSchema>
 }
 
 export interface SplitPaneApi {

@@ -55,7 +55,7 @@ export interface GridLayoutContext {
   props: GridResolvedProps
   width: number
   height: number
-  entries: GridChildEntry[]
+  entries: Array<GridChildEntry>
 }
 
 export interface GridLayoutResult {
@@ -79,10 +79,10 @@ export function compileGridChildLayout(layout: GridChildLayout = {}): CompiledGr
 
 /** Считает rect детей Grid без создания Nova nodes и без render side effects. */
 export class GridLayoutEngine {
-  private readonly sortedEntries: GridChildEntry[] = []
-  private readonly measuredItems: GridMeasuredItem[] = []
-  private readonly rowHeights: number[] = []
-  private readonly rowOffsets: number[] = []
+  private readonly sortedEntries: Array<GridChildEntry> = []
+  private readonly measuredItems: Array<GridMeasuredItem> = []
+  private readonly rowHeights: Array<number> = []
+  private readonly rowOffsets: Array<number> = []
 
   compute(context: GridLayoutContext): GridLayoutResult {
     const props = context.props
@@ -115,7 +115,7 @@ export class GridLayoutEngine {
     }
   }
 
-  private prepareSortedEntries(entries: GridChildEntry[]): void {
+  private prepareSortedEntries(entries: Array<GridChildEntry>): void {
     this.sortedEntries.length = 0
     if (isAlreadyOrdered(entries)) {
       this.sortedEntries.push(...entries)
@@ -314,7 +314,7 @@ function createMeasuredItem(): GridMeasuredItem {
   }
 }
 
-function isAlreadyOrdered(entries: GridChildEntry[]): boolean {
+function isAlreadyOrdered(entries: Array<GridChildEntry>): boolean {
   let previousOrder = Number.NEGATIVE_INFINITY
 
   for (const entry of entries) {

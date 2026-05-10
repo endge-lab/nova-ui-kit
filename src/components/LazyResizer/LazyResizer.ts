@@ -1,10 +1,7 @@
 import { NovaNode } from '@endge/nova'
-import type { NovaApp } from '@endge/nova'
-import type { NovaSurface } from '@endge/nova'
-import type { EventList } from '@endge/utils'
+import type { NovaApp , NovaSurface , NovaSchemaItem } from '@endge/nova'
+import type { EventList , Side } from '@endge/utils'
 import type { LazyResizerOptions } from '@/domain/domain.types'
-import type { Side } from '@endge/utils'
-import type { NovaSchemaItem } from '@endge/nova'
 import { resolveNovaUiMotionOptions } from '@/shared/motion'
 
 export class LazyResizer<E extends EventList> extends NovaNode<E> {

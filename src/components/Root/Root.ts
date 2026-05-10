@@ -71,7 +71,7 @@ export class Root<E extends EventList = Record<string, any>>
 
   private readonly ownRect = createLayoutRect()
   private readonly childRect = createLayoutRect()
-  private readonly managedChildren: NovaNode<E>[] = []
+  private readonly managedChildren: Array<NovaNode<E>> = []
   private readonly appliedCascade = new WeakMap<NovaUiStylableNode, AppliedCascadeState>()
   private readonly api: RootApi
   private layoutDirty = true
@@ -86,7 +86,7 @@ export class Root<E extends EventList = Record<string, any>>
     app: NovaApp<E>,
     surface: NovaSurface<E>,
     props: RootProps = {},
-    options: { componentId?: string; children?: RootChildSchema[] } = {},
+    options: { componentId?: string; children?: Array<RootChildSchema> } = {},
     descriptor: RootDescriptor = ROOT_NODE_DESCRIPTOR,
   ) {
     const resolvedProps = normalizeRootProps(props)
@@ -190,7 +190,7 @@ export class Root<E extends EventList = Record<string, any>>
   }
 
   /** Заменяет managed children и применяет layout/style одним проходом. */
-  setChildren(children: RootChildSchema[]): void {
+  setChildren(children: Array<RootChildSchema>): void {
     const reconciled = reconcileNovaTemplateChildren(this, this.managedChildren, children)
     this.managedChildren.length = 0
     this.managedChildren.push(...reconciled.nodes)
@@ -263,7 +263,7 @@ export class Root<E extends EventList = Record<string, any>>
     if (schema.length > 0) this.renderer.schema(schema)
   }
 
-  protected override onPropsChanged(changedKeys: (keyof RootResolvedProps)[]): void {
+  protected override onPropsChanged(changedKeys: Array<keyof RootResolvedProps>): void {
     this.props = normalizeRootProps(this.props)
     if (hasRootLayoutChanges(changedKeys)) this.layoutDirty = true
     if (!this.externalLayout && hasRootGeometryChanges(changedKeys)) {
@@ -571,10 +571,10 @@ function isStylableNode(node: unknown): node is NovaUiStylableNode {
     && 'setProps' in node
 }
 
-function hasRootGeometryChanges(keys: (keyof RootResolvedProps)[]): boolean {
+function hasRootGeometryChanges(keys: Array<keyof RootResolvedProps>): boolean {
   return keys.includes('x') || keys.includes('y') || keys.includes('width') || keys.includes('height')
 }
 
-function hasRootLayoutChanges(keys: (keyof RootResolvedProps)[]): boolean {
+function hasRootLayoutChanges(keys: Array<keyof RootResolvedProps>): boolean {
   return keys.includes('width') || keys.includes('height') || keys.includes('padding')
 }

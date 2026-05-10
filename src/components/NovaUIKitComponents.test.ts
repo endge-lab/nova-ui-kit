@@ -8,7 +8,7 @@ import {
   type NovaApp,
 } from '@endge/nova'
 import {
-  NovaUiKit,
+  NovaUIKit,
   type ButtonApi,
   type CheckboxApi,
   type FlexApi,
@@ -24,7 +24,7 @@ import {
   type TooltipApi,
   validateNovaUiStyleSheetSource,
 } from '@/index'
-import { registerNovaUiKit } from '@/registerNovaUiKit'
+import { registerNovaUIKit } from '@/registerNovaUIKit'
 import { normalizeButtonProps } from '@/components/Button/Button.config'
 import { normalizeCheckboxProps } from '@/components/Checkbox/Checkbox.config'
 import { normalizePanelProps } from '@/components/Panel/Panel.config'
@@ -99,7 +99,7 @@ function createApp(): NovaApp<TestEvents> {
       loop: false,
     },
   })
-  registerNovaUiKit(app.schema)
+  registerNovaUIKit(app.schema)
   return app
 }
 
@@ -115,7 +115,7 @@ describe('Nova UI Kit components', () => {
     const surface = app.createSurface2D('components')
 
     app.schema.createNode(surface, {
-      type: NovaUiKit.Root,
+      type: NovaUIKit.Root,
       id: 'root',
       props: {
         styleSheet: `
@@ -132,38 +132,38 @@ describe('Nova UI Kit components', () => {
         `,
       },
       children: [
-        { type: NovaUiKit.Surface, id: 'surface', props: { width: 160, height: 80 } },
-        { type: NovaUiKit.Button, id: 'button', props: { text: 'Run' } },
-        { type: NovaUiKit.Tag, id: 'tag', props: { text: 'Ready' } },
+        { type: NovaUIKit.Surface, id: 'surface', props: { width: 160, height: 80 } },
+        { type: NovaUIKit.Button, id: 'button', props: { text: 'Run' } },
+        { type: NovaUIKit.Tag, id: 'tag', props: { text: 'Ready' } },
         {
-          type: NovaUiKit.SplitPane,
+          type: NovaUIKit.SplitPane,
           id: 'split',
           props: { width: 300, height: 140 },
           children: [
-            { type: NovaUiKit.Surface, id: 'split-a', props: { background: '#f8fafc' } },
-            { type: NovaUiKit.Surface, id: 'split-b', props: { background: '#eff6ff' } },
+            { type: NovaUIKit.Surface, id: 'split-a', props: { background: '#f8fafc' } },
+            { type: NovaUIKit.Surface, id: 'split-b', props: { background: '#eff6ff' } },
           ],
         },
         {
-          type: NovaUiKit.ScrollArea,
+          type: NovaUIKit.ScrollArea,
           id: 'scroll-area',
           props: { width: 220, height: 120, contentHeight: 360 },
           children: [
-            { type: NovaUiKit.Surface, id: 'scroll-content', props: { background: '#f8fafc' } },
+            { type: NovaUIKit.Surface, id: 'scroll-content', props: { background: '#f8fafc' } },
           ],
         },
-        { type: NovaUiKit.Scrollbar, id: 'scrollbar', props: { contentSize: 400, viewportSize: 100 } },
-        { type: NovaUiKit.Slider, id: 'slider', props: { value: 25 } },
-        { type: NovaUiKit.Checkbox, id: 'checkbox', props: { label: 'Enabled' } },
-        { type: NovaUiKit.Toggle, id: 'toggle', props: { label: 'Live' } },
+        { type: NovaUIKit.Scrollbar, id: 'scrollbar', props: { contentSize: 400, viewportSize: 100 } },
+        { type: NovaUIKit.Slider, id: 'slider', props: { value: 25 } },
+        { type: NovaUIKit.Checkbox, id: 'checkbox', props: { label: 'Enabled' } },
+        { type: NovaUIKit.Toggle, id: 'toggle', props: { label: 'Live' } },
         {
-          type: NovaUiKit.Tooltip,
+          type: NovaUIKit.Tooltip,
           id: 'tooltip',
           props: { content: 'Tooltip', open: true },
-          trigger: { type: NovaUiKit.Button, id: 'tooltip-trigger', props: { text: '?' } },
+          trigger: { type: NovaUIKit.Button, id: 'tooltip-trigger', props: { text: '?' } },
         },
         {
-          type: NovaUiKit.SegmentedControl,
+          type: NovaUIKit.SegmentedControl,
           id: 'segmented',
           props: {
             items: [
@@ -173,11 +173,11 @@ describe('Nova UI Kit components', () => {
           },
         },
         {
-          type: NovaUiKit.Panel,
+          type: NovaUIKit.Panel,
           id: 'panel',
           props: { title: 'Panel' },
           children: [
-            { type: NovaUiKit.TextBlock, id: 'panel-text', props: { text: 'Content' } },
+            { type: NovaUIKit.TextBlock, id: 'panel-text', props: { text: 'Content' } },
           ],
         },
       ],
@@ -214,15 +214,15 @@ describe('Nova UI Kit components', () => {
     const surface = app.createSurface2D('context')
 
     app.schema.createNode(surface, {
-      type: NovaUiKit.Root,
+      type: NovaUIKit.Root,
       id: 'root',
       children: [
         {
-          type: NovaUiKit.Grid,
+          type: NovaUIKit.Grid,
           id: 'grid',
           children: [
             {
-              type: NovaUiKit.TextBlock,
+              type: NovaUIKit.TextBlock,
               id: 'row-a',
               key: 'row-a',
               context: { rowId: 'a' },
@@ -239,7 +239,7 @@ describe('Nova UI Kit components', () => {
 
     grid.setChildren([
       {
-        type: NovaUiKit.TextBlock,
+        type: NovaUIKit.TextBlock,
         id: 'row-a',
         key: 'row-a',
         context: { rowId: 'a2' },
@@ -321,7 +321,7 @@ describe('Nova UI Kit components', () => {
     const app = createApp()
     const surface = app.createSurface2D('cursor-props')
     app.schema.createNode(surface, {
-      type: NovaUiKit.Root,
+      type: NovaUIKit.Root,
       id: 'cursor-root',
       props: {
         cursor: { default: 'default' },
@@ -329,7 +329,7 @@ describe('Nova UI Kit components', () => {
       },
       children: [
         {
-          type: NovaUiKit.Button,
+          type: NovaUIKit.Button,
           id: 'cursor-button',
           props: {
             text: 'Cursor',
@@ -364,12 +364,12 @@ describe('Nova UI Kit components', () => {
     ])
 
     app.schema.createNode(surface, {
-      type: NovaUiKit.Root,
+      type: NovaUIKit.Root,
       id: 'sound-root',
       props: { width: 520, height: 260 },
       children: [
         {
-          type: NovaUiKit.Button,
+          type: NovaUIKit.Button,
           id: 'sound-button',
           props: {
             text: 'Play',
@@ -377,7 +377,7 @@ describe('Nova UI Kit components', () => {
           },
         },
         {
-          type: NovaUiKit.Button,
+          type: NovaUIKit.Button,
           id: 'sound-disabled-button',
           props: {
             text: 'Disabled',
@@ -385,11 +385,11 @@ describe('Nova UI Kit components', () => {
             sound: { press: 'ui.press', disabledPress: 'ui.disabled' },
           },
         },
-        { type: NovaUiKit.Toggle, id: 'sound-toggle', props: { sound: { change: 'ui.change' } } },
-        { type: NovaUiKit.Checkbox, id: 'sound-checkbox', props: { sound: { change: 'ui.change' } } },
-        { type: NovaUiKit.Slider, id: 'sound-slider', props: { value: 10, sound: { change: 'ui.change' } } },
+        { type: NovaUIKit.Toggle, id: 'sound-toggle', props: { sound: { change: 'ui.change' } } },
+        { type: NovaUIKit.Checkbox, id: 'sound-checkbox', props: { sound: { change: 'ui.change' } } },
+        { type: NovaUIKit.Slider, id: 'sound-slider', props: { value: 10, sound: { change: 'ui.change' } } },
         {
-          type: NovaUiKit.SegmentedControl,
+          type: NovaUIKit.SegmentedControl,
           id: 'sound-segmented',
           props: {
             width: 160,
@@ -431,22 +431,22 @@ describe('Nova UI Kit components', () => {
     const surface = app.createSurface2D('containers')
 
     app.schema.createNode(surface, {
-      type: NovaUiKit.Root,
+      type: NovaUIKit.Root,
       id: 'layout-root',
       props: { width: 520, height: 320, padding: 0 },
       children: [
         {
-          type: NovaUiKit.Panel,
+          type: NovaUIKit.Panel,
           id: 'layout-panel',
           props: { title: 'Panel', width: 520, height: 320, padding: 16 },
           children: [
             {
-              type: NovaUiKit.Flex,
+              type: NovaUIKit.Flex,
               id: 'layout-flow',
               props: { direction: 'row', wrap: 'wrap', gap: 10 },
               children: [
-                { type: NovaUiKit.Surface, id: 'layout-card-a', props: {}, layout: { width: 100, height: 60, flexShrink: 0 } },
-                { type: NovaUiKit.Surface, id: 'layout-card-b', props: {}, layout: { width: 100, height: 60, flexShrink: 0 } },
+                { type: NovaUIKit.Surface, id: 'layout-card-a', props: {}, layout: { width: 100, height: 60, flexShrink: 0 } },
+                { type: NovaUIKit.Surface, id: 'layout-card-b', props: {}, layout: { width: 100, height: 60, flexShrink: 0 } },
               ],
             },
           ],

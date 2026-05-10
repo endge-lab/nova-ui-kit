@@ -14,12 +14,12 @@ export interface SurfaceResolvedProps extends NovaUiCommonResolvedProps {}
 export interface SurfaceChildSchema<TProps = Record<string, any>> extends NovaComponentSchema<TProps> {}
 
 export interface SurfaceSchema extends NovaComponentSchema<SurfaceProps> {
-  children?: SurfaceChildSchema[]
+  children?: Array<SurfaceChildSchema>
 }
 
 export interface SurfaceApi {
   setProps: (patch: SurfaceProps) => void
-  setChildren: (children: SurfaceChildSchema[]) => void
+  setChildren: (children: Array<SurfaceChildSchema>) => void
   relayout: () => void
   getChildRect: () => Readonly<NovaUiLayoutRect>
 }

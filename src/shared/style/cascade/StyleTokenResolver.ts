@@ -52,7 +52,7 @@ export function createNovaUiCssVariableTokenResolver(element: Element): NovaUiSt
 }
 
 /** Извлекает token dependencies из source. */
-export function extractNovaUiStyleTokenDependencies(source: string): string[] {
+export function extractNovaUiStyleTokenDependencies(source: string): Array<string> {
   const tokens = new Set<string>()
   for (const match of source.matchAll(VAR_PATTERN)) {
     tokens.add(match[1])

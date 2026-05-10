@@ -11,14 +11,14 @@ export interface SegmentedControlItem {
 }
 
 export interface SegmentedControlProps extends NovaUiCommonProps {
-  items?: SegmentedControlItem[]
+  items?: Array<SegmentedControlItem>
   value?: string
   size?: 'sm' | 'md' | 'lg'
   onChange?: (value: string, event?: Event) => void
 }
 
 export interface SegmentedControlResolvedProps extends NovaUiCommonResolvedProps {
-  items: SegmentedControlItem[]
+  items: Array<SegmentedControlItem>
   value: string
   size: 'sm' | 'md' | 'lg'
   onChange?: (value: string, event?: Event) => void

@@ -1,4 +1,5 @@
-import { reconcileNovaTemplateChildren, type NovaNode } from '@endge/nova'
+import { reconcileNovaTemplateChildren } from '@endge/nova'
+import type { NovaApp, NovaNode, NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
 import {
   SURFACE_NODE_DESCRIPTOR,
@@ -30,12 +31,11 @@ import {
   type NovaUiStyleContext,
   type NovaUiStyleReceiveResult,
 } from '@/shared/style'
-import type { NovaApp, NovaSurface } from '@endge/nova'
 
 /** Базовый visual container UI Kit: фон, border, clip, padding и children. */
 export class Surface<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<SurfaceResolvedProps, SurfaceApi, SurfaceProps, E> {
-  private readonly managedChildren: NovaNode<E>[] = []
+  private readonly managedChildren: Array<NovaNode<E>> = []
   private readonly childRect = createLayoutRect()
   private readonly api: SurfaceApi
   private layoutDirty = true
@@ -44,7 +44,7 @@ export class Surface<E extends EventList = Record<string, any>>
     app: NovaApp<E>,
     surface: NovaSurface<E>,
     props: SurfaceProps = {},
-    options: { componentId?: string; children?: SurfaceChildSchema[] } = {},
+    options: { componentId?: string; children?: Array<SurfaceChildSchema> } = {},
     descriptor: SurfaceDescriptor = SURFACE_NODE_DESCRIPTOR,
   ) {
     super(app, surface, descriptor, normalizeSurfaceProps(props), options)
@@ -65,7 +65,7 @@ export class Surface<E extends EventList = Record<string, any>>
     return this.api
   }
 
-  setChildren(children: SurfaceChildSchema[]): void {
+  setChildren(children: Array<SurfaceChildSchema>): void {
     const reconciled = reconcileNovaTemplateChildren(this, this.managedChildren, children)
     this.managedChildren.length = 0
     this.managedChildren.push(...reconciled.nodes)
@@ -114,7 +114,7 @@ export class Surface<E extends EventList = Record<string, any>>
     if (this.props.clip) this.renderer.clip(0, 0, this.width, this.height)
   }
 
-  protected override onPropsChanged(changedKeys: (keyof SurfaceResolvedProps)[]): void {
+  protected override onPropsChanged(changedKeys: Array<keyof SurfaceResolvedProps>): void {
     this.props = normalizeSurfaceProps(this.props)
     this.applyCommonPropsChanged(changedKeys)
     if (changedKeys.includes('padding')) this.relayout()

@@ -21,7 +21,7 @@ import type {
   NovaUiStyleValidationResult,
 } from '@/shared/style/cascade/StyleSheet'
 
-const COMPONENT_NAMES: NovaUiStyleComponentName[] = [
+const COMPONENT_NAMES: Array<NovaUiStyleComponentName> = [
   'Root',
   'Flex',
   'Grid',
@@ -49,8 +49,8 @@ interface ParsedStyleRule {
 
 /** Валидирует CSS-подобный stylesheet и возвращает compiled rules для Root. */
 export function validateNovaUiStyleSheetSource(source: string): NovaUiStyleValidationResult {
-  const diagnostics: NovaUiStyleDiagnostic[] = []
-  const rules: NovaUiCompiledStyleRule[] = []
+  const diagnostics: Array<NovaUiStyleDiagnostic> = []
+  const rules: Array<NovaUiCompiledStyleRule> = []
   const cleanedSource = stripCommentsPreservePositions(source)
   let order = 0
 
@@ -95,11 +95,11 @@ export function createEmptyStyleSheetValidationResult(source = ''): NovaUiStyleV
 function parseStyleRules(
   cleanedSource: string,
   originalSource: string,
-  diagnostics: NovaUiStyleDiagnostic[],
-  parentSelectors: string[] = [],
+  diagnostics: Array<NovaUiStyleDiagnostic>,
+  parentSelectors: Array<string> = [],
   baseOffset = 0,
-): ParsedStyleRule[] {
-  const rules: ParsedStyleRule[] = []
+): Array<ParsedStyleRule> {
+  const rules: Array<ParsedStyleRule> = []
   let cursor = 0
 
   while (cursor < cleanedSource.length) {
@@ -210,16 +210,16 @@ function splitRuleBody(body: string): {
   return { declarations, nested }
 }
 
-function splitSelectorList(source: string): string[] {
+function splitSelectorList(source: string): Array<string> {
   return splitTopLevel(source, ',')
     .map(selector => selector.trim())
     .filter(Boolean)
 }
 
-function combineSelectors(parentSelectors: string[], selectors: string[]): string[] {
+function combineSelectors(parentSelectors: Array<string>, selectors: Array<string>): Array<string> {
   if (parentSelectors.length === 0) return selectors
 
-  const result: string[] = []
+  const result: Array<string> = []
   for (const parent of parentSelectors) {
     for (const selector of selectors) {
       result.push(selector.includes('&') ? selector.replace(/&/g, parent) : `${parent} ${selector}`)
@@ -228,8 +228,8 @@ function combineSelectors(parentSelectors: string[], selectors: string[]): strin
   return result
 }
 
-function splitTopLevel(source: string, separator: string): string[] {
-  const result: string[] = []
+function splitTopLevel(source: string, separator: string): Array<string> {
+  const result: Array<string> = []
   let buffer = ''
   let depth = 0
   let quote = ''
@@ -265,7 +265,7 @@ function skipWhitespace(source: string, cursor: number): number {
   return index
 }
 
-function findNextTopLevel(source: string, cursor: number, chars: string[]): number {
+function findNextTopLevel(source: string, cursor: number, chars: Array<string>): number {
   let depth = 0
   let quote = ''
 
@@ -320,7 +320,7 @@ function parseSelector(
   raw: string,
   source: string,
   offset: number,
-  diagnostics: NovaUiStyleDiagnostic[],
+  diagnostics: Array<NovaUiStyleDiagnostic>,
 ): NovaUiStyleSelector | null {
   const tokens = tokenizeSelector(raw)
   if (!tokens) {
@@ -328,8 +328,8 @@ function parseSelector(
     return null
   }
 
-  const parts: NovaUiStyleSelectorPart[] = []
-  const combinators: NovaUiStyleSelectorCombinator[] = []
+  const parts: Array<NovaUiStyleSelectorPart> = []
+  const combinators: Array<NovaUiStyleSelectorCombinator> = []
 
   for (const token of tokens) {
     if (token === '>' || token === ' ') {
@@ -362,8 +362,8 @@ function parseSelector(
   }
 }
 
-function tokenizeSelector(raw: string): string[] | null {
-  const tokens: string[] = []
+function tokenizeSelector(raw: string): Array<string> | null {
+  const tokens: Array<string> = []
   let buffer = ''
   let inAttr = false
   let pendingSpace = false
@@ -401,7 +401,7 @@ function tokenizeSelector(raw: string): string[] | null {
   return tokens
 }
 
-function flushSelectorToken(tokens: string[], value: string): void {
+function flushSelectorToken(tokens: Array<string>, value: string): void {
   const token = value.trim()
   if (token) tokens.push(token)
 }
@@ -465,7 +465,7 @@ function parseDeclarations(
   rawBody: string,
   source: string,
   offset: number,
-  diagnostics: NovaUiStyleDiagnostic[],
+  diagnostics: Array<NovaUiStyleDiagnostic>,
 ): NovaUiStyleDeclarations | null {
   const declarations: NovaUiStyleDeclarations = {
     mask: NovaUiStyleMask.None,
@@ -502,7 +502,7 @@ function parseDeclarations(
 function parseDeclarationValue(
   key: string,
   value: string,
-  diagnostics: NovaUiStyleDiagnostic[],
+  diagnostics: Array<NovaUiStyleDiagnostic>,
   source: string,
   offset: number,
 ): unknown {
@@ -617,7 +617,7 @@ function applyParsedDeclaration(
 
 function parseSpacing(
   value: string,
-  diagnostics: NovaUiStyleDiagnostic[],
+  diagnostics: Array<NovaUiStyleDiagnostic>,
   source: string,
   offset: number,
 ): NovaUiSpacing | null {
@@ -627,7 +627,7 @@ function parseSpacing(
     return null
   }
 
-  const numbers = items as number[]
+  const numbers = items as Array<number>
   if (numbers.length === 1) return numbers[0]
   if (numbers.length === 2) return { vertical: numbers[0], horizontal: numbers[1] }
 
@@ -641,7 +641,7 @@ function parseSpacing(
 
 function parseFiniteNumber(
   value: string,
-  diagnostics: NovaUiStyleDiagnostic[],
+  diagnostics: Array<NovaUiStyleDiagnostic>,
   source: string,
   offset: number,
 ): number | null {
@@ -656,7 +656,7 @@ function parseFiniteNumber(
 
 function parseBoolean(
   value: string,
-  diagnostics: NovaUiStyleDiagnostic[],
+  diagnostics: Array<NovaUiStyleDiagnostic>,
   source: string,
   offset: number,
 ): boolean | null {
@@ -681,7 +681,7 @@ function selectorPartSpecificity(part: NovaUiStyleSelectorPart): number {
 
 function parseCursor(
   value: string,
-  diagnostics: NovaUiStyleDiagnostic[],
+  diagnostics: Array<NovaUiStyleDiagnostic>,
   source: string,
   offset: number,
 ): unknown {
@@ -721,8 +721,8 @@ function parseCursor(
   return stripQuotes(value)
 }
 
-function splitFunctionArgs(source: string): string[] {
-  const result: string[] = []
+function splitFunctionArgs(source: string): Array<string> {
+  const result: Array<string> = []
   let buffer = ''
   let depth = 0
   let quote = ''
@@ -761,7 +761,7 @@ function parseHotspot(value: string | undefined): { x: number; y: number } | und
 
 function parseCursorProps(
   value: string | undefined,
-  diagnostics: NovaUiStyleDiagnostic[],
+  diagnostics: Array<NovaUiStyleDiagnostic>,
   source: string,
   offset: number,
 ): Record<string, unknown> | undefined {
@@ -824,9 +824,9 @@ function resolveLineColumn(source: string, index: number): { line: number; colum
   }
 }
 
-const LINE_STARTS_CACHE = new Map<string, number[]>()
+const LINE_STARTS_CACHE = new Map<string, Array<number>>()
 
-function getLineStarts(source: string): number[] {
+function getLineStarts(source: string): Array<number> {
   const cached = LINE_STARTS_CACHE.get(source)
   if (cached) return cached
 

@@ -35,7 +35,7 @@ const NOVA_UI_KIT_DESCRIPTORS: Array<NovaComponentDescriptor<any, any, any, any>
   PANEL_DESCRIPTOR,
 ]
 
-export function registerNovaUiKit(registry: NovaSchemaRegistry): void {
+export function registerNovaUIKit(registry: NovaSchemaRegistry): void {
   for (const descriptor of NOVA_UI_KIT_DESCRIPTORS) {
     registry.register(descriptor, { override: true })
   }

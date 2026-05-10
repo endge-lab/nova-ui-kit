@@ -73,7 +73,7 @@ export function layoutTextBlock(props: TextBlockResolvedProps, measureText: Text
 
   const contentHeight = visibleLines.length * props.lineHeight
   const yOffset = resolveVerticalOffset(props.verticalAlign, innerHeight, contentHeight)
-  const lines: TextBlockLayoutLine[] = visibleLines.map((line, index) => ({
+  const lines: Array<TextBlockLayoutLine> = visibleLines.map((line, index) => ({
     ...line,
     x: props.padding.left,
     y: props.padding.top + yOffset + index * props.lineHeight,
@@ -257,7 +257,7 @@ function resolveVerticalOffset(align: TextBlockResolvedProps['verticalAlign'], i
   return 0
 }
 
-function splitPreservedLines(text: string): string[] {
+function splitPreservedLines(text: string): Array<string> {
   return normalizeLineEndings(text).split('\n')
 }
 

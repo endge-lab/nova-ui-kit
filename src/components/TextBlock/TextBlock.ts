@@ -152,11 +152,11 @@ export class TextBlock<E extends EventList = Record<string, any>>
     const affectedMask = changedMask & this.getSubtreeStyleMask()
     const effectiveChangedMask = diffInheritedTextStyle(previousStyle, nextStyle, affectedMask)
 
-    if (effectiveChangedMask === NovaUiStyleMask.None) return {
+    if (effectiveChangedMask === NovaUiStyleMask.None) {return {
       update: false,
       render: false,
       layout: false,
-    }
+    }}
 
     this.effectiveTextStyle = nextStyle
 
@@ -227,7 +227,7 @@ export class TextBlock<E extends EventList = Record<string, any>>
     requireNovaUiRoot(this)
   }
 
-  protected override onPropsChanged(changedKeys: (keyof TextBlockResolvedProps)[]): void {
+  protected override onPropsChanged(changedKeys: Array<keyof TextBlockResolvedProps>): void {
     const previousStyle = this.effectiveTextStyle
     this.props = normalizeTextBlockProps(this.props)
     this.localStyleMask = inheritedTextStyleMask(this.props.style)
@@ -321,11 +321,11 @@ export class TextBlock<E extends EventList = Record<string, any>>
   )
 }
 
-function hasGeometryChanges(keys: (keyof TextBlockResolvedProps)[]): boolean {
+function hasGeometryChanges(keys: Array<keyof TextBlockResolvedProps>): boolean {
   return keys.includes('x') || keys.includes('y') || keys.includes('width') || keys.includes('height')
 }
 
-function hasTextBlockLayoutChanges(keys: (keyof TextBlockResolvedProps)[]): boolean {
+function hasTextBlockLayoutChanges(keys: Array<keyof TextBlockResolvedProps>): boolean {
   return (
     keys.includes('text')
     || keys.includes('width')

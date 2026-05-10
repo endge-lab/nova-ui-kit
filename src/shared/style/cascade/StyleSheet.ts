@@ -29,16 +29,16 @@ export type NovaUiStyleSelectorCombinator = 'descendant' | 'child'
 export interface NovaUiStyleSelectorPart {
   type?: NovaUiStyleComponentName
   id?: string
-  classes: string[]
+  classes: Array<string>
   attrs: Record<string, string | true>
-  pseudos: string[]
+  pseudos: Array<string>
 }
 
 /** Скомпилированный selector с specificity и связями между segment. */
 export interface NovaUiStyleSelector {
   raw: string
-  parts: NovaUiStyleSelectorPart[]
-  combinators: NovaUiStyleSelectorCombinator[]
+  parts: Array<NovaUiStyleSelectorPart>
+  combinators: Array<NovaUiStyleSelectorCombinator>
   specificity: number
 }
 
@@ -78,20 +78,20 @@ export interface NovaUiCompiledStyleRule {
   declarations: NovaUiStyleDeclarations
   order: number
   rightMostId?: string
-  rightMostClasses: string[]
+  rightMostClasses: Array<string>
   rightMostType?: NovaUiStyleComponentName
 }
 
 /** Готовый к hot path stylesheet с индексами по правой части selector. */
 export interface NovaUiCompiledStyleSheet {
-  rules: NovaUiCompiledStyleRule[]
-  byId: Map<string, NovaUiCompiledStyleRule[]>
-  byClass: Map<string, NovaUiCompiledStyleRule[]>
-  byType: Map<NovaUiStyleComponentName, NovaUiCompiledStyleRule[]>
-  universal: NovaUiCompiledStyleRule[]
+  rules: Array<NovaUiCompiledStyleRule>
+  byId: Map<string, Array<NovaUiCompiledStyleRule>>
+  byClass: Map<string, Array<NovaUiCompiledStyleRule>>
+  byType: Map<NovaUiStyleComponentName, Array<NovaUiCompiledStyleRule>>
+  universal: Array<NovaUiCompiledStyleRule>
   version: number
   source?: string
-  tokenDependencies?: string[]
+  tokenDependencies?: Array<string>
 }
 
 /** Precompiled stylesheet asset для `.novacss` и `<style>` блоков `.nova`. */
@@ -99,8 +99,8 @@ export interface NovaUiStyleSheetAsset {
   ok: boolean
   source: string
   styleSheet: NovaUiCompiledStyleSheet | null
-  diagnostics: NovaUiStyleDiagnostic[]
-  tokenDependencies: string[]
+  diagnostics: Array<NovaUiStyleDiagnostic>
+  tokenDependencies: Array<string>
   scopeId?: string
 }
 
@@ -133,7 +133,7 @@ export interface NovaUiStyleDiagnostic {
 export interface NovaUiStyleValidationResult {
   ok: boolean
   styleSheet: NovaUiCompiledStyleSheet | null
-  diagnostics: NovaUiStyleDiagnostic[]
+  diagnostics: Array<NovaUiStyleDiagnostic>
 }
 
 /** Минимальный контракт node, которую cascade engine может стилизовать. */

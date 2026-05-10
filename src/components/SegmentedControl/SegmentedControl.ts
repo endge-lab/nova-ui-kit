@@ -14,8 +14,7 @@ import {
   NovaUiComponentNode,
   buildBoxSchema,
   resolveComponentTextStyle,
-} from '@/shared/component'
-import { pushIcon, pushText, sizeTokenPadding } from '@/shared/component'
+ pushIcon, pushText, sizeTokenPadding } from '@/shared/component'
 
 export class SegmentedControl<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<SegmentedControlResolvedProps, SegmentedControlApi, SegmentedControlProps, E> {
@@ -106,7 +105,7 @@ export class SegmentedControl<E extends EventList = Record<string, any>>
     this.renderer.schema(schema)
   }
 
-  protected override onPropsChanged(changedKeys: (keyof SegmentedControlResolvedProps)[]): void {
+  protected override onPropsChanged(changedKeys: Array<keyof SegmentedControlResolvedProps>): void {
     this.props = normalizeSegmentedControlProps(this.props)
     this.options({ interactive: !this.props.disabled })
     this.applyCommonPropsChanged(changedKeys)

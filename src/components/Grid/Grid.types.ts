@@ -62,7 +62,7 @@ export interface GridResolvedProps {
   background?: string
   border?: NovaUiBorder
   clip: boolean
-  className?: string | string[]
+  className?: string | Array<string>
   attrs?: NovaUiStyleIdentityProps['attrs']
 }
 
@@ -85,12 +85,12 @@ export interface GridChildSchema<TProps = Record<string, any>> extends NovaCompo
 
 /** Schema Grid контейнера с вложенными детьми. */
 export interface GridSchema extends NovaComponentSchema<GridProps> {
-  children?: GridChildSchema[]
+  children?: Array<GridChildSchema>
 }
 
 /** Публичный API Grid для runtime-управления детьми и relayout. */
 export interface GridApi {
-  setChildren: (children: GridChildSchema[]) => void
+  setChildren: (children: Array<GridChildSchema>) => void
   setChildLayout: (id: string, layout: GridChildLayout) => void
   relayout: () => void
   getChildRect: (id: string) => Readonly<NovaUiLayoutRect> | undefined

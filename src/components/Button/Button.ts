@@ -1,4 +1,5 @@
 import type { EventList } from '@endge/utils'
+import type { NovaApp, NovaSchema, NovaSurface } from '@endge/nova'
 import {
   BUTTON_NODE_DESCRIPTOR,
   normalizeButtonProps,
@@ -20,7 +21,6 @@ import {
   pushText,
   sizeTokenPadding,
 } from '@/shared/component/ComponentRender'
-import type { NovaApp, NovaSchema, NovaSurface } from '@endge/nova'
 
 export class Button<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<ButtonResolvedProps, ButtonApi, ButtonProps, E> {
@@ -102,7 +102,7 @@ export class Button<E extends EventList = Record<string, any>>
     this.renderer.schema(schema)
   }
 
-  protected override onPropsChanged(changedKeys: (keyof ButtonResolvedProps)[]): void {
+  protected override onPropsChanged(changedKeys: Array<keyof ButtonResolvedProps>): void {
     this.props = normalizeButtonProps(this.props)
     this.options({ interactive: !this.props.disabled })
     this.applyCommonPropsChanged(changedKeys)

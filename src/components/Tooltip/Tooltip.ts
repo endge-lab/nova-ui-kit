@@ -17,8 +17,7 @@ import {
   NovaUiComponentNode,
   buildBoxSchema,
   resolveComponentTextStyle,
-} from '@/shared/component'
-import { pushText } from '@/shared/component'
+ pushText } from '@/shared/component'
 import { resolveSpacing } from '@/shared/layout'
 
 export class Tooltip<E extends EventList = Record<string, any>>
@@ -31,7 +30,7 @@ export class Tooltip<E extends EventList = Record<string, any>>
     app: NovaApp<E>,
     surface: NovaSurface<E>,
     props: TooltipProps = {},
-    options: { componentId?: string; trigger?: NovaComponentSchema; children?: NovaComponentSchema[] } = {},
+    options: { componentId?: string; trigger?: NovaComponentSchema; children?: Array<NovaComponentSchema> } = {},
     descriptor: TooltipDescriptor = TOOLTIP_NODE_DESCRIPTOR,
   ) {
     super(app, surface, descriptor, normalizeTooltipProps(props), options)
@@ -105,7 +104,7 @@ export class Tooltip<E extends EventList = Record<string, any>>
     this.renderer.schema(schema)
   }
 
-  protected override onPropsChanged(changedKeys: (keyof TooltipResolvedProps)[]): void {
+  protected override onPropsChanged(changedKeys: Array<keyof TooltipResolvedProps>): void {
     this.props = normalizeTooltipProps(this.props)
     this.options({ interactive: !this.props.disabled })
     this.applyCommonPropsChanged(changedKeys)
