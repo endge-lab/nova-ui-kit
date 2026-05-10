@@ -242,7 +242,7 @@ export class Flex<E extends EventList = Record<string, any>>
 
     children.forEach((child, index) => {
       const node = reconciled.nodes[index]
-      const id = child.id ?? node.componentId
+      const id = child.id ?? (node as NovaNode<E> & { componentId?: string }).componentId ?? node.id
       const entry = createFlexChildEntry(id, node, child.layout)
       this.childEntries.push(entry)
       this.childEntriesById.set(id, entry)

@@ -11,8 +11,9 @@ import {
   NovaUiKit,
   type ButtonApi,
   type CheckboxApi,
-  type PanelApi,
   type FlexApi,
+  type GridApi,
+  type PanelApi,
   type ScrollAreaApi,
   type ScrollbarApi,
   type SegmentedControlApi,
@@ -208,6 +209,51 @@ describe('Nova UI Kit components', () => {
     app.destroy()
   })
 
+  it('preserves keyed children and forwards schema context through UI Kit containers', () => {
+    const app = createApp()
+    const surface = app.createSurface2D('context')
+
+    app.schema.createNode(surface, {
+      type: NovaUiKit.Root,
+      id: 'root',
+      children: [
+        {
+          type: NovaUiKit.Grid,
+          id: 'grid',
+          children: [
+            {
+              type: NovaUiKit.TextBlock,
+              id: 'row-a',
+              key: 'row-a',
+              context: { rowId: 'a' },
+              props: { text: 'A' },
+            },
+          ],
+        },
+      ],
+    })
+
+    const grid = app.components.requireApi<GridApi>('grid')
+    const first = app.components.require('row-a')
+    expect(first.getContext<{ rowId: string }>().rowId).toBe('a')
+
+    grid.setChildren([
+      {
+        type: NovaUiKit.TextBlock,
+        id: 'row-a',
+        key: 'row-a',
+        context: { rowId: 'a2' },
+        props: { text: 'A2' },
+      },
+    ])
+
+    expect(app.components.require('row-a')).toBe(first)
+    expect(first.getContext<{ rowId: string }>().rowId).toBe('a2')
+    expect((first.getApi() as { getProps: () => { text: string } }).getProps().text).toBe('A2')
+
+    app.destroy()
+  })
+
   it('normalizes component props and stylesheet declarations under load', () => {
     const cursor = {
       hover: 'pointer',
@@ -304,6 +350,80 @@ describe('Nova UI Kit components', () => {
     expect(app.components.requireApi<ButtonApi>('cursor-button').getProps().cursorContext).toEqual({ axis: 'x' })
 
     app.destroy()
+  })
+
+  it('plays declarative sound props for core controls', async () => {
+    vi.useFakeTimers()
+    const app = createApp()
+    const surface = app.createSurface2D('sound-props')
+    await app.sound.load([
+      { id: 'ui.press', src: 'press.ogg' },
+      { id: 'ui.hover', src: 'hover.ogg' },
+      { id: 'ui.change', src: 'change.ogg' },
+      { id: 'ui.disabled', src: 'disabled.ogg' },
+    ])
+
+    app.schema.createNode(surface, {
+      type: NovaUiKit.Root,
+      id: 'sound-root',
+      props: { width: 520, height: 260 },
+      children: [
+        {
+          type: NovaUiKit.Button,
+          id: 'sound-button',
+          props: {
+            text: 'Play',
+            sound: { press: 'ui.press', hover: 'ui.hover', disabledPress: 'ui.disabled' },
+          },
+        },
+        {
+          type: NovaUiKit.Button,
+          id: 'sound-disabled-button',
+          props: {
+            text: 'Disabled',
+            disabled: true,
+            sound: { press: 'ui.press', disabledPress: 'ui.disabled' },
+          },
+        },
+        { type: NovaUiKit.Toggle, id: 'sound-toggle', props: { sound: { change: 'ui.change' } } },
+        { type: NovaUiKit.Checkbox, id: 'sound-checkbox', props: { sound: { change: 'ui.change' } } },
+        { type: NovaUiKit.Slider, id: 'sound-slider', props: { value: 10, sound: { change: 'ui.change' } } },
+        {
+          type: NovaUiKit.SegmentedControl,
+          id: 'sound-segmented',
+          props: {
+            width: 160,
+            height: 32,
+            sound: { hover: 'ui.hover', change: 'ui.change' },
+            items: [
+              { value: 'a', label: 'A' },
+              { value: 'b', label: 'B' },
+            ],
+          },
+        },
+      ],
+    })
+
+    app.components.requireApi<ButtonApi>('sound-button').press()
+    app.components.requireApi<ButtonApi>('sound-disabled-button').press()
+    app.components.requireApi<ToggleApi>('sound-toggle').toggle()
+    app.components.requireApi<CheckboxApi>('sound-checkbox').toggle()
+    app.components.requireApi<SliderApi>('sound-slider').setValue(20)
+    app.components.requireApi<SliderApi>('sound-slider').setValue(20)
+    app.components.requireApi<SegmentedControlApi>('sound-segmented').setValue('b')
+    app.components.requireApi<SegmentedControlApi>('sound-segmented').setValue('b')
+
+    expect(app.sound.stats().played).toBe(6)
+
+    const segmented = app.components.require('sound-segmented')
+    segmented.eventHandlers.mousemove?.(new MouseEvent('mousemove', { clientX: 8, clientY: 8 }))
+    segmented.eventHandlers.mousemove?.(new MouseEvent('mousemove', { clientX: 9, clientY: 8 }))
+
+    expect(app.sound.stats().played).toBe(7)
+
+    vi.advanceTimersByTime(1)
+    app.destroy()
+    vi.useRealTimers()
   })
 
   it('relayouts layout-target children inside visual containers', () => {

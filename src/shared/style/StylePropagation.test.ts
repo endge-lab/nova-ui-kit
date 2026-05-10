@@ -200,7 +200,7 @@ describe('Nova UI style propagation', () => {
           Root { cursor: url("/cursors/cursor-pointer.svg", 2 2, default); }
           Button.resize:hover { cursor: component("ResizeCursor", { "axis": "x" }, 8 8); }
           Button.resize:pressed { cursor: pointer; }
-          Button.resize { color: #334455; }
+          Button.resize { background: #f8fafc; }
         `,
       },
       children: [
@@ -230,7 +230,7 @@ describe('Nova UI style propagation', () => {
       },
       pressed: 'pointer',
     })
-    expect(buttonApi(app, 'resize-button').getProps().color).toBe('#334455')
+    expect(buttonApi(app, 'resize-button').getProps().background).toBe('#f8fafc')
 
     app.destroy()
   })

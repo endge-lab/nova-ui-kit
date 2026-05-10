@@ -96,7 +96,7 @@ export function matchStyleRules(
     collectCandidates(candidates, seen, styleSheet.byClass.get(className))
   }
 
-  const matched = candidates.filter(rule => selectorMatches(node, rule.selector))
+  const matched = candidates.filter(rule => selectorMatchesWithIdentity(node, identity, rule.selector))
   matched.sort((left, right) => {
     const specificityDiff = left.selector.specificity - right.selector.specificity
     return specificityDiff || left.order - right.order
@@ -107,10 +107,18 @@ export function matchStyleRules(
 
 /** Проверяет, подходит ли selector к node с учетом ancestor chain. */
 export function selectorMatches(node: NovaUiStylableNode, selector: NovaUiStyleSelector): boolean {
+  return selectorMatchesWithIdentity(node, readStyleNodeIdentity(node), selector)
+}
+
+function selectorMatchesWithIdentity(
+  node: NovaUiStylableNode,
+  identity: StyleNodeIdentity,
+  selector: NovaUiStyleSelector,
+): boolean {
   let current: NovaNode<any> | null = node
   let partIndex = selector.parts.length - 1
 
-  if (!matchesPart(current, selector.parts[partIndex])) return false
+  if (!matchesIdentityPart(identity, selector.parts[partIndex])) return false
   partIndex -= 1
 
   while (partIndex >= 0) {
@@ -149,7 +157,10 @@ function findAncestorMatching(
 function matchesPart(node: unknown, part: NovaUiStyleSelectorPart): boolean {
   if (!isStylableNode(node)) return false
 
-  const identity = readStyleNodeIdentity(node)
+  return matchesIdentityPart(readStyleNodeIdentity(node), part)
+}
+
+function matchesIdentityPart(identity: StyleNodeIdentity, part: NovaUiStyleSelectorPart): boolean {
   if (part.type && identity.type !== part.type) return false
   if (part.id && identity.id !== part.id) return false
 

@@ -517,7 +517,8 @@ function mergeCursorDeclaration(
 
 function normalizeCursorStateMap(source: NovaCursorDeclaration | undefined): NovaCursorStateMap {
   if (!source) return {}
-  if (isCursorValue(source) || Array.isArray(source)) {
+  if (Array.isArray(source)) return {}
+  if (isCursorValue(source)) {
     return { default: source }
   }
   return { ...source }

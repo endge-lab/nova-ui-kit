@@ -802,13 +802,42 @@ function createDiagnostic(
 }
 
 function resolveLineColumn(source: string, index: number): { line: number; column: number } {
-  const prefix = source.slice(0, Math.max(0, index))
-  const lines = prefix.split('\n')
+  const lineStarts = getLineStarts(source)
+  const normalizedIndex = Math.max(0, index)
+  let low = 0
+  let high = lineStarts.length - 1
+  let lineIndex = 0
+
+  while (low <= high) {
+    const middle = Math.floor((low + high) / 2)
+    if (lineStarts[middle] <= normalizedIndex) {
+      lineIndex = middle
+      low = middle + 1
+    } else {
+      high = middle - 1
+    }
+  }
 
   return {
-    line: lines.length,
-    column: lines[lines.length - 1].length + 1,
+    line: lineIndex + 1,
+    column: normalizedIndex - lineStarts[lineIndex] + 1,
   }
+}
+
+const LINE_STARTS_CACHE = new Map<string, number[]>()
+
+function getLineStarts(source: string): number[] {
+  const cached = LINE_STARTS_CACHE.get(source)
+  if (cached) return cached
+
+  const starts = [0]
+  for (let index = 0; index < source.length; index += 1) {
+    if (source.charCodeAt(index) === 10) starts.push(index + 1)
+  }
+
+  if (LINE_STARTS_CACHE.size > 8) LINE_STARTS_CACHE.clear()
+  LINE_STARTS_CACHE.set(source, starts)
+  return starts
 }
 
 const STRING_KEYS = new Set([
