@@ -89,4 +89,3 @@ export function registerAdvancedComponents(registry: { register: (descriptor: Ad
 export function registerAdvancedComponentSchemas(registry: NovaSchemaRegistry): void {
   registerAdvancedComponents(registry)
 }
-

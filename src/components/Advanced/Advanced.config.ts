@@ -295,4 +295,3 @@ function defaultStepItems() {
     { label: 'Smoke', value: 'smoke' },
   ]
 }
-
