@@ -50,7 +50,6 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
       if (this.motionEnabled) {
         this.nova.motion.to(this, { scaleX: 1.08, opacity: 0.85 }, resolveNovaUiMotionOptions('pressFeedback'))
       }
-      this.nova.cursor('col-resize')
       this.nova.invalidate()
       return false
     })
@@ -61,8 +60,6 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
       if (e.defaultPrevented) {
         return false
       }
-
-      this.nova.cursor('col-resize')
       this.nova.invalidate()
       return false
     })
@@ -78,7 +75,6 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
       if (this.motionEnabled) {
         this.nova.motion.to(this, { scaleX: 1, opacity: 1 }, resolveNovaUiMotionOptions('pressFeedback'))
       }
-      this.nova.cursor('default')
       this.nova.invalidate()
       return false
     })
@@ -86,14 +82,12 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
     this.on('mouseenter', () => {
       if (this.disabled) return
       this.isHover = true
-      this.nova.cursor('col-resize')
       this.nova.invalidate()
     })
 
     this.on('mouseleave', () => {
       this.isHover = false
       if (!this.isDragging) {
-        this.nova.cursor('default')
         this.nova.invalidate()
       }
     })
@@ -160,6 +154,8 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
       ...rest,
       interactive: disabled === true ? false : true,
       active: disabled === true ? false : true,
+      cursor: { hover: 'col-resize', pressed: 'col-resize', dragging: 'col-resize', disabled: 'not-allowed' },
+      cursorContext: { axis: 'x', disabled: disabled === true },
     })
     this.color = color ?? this.color
     this.hoverColor = hoverColor ?? this.hoverColor ?? this.color

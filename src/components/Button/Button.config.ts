@@ -103,6 +103,7 @@ function resolveButtonDefaults(variant: ButtonResolvedProps['variant'], size: Bu
       hoverBackground: '#1d4ed8',
       pressedBackground: '#1e40af',
       activeBackground: '#1d4ed8',
+      cursor: { hover: 'pointer', pressed: 'pointer', disabled: 'not-allowed' },
     }
   }
   if (variant === 'danger') {
@@ -114,6 +115,7 @@ function resolveButtonDefaults(variant: ButtonResolvedProps['variant'], size: Bu
       border: { color: '#b91c1c', width: 1, radius: 7 },
       hoverBackground: '#b91c1c',
       pressedBackground: '#991b1b',
+      cursor: { hover: 'pointer', pressed: 'pointer', disabled: 'not-allowed' },
     }
   }
   if (variant === 'ghost') {
@@ -126,6 +128,7 @@ function resolveButtonDefaults(variant: ButtonResolvedProps['variant'], size: Bu
       hoverBackground: 'rgba(148,163,184,0.14)',
       pressedBackground: 'rgba(148,163,184,0.24)',
       activeBackground: 'rgba(37,99,235,0.14)',
+      cursor: { hover: 'pointer', pressed: 'pointer', disabled: 'not-allowed' },
     }
   }
 
@@ -138,5 +141,6 @@ function resolveButtonDefaults(variant: ButtonResolvedProps['variant'], size: Bu
     hoverBackground: '#f8fafc',
     pressedBackground: '#eef2f7',
     activeBackground: '#eff6ff',
+    cursor: { hover: 'pointer', pressed: 'pointer', disabled: 'not-allowed' },
   }
 }

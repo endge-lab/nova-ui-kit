@@ -42,6 +42,7 @@ export function normalizeSegmentedControlProps(props: SegmentedControlProps = {}
       activeBackground: '#ffffff',
       color: '#334155',
       accentColor: '#2563eb',
+      cursor: { hover: 'pointer', pressed: 'pointer', disabled: 'not-allowed' },
     }),
     items,
     value,

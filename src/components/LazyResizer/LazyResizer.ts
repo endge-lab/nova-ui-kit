@@ -57,6 +57,14 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
       ...rest,
       interactive: true,
       active: true,
+      cursor: {
+        hover: this.getCursorByDirection(),
+        pressed: this.getCursorByDirection(),
+        dragging: this.getCursorByDirection(),
+      },
+      cursorContext: {
+        axis: this._direction === 'left' || this._direction === 'right' ? 'x' : 'y',
+      },
     })
     this.updateHitBounds()
     return this
@@ -128,7 +136,6 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
 
       this._isDragging = true
       this.animateDragOverlay(1)
-      this.nova.cursor(this.getCursorByDirection())
       this.dirty({ render: true })
       return false
     })
@@ -170,7 +177,6 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
 
       this._onChangeMove(e, delta)
       if (e.defaultPrevented) return false
-      this.nova.cursor(this.getCursorByDirection())
       this.dirty({ render: true })
       return false
     })
@@ -220,7 +226,6 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
 
       this._isDragging = false
       this.animateDragOverlay(0)
-      this.nova.cursor('default')
       this.dirty({ render: true })
       return false
     }
@@ -250,16 +255,12 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
           break
       }
 
-      if (isNearLine) {
-        this.nova.cursor(this.getCursorByDirection())
-      }
       this._isHover = isNearLine
       this.animateHoverLine(isNearLine)
       this.dirty({ render: true })
     })
 
     this.on('mouseleave', () => {
-      this.nova.cursor('default')
       this._isHover = false
       this.animateHoverLine(false)
       this.dirty({ render: true })
@@ -276,7 +277,6 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
     this._isHover = false
     this._overlayOpacity = 0
     this._motionLineWidth = null
-    this.nova.cursor('default')
     this.dirty({ render: true })
   }
 

@@ -92,12 +92,8 @@ export class Toggle<E extends EventList = Record<string, any>>
   }
 
   private setupEvents(): void {
-    this.on('mouseenter', () => {
-      if (!this.props.disabled) this.nova.cursor('pointer')
-    })
     this.on('mouseleave', () => {
       this.pressed = false
-      this.nova.cursor('default')
       this.dirty({ render: true })
     })
     this.on('mousedown', event => {

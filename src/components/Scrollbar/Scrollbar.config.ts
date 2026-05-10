@@ -33,18 +33,21 @@ export const SCROLLBAR_FIELD_DEFINITIONS = {
 } as const
 
 export function normalizeScrollbarProps(props: ScrollbarProps = {}): ScrollbarResolvedProps {
+  const orientation = props.orientation ?? 'vertical'
   const viewportSize = Math.max(0, finiteNumber(props.viewportSize, 100))
   const contentSize = Math.max(viewportSize, finiteNumber(props.contentSize, viewportSize))
   const max = Math.max(0, contentSize - viewportSize)
+  const cursor = orientation === 'horizontal' ? 'ew-resize' : 'ns-resize'
   return {
     ...normalizeCommonProps(props, {
-      width: props.orientation === 'vertical' ? 12 : 160,
-      height: props.orientation === 'vertical' ? 160 : 12,
+      width: orientation === 'vertical' ? 12 : 160,
+      height: orientation === 'vertical' ? 160 : 12,
       trackColor: 'rgba(148,163,184,0.24)',
       thumbColor: 'rgba(71,85,105,0.72)',
       hoverBackground: 'rgba(71,85,105,0.88)',
+      cursor: { hover: cursor, pressed: cursor, dragging: cursor, disabled: 'not-allowed' },
     }),
-    orientation: props.orientation ?? 'vertical',
+    orientation,
     value: clamp(finiteNumber(props.value, 0), 0, max),
     viewportSize,
     contentSize,

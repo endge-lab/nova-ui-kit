@@ -37,6 +37,7 @@ export function normalizeToggleProps(props: ToggleProps = {}): ToggleResolvedPro
       trackColor: '#cbd5e1',
       thumbColor: '#ffffff',
       border: { color: '#cbd5e1', width: 1, radius: 999 },
+      cursor: { hover: 'pointer', pressed: 'pointer', disabled: 'not-allowed' },
     }),
     checked: props.checked ?? false,
     label: props.label ?? '',

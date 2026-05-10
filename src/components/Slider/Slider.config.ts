@@ -39,6 +39,8 @@ export function normalizeSliderProps(props: SliderProps = {}): SliderResolvedPro
   const max = Math.max(min, finiteNumber(props.max, 100))
   const step = Math.max(0, finiteNumber(props.step, 1))
   const value = clamp(roundToStep(finiteNumber(props.value, min), min, step), min, max)
+  const orientation = props.orientation ?? 'horizontal'
+  const cursor = orientation === 'horizontal' ? 'ew-resize' : 'ns-resize'
 
   return {
     ...normalizeCommonProps(props, {
@@ -48,12 +50,13 @@ export function normalizeSliderProps(props: SliderProps = {}): SliderResolvedPro
       trackColor: '#dbe4ef',
       thumbColor: '#ffffff',
       border: { color: '#2563eb', width: 2, radius: 999 },
+      cursor: { hover: cursor, pressed: cursor, dragging: cursor, disabled: 'not-allowed' },
     }),
     min,
     max,
     step,
     value,
-    orientation: props.orientation ?? 'horizontal',
+    orientation,
     marks: props.marks ?? [],
     onChange: props.onChange,
   }

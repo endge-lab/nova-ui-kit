@@ -39,6 +39,7 @@ export function normalizeCheckboxProps(props: CheckboxProps = {}): CheckboxResol
       border: { color: '#cbd5e1', width: 1, radius: 4 },
       hoverBackground: '#f8fafc',
       pressedBackground: '#eff6ff',
+      cursor: { hover: 'pointer', pressed: 'pointer', disabled: 'not-allowed' },
     }),
     checked: props.checked ?? false,
     indeterminate: props.indeterminate ?? false,

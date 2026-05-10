@@ -2,6 +2,8 @@ import {
   NovaComponentNode,
   type NovaApp,
   type NovaCursorDeclaration,
+  type NovaCursorStateMap,
+  type NovaCursorValue,
   type NovaNode,
   type NovaSurface,
 } from '@endge/nova'
@@ -468,18 +470,27 @@ function mergeCursorDeclaration(
   state: string,
 ): NovaCursorDeclaration {
   if (Array.isArray(source)) return source
-  const stateKey = state as keyof NonNullable<Exclude<NovaCursorDeclaration, string | any[]>>
   const base = normalizeCursorStateMap(target)
-  base[stateKey as 'hover' | 'pressed' | 'dragging' | 'disabled'] = source as never
+  if (isCursorStateName(state) && isCursorValue(source)) {
+    base[state] = source
+  }
   return base
 }
 
-function normalizeCursorStateMap(source: NovaCursorDeclaration | undefined): Record<string, unknown> {
+function normalizeCursorStateMap(source: NovaCursorDeclaration | undefined): NovaCursorStateMap {
   if (!source) return {}
-  if (typeof source === 'string' || Array.isArray(source) || 'type' in source) {
+  if (isCursorValue(source) || Array.isArray(source)) {
     return { default: source }
   }
   return { ...source }
+}
+
+function isCursorValue(source: NovaCursorDeclaration): source is NovaCursorValue {
+  return typeof source === 'string' || (!!source && typeof source === 'object' && !Array.isArray(source) && 'type' in source)
+}
+
+function isCursorStateName(value: string): value is Exclude<keyof NovaCursorStateMap, 'default'> {
+  return value === 'hover' || value === 'pressed' || value === 'dragging' || value === 'disabled'
 }
 
 function readBaselineValue<T>(state: AppliedCascadeState, key: string, fallback: T): T {

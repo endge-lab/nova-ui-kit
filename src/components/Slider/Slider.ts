@@ -109,12 +109,6 @@ export class Slider<E extends EventList = Record<string, any>>
   }
 
   private setupEvents(): void {
-    this.on('mouseenter', () => {
-      if (!this.props.disabled) this.nova.cursor(this.props.orientation === 'horizontal' ? 'ew-resize' : 'ns-resize')
-    })
-    this.on('mouseleave', () => {
-      if (!this.dragging) this.nova.cursor('default')
-    })
     this.on('mousedown', event => {
       if (this.props.disabled) return false
       this.focus(event)
@@ -132,7 +126,6 @@ export class Slider<E extends EventList = Record<string, any>>
       if (!this.dragging) return false
       this.dragging = false
       this.setValue(this.valueFromEvent(event), event)
-      this.nova.cursor('default')
       this.dirty({ render: true })
       return false
     })

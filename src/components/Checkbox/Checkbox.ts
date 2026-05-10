@@ -94,13 +94,11 @@ export class Checkbox<E extends EventList = Record<string, any>>
     this.on('mouseenter', () => {
       if (this.props.disabled) return
       this.hovered = true
-      this.nova.cursor('pointer')
       this.dirty({ render: true })
     })
     this.on('mouseleave', () => {
       this.hovered = false
       this.pressed = false
-      this.nova.cursor('default')
       this.dirty({ render: true })
     })
     this.on('mousedown', event => {
