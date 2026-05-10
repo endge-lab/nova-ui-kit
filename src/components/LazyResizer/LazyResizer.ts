@@ -128,7 +128,7 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
 
       this._isDragging = true
       this.animateDragOverlay(1)
-      this.nova.renderer.cursor(this.getCursorByDirection())
+      this.nova.cursor(this.getCursorByDirection())
       this.dirty({ render: true })
       return false
     })
@@ -170,7 +170,7 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
 
       this._onChangeMove(e, delta)
       if (e.defaultPrevented) return false
-      this.nova.renderer.cursor(this.getCursorByDirection())
+      this.nova.cursor(this.getCursorByDirection())
       this.dirty({ render: true })
       return false
     })
@@ -220,7 +220,7 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
 
       this._isDragging = false
       this.animateDragOverlay(0)
-      this.nova.renderer.cursor('default')
+      this.nova.cursor('default')
       this.dirty({ render: true })
       return false
     }
@@ -251,7 +251,7 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
       }
 
       if (isNearLine) {
-        this.nova.renderer.cursor(this.getCursorByDirection())
+        this.nova.cursor(this.getCursorByDirection())
       }
       this._isHover = isNearLine
       this.animateHoverLine(isNearLine)
@@ -259,7 +259,7 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
     })
 
     this.on('mouseleave', () => {
-      this.nova.renderer.cursor('default')
+      this.nova.cursor('default')
       this._isHover = false
       this.animateHoverLine(false)
       this.dirty({ render: true })
@@ -276,7 +276,7 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
     this._isHover = false
     this._overlayOpacity = 0
     this._motionLineWidth = null
-    this.nova.renderer.cursor('default')
+    this.nova.cursor('default')
     this.dirty({ render: true })
   }
 

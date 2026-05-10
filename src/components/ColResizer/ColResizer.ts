@@ -50,7 +50,7 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
       if (this.motionEnabled) {
         this.nova.motion.to(this, { scaleX: 1.08, opacity: 0.85 }, resolveNovaUiMotionOptions('pressFeedback'))
       }
-      this.nova.renderer.cursor('col-resize')
+      this.nova.cursor('col-resize')
       this.nova.invalidate()
       return false
     })
@@ -62,7 +62,7 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
         return false
       }
 
-      this.nova.renderer.cursor('col-resize')
+      this.nova.cursor('col-resize')
       this.nova.invalidate()
       return false
     })
@@ -78,7 +78,7 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
       if (this.motionEnabled) {
         this.nova.motion.to(this, { scaleX: 1, opacity: 1 }, resolveNovaUiMotionOptions('pressFeedback'))
       }
-      this.nova.renderer.cursor('default')
+      this.nova.cursor('default')
       this.nova.invalidate()
       return false
     })
@@ -86,14 +86,14 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
     this.on('mouseenter', () => {
       if (this.disabled) return
       this.isHover = true
-      this.nova.renderer.cursor('col-resize')
+      this.nova.cursor('col-resize')
       this.nova.invalidate()
     })
 
     this.on('mouseleave', () => {
       this.isHover = false
       if (!this.isDragging) {
-        this.nova.renderer.cursor('default')
+        this.nova.cursor('default')
         this.nova.invalidate()
       }
     })

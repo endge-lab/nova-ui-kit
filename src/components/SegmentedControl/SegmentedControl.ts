@@ -112,13 +112,13 @@ export class SegmentedControl<E extends EventList = Record<string, any>>
     this.on('mousemove', event => {
       if (this.props.disabled) return
       this.hoveredIndex = this.indexFromEvent(event)
-      this.nova.renderer.cursor(this.hoveredIndex >= 0 ? 'pointer' : 'default')
+      this.nova.cursor(this.hoveredIndex >= 0 ? 'pointer' : 'default')
       this.dirty({ render: true })
     })
     this.on('mouseleave', () => {
       this.hoveredIndex = -1
       this.pressedIndex = -1
-      this.nova.renderer.cursor('default')
+      this.nova.cursor('default')
       this.dirty({ render: true })
     })
     this.on('mousedown', event => {

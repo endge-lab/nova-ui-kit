@@ -107,12 +107,12 @@ export class Scrollbar<E extends EventList = Record<string, any>>
     this.on('mouseenter', () => {
       if (this.props.disabled) return
       this.hovered = true
-      this.nova.renderer.cursor(this.props.orientation === 'horizontal' ? 'ew-resize' : 'ns-resize')
+      this.nova.cursor(this.props.orientation === 'horizontal' ? 'ew-resize' : 'ns-resize')
       this.dirty({ render: true })
     })
     this.on('mouseleave', () => {
       this.hovered = false
-      if (!this.dragging) this.nova.renderer.cursor('default')
+      if (!this.dragging) this.nova.cursor('default')
       this.dirty({ render: true })
     })
     this.on('mousedown', event => {
@@ -130,7 +130,7 @@ export class Scrollbar<E extends EventList = Record<string, any>>
       if (!this.dragging) return false
       this.dragging = false
       this.setValue(this.valueFromEvent(event), event)
-      this.nova.renderer.cursor('default')
+      this.nova.cursor('default')
       this.dirty({ render: true })
       return false
     })

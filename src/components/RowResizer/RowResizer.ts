@@ -50,7 +50,7 @@ export class RowResizer<E extends EventList> extends NovaNode<E> {
       if (this._motionEnabled) {
         this.nova.motion.to(this, { scaleY: 1.08, opacity: 0.85 }, resolveNovaUiMotionOptions('pressFeedback'))
       }
-      this.nova.renderer.cursor('row-resize')
+      this.nova.cursor('row-resize')
       this.nova.invalidate()
       return false
     })
@@ -60,7 +60,7 @@ export class RowResizer<E extends EventList> extends NovaNode<E> {
       this._onChangeMove(e, dy)
       if (e.defaultPrevented) return false
 
-      this.nova.renderer.cursor('row-resize')
+      this.nova.cursor('row-resize')
       this.nova.invalidate()
       return false
     })
@@ -73,7 +73,7 @@ export class RowResizer<E extends EventList> extends NovaNode<E> {
       if (this._motionEnabled) {
         this.nova.motion.to(this, { scaleY: 1, opacity: 1 }, resolveNovaUiMotionOptions('pressFeedback'))
       }
-      this.nova.renderer.cursor('default')
+      this.nova.cursor('default')
       this.nova.invalidate()
       return false
     })
@@ -81,14 +81,14 @@ export class RowResizer<E extends EventList> extends NovaNode<E> {
     this.on('mouseenter', () => {
       if (this._disabled) return
       this._isHover = true
-      this.nova.renderer.cursor('row-resize')
+      this.nova.cursor('row-resize')
       this.nova.invalidate()
     })
 
     this.on('mouseleave', () => {
       this._isHover = false
       if (!this._isDragging) {
-        this.nova.renderer.cursor('default')
+        this.nova.cursor('default')
         this.nova.invalidate()
       }
     })
