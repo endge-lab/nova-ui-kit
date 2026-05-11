@@ -3,6 +3,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   Nova,
+  NovaComponent,
+  NovaNode,
   RaphSchedulerType,
   RendererType,
   type NovaApp,
@@ -44,6 +46,11 @@ import { RowResizer } from '@/components/RowResizer/RowResizer'
 import { ColResizer } from '@/components/ColResizer/ColResizer'
 
 type TestEvents = Record<string, any>
+
+@NovaComponent({ tag: 'InspectorCard' })
+class InspectorCardNode extends NovaNode<TestEvents> {
+  render(): void {}
+}
 
 function create2DContextStub(): CanvasRenderingContext2D {
   const state: Record<PropertyKey, any> = {
@@ -209,6 +216,39 @@ describe('Nova UI Kit components', () => {
     expect(app.components.requireApi<SegmentedControlApi>('segmented').getProps().value).toBe('b')
     expect(app.components.requireApi<PanelApi>('panel').getProps().title).toBe('Updated')
 
+    app.destroy()
+  })
+
+  it('accepts mixed constructor and string children inside Root, Panel and SplitPane containers', () => {
+    const app = createApp()
+    const surface = app.createSurface('mixed-children')
+    Nova.registerComponents(app.schema, InspectorCardNode)
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'mixed-root',
+      children: [
+        {
+          type: NovaUIKit.Panel,
+          id: 'mixed-panel',
+          props: { title: 'Mixed' },
+          children: [
+            {
+              type: NovaUIKit.SplitPane,
+              id: 'mixed-split',
+              props: { width: 300, height: 120 },
+              children: [
+                { type: InspectorCardNode, id: 'left-inspector', props: { side: 'left' } },
+                { type: 'InspectorCard', id: 'right-inspector', props: { side: 'right' } },
+              ],
+            },
+          ],
+        },
+      ],
+    })
+
+    expect((app.components.api<any>('left-inspector') as { props: Record<string, any> }).props.side).toBe('left')
+    expect((app.components.api<any>('right-inspector') as { props: Record<string, any> }).props.side).toBe('right')
     app.destroy()
   })
 

@@ -39,6 +39,7 @@ const NOVA_UI_KIT_DESCRIPTORS: Array<NovaComponentDescriptor<any, any, any, any>
 
 export function registerNovaUIKit(registry: NovaSchemaRegistry): void {
   for (const descriptor of NOVA_UI_KIT_DESCRIPTORS) {
+    registry.reserveTag(descriptor.name)
     registry.register(descriptor, { override: true })
   }
 }

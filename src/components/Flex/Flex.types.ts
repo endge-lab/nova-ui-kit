@@ -1,4 +1,4 @@
-import type { NovaComponentSchema } from '@endge/nova'
+import type { NovaComponentSchema, NovaElementSchema } from '@endge/nova'
 import type {
   NovaUiLayoutRect,
   NovaUiLayoutValue,
@@ -78,7 +78,7 @@ export interface FlexChildLayout {
 }
 
 /** Schema ребенка с отдельным layout-блоком. */
-export interface FlexChildSchema<TProps = Record<string, any>> extends NovaComponentSchema<TProps> {
+export interface FlexChildSchema<TProps = Record<string, any>> extends NovaElementSchema<TProps> {
   layout?: FlexChildLayout
 }
 

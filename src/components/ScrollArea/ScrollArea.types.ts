@@ -1,4 +1,4 @@
-import type { NovaComponentSchema } from '@endge/nova'
+import type { NovaComponentSchema, NovaElementSchema } from '@endge/nova'
 import type { NovaUiCommonProps, NovaUiCommonResolvedProps } from '@/shared/component'
 import type { ScrollbarProps, ScrollbarState } from '@/components/Scrollbar/Scrollbar.types'
 
@@ -24,7 +24,7 @@ export interface ScrollAreaResolvedProps extends NovaUiCommonResolvedProps {
   scrollbar: Partial<ScrollbarProps>
 }
 
-export interface ScrollAreaChildSchema<TProps = Record<string, any>> extends NovaComponentSchema<TProps> {}
+export interface ScrollAreaChildSchema<TProps = Record<string, any>> extends NovaElementSchema<TProps> {}
 
 export interface ScrollAreaSchema extends NovaComponentSchema<ScrollAreaProps> {
   children?: Array<ScrollAreaChildSchema>

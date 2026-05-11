@@ -1,4 +1,4 @@
-import type { NovaComponentSchema } from '@endge/nova'
+import type { NovaComponentSchema, NovaElementSchema } from '@endge/nova'
 import type { NovaUiCommonProps, NovaUiCommonResolvedProps } from '@/shared/component'
 import type { NovaUiLayoutRect } from '@/shared/layout'
 
@@ -22,7 +22,7 @@ export interface PanelResolvedProps extends NovaUiCommonResolvedProps {
   footer?: NovaComponentSchema
 }
 
-export interface PanelChildSchema<TProps = Record<string, any>> extends NovaComponentSchema<TProps> {}
+export interface PanelChildSchema<TProps = Record<string, any>> extends NovaElementSchema<TProps> {}
 
 export interface PanelSchema extends NovaComponentSchema<PanelProps> {
   children?: Array<PanelChildSchema>

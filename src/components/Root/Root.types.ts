@@ -1,4 +1,4 @@
-import type { NovaComponentSchema, NovaCursorContext, NovaCursorDeclaration } from '@endge/nova'
+import type { NovaComponentSchema, NovaCursorContext, NovaCursorDeclaration, NovaElementSchema } from '@endge/nova'
 import type {
   NovaUiLayoutRect,
   NovaUiSpacing,
@@ -51,7 +51,7 @@ export interface RootResolvedProps extends NovaUiStyleIdentityProps {
 }
 
 /** Schema ребенка Root. Каждый ребенок получает внутренний rect Root. */
-export interface RootChildSchema<TProps = Record<string, any>> extends NovaComponentSchema<TProps> {}
+export interface RootChildSchema<TProps = Record<string, any>> extends NovaElementSchema<TProps> {}
 
 /** Schema корня UI Kit дерева. */
 export interface RootSchema extends NovaComponentSchema<RootProps> {

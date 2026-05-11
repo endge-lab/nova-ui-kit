@@ -1,4 +1,4 @@
-import type { NovaComponentSchema } from '@endge/nova'
+import type { NovaComponentSchema, NovaElementSchema } from '@endge/nova'
 import type {
   NovaUiLayoutRect,
   NovaUiLayoutValue,
@@ -79,7 +79,7 @@ export interface GridChildLayout {
 }
 
 /** Schema ребенка Grid с отдельным layout-блоком. */
-export interface GridChildSchema<TProps = Record<string, any>> extends NovaComponentSchema<TProps> {
+export interface GridChildSchema<TProps = Record<string, any>> extends NovaElementSchema<TProps> {
   layout?: GridChildLayout
 }
 

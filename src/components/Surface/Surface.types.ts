@@ -1,4 +1,4 @@
-import type { NovaComponentSchema } from '@endge/nova'
+import type { NovaComponentSchema, NovaElementSchema } from '@endge/nova'
 import type {
   NovaUiCommonProps,
   NovaUiCommonResolvedProps,
@@ -11,7 +11,7 @@ export interface SurfaceProps extends NovaUiCommonProps {}
 
 export interface SurfaceResolvedProps extends NovaUiCommonResolvedProps {}
 
-export interface SurfaceChildSchema<TProps = Record<string, any>> extends NovaComponentSchema<TProps> {}
+export interface SurfaceChildSchema<TProps = Record<string, any>> extends NovaElementSchema<TProps> {}
 
 export interface SurfaceSchema extends NovaComponentSchema<SurfaceProps> {
   children?: Array<SurfaceChildSchema>

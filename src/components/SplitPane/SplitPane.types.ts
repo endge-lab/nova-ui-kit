@@ -1,4 +1,4 @@
-import type { NovaComponentSchema } from '@endge/nova'
+import type { NovaComponentSchema, NovaElementSchema } from '@endge/nova'
 import type { NovaUiCommonProps, NovaUiCommonResolvedProps } from '@/shared/component'
 
 export const SPLIT_PANE_SCHEMA_TYPE = 'nova-ui.split-pane'
@@ -31,7 +31,7 @@ export interface SplitPaneResolvedProps extends NovaUiCommonResolvedProps {
   collapsedPane: SplitPaneCollapsedPane
 }
 
-export interface SplitPaneChildSchema<TProps = Record<string, any>> extends NovaComponentSchema<TProps> {}
+export interface SplitPaneChildSchema<TProps = Record<string, any>> extends NovaElementSchema<TProps> {}
 
 export interface SplitPaneSchema extends NovaComponentSchema<SplitPaneProps> {
   children?: [SplitPaneChildSchema, SplitPaneChildSchema] | Array<SplitPaneChildSchema>
