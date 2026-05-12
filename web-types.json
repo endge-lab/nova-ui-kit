@@ -78,67 +78,83 @@
         },
         {
           "name": "Root",
-          "description": "Nova UI Kit root DSL node."
+          "description": "Nova UI Kit root DSL node.",
+          "source": { "module": "@endge/nova-ui-kit", "symbol": "Root" }
         },
         {
           "name": "Flex",
-          "description": "Nova UI Kit flex layout DSL node."
+          "description": "Nova UI Kit flex layout DSL node.",
+          "source": { "module": "@endge/nova-ui-kit", "symbol": "Flex" }
         },
         {
           "name": "Grid",
-          "description": "Nova UI Kit grid layout DSL node."
+          "description": "Nova UI Kit grid layout DSL node.",
+          "source": { "module": "@endge/nova-ui-kit", "symbol": "Grid" }
         },
         {
           "name": "TextBlock",
-          "description": "Nova UI Kit text DSL node."
+          "description": "Nova UI Kit text DSL node.",
+          "source": { "module": "@endge/nova-ui-kit", "symbol": "TextBlock" }
         },
         {
           "name": "Surface",
-          "description": "Nova UI Kit surface DSL node."
+          "description": "Nova UI Kit surface DSL node.",
+          "source": { "module": "@endge/nova-ui-kit", "symbol": "Surface" }
         },
         {
           "name": "Button",
-          "description": "Nova UI Kit button DSL node."
+          "description": "Nova UI Kit button DSL node.",
+          "source": { "module": "@endge/nova-ui-kit", "symbol": "Button" }
         },
         {
           "name": "Tag",
-          "description": "Nova UI Kit tag DSL node."
+          "description": "Nova UI Kit tag DSL node.",
+          "source": { "module": "@endge/nova-ui-kit", "symbol": "Tag" }
         },
         {
           "name": "SplitPane",
-          "description": "Nova UI Kit split pane DSL node."
+          "description": "Nova UI Kit split pane DSL node.",
+          "source": { "module": "@endge/nova-ui-kit", "symbol": "SplitPane" }
         },
         {
           "name": "ScrollArea",
-          "description": "Nova UI Kit scroll area DSL node."
+          "description": "Nova UI Kit scroll area DSL node.",
+          "source": { "module": "@endge/nova-ui-kit", "symbol": "ScrollArea" }
         },
         {
           "name": "Scrollbar",
-          "description": "Nova UI Kit scrollbar DSL node."
+          "description": "Nova UI Kit scrollbar DSL node.",
+          "source": { "module": "@endge/nova-ui-kit", "symbol": "Scrollbar" }
         },
         {
           "name": "Slider",
-          "description": "Nova UI Kit slider DSL node."
+          "description": "Nova UI Kit slider DSL node.",
+          "source": { "module": "@endge/nova-ui-kit", "symbol": "Slider" }
         },
         {
           "name": "Checkbox",
-          "description": "Nova UI Kit checkbox DSL node."
+          "description": "Nova UI Kit checkbox DSL node.",
+          "source": { "module": "@endge/nova-ui-kit", "symbol": "Checkbox" }
         },
         {
           "name": "Toggle",
-          "description": "Nova UI Kit toggle DSL node."
+          "description": "Nova UI Kit toggle DSL node.",
+          "source": { "module": "@endge/nova-ui-kit", "symbol": "Toggle" }
         },
         {
           "name": "Tooltip",
-          "description": "Nova UI Kit tooltip DSL node."
+          "description": "Nova UI Kit tooltip DSL node.",
+          "source": { "module": "@endge/nova-ui-kit", "symbol": "Tooltip" }
         },
         {
           "name": "SegmentedControl",
-          "description": "Nova UI Kit segmented control DSL node."
+          "description": "Nova UI Kit segmented control DSL node.",
+          "source": { "module": "@endge/nova-ui-kit", "symbol": "SegmentedControl" }
         },
         {
           "name": "Panel",
-          "description": "Nova UI Kit panel DSL node."
+          "description": "Nova UI Kit panel DSL node.",
+          "source": { "module": "@endge/nova-ui-kit", "symbol": "Panel" }
         },
         {
           "name": "NovaNamespacedComponent",
