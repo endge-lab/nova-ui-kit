@@ -99,7 +99,6 @@ export class ScrollArea<E extends EventList = Record<string, any>>
   setSlots(slots: NovaTemplateSlots = {}): void {
     this.slots = { ...slots }
     this.ensureScrollbars()
-    this.syncScrollbars()
     this.dirty({ update: true, render: true })
   }
 
@@ -228,6 +227,22 @@ export class ScrollArea<E extends EventList = Record<string, any>>
   }
 
   private syncScrollbars(): void {
+    if (this.props.scrollbarVisibility === 'hidden') {
+      this.reconcileSlot('scrollbar-y', [])
+      this.reconcileSlot('scrollbar-x', [])
+      this.reconcileSlot('track-y', [])
+      this.reconcileSlot('track-x', [])
+      this.reconcileSlot('thumb-y', [])
+      this.reconcileSlot('thumb-x', [])
+      this.reconcileSlot('corner', [])
+      this.visualState = {
+        ...this.visualState,
+        visible: false,
+        opacity: 0,
+      }
+      return
+    }
+
     const thickness = this.props.scrollbar.thickness ?? 8
     const canScrollY = this.props.axis !== 'x'
     const canScrollX = this.props.axis !== 'y'
