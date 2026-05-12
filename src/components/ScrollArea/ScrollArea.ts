@@ -16,12 +16,12 @@ import {
 import type {
   ScrollAreaApi,
   ScrollAreaChildSchema,
-  type ScrollAreaCornerSlotContext,
+  ScrollAreaCornerSlotContext,
   ScrollAreaProps,
   ScrollAreaResolvedProps,
-  type ScrollAreaSlotContext,
+  ScrollAreaSlotContext,
   ScrollAreaState,
-  type ScrollAreaVisualState,
+  ScrollAreaVisualState,
 } from '@/components/ScrollArea/ScrollArea.types'
 import { SCROLLBAR_SCHEMA_TYPE, type ScrollbarApi } from '@/components/Scrollbar/Scrollbar.types'
 import {
@@ -43,6 +43,10 @@ export class ScrollArea<E extends EventList = Record<string, any>>
   private readonly api: ScrollAreaApi
   private slots: NovaTemplateSlots = {}
   private idleTimer = 0
+  private lastScrollbarActivityAt = 0
+  private scrollSyncPending = false
+  private scrollVersion = 0
+  private flushedScrollVersion = 0
   private visualState: ScrollAreaVisualState = {
     hovered: false,
     scrolling: false,
@@ -100,10 +104,18 @@ export class ScrollArea<E extends EventList = Record<string, any>>
   }
 
   scrollTo(x: number, y: number): void {
-    const next = normalizeScrollAreaProps({ ...this.props, scrollX: x, scrollY: y })
-    if (next.scrollX === this.props.scrollX && next.scrollY === this.props.scrollY) return
-    this.markScrollbarsActive()
-    this.setProps({ scrollX: next.scrollX, scrollY: next.scrollY })
+    const nextX = clamp(Number.isFinite(x) ? x : 0, 0, Math.max(0, this.props.contentWidth - this.props.width))
+    const nextY = clamp(Number.isFinite(y) ? y : 0, 0, Math.max(0, this.props.contentHeight - this.props.height))
+    if (nextX === this.props.scrollX && nextY === this.props.scrollY) return
+    this.markScrollbarsActive(false)
+    this.props.scrollX = nextX
+    this.props.scrollY = nextY
+    this.scrollVersion += 1
+    if (!this.scrollSyncPending) {
+      this.scrollSyncPending = true
+      this.dirty({ update: true, render: true })
+      queueMicrotask(() => this.flushDeferredScrollSync())
+    }
   }
 
   getScrollState(): ScrollAreaState {
@@ -124,6 +136,7 @@ export class ScrollArea<E extends EventList = Record<string, any>>
   }
 
   update(): void {
+    this.flushedScrollVersion = this.scrollVersion
     for (const child of this.contentChildren) {
       applyNodeLayoutRect(child as NovaNode<any>, {
         x: -this.props.scrollX,
@@ -146,7 +159,8 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     this.props = normalizeScrollAreaProps(this.props)
     this.options({ interactive: !this.props.disabled })
     this.applyCommonPropsChanged(changedKeys)
-    this.ensureScrollbars()
+    if (this.hasStructuralScrollbarChanges(changedKeys)) this.ensureScrollbars()
+    else if (!this.shouldDeferScrollbarSync(changedKeys)) this.syncScrollbars()
     this.dirty({ update: true, render: true })
   }
 
@@ -163,7 +177,6 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     this.on('wheel', event => {
       if (this.props.disabled) return false
       event.preventDefault()
-      this.markScrollbarsActive()
       const multiplier = this.props.wheelMultiplier
       const dx = this.props.axis === 'y' ? 0 : event.deltaX * multiplier
       const dy = this.props.axis === 'x' ? 0 : event.deltaY * multiplier
@@ -313,33 +326,74 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     return this.visualState.opacity
   }
 
-  private markScrollbarsActive(): void {
+  private markScrollbarsActive(sync = true): void {
     if (this.props.scrollbarVisibility !== 'active') return
-    window.clearTimeout(this.idleTimer)
-    this.visualState = {
-      ...this.visualState,
-      scrolling: true,
-      idle: false,
-      opacity: 1,
+    this.lastScrollbarActivityAt = Date.now()
+    if (!this.visualState.scrolling || this.visualState.idle || this.visualState.opacity !== 1) {
+      this.visualState = {
+        ...this.visualState,
+        scrolling: true,
+        idle: false,
+        opacity: 1,
+      }
     }
-    this.syncScrollbars()
+    if (sync) this.syncScrollbars()
     this.scheduleScrollbarIdle()
+  }
+
+  private hasStructuralScrollbarChanges(changedKeys: Array<keyof ScrollAreaResolvedProps>): boolean {
+    return changedKeys.some(key => (
+      key === 'contentWidth'
+      || key === 'contentHeight'
+      || key === 'scrollbarVisibility'
+      || key === 'scrollbar'
+      || key === 'axis'
+      || key === 'width'
+      || key === 'height'
+    ))
+  }
+
+  private shouldDeferScrollbarSync(changedKeys: Array<keyof ScrollAreaResolvedProps>): boolean {
+    return changedKeys.every(key => (
+      key === 'scrollX'
+      || key === 'scrollY'
+      || key === 'scrollbarIdleDelay'
+      || key === 'scrollbarFadeDuration'
+      || key === 'wheelMultiplier'
+    ))
+  }
+
+  private flushDeferredScrollSync(): void {
+    if (this.lifecycleState === 'destroyed') return
+    this.scrollSyncPending = false
+    if (this.flushedScrollVersion !== this.scrollVersion) {
+      this.dirty({ update: true, render: true })
+    }
   }
 
   private scheduleScrollbarIdle(): void {
     if (this.props.scrollbarVisibility !== 'active') return
-    window.clearTimeout(this.idleTimer)
-    this.idleTimer = window.setTimeout(() => {
-      if (this.visualState.hovered || this.visualState.dragging) return
-      this.visualState = {
-        ...this.visualState,
-        scrolling: false,
-        idle: true,
-        opacity: 0,
-      }
-      this.syncScrollbars()
-      this.dirty({ render: true })
-    }, this.props.scrollbarIdleDelay)
+    if (this.idleTimer !== 0) return
+    this.idleTimer = window.setTimeout(() => this.flushScrollbarIdle(), this.props.scrollbarIdleDelay)
+  }
+
+  private flushScrollbarIdle(): void {
+    this.idleTimer = 0
+    const elapsed = Date.now() - this.lastScrollbarActivityAt
+    const remaining = this.props.scrollbarIdleDelay - elapsed
+    if (remaining > 0) {
+      this.idleTimer = window.setTimeout(() => this.flushScrollbarIdle(), remaining)
+      return
+    }
+    if (this.visualState.hovered || this.visualState.dragging) return
+    this.visualState = {
+      ...this.visualState,
+      scrolling: false,
+      idle: true,
+      opacity: 0,
+    }
+    this.syncScrollbars()
+    this.dirty({ render: true })
   }
 
   private hasCustomScrollbar(orientation: ScrollbarOrientation): boolean {
