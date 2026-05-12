@@ -84,7 +84,7 @@ export class Scrollbar<E extends EventList = Record<string, any>>
       y: horizontal ? (cross - this.props.thickness) / 2 : 0,
       width: horizontal ? length : this.props.thickness,
       height: horizontal ? this.props.thickness : length,
-      styles: { background: this.props.trackColor ?? 'rgba(148,163,184,0.24)', border: { radius: 999, width: 0 } },
+      styles: { background: this.props.trackColor ?? 'rgba(148,163,184,0.24)', opacity: this.props.opacity, border: { radius: 999, width: 0 } },
     })
     schema.push({
       type: 'rect',
@@ -92,7 +92,7 @@ export class Scrollbar<E extends EventList = Record<string, any>>
       y: horizontal ? (cross - this.props.thickness) / 2 : offset,
       width: horizontal ? thumbLength : this.props.thickness,
       height: horizontal ? this.props.thickness : thumbLength,
-      styles: { background: thumbColor ?? 'rgba(71,85,105,0.72)', border: { radius: 999, width: 0 } },
+      styles: { background: thumbColor ?? 'rgba(71,85,105,0.72)', opacity: this.props.opacity, border: { radius: 999, width: 0 } },
     })
     this.renderer.schema(schema)
   }
