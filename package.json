@@ -1,10 +1,11 @@
 {
   "name": "@endge/nova-ui-kit",
   "private": false,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "module": "./dist/nova-ui-kit.js",
   "types": "./dist/index.d.ts",
+  "web-types": "./web-types.json",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -13,7 +14,8 @@
   },
   "sideEffects": false,
   "files": [
-    "dist"
+    "dist",
+    "web-types.json"
   ],
   "scripts": {
     "clean": "rimraf dist tsconfig.tsbuildinfo",

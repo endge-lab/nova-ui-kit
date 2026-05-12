@@ -1,0 +1,153 @@
+{
+  "$schema": "https://raw.githubusercontent.com/JetBrains/web-types/master/schema/web-types.json",
+  "name": "@endge/nova-ui-kit",
+  "version": "0.1.1",
+  "framework": "vue",
+  "js-types-syntax": "typescript",
+  "description-markup": "markdown",
+  "contributions": {
+    "html": {
+      "elements": [
+        {
+          "name": "nova-template",
+          "description": "Vue marker for binding compiled Nova SFC templates to a Nova canvas.",
+          "attributes": [
+            {
+              "name": "src",
+              "description": "Path to a `.nova` file used by the Nova Vite compiler.",
+              "value": {
+                "kind": "plain",
+                "type": "string"
+              }
+            },
+            {
+              "name": "source",
+              "description": "Debug source path injected by the Nova Vite compiler.",
+              "value": {
+                "kind": "plain",
+                "type": "string"
+              }
+            },
+            {
+              "name": "debug-id",
+              "description": "Debug identifier injected by the Nova Vite compiler.",
+              "value": {
+                "kind": "plain",
+                "type": "string"
+              }
+            }
+          ]
+        }
+      ],
+      "vue-components": [
+        {
+          "name": "nova-template",
+          "description": "Vue marker for binding compiled Nova SFC templates to a Nova canvas.",
+          "props": [
+            {
+              "name": "src",
+              "description": "Path to a `.nova` file used by the Nova Vite compiler.",
+              "type": "string"
+            },
+            {
+              "name": "component",
+              "description": "Compiled Nova component constructor injected by the Nova Vite compiler.",
+              "type": "unknown"
+            },
+            {
+              "name": "source",
+              "description": "Debug source path injected by the Nova Vite compiler.",
+              "type": "string"
+            },
+            {
+              "name": "debug-id",
+              "description": "Debug identifier injected by the Nova Vite compiler.",
+              "type": "string"
+            },
+            {
+              "name": "options",
+              "description": "Template options forwarded to the compiled Nova component.",
+              "type": "unknown"
+            },
+            {
+              "name": "data",
+              "description": "Template data forwarded to the compiled Nova component.",
+              "type": "unknown"
+            }
+          ]
+        },
+        {
+          "name": "Root",
+          "description": "Nova UI Kit root DSL node."
+        },
+        {
+          "name": "Flex",
+          "description": "Nova UI Kit flex layout DSL node."
+        },
+        {
+          "name": "Grid",
+          "description": "Nova UI Kit grid layout DSL node."
+        },
+        {
+          "name": "TextBlock",
+          "description": "Nova UI Kit text DSL node."
+        },
+        {
+          "name": "Surface",
+          "description": "Nova UI Kit surface DSL node."
+        },
+        {
+          "name": "Button",
+          "description": "Nova UI Kit button DSL node."
+        },
+        {
+          "name": "Tag",
+          "description": "Nova UI Kit tag DSL node."
+        },
+        {
+          "name": "SplitPane",
+          "description": "Nova UI Kit split pane DSL node."
+        },
+        {
+          "name": "ScrollArea",
+          "description": "Nova UI Kit scroll area DSL node."
+        },
+        {
+          "name": "Scrollbar",
+          "description": "Nova UI Kit scrollbar DSL node."
+        },
+        {
+          "name": "Slider",
+          "description": "Nova UI Kit slider DSL node."
+        },
+        {
+          "name": "Checkbox",
+          "description": "Nova UI Kit checkbox DSL node."
+        },
+        {
+          "name": "Toggle",
+          "description": "Nova UI Kit toggle DSL node."
+        },
+        {
+          "name": "Tooltip",
+          "description": "Nova UI Kit tooltip DSL node."
+        },
+        {
+          "name": "SegmentedControl",
+          "description": "Nova UI Kit segmented control DSL node."
+        },
+        {
+          "name": "Panel",
+          "description": "Nova UI Kit panel DSL node."
+        },
+        {
+          "name": "NovaNamespacedComponent",
+          "pattern": {
+            "regex": "[A-Z][A-Za-z0-9]*(\\.[A-Z][A-Za-z0-9]*)+"
+          },
+          "description": "Namespaced Nova DSL component, for example `TimelineChart.Root`."
+        }
+      ]
+    }
+  }
+}
