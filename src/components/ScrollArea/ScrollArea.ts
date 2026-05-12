@@ -1,4 +1,12 @@
-import { reconcileNovaTemplateChildren, type NovaApp, type NovaNode, type NovaSurface } from '@endge/nova'
+import {
+  NovaTemplateRuntime,
+  reconcileNovaTemplateChildren,
+  type NovaApp,
+  type NovaNode,
+  type NovaSurface,
+  type NovaTemplateChildSchema,
+  type NovaTemplateSlots,
+} from '@endge/nova'
 import type { EventList } from '@endge/utils'
 import {
   SCROLL_AREA_NODE_DESCRIPTOR,
@@ -8,9 +16,12 @@ import {
 import type {
   ScrollAreaApi,
   ScrollAreaChildSchema,
+  type ScrollAreaCornerSlotContext,
   ScrollAreaProps,
   ScrollAreaResolvedProps,
+  type ScrollAreaSlotContext,
   ScrollAreaState,
+  type ScrollAreaVisualState,
 } from '@/components/ScrollArea/ScrollArea.types'
 import { SCROLLBAR_SCHEMA_TYPE, type ScrollbarApi } from '@/components/Scrollbar/Scrollbar.types'
 import {
@@ -19,19 +30,33 @@ import {
   clamp,
 } from '@/shared/component'
 import { applyNodeLayoutRect } from '@/shared/layout'
+import type { NovaUiLayoutRect } from '@/shared/layout'
+
+type ScrollbarOrientation = 'horizontal' | 'vertical'
 
 export class ScrollArea<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<ScrollAreaResolvedProps, ScrollAreaApi, ScrollAreaProps, E> {
   private readonly contentChildren: Array<NovaNode<E>> = []
+  private readonly slotRuntimes = new Map<string, NovaTemplateRuntime<E>>()
   private verticalScrollbar: NovaNode<E> | null = null
   private horizontalScrollbar: NovaNode<E> | null = null
   private readonly api: ScrollAreaApi
+  private slots: NovaTemplateSlots = {}
+  private idleTimer = 0
+  private visualState: ScrollAreaVisualState = {
+    hovered: false,
+    scrolling: false,
+    dragging: false,
+    idle: true,
+    visible: false,
+    opacity: 0,
+  }
 
   constructor(
     app: NovaApp<E>,
     surface: NovaSurface<E>,
     props: ScrollAreaProps = {},
-    options: { componentId?: string; children?: Array<ScrollAreaChildSchema> } = {},
+    options: { componentId?: string; children?: Array<ScrollAreaChildSchema>; slots?: NovaTemplateSlots } = {},
     descriptor: ScrollAreaDescriptor = SCROLL_AREA_NODE_DESCRIPTOR,
   ) {
     super(app, surface, descriptor, normalizeScrollAreaProps(props), options)
@@ -39,11 +64,14 @@ export class ScrollArea<E extends EventList = Record<string, any>>
       scrollTo: (x, y) => this.scrollTo(x, y),
       scrollBy: (dx, dy) => this.scrollTo(this.props.scrollX + dx, this.props.scrollY + dy),
       getScrollState: () => this.getScrollState(),
+      getScrollbarState: () => ({ ...this.visualState }),
       setChildren: children => this.setChildren(children),
+      setSlots: slots => this.setSlots(slots),
       setProps: patch => this.setProps(patch),
       getProps: () => this.props,
     }
     this.options({ interactive: !this.props.disabled })
+    this.slots = { ...(options.slots ?? {}) }
     this.setChildren(options.children ?? [])
     this.ensureScrollbars()
     this.setupEvents()
@@ -64,9 +92,17 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     this.dirty({ update: true, render: true })
   }
 
+  setSlots(slots: NovaTemplateSlots = {}): void {
+    this.slots = { ...slots }
+    this.ensureScrollbars()
+    this.syncScrollbars()
+    this.dirty({ update: true, render: true })
+  }
+
   scrollTo(x: number, y: number): void {
     const next = normalizeScrollAreaProps({ ...this.props, scrollX: x, scrollY: y })
     if (next.scrollX === this.props.scrollX && next.scrollY === this.props.scrollY) return
+    this.markScrollbarsActive()
     this.setProps({ scrollX: next.scrollX, scrollY: next.scrollY })
   }
 
@@ -115,12 +151,25 @@ export class ScrollArea<E extends EventList = Record<string, any>>
   }
 
   private setupEvents(): void {
+    this.on('mouseenter', () => {
+      if (this.props.disabled) return
+      this.visualState.hovered = true
+      this.markScrollbarsActive()
+    })
+    this.on('mouseleave', () => {
+      this.visualState.hovered = false
+      this.scheduleScrollbarIdle()
+    })
     this.on('wheel', event => {
       if (this.props.disabled) return false
       event.preventDefault()
+      this.markScrollbarsActive()
+      const multiplier = this.props.wheelMultiplier
+      const dx = this.props.axis === 'y' ? 0 : event.deltaX * multiplier
+      const dy = this.props.axis === 'x' ? 0 : event.deltaY * multiplier
       this.scrollTo(
-        this.props.scrollX + event.deltaX,
-        this.props.scrollY + event.deltaY,
+        this.props.scrollX + dx,
+        this.props.scrollY + dy,
       )
       return false
     })
@@ -132,10 +181,14 @@ export class ScrollArea<E extends EventList = Record<string, any>>
       this.horizontalScrollbar?.remove()
       this.verticalScrollbar = null
       this.horizontalScrollbar = null
+      this.clearSlotRuntimes()
       return
     }
 
-    if (!this.verticalScrollbar) {
+    if (this.hasCustomScrollbar('vertical')) {
+      this.verticalScrollbar?.remove()
+      this.verticalScrollbar = null
+    } else if (!this.verticalScrollbar) {
       this.verticalScrollbar = this.nova.schema.createChild(this, {
         type: SCROLLBAR_SCHEMA_TYPE,
         id: `${this.componentId}-scrollbar-y`,
@@ -145,7 +198,10 @@ export class ScrollArea<E extends EventList = Record<string, any>>
         },
       }) as NovaNode<E>
     }
-    if (!this.horizontalScrollbar) {
+    if (this.hasCustomScrollbar('horizontal')) {
+      this.horizontalScrollbar?.remove()
+      this.horizontalScrollbar = null
+    } else if (!this.horizontalScrollbar) {
       this.horizontalScrollbar = this.nova.schema.createChild(this, {
         type: SCROLLBAR_SCHEMA_TYPE,
         id: `${this.componentId}-scrollbar-x`,
@@ -160,22 +216,48 @@ export class ScrollArea<E extends EventList = Record<string, any>>
 
   private syncScrollbars(): void {
     const thickness = this.props.scrollbar.thickness ?? 8
-    const showY = this.props.scrollbarVisibility === 'always' || this.props.contentHeight > this.height
-    const showX = this.props.scrollbarVisibility === 'always' || this.props.contentWidth > this.width
-
-    this.verticalScrollbar?.options({
+    const canScrollY = this.props.axis !== 'x'
+    const canScrollX = this.props.axis !== 'y'
+    const showY = canScrollY && (
+      this.props.scrollbarVisibility === 'always' || this.props.contentHeight > this.height
+    )
+    const showX = canScrollX && (
+      this.props.scrollbarVisibility === 'always' || this.props.contentWidth > this.width
+    )
+    const opacity = this.resolveScrollbarOpacity(showX || showY)
+    this.visualState = {
+      ...this.visualState,
+      visible: showX || showY,
+      opacity,
+    }
+    const verticalTrackRect: NovaUiLayoutRect = {
       x: Math.max(0, this.width - thickness - 2),
       y: 2,
       width: thickness,
       height: Math.max(0, this.height - (showX ? thickness + 6 : 4)),
-      visible: showY,
-      active: showY,
-    })
-    this.horizontalScrollbar?.options({
+    }
+    const horizontalTrackRect: NovaUiLayoutRect = {
       x: 2,
       y: Math.max(0, this.height - thickness - 2),
       width: Math.max(0, this.width - (showY ? thickness + 6 : 4)),
       height: thickness,
+    }
+    const verticalThumbRect = this.resolveThumbRect('vertical', verticalTrackRect)
+    const horizontalThumbRect = this.resolveThumbRect('horizontal', horizontalTrackRect)
+
+    this.verticalScrollbar?.options({
+      x: verticalTrackRect.x,
+      y: verticalTrackRect.y,
+      width: verticalTrackRect.width,
+      height: verticalTrackRect.height,
+      visible: showY,
+      active: showY,
+    })
+    this.horizontalScrollbar?.options({
+      x: horizontalTrackRect.x,
+      y: horizontalTrackRect.y,
+      width: horizontalTrackRect.width,
+      height: horizontalTrackRect.height,
       visible: showX,
       active: showX,
     })
@@ -189,6 +271,7 @@ export class ScrollArea<E extends EventList = Record<string, any>>
       thickness,
       trackColor: this.props.trackColor,
       thumbColor: this.props.thumbColor,
+      opacity,
     })
     this.horizontalScrollbarApi()?.setProps({
       ...this.props.scrollbar,
@@ -199,6 +282,16 @@ export class ScrollArea<E extends EventList = Record<string, any>>
       thickness,
       trackColor: this.props.trackColor,
       thumbColor: this.props.thumbColor,
+      opacity,
+    })
+
+    this.syncCustomSlots('vertical', showY, verticalTrackRect, verticalThumbRect)
+    this.syncCustomSlots('horizontal', showX, horizontalTrackRect, horizontalThumbRect)
+    this.syncCornerSlot(showX && showY, {
+      x: verticalTrackRect.x,
+      y: horizontalTrackRect.y,
+      width: verticalTrackRect.width,
+      height: horizontalTrackRect.height,
     })
   }
 
@@ -212,5 +305,149 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     return this.horizontalScrollbar && 'getApi' in this.horizontalScrollbar
       ? (this.horizontalScrollbar as unknown as { getApi: () => ScrollbarApi }).getApi()
       : null
+  }
+
+  private resolveScrollbarOpacity(hasVisibleScrollbar: boolean): number {
+    if (!hasVisibleScrollbar) return 0
+    if (this.props.scrollbarVisibility !== 'active') return 1
+    return this.visualState.opacity
+  }
+
+  private markScrollbarsActive(): void {
+    if (this.props.scrollbarVisibility !== 'active') return
+    window.clearTimeout(this.idleTimer)
+    this.visualState = {
+      ...this.visualState,
+      scrolling: true,
+      idle: false,
+      opacity: 1,
+    }
+    this.syncScrollbars()
+    this.scheduleScrollbarIdle()
+  }
+
+  private scheduleScrollbarIdle(): void {
+    if (this.props.scrollbarVisibility !== 'active') return
+    window.clearTimeout(this.idleTimer)
+    this.idleTimer = window.setTimeout(() => {
+      if (this.visualState.hovered || this.visualState.dragging) return
+      this.visualState = {
+        ...this.visualState,
+        scrolling: false,
+        idle: true,
+        opacity: 0,
+      }
+      this.syncScrollbars()
+      this.dirty({ render: true })
+    }, this.props.scrollbarIdleDelay)
+  }
+
+  private hasCustomScrollbar(orientation: ScrollbarOrientation): boolean {
+    const axisSlot = orientation === 'vertical' ? this.slots['scrollbar-y'] : this.slots['scrollbar-x']
+    return !!axisSlot || !!this.slots.scrollbar || !!this.slots.track || !!this.slots.thumb
+  }
+
+  private syncCustomSlots(
+    orientation: ScrollbarOrientation,
+    visible: boolean,
+    trackRect: NovaUiLayoutRect,
+    thumbRect: NovaUiLayoutRect,
+  ): void {
+    const suffix = orientation === 'vertical' ? 'y' : 'x'
+    const specificScrollbar = this.slots[`scrollbar-${suffix}`]
+    const scrollbar = specificScrollbar ?? this.slots.scrollbar
+    const context = this.createSlotContext(orientation, trackRect, thumbRect)
+
+    if (!visible || !this.hasCustomScrollbar(orientation)) {
+      this.reconcileSlot(`scrollbar-${suffix}`, [])
+      this.reconcileSlot(`track-${suffix}`, [])
+      this.reconcileSlot(`thumb-${suffix}`, [])
+      return
+    }
+
+    if (scrollbar) {
+      this.reconcileSlot(`scrollbar-${suffix}`, scrollbar(context))
+      this.reconcileSlot(`track-${suffix}`, [])
+      this.reconcileSlot(`thumb-${suffix}`, [])
+      return
+    }
+
+    this.reconcileSlot(`scrollbar-${suffix}`, [])
+    this.reconcileSlot(`track-${suffix}`, this.slots.track?.(context) ?? [])
+    this.reconcileSlot(`thumb-${suffix}`, this.slots.thumb?.(context) ?? [])
+  }
+
+  private syncCornerSlot(visible: boolean, rect: NovaUiLayoutRect): void {
+    if (!visible || !this.slots.corner) {
+      this.reconcileSlot('corner', [])
+      return
+    }
+
+    const context: ScrollAreaCornerSlotContext = {
+      state: { ...this.visualState },
+      rect,
+    }
+    this.reconcileSlot('corner', this.slots.corner(context))
+  }
+
+  private createSlotContext(
+    orientation: ScrollbarOrientation,
+    trackRect: NovaUiLayoutRect,
+    thumbRect: NovaUiLayoutRect,
+  ): ScrollAreaSlotContext {
+    const vertical = orientation === 'vertical'
+    return {
+      orientation: vertical ? 'vertical' : 'horizontal',
+      state: { ...this.visualState },
+      metrics: vertical ? this.getScrollState().y : this.getScrollState().x,
+      thumbRect,
+      trackRect,
+      actions: {
+        scrollTo: value => {
+          if (vertical) this.scrollTo(this.props.scrollX, value)
+          else this.scrollTo(value, this.props.scrollY)
+        },
+        scrollBy: delta => {
+          if (vertical) this.scrollTo(this.props.scrollX, this.props.scrollY + delta)
+          else this.scrollTo(this.props.scrollX + delta, this.props.scrollY)
+        },
+      },
+    }
+  }
+
+  private resolveThumbRect(orientation: ScrollbarOrientation, trackRect: NovaUiLayoutRect): NovaUiLayoutRect {
+    const vertical = orientation === 'vertical'
+    const viewportSize = vertical ? this.height : this.width
+    const contentSize = vertical ? this.props.contentHeight : this.props.contentWidth
+    const value = vertical ? this.props.scrollY : this.props.scrollX
+    const max = Math.max(0, contentSize - viewportSize)
+    const length = Math.max(1, vertical ? trackRect.height : trackRect.width)
+    const thumbLength = Math.max(20, length * (viewportSize / Math.max(viewportSize, contentSize)))
+    const travel = Math.max(0, length - thumbLength)
+    const offset = max > 0 ? travel * (value / max) : 0
+
+    return vertical
+      ? { x: trackRect.x, y: trackRect.y + offset, width: trackRect.width, height: thumbLength }
+      : { x: trackRect.x + offset, y: trackRect.y, width: thumbLength, height: trackRect.height }
+  }
+
+  private reconcileSlot(key: string, schemas: Array<NovaTemplateChildSchema>): void {
+    let runtime = this.slotRuntimes.get(key)
+    if (!runtime) {
+      runtime = new NovaTemplateRuntime(this)
+      this.slotRuntimes.set(key, runtime)
+    }
+    runtime.reconcile(schemas)
+  }
+
+  private clearSlotRuntimes(): void {
+    for (const runtime of this.slotRuntimes.values()) runtime.dispose()
+    this.slotRuntimes.clear()
+  }
+
+  override dispose(): void {
+    window.clearTimeout(this.idleTimer)
+    this.clearSlotRuntimes()
+    super.dispose()
   }
 }

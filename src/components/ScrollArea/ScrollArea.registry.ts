@@ -17,6 +17,7 @@ export const SCROLL_AREA_DESCRIPTOR: ScrollAreaDescriptor = createScrollAreaDesc
     {
       componentId: scrollAreaSchema.id,
       children: scrollAreaSchema.children ?? [],
+      slots: scrollAreaSchema.slots ?? {},
     },
     SCROLL_AREA_DESCRIPTOR,
   )

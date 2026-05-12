@@ -252,6 +252,192 @@ describe('Nova UI Kit components', () => {
     app.destroy()
   })
 
+  it('renders ScrollArea default chrome and custom thumb slots without replacing slot identity', () => {
+    const app = createApp()
+    const surface = app.createSurface('scroll-area-slots')
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'scroll-slot-root',
+      children: [
+        {
+          type: NovaUIKit.ScrollArea,
+          id: 'scroll-default',
+          props: { width: 220, height: 120, contentHeight: 360 },
+          children: [
+            { type: NovaUIKit.Surface, id: 'scroll-default-content', props: { background: '#f8fafc' } },
+          ],
+        },
+        {
+          type: NovaUIKit.ScrollArea,
+          id: 'scroll-custom',
+          props: { y: 140, width: 220, height: 120, contentHeight: 360, scrollbarVisibility: 'active' },
+          slots: {
+            thumb: scope => [
+              {
+                type: NovaUIKit.Surface,
+                id: `custom-thumb-${scope?.orientation}`,
+                key: scope?.orientation,
+                props: {
+                  x: scope?.thumbRect.x,
+                  y: scope?.thumbRect.y,
+                  width: scope?.thumbRect.width,
+                  height: scope?.thumbRect.height,
+                  opacity: scope?.state.opacity,
+                  background: '#2563eb',
+                  border: { width: 0, radius: 999 },
+                },
+              },
+            ],
+          },
+          children: [
+            { type: NovaUIKit.Surface, id: 'scroll-custom-content', props: { background: '#f8fafc' } },
+          ],
+        },
+      ],
+    })
+    app.raph.run()
+    app.raph.run()
+
+    expect(app.components.api<ScrollbarApi>('scroll-default-scrollbar-y')).toBeTruthy()
+    expect(app.components.api<ScrollbarApi>('scroll-custom-scrollbar-y')).toBeUndefined()
+
+    const api = app.components.requireApi<ScrollAreaApi>('scroll-custom')
+    const firstThumb = app.components.require('custom-thumb-vertical')
+    api.scrollTo(0, 80)
+    app.raph.run()
+    app.raph.run()
+
+    expect(app.components.require('custom-thumb-vertical')).toBe(firstThumb)
+    expect((app.components.require('custom-thumb-vertical') as any).getProps().opacity).toBe(1)
+
+    app.destroy()
+  })
+
+  it('supports full ScrollArea scrollbar-y slots and active idle visibility', () => {
+    vi.useFakeTimers()
+    const app = createApp()
+    const surface = app.createSurface('scroll-area-active')
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'scroll-active-root',
+      children: [
+        {
+          type: NovaUIKit.ScrollArea,
+          id: 'scroll-active',
+          props: {
+            width: 220,
+            height: 120,
+            contentHeight: 360,
+            scrollbarVisibility: 'active',
+            scrollbarIdleDelay: 120,
+          },
+          slots: {
+            'scrollbar-y': scope => [
+              {
+                type: NovaUIKit.Surface,
+                id: 'custom-scrollbar-y',
+                key: 'custom-scrollbar-y',
+                props: {
+                  x: scope?.trackRect.x,
+                  y: scope?.trackRect.y,
+                  width: scope?.trackRect.width,
+                  height: scope?.trackRect.height,
+                  opacity: scope?.state.opacity,
+                  background: 'rgba(15,23,42,0.12)',
+                },
+              },
+            ],
+          },
+          children: [
+            { type: NovaUIKit.Surface, id: 'scroll-active-content', props: { background: '#f8fafc' } },
+          ],
+        },
+      ],
+    })
+    app.raph.run()
+    app.raph.run()
+
+    const api = app.components.requireApi<ScrollAreaApi>('scroll-active')
+    const node = app.components.require('scroll-active') as unknown as NovaNode<TestEvents>
+
+    expect(api.getScrollbarState().opacity).toBe(0)
+    node.eventHandlers.wheel?.(new WheelEvent('wheel', { deltaY: 48 }))
+    app.raph.run()
+    app.raph.run()
+
+    expect(api.getScrollState().y.value).toBe(48)
+    expect(api.getScrollbarState().opacity).toBe(1)
+    expect((app.components.require('custom-scrollbar-y') as any).getProps().opacity).toBe(1)
+
+    vi.advanceTimersByTime(130)
+    app.raph.run()
+    app.raph.run()
+
+    expect(api.getScrollbarState().opacity).toBe(0)
+    expect((app.components.require('custom-scrollbar-y') as any).getProps().opacity).toBe(0)
+
+    app.destroy()
+    vi.useRealTimers()
+  })
+
+  it('keeps ScrollArea custom thumb slot scroll updates under budget without child growth', () => {
+    const app = createApp()
+    const surface = app.createSurface('scroll-area-slot-perf')
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'scroll-perf-root',
+      children: [
+        {
+          type: NovaUIKit.ScrollArea,
+          id: 'scroll-perf',
+          props: { width: 220, height: 120, contentHeight: 720, scrollbarVisibility: 'active' },
+          slots: {
+            thumb: scope => [
+              {
+                type: NovaUIKit.Surface,
+                id: `scroll-perf-thumb-${scope?.orientation}`,
+                key: scope?.orientation,
+                props: {
+                  x: scope?.thumbRect.x,
+                  y: scope?.thumbRect.y,
+                  width: scope?.thumbRect.width,
+                  height: scope?.thumbRect.height,
+                  opacity: scope?.state.opacity,
+                  background: '#2563eb',
+                },
+              },
+            ],
+          },
+          children: [
+            { type: NovaUIKit.Surface, id: 'scroll-perf-content', props: { background: '#f8fafc' } },
+          ],
+        },
+      ],
+    })
+    app.raph.run()
+    app.raph.run()
+
+    const api = app.components.requireApi<ScrollAreaApi>('scroll-perf')
+    const node = app.components.require('scroll-perf') as unknown as NovaNode<TestEvents>
+    const initialChildCount = node.children.length
+    const startedAt = performance.now()
+
+    for (let index = 0; index < 1_000; index += 1) {
+      api.scrollTo(0, index % 480)
+    }
+
+    const elapsed = performance.now() - startedAt
+
+    expect(node.children).toHaveLength(initialChildCount)
+    expect(app.components.require('scroll-perf-thumb-vertical')).toBeTruthy()
+    expect(elapsed).toBeLessThan(250)
+
+    app.destroy()
+  })
+
   it('preserves keyed children and forwards schema context through UI Kit containers', () => {
     const app = createApp()
     const surface = app.createSurface('context')
