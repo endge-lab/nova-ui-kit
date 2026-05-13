@@ -5,8 +5,8 @@ import {
   createScrollbarDescriptor,
   normalizeScrollbarProps,
   type ScrollbarDescriptor,
-} from '@/components/Scrollbar/Scrollbar.config'
-import type { ScrollbarSchema } from '@/components/Scrollbar/Scrollbar.types'
+} from '@/components/Scrollbar/scrollbar.config'
+import type { ScrollbarSchema } from '@/components/Scrollbar/scrollbar.types'
 
 export const SCROLLBAR_DESCRIPTOR: ScrollbarDescriptor = createScrollbarDescriptor((context, schema) => {
   const scrollbarSchema = schema as ScrollbarSchema

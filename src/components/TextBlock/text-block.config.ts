@@ -5,14 +5,14 @@ import type {
   NovaComponentSchema,
 } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import { normalizeTextBlockProps } from '@/components/TextBlock/TextBlockLayout'
-import { buildTextBlockSchema } from '@/components/TextBlock/TextBlock.schema'
+import { normalizeTextBlockProps } from '@/components/TextBlock/text-block-layout'
+import { buildTextBlockSchema } from '@/components/TextBlock/text-block.schema'
 import {
   TEXT_BLOCK_SCHEMA_TYPE,
   type TextBlockApi,
   type TextBlockProps,
   type TextBlockResolvedProps,
-} from '@/components/TextBlock/TextBlock.types'
+} from '@/components/TextBlock/text-block.types'
 import { measureNovaUiTextWidth } from '@/shared/layout'
 
 export type TextBlockDescriptor = NovaComponentDescriptor<

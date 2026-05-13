@@ -6,21 +6,21 @@ import {
   normalizeAdvancedComponentProps,
   severityPalette,
   type AdvancedComponentDescriptor,
-} from '@/components/Advanced/Advanced.config'
+} from '@/components/Advanced/advanced.config'
 import type {
   AdvancedComponentApi,
   AdvancedComponentKind,
   AdvancedComponentProps,
   AdvancedComponentResolvedProps,
   AdvancedItem,
-} from '@/components/Advanced/Advanced.types'
+} from '@/components/Advanced/advanced.types'
 import {
   NovaUiComponentNode,
   buildBoxSchema,
   clamp,
   resolveComponentTextStyle,
-} from '@/shared/component/ComponentProps'
-import { pushIcon, pushText } from '@/shared/component/ComponentRender'
+} from '@/shared/component/component-props'
+import { pushIcon, pushText } from '@/shared/component/component-render'
 import type { NovaUiPartStyle } from '@/domain/domain.types'
 
 const TWO_PI = Math.PI * 2

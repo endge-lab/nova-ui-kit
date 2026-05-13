@@ -5,8 +5,8 @@ import {
   createPanelDescriptor,
   normalizePanelProps,
   type PanelDescriptor,
-} from '@/components/Panel/Panel.config'
-import type { PanelSchema } from '@/components/Panel/Panel.types'
+} from '@/components/Panel/panel.config'
+import type { PanelSchema } from '@/components/Panel/panel.types'
 
 export const PANEL_DESCRIPTOR: PanelDescriptor = createPanelDescriptor((context, schema) => {
   const panelSchema = schema as PanelSchema

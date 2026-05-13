@@ -4,13 +4,13 @@ import {
   PANEL_NODE_DESCRIPTOR,
   normalizePanelProps,
   type PanelDescriptor,
-} from '@/components/Panel/Panel.config'
+} from '@/components/Panel/panel.config'
 import type {
   PanelApi,
   PanelChildSchema,
   PanelProps,
   PanelResolvedProps,
-} from '@/components/Panel/Panel.types'
+} from '@/components/Panel/panel.types'
 import {
   NovaUiComponentNode,
   buildBoxSchema,

@@ -6,13 +6,13 @@ import {
   SPLIT_PANE_NODE_DESCRIPTOR,
   normalizeSplitPaneProps,
   type SplitPaneDescriptor,
-} from '@/components/SplitPane/SplitPane.config'
+} from '@/components/SplitPane/split-pane.config'
 import type {
   SplitPaneApi,
   SplitPaneChildSchema,
   SplitPaneProps,
   SplitPaneResolvedProps,
-} from '@/components/SplitPane/SplitPane.types'
+} from '@/components/SplitPane/split-pane.types'
 import {
   NovaUiComponentNode,
   buildBoxSchema,

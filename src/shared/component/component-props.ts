@@ -37,7 +37,7 @@ import {
   type NovaUiStyleReceiveResult,
   type NovaUiStyleTarget,
 } from '@/shared/style'
-import { requireNovaUiRoot } from '@/components/Root/RootTarget'
+import { requireNovaUiRoot } from '@/components/Root/root-target'
 
 export type NovaUiComponentSize = 'sm' | 'md' | 'lg'
 export type NovaUiOrientation = 'horizontal' | 'vertical'

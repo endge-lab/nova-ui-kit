@@ -36,7 +36,7 @@ import {
   type AdvancedComponentKind,
   type AdvancedComponentProps,
   type AdvancedComponentResolvedProps,
-} from '@/components/Advanced/Advanced.types'
+} from '@/components/Advanced/advanced.types'
 
 export type AdvancedComponentDescriptor = NovaComponentDescriptor<AdvancedComponentResolvedProps, AdvancedComponentApi, Record<string, never>, AdvancedComponentProps>
 

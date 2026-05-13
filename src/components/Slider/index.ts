@@ -1,4 +1,4 @@
 export * from '@/components/Slider/Slider'
-export * from '@/components/Slider/Slider.config'
-export * from '@/components/Slider/Slider.registry'
-export * from '@/components/Slider/Slider.types'
+export * from '@/components/Slider/slider.config'
+export * from '@/components/Slider/slider.registry'
+export * from '@/components/Slider/slider.types'

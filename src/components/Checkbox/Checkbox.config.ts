@@ -11,7 +11,7 @@ import {
   type CheckboxApi,
   type CheckboxProps,
   type CheckboxResolvedProps,
-} from '@/components/Checkbox/Checkbox.types'
+} from '@/components/Checkbox/checkbox.types'
 
 export type CheckboxDescriptor = NovaComponentDescriptor<CheckboxResolvedProps, CheckboxApi, Record<string, never>, CheckboxProps>
 

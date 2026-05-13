@@ -5,8 +5,8 @@ import {
   createTooltipDescriptor,
   normalizeTooltipProps,
   type TooltipDescriptor,
-} from '@/components/Tooltip/Tooltip.config'
-import type { TooltipSchema } from '@/components/Tooltip/Tooltip.types'
+} from '@/components/Tooltip/tooltip.config'
+import type { TooltipSchema } from '@/components/Tooltip/tooltip.types'
 
 export const TOOLTIP_DESCRIPTOR: TooltipDescriptor = createTooltipDescriptor((context, schema) => {
   const tooltipSchema = schema as TooltipSchema

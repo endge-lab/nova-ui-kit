@@ -8,8 +8,8 @@ import type { NovaUiSpacing } from '@/shared/layout'
 import {
   compileStyleSheetIndexes,
   createEmptyStyleSheet,
-} from '@/shared/style/cascade/StyleSelectorMatcher'
-import { extractNovaUiStyleTokenDependencies } from '@/shared/style/cascade/StyleTokenResolver'
+} from '@/shared/style/cascade/style-selector-matcher'
+import { extractNovaUiStyleTokenDependencies } from '@/shared/style/cascade/style-token-resolver'
 import type {
   NovaUiCompiledStyleRule,
   NovaUiStyleComponentName,
@@ -19,7 +19,7 @@ import type {
   NovaUiStyleSelectorCombinator,
   NovaUiStyleSelectorPart,
   NovaUiStyleValidationResult,
-} from '@/shared/style/cascade/StyleSheet'
+} from '@/shared/style/cascade/style-sheet'
 
 const COMPONENT_NAMES: Array<NovaUiStyleComponentName> = [
   'Root',

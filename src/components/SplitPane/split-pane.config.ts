@@ -12,7 +12,7 @@ import {
   type SplitPaneApi,
   type SplitPaneProps,
   type SplitPaneResolvedProps,
-} from '@/components/SplitPane/SplitPane.types'
+} from '@/components/SplitPane/split-pane.types'
 
 export type SplitPaneDescriptor = NovaComponentDescriptor<SplitPaneResolvedProps, SplitPaneApi, Record<string, never>, SplitPaneProps>
 

@@ -10,7 +10,7 @@ import {
   GRID_NODE_DESCRIPTOR,
   normalizeGridProps,
   type GridDescriptor,
-} from '@/components/Grid/Grid.config'
+} from '@/components/Grid/grid.config'
 import {
   GridLayoutEngine,
   compileGridChildLayout,
@@ -23,8 +23,8 @@ import type {
   GridChildSchema,
   GridProps,
   GridResolvedProps,
-} from '@/components/Grid/Grid.types'
-import { requireNovaUiRoot } from '@/components/Root/RootTarget'
+} from '@/components/Grid/grid.types'
+import { requireNovaUiRoot } from '@/components/Root/root-target'
 import {
   NOVA_UI_LAYOUT_TARGET,
   applyNodeLayoutRect,

@@ -1,4 +1,4 @@
 export * from '@/components/SplitPane/SplitPane'
-export * from '@/components/SplitPane/SplitPane.config'
-export * from '@/components/SplitPane/SplitPane.registry'
-export * from '@/components/SplitPane/SplitPane.types'
+export * from '@/components/SplitPane/split-pane.config'
+export * from '@/components/SplitPane/split-pane.registry'
+export * from '@/components/SplitPane/split-pane.types'

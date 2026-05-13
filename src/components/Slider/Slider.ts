@@ -4,8 +4,8 @@ import {
   SLIDER_NODE_DESCRIPTOR,
   normalizeSliderProps,
   type SliderDescriptor,
-} from '@/components/Slider/Slider.config'
-import type { SliderApi, SliderProps, SliderResolvedProps } from '@/components/Slider/Slider.types'
+} from '@/components/Slider/slider.config'
+import type { SliderApi, SliderProps, SliderResolvedProps } from '@/components/Slider/slider.types'
 import {
   NovaUiComponentNode,
   clamp,

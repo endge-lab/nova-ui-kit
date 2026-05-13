@@ -1,9 +1,9 @@
 import type { NovaSchema, NovaText } from '@endge/nova'
-import { layoutTextBlock } from '@/components/TextBlock/TextBlockLayout'
+import { layoutTextBlock } from '@/components/TextBlock/text-block-layout'
 import type {
   TextBlockMeasureFn,
   TextBlockResolvedProps,
-} from '@/components/TextBlock/TextBlock.types'
+} from '@/components/TextBlock/text-block.types'
 import { borderRadiusToRendererValue } from '@/shared/style'
 
 export function buildTextBlockSchema(

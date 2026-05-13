@@ -1,5 +1,5 @@
-import { BUTTON_SCHEMA_TYPE } from '@/components/Button/Button.types'
-import { CHECKBOX_SCHEMA_TYPE } from '@/components/Checkbox/Checkbox.types'
+import { BUTTON_SCHEMA_TYPE } from '@/components/Button/button.types'
+import { CHECKBOX_SCHEMA_TYPE } from '@/components/Checkbox/checkbox.types'
 import {
   ACCORDION_SCHEMA_TYPE,
   BLOCK_UI_SCHEMA_TYPE,
@@ -26,21 +26,21 @@ import {
   TABS_SCHEMA_TYPE,
   TOAST_SCHEMA_TYPE,
   TOGGLE_SWITCH_SCHEMA_TYPE,
-} from '@/components/Advanced/Advanced.types'
-import { FLEX_SCHEMA_TYPE } from '@/components/Flex/Flex.types'
-import { GRID_SCHEMA_TYPE } from '@/components/Grid/Grid.types'
-import { PANEL_SCHEMA_TYPE } from '@/components/Panel/Panel.types'
-import { ROOT_SCHEMA_TYPE } from '@/components/Root/Root.types'
-import { SCROLL_AREA_SCHEMA_TYPE } from '@/components/ScrollArea/ScrollArea.types'
-import { SCROLLBAR_SCHEMA_TYPE } from '@/components/Scrollbar/Scrollbar.types'
-import { SEGMENTED_CONTROL_SCHEMA_TYPE } from '@/components/SegmentedControl/SegmentedControl.types'
-import { SLIDER_SCHEMA_TYPE } from '@/components/Slider/Slider.types'
-import { SPLIT_PANE_SCHEMA_TYPE } from '@/components/SplitPane/SplitPane.types'
-import { SURFACE_SCHEMA_TYPE } from '@/components/Surface/Surface.types'
-import { TAG_SCHEMA_TYPE } from '@/components/Tag/Tag.types'
-import { TEXT_BLOCK_SCHEMA_TYPE } from '@/components/TextBlock/TextBlock.types'
-import { TOGGLE_SCHEMA_TYPE } from '@/components/Toggle/Toggle.types'
-import { TOOLTIP_SCHEMA_TYPE } from '@/components/Tooltip/Tooltip.types'
+} from '@/components/Advanced/advanced.types'
+import { FLEX_SCHEMA_TYPE } from '@/components/Flex/flex.types'
+import { GRID_SCHEMA_TYPE } from '@/components/Grid/grid.types'
+import { PANEL_SCHEMA_TYPE } from '@/components/Panel/panel.types'
+import { ROOT_SCHEMA_TYPE } from '@/components/Root/root.types'
+import { SCROLL_AREA_SCHEMA_TYPE } from '@/components/ScrollArea/scroll-area.types'
+import { SCROLLBAR_SCHEMA_TYPE } from '@/components/Scrollbar/scrollbar.types'
+import { SEGMENTED_CONTROL_SCHEMA_TYPE } from '@/components/SegmentedControl/segmented-control.types'
+import { SLIDER_SCHEMA_TYPE } from '@/components/Slider/slider.types'
+import { SPLIT_PANE_SCHEMA_TYPE } from '@/components/SplitPane/split-pane.types'
+import { SURFACE_SCHEMA_TYPE } from '@/components/Surface/surface.types'
+import { TAG_SCHEMA_TYPE } from '@/components/Tag/tag.types'
+import { TEXT_BLOCK_SCHEMA_TYPE } from '@/components/TextBlock/text-block.types'
+import { TOGGLE_SCHEMA_TYPE } from '@/components/Toggle/toggle.types'
+import { TOOLTIP_SCHEMA_TYPE } from '@/components/Tooltip/tooltip.types'
 
 /** Группировка schema type для более читаемого UI Kit DSL. */
 export const NovaUIKit = {

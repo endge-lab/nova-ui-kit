@@ -5,8 +5,8 @@ import {
   createToggleDescriptor,
   normalizeToggleProps,
   type ToggleDescriptor,
-} from '@/components/Toggle/Toggle.config'
-import type { ToggleSchema } from '@/components/Toggle/Toggle.types'
+} from '@/components/Toggle/toggle.config'
+import type { ToggleSchema } from '@/components/Toggle/toggle.types'
 
 export const TOGGLE_DESCRIPTOR: ToggleDescriptor = createToggleDescriptor((context, schema) => {
   const toggleSchema = schema as ToggleSchema

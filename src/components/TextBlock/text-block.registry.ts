@@ -3,7 +3,7 @@ import { TextBlock } from '@/components/TextBlock/TextBlock'
 import {
   createTextBlockDescriptor,
   type TextBlockDescriptor,
-} from '@/components/TextBlock/TextBlock.config'
+} from '@/components/TextBlock/text-block.config'
 
 export const TEXT_BLOCK_DESCRIPTOR: TextBlockDescriptor = createTextBlockDescriptor((context, schema) => new TextBlock(
   context.app,

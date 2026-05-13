@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import type { NovaNode } from '@endge/nova'
-import { normalizeGridProps } from '@/components/Grid/Grid.config'
+import { normalizeGridProps } from '@/components/Grid/grid.config'
 import {
   GridLayoutEngine,
   createGridChildEntry,
 } from '@/components/Grid/GridLayoutEngine'
-import type { GridChildLayout } from '@/components/Grid/Grid.types'
+import type { GridChildLayout } from '@/components/Grid/grid.types'
 import { NOVA_UI_LAYOUT_TARGET } from '@/shared/layout'
 
 function createNode(width = 0, height = 0): NovaNode<any> {

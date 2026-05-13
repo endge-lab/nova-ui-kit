@@ -4,7 +4,7 @@ import type {
   NovaUiCommonResolvedProps,
   NovaUiComponentSize,
   NovaUiIconSource,
-} from '@/shared/component/ComponentProps'
+} from '@/shared/component/component-props'
 
 export const BUTTON_SCHEMA_TYPE = 'nova-ui.button'
 

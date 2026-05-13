@@ -1,1 +1,1 @@
-export * from '@/shared/style/validation/StyleSheetValidator'
+export * from '@/shared/style/validation/style-sheet-validator'

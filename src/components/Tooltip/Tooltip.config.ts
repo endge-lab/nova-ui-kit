@@ -12,7 +12,7 @@ import {
   type TooltipApi,
   type TooltipProps,
   type TooltipResolvedProps,
-} from '@/components/Tooltip/Tooltip.types'
+} from '@/components/Tooltip/tooltip.types'
 
 export type TooltipDescriptor = NovaComponentDescriptor<TooltipResolvedProps, TooltipApi, Record<string, never>, TooltipProps>
 

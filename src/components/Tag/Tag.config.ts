@@ -13,7 +13,7 @@ import {
   type TagProps,
   type TagResolvedProps,
   type TagTone,
-} from '@/components/Tag/Tag.types'
+} from '@/components/Tag/tag.types'
 
 export type TagDescriptor = NovaComponentDescriptor<TagResolvedProps, TagApi, Record<string, never>, TagProps>
 

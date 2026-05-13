@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import type { NovaNode } from '@endge/nova'
-import { normalizeFlexProps } from '@/components/Flex/Flex.config'
+import { normalizeFlexProps } from '@/components/Flex/flex.config'
 import {
   FlexLayoutEngine,
   createFlexChildEntry,
 } from '@/components/Flex/FlexLayoutEngine'
-import type { FlexChildLayout } from '@/components/Flex/Flex.types'
+import type { FlexChildLayout } from '@/components/Flex/flex.types'
 import { NOVA_UI_LAYOUT_TARGET } from '@/shared/layout'
 
 function createNode(width = 0, height = 0): NovaNode<any> {

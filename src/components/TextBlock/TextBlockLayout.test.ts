@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { layoutTextBlock, normalizeTextBlockProps } from '@/components/TextBlock/TextBlockLayout'
-import type { TextBlockMeasureFn } from '@/components/TextBlock/TextBlock.types'
+import { layoutTextBlock, normalizeTextBlockProps } from '@/components/TextBlock/text-block-layout'
+import type { TextBlockMeasureFn } from '@/components/TextBlock/text-block.types'
 
 const measureText: TextBlockMeasureFn = text => text.length * 8
 

@@ -2,7 +2,7 @@ import type { NovaComponentSchema, NovaElementSchema } from '@endge/nova'
 import type {
   NovaUiCommonProps,
   NovaUiCommonResolvedProps,
-} from '@/shared/component/ComponentProps'
+} from '@/shared/component/component-props'
 import type { NovaUiLayoutRect } from '@/shared/layout'
 
 export const SURFACE_SCHEMA_TYPE = 'nova-ui.surface'

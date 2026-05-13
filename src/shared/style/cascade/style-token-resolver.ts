@@ -1,13 +1,13 @@
 import {
   compileStyleSheetIndexes,
-} from '@/shared/style/cascade/StyleSelectorMatcher'
+} from '@/shared/style/cascade/style-selector-matcher'
 import type {
   NovaUiCompiledStyleRule,
   NovaUiCompiledStyleSheet,
   NovaUiStyleDeclarations,
   NovaUiStyleSheetAsset,
   NovaUiStyleTokenResolver,
-} from '@/shared/style/cascade/StyleSheet'
+} from '@/shared/style/cascade/style-sheet'
 
 const VAR_PATTERN = /var\(\s*(--[\w-]+)\s*(?:,\s*([^)]+))?\)/g
 const NUMERIC_TOKEN_KEYS = new Set([

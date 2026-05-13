@@ -12,7 +12,7 @@ import {
   SCROLL_AREA_NODE_DESCRIPTOR,
   normalizeScrollAreaProps,
   type ScrollAreaDescriptor,
-} from '@/components/ScrollArea/ScrollArea.config'
+} from '@/components/ScrollArea/scroll-area.config'
 import type {
   ScrollAreaApi,
   ScrollAreaChildSchema,
@@ -22,8 +22,8 @@ import type {
   ScrollAreaSlotContext,
   ScrollAreaState,
   ScrollAreaVisualState,
-} from '@/components/ScrollArea/ScrollArea.types'
-import { SCROLLBAR_SCHEMA_TYPE, type ScrollbarApi } from '@/components/Scrollbar/Scrollbar.types'
+} from '@/components/ScrollArea/scroll-area.types'
+import { SCROLLBAR_SCHEMA_TYPE, type ScrollbarApi } from '@/components/Scrollbar/scrollbar.types'
 import {
   NovaUiComponentNode,
   buildBoxSchema,

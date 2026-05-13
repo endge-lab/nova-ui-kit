@@ -5,8 +5,8 @@ import {
   createSurfaceDescriptor,
   normalizeSurfaceProps,
   type SurfaceDescriptor,
-} from '@/components/Surface/Surface.config'
-import type { SurfaceSchema } from '@/components/Surface/Surface.types'
+} from '@/components/Surface/surface.config'
+import type { SurfaceSchema } from '@/components/Surface/surface.types'
 
 export const SURFACE_DESCRIPTOR: SurfaceDescriptor = createSurfaceDescriptor((context, schema) => {
   const surfaceSchema = schema as SurfaceSchema

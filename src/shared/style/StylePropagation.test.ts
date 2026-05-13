@@ -7,15 +7,15 @@ import {
   RendererType,
   type NovaApp,
 } from '@endge/nova'
-import type { ButtonApi } from '@/components/Button/Button.types'
-import { BUTTON_SCHEMA_TYPE } from '@/components/Button/Button.types'
-import { FLEX_SCHEMA_TYPE } from '@/components/Flex/Flex.types'
-import { GRID_SCHEMA_TYPE } from '@/components/Grid/Grid.types'
+import type { ButtonApi } from '@/components/Button/button.types'
+import { BUTTON_SCHEMA_TYPE } from '@/components/Button/button.types'
+import { FLEX_SCHEMA_TYPE } from '@/components/Flex/flex.types'
+import { GRID_SCHEMA_TYPE } from '@/components/Grid/grid.types'
 import type { Root } from '@/components/Root/Root'
-import { ROOT_SCHEMA_TYPE } from '@/components/Root/Root.types'
+import { ROOT_SCHEMA_TYPE } from '@/components/Root/root.types'
 import type { TextBlock } from '@/components/TextBlock/TextBlock'
-import type { TextBlockApi } from '@/components/TextBlock/TextBlock.types'
-import { TEXT_BLOCK_SCHEMA_TYPE } from '@/components/TextBlock/TextBlock.types'
+import type { TextBlockApi } from '@/components/TextBlock/text-block.types'
+import { TEXT_BLOCK_SCHEMA_TYPE } from '@/components/TextBlock/text-block.types'
 import { registerNovaUIKit } from '@/registerNovaUIKit'
 
 type TestEvents = Record<string, any>

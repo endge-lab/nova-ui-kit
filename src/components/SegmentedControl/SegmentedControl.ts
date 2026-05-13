@@ -4,12 +4,12 @@ import {
   SEGMENTED_CONTROL_NODE_DESCRIPTOR,
   normalizeSegmentedControlProps,
   type SegmentedControlDescriptor,
-} from '@/components/SegmentedControl/SegmentedControl.config'
+} from '@/components/SegmentedControl/segmented-control.config'
 import type {
   SegmentedControlApi,
   SegmentedControlProps,
   SegmentedControlResolvedProps,
-} from '@/components/SegmentedControl/SegmentedControl.types'
+} from '@/components/SegmentedControl/segmented-control.types'
 import {
   NovaUiComponentNode,
   buildBoxSchema,

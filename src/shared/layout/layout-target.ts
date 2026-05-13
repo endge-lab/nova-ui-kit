@@ -1,5 +1,5 @@
 import type { NovaNode } from '@endge/nova'
-import type { NovaUiLayoutRect } from '@/shared/layout/LayoutRect'
+import type { NovaUiLayoutRect } from '@/shared/layout/layout-rect'
 
 /** Символ помечает компонент, который принимает rect от layout-родителя. */
 export const NOVA_UI_LAYOUT_TARGET = Symbol.for('@endge/nova-ui-kit.layout-target')

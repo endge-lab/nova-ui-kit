@@ -10,7 +10,7 @@ import {
   FLEX_NODE_DESCRIPTOR,
   normalizeFlexProps,
   type FlexDescriptor,
-} from '@/components/Flex/Flex.config'
+} from '@/components/Flex/flex.config'
 import {
   FlexLayoutEngine,
   compileFlexChildLayout,
@@ -23,8 +23,8 @@ import type {
   FlexChildSchema,
   FlexProps,
   FlexResolvedProps,
-} from '@/components/Flex/Flex.types'
-import { requireNovaUiRoot } from '@/components/Root/RootTarget'
+} from '@/components/Flex/flex.types'
+import { requireNovaUiRoot } from '@/components/Root/root-target'
 import {
   NOVA_UI_LAYOUT_TARGET,
   applyNodeLayoutRect,

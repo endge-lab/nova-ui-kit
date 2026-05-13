@@ -7,17 +7,17 @@ import type { EventList } from '@endge/utils'
 import {
   TEXT_BLOCK_NODE_DESCRIPTOR,
   type TextBlockDescriptor,
-} from '@/components/TextBlock/TextBlock.config'
-import { buildTextBlockSchema } from '@/components/TextBlock/TextBlock.schema'
-import { layoutTextBlock, normalizeTextBlockProps } from '@/components/TextBlock/TextBlockLayout'
+} from '@/components/TextBlock/text-block.config'
+import { buildTextBlockSchema } from '@/components/TextBlock/text-block.schema'
+import { layoutTextBlock, normalizeTextBlockProps } from '@/components/TextBlock/text-block-layout'
 import {
   type TextBlockApi,
   type TextBlockLayout,
   type TextBlockMeasureFn,
   type TextBlockProps,
   type TextBlockResolvedProps,
-} from '@/components/TextBlock/TextBlock.types'
-import { requireNovaUiRoot } from '@/components/Root/RootTarget'
+} from '@/components/TextBlock/text-block.types'
+import { requireNovaUiRoot } from '@/components/Root/root-target'
 import {
   NOVA_UI_LAYOUT_TARGET,
   TextMeasureCache,

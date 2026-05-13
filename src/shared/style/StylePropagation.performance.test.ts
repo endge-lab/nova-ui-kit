@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { NovaNode } from '@endge/nova'
-import { normalizeGridProps } from '@/components/Grid/Grid.config'
+import { normalizeGridProps } from '@/components/Grid/grid.config'
 import {
   GridLayoutEngine,
   createGridChildEntry,

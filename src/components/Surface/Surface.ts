@@ -5,17 +5,17 @@ import {
   SURFACE_NODE_DESCRIPTOR,
   normalizeSurfaceProps,
   type SurfaceDescriptor,
-} from '@/components/Surface/Surface.config'
+} from '@/components/Surface/surface.config'
 import type {
   SurfaceApi,
   SurfaceChildSchema,
   SurfaceProps,
   SurfaceResolvedProps,
-} from '@/components/Surface/Surface.types'
+} from '@/components/Surface/surface.types'
 import {
   NovaUiComponentNode,
   buildBoxSchema,
-} from '@/shared/component/ComponentProps'
+} from '@/shared/component/component-props'
 import {
   applyNodeLayoutRect,
   copyRect,

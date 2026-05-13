@@ -10,7 +10,7 @@ import {
   type GridApi,
   type GridProps,
   type GridResolvedProps,
-} from '@/components/Grid/Grid.types'
+} from '@/components/Grid/grid.types'
 
 export type GridDescriptor = NovaComponentDescriptor<
   GridResolvedProps,

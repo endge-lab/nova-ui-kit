@@ -1,2 +1,2 @@
-export * from '@/shared/component/ComponentProps'
-export * from '@/shared/component/ComponentRender'
+export * from '@/shared/component/component-props'
+export * from '@/shared/component/component-render'

@@ -1,1 +1,1 @@
-export * from '@/shared/style/identity/StyleIdentity'
+export * from '@/shared/style/identity/style-identity'

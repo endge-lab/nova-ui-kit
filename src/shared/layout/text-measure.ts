@@ -1,4 +1,4 @@
-import type { TextBlockMeasureFn } from '@/components/TextBlock/TextBlock.types'
+import type { TextBlockMeasureFn } from '@/components/TextBlock/text-block.types'
 
 let measureCanvas: HTMLCanvasElement | null = null
 

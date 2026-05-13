@@ -15,7 +15,7 @@ import type {
   GridAlign,
   GridChildLayout,
   GridResolvedProps,
-} from '@/components/Grid/Grid.types'
+} from '@/components/Grid/grid.types'
 
 interface CompiledGridChildLayout {
   colSpan: number

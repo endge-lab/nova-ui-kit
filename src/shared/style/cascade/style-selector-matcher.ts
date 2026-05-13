@@ -2,7 +2,7 @@ import { type NovaNode } from '@endge/nova'
 import {
   normalizeStyleClasses,
   readNovaUiStyleIdentityProps,
-} from '@/shared/style/identity/StyleIdentity'
+} from '@/shared/style/identity/style-identity'
 import type {
   NovaUiCompiledStyleRule,
   NovaUiCompiledStyleSheet,
@@ -10,7 +10,7 @@ import type {
   NovaUiStyleSelector,
   NovaUiStyleSelectorPart,
   NovaUiStylableNode,
-} from '@/shared/style/cascade/StyleSheet'
+} from '@/shared/style/cascade/style-sheet'
 
 interface StyleNodeIdentity {
   type: NovaUiStyleComponentName

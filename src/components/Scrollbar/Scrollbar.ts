@@ -4,13 +4,13 @@ import {
   SCROLLBAR_NODE_DESCRIPTOR,
   normalizeScrollbarProps,
   type ScrollbarDescriptor,
-} from '@/components/Scrollbar/Scrollbar.config'
+} from '@/components/Scrollbar/scrollbar.config'
 import type {
   ScrollbarApi,
   ScrollbarProps,
   ScrollbarResolvedProps,
   ScrollbarState,
-} from '@/components/Scrollbar/Scrollbar.types'
+} from '@/components/Scrollbar/scrollbar.types'
 import {
   NovaUiComponentNode,
   clamp,

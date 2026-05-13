@@ -10,13 +10,13 @@ import {
   NOVA_UI_COMMON_FIELD_DEFINITIONS,
   commonMeasureBounds,
   normalizeCommonProps,
-} from '@/shared/component/ComponentProps'
+} from '@/shared/component/component-props'
 import {
   SURFACE_SCHEMA_TYPE,
   type SurfaceApi,
   type SurfaceProps,
   type SurfaceResolvedProps,
-} from '@/components/Surface/Surface.types'
+} from '@/components/Surface/surface.types'
 
 export type SurfaceDescriptor = NovaComponentDescriptor<
   SurfaceResolvedProps,

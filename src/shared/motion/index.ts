@@ -1,1 +1,1 @@
-export * from '@/shared/motion/MotionPreset'
+export * from '@/shared/motion/motion-preset'

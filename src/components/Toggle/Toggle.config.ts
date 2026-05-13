@@ -11,7 +11,7 @@ import {
   type ToggleApi,
   type ToggleProps,
   type ToggleResolvedProps,
-} from '@/components/Toggle/Toggle.types'
+} from '@/components/Toggle/toggle.types'
 
 export type ToggleDescriptor = NovaComponentDescriptor<ToggleResolvedProps, ToggleApi, Record<string, never>, ToggleProps>
 

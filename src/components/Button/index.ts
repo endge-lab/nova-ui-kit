@@ -1,4 +1,4 @@
 export * from '@/components/Button/Button'
-export * from '@/components/Button/Button.config'
-export * from '@/components/Button/Button.registry'
-export * from '@/components/Button/Button.types'
+export * from '@/components/Button/button.config'
+export * from '@/components/Button/button.registry'
+export * from '@/components/Button/button.types'

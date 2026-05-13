@@ -4,8 +4,8 @@ import {
   TAG_NODE_DESCRIPTOR,
   normalizeTagProps,
   type TagDescriptor,
-} from '@/components/Tag/Tag.config'
-import type { TagApi, TagProps, TagResolvedProps, TagTone } from '@/components/Tag/Tag.types'
+} from '@/components/Tag/tag.config'
+import type { TagApi, TagProps, TagResolvedProps, TagTone } from '@/components/Tag/tag.types'
 import {
   NovaUiComponentNode,
   buildBoxSchema,

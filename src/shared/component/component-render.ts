@@ -2,7 +2,7 @@ import type { NovaSchema } from '@endge/nova'
 import type {
   NovaUiIconSource,
   NovaUiTextStyleDefaults,
-} from '@/shared/component/ComponentProps'
+} from '@/shared/component/component-props'
 
 export function pushText(
   schema: NovaSchema,

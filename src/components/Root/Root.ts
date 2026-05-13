@@ -13,17 +13,17 @@ import {
   ROOT_NODE_DESCRIPTOR,
   normalizeRootProps,
   type RootDescriptor,
-} from '@/components/Root/Root.config'
+} from '@/components/Root/root.config'
 import {
   NOVA_UI_ROOT_TARGET,
   type NovaUiRootTarget,
-} from '@/components/Root/RootTarget'
+} from '@/components/Root/root-target'
 import type {
   RootApi,
   RootChildSchema,
   RootProps,
   RootResolvedProps,
-} from '@/components/Root/Root.types'
+} from '@/components/Root/root.types'
 import {
   NOVA_UI_LAYOUT_TARGET,
   applyNodeLayoutRect,

@@ -1,11 +1,11 @@
 import type { NovaApp } from '@endge/nova'
-import { compileStyleSheetIndexes, createEmptyStyleSheet } from '@/shared/style/cascade/StyleSelectorMatcher'
+import { compileStyleSheetIndexes, createEmptyStyleSheet } from '@/shared/style/cascade/style-selector-matcher'
 import type {
   NovaUiCompiledStyleRule,
   NovaUiCompiledStyleSheet,
   NovaUiStyleDiagnostic,
   NovaUiStyleSheetAsset,
-} from '@/shared/style/cascade/StyleSheet'
+} from '@/shared/style/cascade/style-sheet'
 
 interface NovaUiGlobalStyleState {
   entries: Map<symbol, NovaUiStyleSheetAsset>

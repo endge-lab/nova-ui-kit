@@ -4,8 +4,8 @@ import {
   TOGGLE_NODE_DESCRIPTOR,
   normalizeToggleProps,
   type ToggleDescriptor,
-} from '@/components/Toggle/Toggle.config'
-import type { ToggleApi, ToggleProps, ToggleResolvedProps } from '@/components/Toggle/Toggle.types'
+} from '@/components/Toggle/toggle.config'
+import type { ToggleApi, ToggleProps, ToggleResolvedProps } from '@/components/Toggle/toggle.types'
 import {
   NovaUiComponentNode,
   buildBoxSchema,
