@@ -670,7 +670,8 @@ describe('Nova UI Kit components', () => {
                 {
                   type: NovaUIKit.TextBlock,
                   id: 'split-layout-left-label',
-                  props: { text: 'Left', layout: { width: 'fill', height: 'fill' } },
+                  layout: { width: 'fill', height: 'fill' },
+                  props: { text: 'Left' },
                 },
               ],
             },
@@ -681,7 +682,8 @@ describe('Nova UI Kit components', () => {
                 {
                   type: NovaUIKit.TextBlock,
                   id: 'split-layout-right-label',
-                  props: { text: 'Right', layout: { width: 'fill', height: 'fill' } },
+                  layout: { width: 'fill', height: 'fill' },
+                  props: { text: 'Right' },
                 },
               ],
             },
@@ -693,12 +695,14 @@ describe('Nova UI Kit components', () => {
     app.raph.run()
 
     const leftLabel = app.components.require('split-layout-left-label')
+    const leftPane = app.components.require('split-layout-left')
     expect(leftLabel.width).toBe(120)
 
     app.components.requireApi<SplitPaneApi>('split-layout').setSizes([180, 120])
     app.raph.run()
     app.raph.run()
 
+    expect(leftPane.width).toBe(180)
     expect(leftLabel.width).toBe(180)
 
     app.destroy()
