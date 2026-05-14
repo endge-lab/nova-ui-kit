@@ -1,5 +1,5 @@
 import { reconcileNovaTemplateChildren } from '@endge/nova'
-import type { NovaApp, NovaNode, NovaSurface } from '@endge/nova'
+import type { NovaApp, NovaMotionPlayback, NovaNode, NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
 import {
   SURFACE_NODE_DESCRIPTOR,
@@ -31,6 +31,7 @@ import {
   type NovaUiStyleContext,
   type NovaUiStyleReceiveResult,
 } from '@/shared/style'
+import { resolveNovaUiMotionOptions } from '@/shared/motion'
 
 /** Базовый visual container UI Kit: фон, border, clip, padding и children. */
 export class Surface<E extends EventList = Record<string, any>>
@@ -38,6 +39,7 @@ export class Surface<E extends EventList = Record<string, any>>
   private readonly managedChildren: Array<NovaNode<E>> = []
   private readonly childRect = createLayoutRect()
   private readonly api: SurfaceApi
+  private motionPlayback: NovaMotionPlayback | null = null
   private layoutDirty = true
 
   constructor(
@@ -114,10 +116,20 @@ export class Surface<E extends EventList = Record<string, any>>
     if (this.props.clip) this.renderer.clip(0, 0, this.width, this.height)
   }
 
+  protected override onMount(): void {
+    super.onMount()
+    this.syncMotion()
+  }
+
+  protected override onUnmount(): void {
+    this.stopMotion()
+  }
+
   protected override onPropsChanged(changedKeys: Array<keyof SurfaceResolvedProps>): void {
     this.props = normalizeSurfaceProps(this.props)
     this.applyCommonPropsChanged(changedKeys)
     if (changedKeys.includes('padding')) this.relayout()
+    if (changedKeys.includes('motion')) this.syncMotion()
   }
 
   private propagateStyleContext(changedMask: NovaUiStyleMask): NovaUiStyleReceiveResult {
@@ -132,6 +144,25 @@ export class Surface<E extends EventList = Record<string, any>>
       mergeStyleReceiveResult(result, child.receiveStyleContext(context, changedMask & childMask))
     }
     return result
+  }
+
+  private syncMotion(): void {
+    this.stopMotion()
+    if (this.props.motion !== 'shimmer') return
+
+    this.motionPlayback = this.transitionTo(
+      { opacity: 0.58 },
+      {
+        ...resolveNovaUiMotionOptions('shimmer'),
+        duration: 760,
+        yoyo: true,
+      },
+    )
+  }
+
+  private stopMotion(): void {
+    this.motionPlayback?.cancel()
+    this.motionPlayback = null
   }
 
 }

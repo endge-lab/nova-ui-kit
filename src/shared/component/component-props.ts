@@ -80,6 +80,7 @@ export interface NovaUiCommonResolvedProps extends NovaUiStyleIdentityProps {
   y: number
   width: number
   height: number
+  motion?: NovaUiMotionOptions['motion']
   style?: NovaUiInheritedTextStyle
   color?: string
   fontFamily?: string
@@ -188,6 +189,7 @@ export const NOVA_UI_COMMON_DIRTY_POLICY = {
     'sound',
     'cursor',
     'cursorContext',
+    'motion',
     'className',
     'attrs',
   ] as const,
@@ -202,6 +204,7 @@ export function normalizeCommonProps<TProps extends NovaUiCommonProps>(
     y: finiteNumber(props.y, defaults.y ?? 0),
     width: Math.max(0, finiteNumber(props.width, defaults.width ?? 0)),
     height: Math.max(0, finiteNumber(props.height, defaults.height ?? 0)),
+    motion: props.motion ?? defaults.motion,
     style: props.style ?? defaults.style,
     color: props.color ?? defaults.color,
     fontFamily: props.fontFamily ?? defaults.fontFamily,
