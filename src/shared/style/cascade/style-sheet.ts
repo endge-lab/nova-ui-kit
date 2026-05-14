@@ -47,7 +47,7 @@ export type NovaUiStyleComponentName =
   | 'Accordion'
   | 'Fieldset'
   | 'Tabs'
-  | 'Stepper';
+  | 'Stepper'
 export type NovaUiStyleSelectorCombinator = 'descendant' | 'child'
 export type NovaUiStyleDisplay = 'normal' | 'none'
 export type NovaUiStyleResponsiveVariant = 'base' | 'sm' | 'md' | 'lg'

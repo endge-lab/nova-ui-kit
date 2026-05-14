@@ -7,6 +7,7 @@ import type {
 import type {
   NovaUiBorder,
   NovaUiInheritedTextStyle,
+  NovaUiStyleDisplay,
   NovaUiStyleIdentityProps,
 } from '@/shared/style'
 import type { NovaUiMotionOptions } from '@/domain/domain.types'
@@ -38,6 +39,7 @@ export interface GridProps extends NovaUiMotionOptions, NovaUiStyleIdentityProps
   background?: string
   border?: NovaUiBorder
   clip?: boolean
+  display?: NovaUiStyleDisplay
 }
 
 /** Нормализованные параметры Grid контейнера. */
@@ -62,6 +64,7 @@ export interface GridResolvedProps {
   background?: string
   border?: NovaUiBorder
   clip: boolean
+  display: NovaUiStyleDisplay
   className?: string | Array<string>
   attrs?: NovaUiStyleIdentityProps['attrs']
 }

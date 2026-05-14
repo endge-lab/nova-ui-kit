@@ -152,6 +152,7 @@ function selectorMatchRankWithIdentity(
     const part = selector.parts[partIndex]
 
     if (combinator === 'child') {
+      if (!current) return -1
       current = current.parent instanceof Object ? current.parent as NovaNode<any> : null
       const partRank = current ? matchPartRank(current, part, mediaContext) : -1
       if (partRank < 0) return -1
@@ -160,6 +161,7 @@ function selectorMatchRankWithIdentity(
       continue
     }
 
+    if (!current) return -1
     const ancestor = findAncestorMatching(current, part, mediaContext)
     if (!ancestor.node) return -1
     current = ancestor.node

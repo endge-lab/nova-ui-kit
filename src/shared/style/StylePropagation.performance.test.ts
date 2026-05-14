@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import type { NovaNode } from '@endge/nova'
+import { normalizeFlexProps } from '@/components/Flex/flex.config'
+import {
+  FlexLayoutEngine,
+  createFlexChildEntry,
+} from '@/components/Flex/FlexLayoutEngine'
 import { normalizeGridProps } from '@/components/Grid/grid.config'
 import {
   GridLayoutEngine,
@@ -9,6 +14,7 @@ import {
   NOVA_UI_STYLE_TARGET,
   NovaUiStyleMask,
   matchStyleRules,
+  getNovaUiStyleMediaSignature,
   resolveNovaUiStyleSheetTokens,
   validateNovaUiStyleSheetSource,
   type NovaUiCompiledStyleSheet,
@@ -20,6 +26,7 @@ import {
 } from '@/shared/style'
 import {
   copyRect,
+  isNovaUiLayoutDisplayed,
   rectEquals,
   type NovaUiLayoutRect,
 } from '@/shared/layout'
@@ -249,6 +256,62 @@ describe('Nova UI style propagation performance', () => {
     expect(result.averageMs).toBeLessThan(100)
   })
 
+  it('benchmarks responsive variant matching for 10k styled nodes', () => {
+    const source = Array.from({ length: 1_000 }, (_item, index) => (
+      `.box-${index} { background: #123456; }`
+    )).join('\n')
+    const sheet = validateNovaUiStyleSheetSource(source).styleSheet as NovaUiCompiledStyleSheet
+    const nodes = createBenchmarkStyleNodes(10_000, index => `md:box-${index % 1000}`)
+    const result = measureBench('responsive variant selector matching 10000', nodes.length, () => {
+      let matches = 0
+      for (const node of nodes) {
+        matches += matchStyleRules(node, sheet, { width: 760, height: 500 }).length
+      }
+      return {
+        renderCount: matches,
+        updateCount: 0,
+        skippedCount: nodes.length - matches,
+      }
+    })
+
+    logBench(result)
+    expect(result.renderCount).toBe(nodes.length)
+    expect(result.averageMs).toBeLessThan(120)
+  })
+
+  it('benchmarks media signature resize skip inside the same breakpoint', () => {
+    const sheet = validateNovaUiStyleSheetSource(`
+      .box { background: #123456; }
+      @media (min-width: 900px) { .box { background: #abcdef; } }
+      @media (max-height: 540px) { .box { opacity: 0.8; } }
+    `).styleSheet as NovaUiCompiledStyleSheet
+    const result = measureBench('media signature same breakpoint resizes 1000', 1_000, () => {
+      let reapplyCount = 0
+      let signature = getNovaUiStyleMediaSignature(sheet, { width: 780, height: 600 })
+
+      for (let index = 0; index < 1_000; index += 1) {
+        const nextSignature = getNovaUiStyleMediaSignature(sheet, {
+          width: 780 + (index % 40),
+          height: 600 + (index % 20),
+        })
+        if (nextSignature !== signature) {
+          reapplyCount += 1
+          signature = nextSignature
+        }
+      }
+
+      return {
+        renderCount: 0,
+        updateCount: reapplyCount,
+        skippedCount: 1_000 - reapplyCount,
+      }
+    })
+
+    logBench(result)
+    expect(result.updateCount).toBe(0)
+    expect(result.averageMs).toBeLessThan(80)
+  })
+
   it('benchmarks render-only inherited color propagation', () => {
     const results = [1_000, 5_000, 10_000].map(size => {
       const targets = Array.from({ length: size }, () => new BenchTextTarget())
@@ -407,6 +470,41 @@ describe('Nova UI style propagation performance', () => {
     expect(result.skippedCount).toBeGreaterThanOrEqual(size)
     expect(result.averageMs).toBeLessThan(100)
   })
+
+  it('benchmarks Flex layout with hidden children without node churn', () => {
+    const size = 500
+    const hiddenCount = 100
+    const engine = new FlexLayoutEngine()
+    const entries = Array.from({ length: size }, (_item, index) => (
+      createFlexChildEntry(`item-${index}`, createBenchNode(100, 40, index < hiddenCount), { width: 100, height: 40 })
+    ))
+    const visibleEntries = entries.filter(entry => isNovaUiLayoutDisplayed(entry.node))
+    const props = normalizeFlexProps({
+      direction: 'row',
+      wrap: 'wrap',
+      gap: 4,
+      padding: 8,
+    })
+    const result = measureBench('flex layout hidden children 500', size, () => {
+      engine.compute({
+        props,
+        width: 1200,
+        height: 800,
+        entries: visibleEntries,
+      })
+
+      return {
+        renderCount: visibleEntries.length,
+        updateCount: 0,
+        skippedCount: entries.length - visibleEntries.length,
+      }
+    })
+
+    logBench(result)
+    expect(result.renderCount).toBe(size - hiddenCount)
+    expect(result.skippedCount).toBe(hiddenCount)
+    expect(result.averageMs).toBeLessThan(120)
+  })
 })
 
 function createContext(color: string, fontSize?: number): NovaUiStyleContext {
@@ -477,10 +575,13 @@ function resetBenchContainer(container: BenchContainerTarget): void {
   container.skippedCount = 0
 }
 
-function createBenchNode(width: number, height: number): NovaNode<any> {
+function createBenchNode(width: number, height: number, hidden = false): NovaNode<any> {
   return {
     width,
     height,
+    getProps: () => ({
+      display: hidden ? 'none' : 'normal',
+    }),
   } as NovaNode<any>
 }
 
@@ -560,7 +661,10 @@ function createBenchmarkTokenResolver(): NovaUiStyleTokenResolver {
   }
 }
 
-function createBenchmarkStyleNodes(size: number, className?: string): Array<NovaUiStylableNode> {
+function createBenchmarkStyleNodes(
+  size: number,
+  className?: string | ((index: number) => string),
+): Array<NovaUiStylableNode> {
   return Array.from({ length: size }, (_item, index) => ({
     componentId: `node-${index}`,
     descriptor: {
@@ -569,7 +673,9 @@ function createBenchmarkStyleNodes(size: number, className?: string): Array<Nova
     __type: 'TextBlock',
     parent: null,
     getProps: () => ({
-      className: className ?? `item-${index % 1000}`,
+      className: typeof className === 'function'
+        ? className(index)
+        : className ?? `item-${index % 1000}`,
       attrs: {},
     }),
   })) as Array<NovaUiStylableNode>

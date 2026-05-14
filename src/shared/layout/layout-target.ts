@@ -38,6 +38,16 @@ export function isNovaUiLayoutDisplayed(node: unknown): boolean {
   return props.display !== 'none'
 }
 
+/** Помечает layout-предков грязными, когда display меняет участие node в layout. */
+export function relayoutNovaUiLayoutAncestors(node: { parent?: unknown }): void {
+  let parent = node.parent
+  while (parent && typeof parent === 'object') {
+    const candidate = parent as { parent?: unknown; getApi?: () => { relayout?: () => void } }
+    candidate.getApi?.().relayout?.()
+    parent = candidate.parent
+  }
+}
+
 /** Применяет rect к UI Kit target или к обычному NovaNode через options. */
 export function applyNodeLayoutRect(node: NovaNode<any>, rect: NovaUiLayoutRect): boolean {
   if (isNovaUiLayoutTarget(node)) return node.applyLayoutRect(rect)

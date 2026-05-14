@@ -45,6 +45,7 @@ export const GRID_FIELD_DEFINITIONS = {
   style: { type: 'style' },
   background: { type: 'string' },
   clip: { type: 'boolean' },
+  display: { type: 'string' },
   motion: { type: 'motion' },
   className: { type: 'string' },
   attrs: { type: 'record' },
@@ -78,6 +79,7 @@ export function normalizeGridProps(props: GridProps = {}): GridResolvedProps {
     background: props.background,
     border: props.border,
     clip: props.clip ?? false,
+    display: props.display ?? 'normal',
     className: props.className,
     attrs: props.attrs,
   }
@@ -114,6 +116,7 @@ export function createGridDescriptor(createNode?: GridNodeFactory): GridDescript
         'background',
         'border',
         'clip',
+        'display',
         'className',
         'attrs',
       ],

@@ -290,7 +290,7 @@ describe('Nova UI style propagation', () => {
         styleSheet: `
           .box { background: #123456; }
           @media (min-width: 900px) {
-            .wide { background: #abcdef; }
+            .box { background: #abcdef; }
           }
         `,
       },
@@ -299,7 +299,7 @@ describe('Nova UI style propagation', () => {
           type: SURFACE_SCHEMA_TYPE,
           id: 'panel',
           props: {
-            className: 'md:box wide',
+            className: 'md:box',
             width: 120,
             height: 80,
           },

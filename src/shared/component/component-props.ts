@@ -18,6 +18,7 @@ import {
   copyRect,
   createLayoutRect,
   rectEquals,
+  relayoutNovaUiLayoutAncestors,
   resolveSpacing,
   type NovaUiLayoutRect,
   type NovaUiLayoutTarget,
@@ -543,14 +544,7 @@ export abstract class NovaUiComponentNode<
   }
 
   protected markLayoutAncestorsDirty(): void {
-    let parent = this.parent
-    while (parent) {
-      const api = typeof (parent as { getApi?: () => unknown }).getApi === 'function'
-        ? (parent as { getApi: () => { relayout?: () => void } }).getApi()
-        : null
-      api?.relayout?.()
-      parent = parent.parent
-    }
+    relayoutNovaUiLayoutAncestors(this)
   }
 }
 

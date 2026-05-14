@@ -152,7 +152,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -223,6 +223,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "cursor",
               "description": "Default cursor declaration for the root subtree.",
               "type": "NovaCursorDeclaration",
@@ -236,7 +242,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -325,7 +331,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -432,6 +438,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "motion",
               "description": "Optional UI Kit motion preset declaration.",
               "type": "NovaUiMotionDeclaration",
@@ -439,7 +451,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -528,7 +540,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -659,6 +671,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "motion",
               "description": "Optional UI Kit motion preset declaration.",
               "type": "NovaUiMotionDeclaration",
@@ -666,7 +684,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -755,7 +773,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -905,7 +923,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -994,7 +1012,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -1095,6 +1113,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -1174,7 +1198,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -1269,7 +1293,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -1370,6 +1394,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -1449,7 +1479,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -1591,7 +1621,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -1692,6 +1722,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -1771,7 +1807,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -1884,7 +1920,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -1985,6 +2021,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -2064,7 +2106,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -2198,7 +2240,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -2299,6 +2341,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -2378,7 +2426,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -2521,7 +2569,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -2622,6 +2670,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -2701,7 +2755,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -2841,7 +2895,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -2942,6 +2996,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -3021,7 +3081,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -3143,7 +3203,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -3244,6 +3304,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -3323,7 +3389,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -3439,7 +3505,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -3540,6 +3606,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -3619,7 +3691,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -3741,7 +3813,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -3842,6 +3914,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -3921,7 +3999,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -4040,7 +4118,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -4141,6 +4219,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -4220,7 +4304,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -4327,7 +4411,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -4428,6 +4512,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -4507,7 +4597,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -4620,7 +4710,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -4721,6 +4811,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -4800,7 +4896,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -5060,7 +5156,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -5161,6 +5257,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -5240,7 +5342,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -5500,7 +5602,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -5601,6 +5703,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -5680,7 +5788,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -5940,7 +6048,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -6041,6 +6149,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -6120,7 +6234,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -6380,7 +6494,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -6481,6 +6595,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -6560,7 +6680,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -6820,7 +6940,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -6921,6 +7041,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -7000,7 +7126,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -7260,7 +7386,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -7361,6 +7487,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -7440,7 +7572,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -7700,7 +7832,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -7801,6 +7933,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -7880,7 +8018,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -8140,7 +8278,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -8241,6 +8379,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -8320,7 +8464,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -8580,7 +8724,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -8681,6 +8825,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -8760,7 +8910,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -9020,7 +9170,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -9121,6 +9271,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -9200,7 +9356,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -9460,7 +9616,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -9561,6 +9717,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -9640,7 +9802,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -9900,7 +10062,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -10001,6 +10163,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -10080,7 +10248,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -10340,7 +10508,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -10441,6 +10609,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -10520,7 +10694,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -10780,7 +10954,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -10881,6 +11055,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -10960,7 +11140,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -11220,7 +11400,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -11321,6 +11501,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -11400,7 +11586,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -11660,7 +11846,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -11761,6 +11947,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -11840,7 +12032,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -12100,7 +12292,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -12201,6 +12393,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -12280,7 +12478,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -12540,7 +12738,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -12641,6 +12839,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -12720,7 +12924,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -12980,7 +13184,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -13081,6 +13285,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -13160,7 +13370,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -13420,7 +13630,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -13521,6 +13731,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -13600,7 +13816,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -13860,7 +14076,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -13961,6 +14177,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -14040,7 +14262,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -14300,7 +14522,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -14401,6 +14623,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -14480,7 +14708,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -14740,7 +14968,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -14841,6 +15069,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -14920,7 +15154,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },
@@ -15180,7 +15414,7 @@
             },
             {
               "name": "class",
-              "description": "Nova style class mapped to the runtime `className` prop.",
+              "description": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`.",
               "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
               "required": false
             },
@@ -15281,6 +15515,12 @@
               "required": false
             },
             {
+              "name": "display",
+              "description": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it.",
+              "type": "\"normal\" | \"none\"",
+              "required": false
+            },
+            {
               "name": "padding",
               "description": "Inner spacing. Supports number or side/horizontal/vertical object.",
               "type": "NovaUiSpacing",
@@ -15360,7 +15600,7 @@
             },
             {
               "name": "className",
-              "description": "Runtime style class name. In templates prefer `class`.",
+              "description": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
               "type": "string | Array<string>",
               "required": false
             },

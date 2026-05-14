@@ -31,6 +31,7 @@ import {
   createLayoutRect,
   isNovaUiLayoutDisplayed,
   rectEquals,
+  relayoutNovaUiLayoutAncestors,
   resolveSpacing,
   type NovaUiLayoutRect,
   type NovaUiLayoutTarget,
@@ -547,15 +548,8 @@ export class Root<E extends EventList = Record<string, any>>
     this.active = displayed
   }
 
-  private markLayoutAncestorsDirty(node: NovaNode<E>): void {
-    let parent = node.parent
-    while (parent) {
-      const api = typeof (parent as { getApi?: () => unknown }).getApi === 'function'
-        ? (parent as { getApi: () => { relayout?: () => void } }).getApi()
-        : null
-      api?.relayout?.()
-      parent = parent.parent
-    }
+  private markLayoutAncestorsDirty(node: { parent?: unknown }): void {
+    relayoutNovaUiLayoutAncestors(node)
   }
 
   private propagateStyleContext(changedMask: NovaUiStyleMask): NovaUiStyleReceiveResult {

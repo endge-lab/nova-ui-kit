@@ -26,6 +26,7 @@ import {
   createLayoutRect,
   measureNovaUiTextWidth,
   rectEquals,
+  relayoutNovaUiLayoutAncestors,
   type NovaUiLayoutConstraints,
   type NovaUiLayoutMeasure,
   type NovaUiLayoutRect,
@@ -328,14 +329,7 @@ export class TextBlock<E extends EventList = Record<string, any>>
   }
 
   private markLayoutAncestorsDirty(): void {
-    let parent = this.parent
-    while (parent) {
-      const api = typeof (parent as { getApi?: () => unknown }).getApi === 'function'
-        ? (parent as { getApi: () => { relayout?: () => void } }).getApi()
-        : null
-      api?.relayout?.()
-      parent = parent.parent
-    }
+    relayoutNovaUiLayoutAncestors(this)
   }
 }
 

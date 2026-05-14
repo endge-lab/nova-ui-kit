@@ -32,6 +32,7 @@ import {
   createLayoutRect,
   isNovaUiLayoutDisplayed,
   rectEquals,
+  relayoutNovaUiLayoutAncestors,
   type NovaUiLayoutRect,
   type NovaUiLayoutTarget,
 } from '@/shared/layout'
@@ -340,14 +341,7 @@ export class Grid<E extends EventList = Record<string, any>>
   }
 
   private markLayoutAncestorsDirty(): void {
-    let parent = this.parent
-    while (parent) {
-      const api = typeof (parent as { getApi?: () => unknown }).getApi === 'function'
-        ? (parent as { getApi: () => { relayout?: () => void } }).getApi()
-        : null
-      api?.relayout?.()
-      parent = parent.parent
-    }
+    relayoutNovaUiLayoutAncestors(this)
   }
 }
 
