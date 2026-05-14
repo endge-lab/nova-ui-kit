@@ -34,13 +34,13 @@ export function isNovaUiMotionEnabled(options?: NovaUiMotionOptions): boolean {
 }
 
 export function readNovaUiMotionPreset(motion: NovaUiMotionDeclaration | undefined): NovaUiMotionPreset | null {
-  if (!motion || motion === false || Array.isArray(motion)) return null
+  if (motion === false || !motion || Array.isArray(motion)) return null
   if (typeof motion === 'string') return motion
   return motion.name ?? motion.preset
 }
 
 export function readNovaUiMotionConfig(motion: NovaUiMotionDeclaration | undefined): NovaUiMotionConfig {
-  if (!motion || motion === false || typeof motion === 'string' || Array.isArray(motion)) return {}
+  if (motion === false || !motion || typeof motion === 'string' || Array.isArray(motion)) return {}
   return motion
 }
 
@@ -74,7 +74,7 @@ export function resolveNovaUiMotionDeclarations(motion: NovaUiMotionDeclaration 
   config: NovaUiMotionConfig
   options: NovaMotionOptions
 }> {
-  if (!motion || motion === false) return []
+  if (motion === false || !motion) return []
   const items = Array.isArray(motion) ? motion : [motion]
   return items
     .map(item => resolveNovaUiMotionDeclaration(item))
