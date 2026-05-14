@@ -31,7 +31,7 @@ import {
   type NovaUiStyleContext,
   type NovaUiStyleReceiveResult,
 } from '@/shared/style'
-import { resolveNovaUiMotionOptions } from '@/shared/motion'
+import { resolveNovaUiMotionDeclarations } from '@/shared/motion'
 
 /** Базовый visual container UI Kit: фон, border, clip, padding и children. */
 export class Surface<E extends EventList = Record<string, any>>
@@ -39,7 +39,7 @@ export class Surface<E extends EventList = Record<string, any>>
   private readonly managedChildren: Array<NovaNode<E>> = []
   private readonly childRect = createLayoutRect()
   private readonly api: SurfaceApi
-  private motionPlayback: NovaMotionPlayback | null = null
+  private readonly motionPlaybacks: Array<NovaMotionPlayback> = []
   private layoutDirty = true
 
   constructor(
@@ -112,6 +112,11 @@ export class Surface<E extends EventList = Record<string, any>>
 
   render(): void {
     const schema = buildBoxSchema(this.props, this.width, this.height)
+    if (this.props.motionOffsetY !== 0) {
+      for (const item of schema) {
+        if ('y' in item && typeof item.y === 'number') item.y += this.props.motionOffsetY
+      }
+    }
     if (schema.length > 0) this.renderer.schema(schema)
     if (this.props.clip) this.renderer.clip(0, 0, this.width, this.height)
   }
@@ -147,22 +152,65 @@ export class Surface<E extends EventList = Record<string, any>>
   }
 
   private syncMotion(): void {
-    this.stopMotion()
-    if (this.props.motion !== 'shimmer') return
+    this.stopMotion(true)
+    const motions = resolveNovaUiMotionDeclarations(this.props.motion)
 
-    this.motionPlayback = this.transitionTo(
-      { background: this.props.accentColor ?? '#22d3ee', opacity: 0.66 },
-      {
-        ...resolveNovaUiMotionOptions('shimmer'),
-        duration: 760,
-        yoyo: true,
-      },
-    )
+    for (const motion of motions) {
+      if (motion.preset === 'shimmer') {
+        this.motionPlaybacks.push(this.transitionTo(
+          {
+            background: motion.config.background ?? this.props.accentColor ?? '#22d3ee',
+            opacity: motion.config.opacity ?? 0.66,
+          },
+          {
+            ...motion.options,
+            duration: motion.config.duration ?? 760,
+            yoyo: motion.options.yoyo ?? true,
+          },
+        ))
+        continue
+      }
+
+      if (motion.preset === 'bounce') {
+        const height = finiteMotionNumber(motion.config.height, 32)
+        this.motionPlaybacks.push(this.transitionTo(
+          { motionOffsetY: -height },
+          {
+            ...motion.options,
+            yoyo: motion.options.yoyo ?? true,
+          },
+        ))
+        continue
+      }
+
+      if (motion.preset === 'spin') {
+        this.motionPlaybacks.push(this.nova.motion.to(
+          this,
+          { rotation: finiteMotionNumber(motion.config.angle, Math.PI * 2) },
+          {
+            ...motion.options,
+            overwrite: motion.options.overwrite ?? false,
+          },
+        ))
+      }
+    }
   }
 
-  private stopMotion(): void {
-    this.motionPlayback?.cancel()
-    this.motionPlayback = null
+  private stopMotion(resetOffset = false): void {
+    for (const playback of this.motionPlaybacks) playback.cancel()
+    this.motionPlaybacks.length = 0
+    if (resetOffset && this.props.motionOffsetY !== 0) {
+      this.props.motionOffsetY = 0
+      this.dirty({ render: true })
+    }
+    if (resetOffset && this.rotation !== 0) {
+      this.rotation = 0
+      this.dirty({ matrix: true, render: true })
+    }
   }
 
+}
+
+function finiteMotionNumber(value: number | undefined, fallback: number): number {
+  return typeof value === 'number' && Number.isFinite(value) ? value : fallback
 }
