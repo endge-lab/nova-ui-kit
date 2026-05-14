@@ -21,6 +21,7 @@ import {
   copyRect,
   createLayoutRect,
   resolveSpacing,
+  type NovaUiLayoutRect,
 } from '@/shared/layout'
 import {
   NovaUiStyleMask,
@@ -65,6 +66,12 @@ export class Surface<E extends EventList = Record<string, any>>
 
   override getApi(): SurfaceApi {
     return this.api
+  }
+
+  override applyLayoutRect(rect: NovaUiLayoutRect): boolean {
+    const changed = super.applyLayoutRect(rect)
+    if (changed || hasActiveMotionTransform(this.props)) this.applyMotionTransform()
+    return changed
   }
 
   setChildren(children: Array<SurfaceChildSchema>): void {
@@ -112,11 +119,6 @@ export class Surface<E extends EventList = Record<string, any>>
 
   render(): void {
     const schema = buildBoxSchema(this.props, this.width, this.height)
-    if (this.props.motionOffsetY !== 0) {
-      for (const item of schema) {
-        if ('y' in item && typeof item.y === 'number') item.y += this.props.motionOffsetY
-      }
-    }
     if (schema.length > 0) this.renderer.schema(schema)
     if (this.props.clip) this.renderer.clip(0, 0, this.width, this.height)
   }
@@ -133,6 +135,7 @@ export class Surface<E extends EventList = Record<string, any>>
   protected override onPropsChanged(changedKeys: Array<keyof SurfaceResolvedProps>): void {
     this.props = normalizeSurfaceProps(this.props)
     this.applyCommonPropsChanged(changedKeys)
+    if (hasMotionTransformChanges(changedKeys)) this.applyMotionTransform()
     if (changedKeys.includes('padding')) this.relayout()
     if (changedKeys.includes('motion')) this.syncMotion()
   }
@@ -184,9 +187,8 @@ export class Surface<E extends EventList = Record<string, any>>
       }
 
       if (motion.preset === 'spin') {
-        this.motionPlaybacks.push(this.nova.motion.to(
-          this,
-          { rotation: finiteMotionNumber(motion.config.angle, Math.PI * 2) },
+        this.motionPlaybacks.push(this.transitionTo(
+          { motionRotation: finiteMotionNumber(motion.config.angle, Math.PI * 2) },
           {
             ...motion.options,
             overwrite: motion.options.overwrite ?? false,
@@ -199,18 +201,43 @@ export class Surface<E extends EventList = Record<string, any>>
   private stopMotion(resetOffset = false): void {
     for (const playback of this.motionPlaybacks) playback.cancel()
     this.motionPlaybacks.length = 0
-    if (resetOffset && this.props.motionOffsetY !== 0) {
+    if (resetOffset && (this.props.motionOffsetY !== 0 || this.props.motionRotation !== 0)) {
       this.props.motionOffsetY = 0
-      this.dirty({ render: true })
-    }
-    if (resetOffset && this.rotation !== 0) {
-      this.rotation = 0
+      this.props.motionRotation = 0
+      this.applyMotionTransform()
       this.dirty({ matrix: true, render: true })
     }
   }
 
+  private applyMotionTransform(): void {
+    const rotation = this.props.motionRotation
+    const offsetY = this.props.motionOffsetY
+    const centerX = this.layoutRect.width / 2
+    const centerY = this.layoutRect.height / 2
+    const cos = Math.cos(rotation)
+    const sin = Math.sin(rotation)
+
+    super.options({
+      x: this.layoutRect.x + centerX - (cos * centerX - sin * centerY),
+      y: this.layoutRect.y + offsetY + centerY - (sin * centerX + cos * centerY),
+      rotation,
+    })
+  }
 }
 
 function finiteMotionNumber(value: number | undefined, fallback: number): number {
   return typeof value === 'number' && Number.isFinite(value) ? value : fallback
+}
+
+function hasMotionTransformChanges(changedKeys: Array<keyof SurfaceResolvedProps>): boolean {
+  return changedKeys.includes('x')
+    || changedKeys.includes('y')
+    || changedKeys.includes('width')
+    || changedKeys.includes('height')
+    || changedKeys.includes('motionOffsetY')
+    || changedKeys.includes('motionRotation')
+}
+
+function hasActiveMotionTransform(props: SurfaceResolvedProps): boolean {
+  return props.motionOffsetY !== 0 || props.motionRotation !== 0
 }

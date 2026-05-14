@@ -9,6 +9,7 @@ import {
   NOVA_UI_COMMON_DIRTY_POLICY,
   NOVA_UI_COMMON_FIELD_DEFINITIONS,
   commonMeasureBounds,
+  finiteNumber,
   normalizeCommonProps,
 } from '@/shared/component/component-props'
 import {
@@ -32,16 +33,22 @@ export type SurfaceNodeFactory = <E extends EventList>(
 
 export const SURFACE_FIELD_DEFINITIONS = {
   ...NOVA_UI_COMMON_FIELD_DEFINITIONS,
+  motionOffsetY: { type: 'number' },
+  motionRotation: { type: 'number' },
 } as const
 
 export function normalizeSurfaceProps(props: SurfaceProps = {}): SurfaceResolvedProps {
-  return normalizeCommonProps(props, {
-    width: 160,
-    height: 96,
-    background: '#ffffff',
-    border: { color: '#d6d9e2', width: 1, radius: 8 },
-    clip: false,
-  })
+  return {
+    ...normalizeCommonProps(props, {
+      width: 160,
+      height: 96,
+      background: '#ffffff',
+      border: { color: '#d6d9e2', width: 1, radius: 8 },
+      clip: false,
+    }),
+    motionOffsetY: finiteNumber(props.motionOffsetY, 0),
+    motionRotation: finiteNumber(props.motionRotation, 0),
+  }
 }
 
 export function createSurfaceDescriptor(createNode?: SurfaceNodeFactory): SurfaceDescriptor {
@@ -51,7 +58,10 @@ export function createSurfaceDescriptor(createNode?: SurfaceNodeFactory): Surfac
     title: 'Surface',
     version: '0.1.0',
     kind: 'node-component',
-    dirtyPolicy: NOVA_UI_COMMON_DIRTY_POLICY,
+    dirtyPolicy: {
+      ...NOVA_UI_COMMON_DIRTY_POLICY,
+      render: [...NOVA_UI_COMMON_DIRTY_POLICY.render, 'motionOffsetY', 'motionRotation'],
+    },
     fields: SURFACE_FIELD_DEFINITIONS,
     normalize: schema => normalizeSurfaceProps(schema.props),
     measureBounds: (_context, schema) => commonMeasureBounds(schema, normalizeSurfaceProps),

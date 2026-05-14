@@ -7,9 +7,15 @@ import type { NovaUiLayoutRect } from '@/shared/layout'
 
 export const SURFACE_SCHEMA_TYPE = 'nova-ui.surface'
 
-export interface SurfaceProps extends NovaUiCommonProps {}
+export interface SurfaceProps extends NovaUiCommonProps {
+  motionOffsetY?: number
+  motionRotation?: number
+}
 
-export interface SurfaceResolvedProps extends NovaUiCommonResolvedProps {}
+export interface SurfaceResolvedProps extends NovaUiCommonResolvedProps {
+  motionOffsetY: number
+  motionRotation: number
+}
 
 export interface SurfaceChildSchema<TProps = Record<string, any>> extends NovaElementSchema<TProps> {}
 
