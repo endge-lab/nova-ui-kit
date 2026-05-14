@@ -47,8 +47,25 @@ export type NovaUiStyleComponentName =
   | 'Accordion'
   | 'Fieldset'
   | 'Tabs'
-  | 'Stepper'
+  | 'Stepper';
 export type NovaUiStyleSelectorCombinator = 'descendant' | 'child'
+export type NovaUiStyleDisplay = 'normal' | 'none'
+export type NovaUiStyleResponsiveVariant = 'base' | 'sm' | 'md' | 'lg'
+export type NovaUiStyleMediaFeatureName = 'min-width' | 'max-width' | 'min-height' | 'max-height'
+
+export interface NovaUiStyleMediaFeature {
+  name: NovaUiStyleMediaFeatureName
+  value: number
+}
+
+export interface NovaUiStyleMediaQuery {
+  features: Array<NovaUiStyleMediaFeature>
+}
+
+export interface NovaUiStyleMediaContext {
+  width: number
+  height: number
+}
 
 /** Один segment CSS-подобного selector. */
 export interface NovaUiStyleSelectorPart {
@@ -80,6 +97,7 @@ export interface NovaUiStyleDeclarations {
     padding?: NovaUiSpacing
   }
   layout?: {
+    display?: NovaUiStyleDisplay
     gap?: number
     rowGap?: number
     columnGap?: number
@@ -102,6 +120,7 @@ export interface NovaUiCompiledStyleRule {
   selector: NovaUiStyleSelector
   declarations: NovaUiStyleDeclarations
   order: number
+  media?: NovaUiStyleMediaQuery
   rightMostId?: string
   rightMostClasses: Array<string>
   rightMostType?: NovaUiStyleComponentName

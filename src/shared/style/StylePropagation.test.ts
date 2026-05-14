@@ -11,8 +11,10 @@ import type { ButtonApi } from '@/components/Button/button.types'
 import { BUTTON_SCHEMA_TYPE } from '@/components/Button/button.types'
 import { FLEX_SCHEMA_TYPE } from '@/components/Flex/flex.types'
 import { GRID_SCHEMA_TYPE } from '@/components/Grid/grid.types'
+import type { Flex } from '@/components/Flex/Flex'
 import type { Root } from '@/components/Root/Root'
 import { ROOT_SCHEMA_TYPE } from '@/components/Root/root.types'
+import { SURFACE_SCHEMA_TYPE } from '@/components/Surface/surface.types'
 import type { TextBlock } from '@/components/TextBlock/TextBlock'
 import type { TextBlockApi } from '@/components/TextBlock/text-block.types'
 import { TEXT_BLOCK_SCHEMA_TYPE } from '@/components/TextBlock/text-block.types'
@@ -272,6 +274,118 @@ describe('Nova UI style propagation', () => {
 
     expect(textApi(app, 'note').getProps().color).toBe('#445566')
     expect(textApi(app, 'note').getProps().fontWeight).toBe('800')
+
+    app.destroy()
+  })
+
+  it('applies automatic responsive class variants against root width', () => {
+    const app = createApp()
+    const surface = app.createSurface('style')
+    const root = app.schema.createNode(surface, {
+      type: ROOT_SCHEMA_TYPE,
+      id: 'root',
+      props: {
+        width: 700,
+        height: 320,
+        styleSheet: `
+          .box { background: #123456; }
+          @media (min-width: 900px) {
+            .wide { background: #abcdef; }
+          }
+        `,
+      },
+      children: [
+        {
+          type: SURFACE_SCHEMA_TYPE,
+          id: 'panel',
+          props: {
+            className: 'md:box wide',
+            width: 120,
+            height: 80,
+          },
+        },
+      ],
+    }) as Root<TestEvents>
+    const panel = app.components.require<any>('panel')
+    const samePanel = panel
+
+    expect(panel.getProps().background).toBe('#ffffff')
+
+    root.setProps({ width: 800 })
+    root.update()
+    expect(app.components.require<any>('panel')).toBe(samePanel)
+    expect(panel.getProps().background).toBe('#123456')
+
+    root.setProps({ width: 920 })
+    root.update()
+    expect(app.components.require<any>('panel')).toBe(samePanel)
+    expect(panel.getProps().background).toBe('#abcdef')
+
+    app.destroy()
+  })
+
+  it('supports display utilities and excludes hidden children from Flex layout without churn', () => {
+    const app = createApp()
+    const surface = app.createSurface('style')
+    const root = app.schema.createNode(surface, {
+      type: ROOT_SCHEMA_TYPE,
+      id: 'root',
+      props: {
+        width: 700,
+        height: 200,
+      },
+      children: [
+        {
+          type: FLEX_SCHEMA_TYPE,
+          id: 'row',
+          props: {
+            width: 300,
+            height: 100,
+            direction: 'row',
+          },
+          children: [
+            {
+              type: SURFACE_SCHEMA_TYPE,
+              id: 'hidden',
+              props: {
+                className: 'hidden md:shown',
+                width: 100,
+                height: 100,
+              },
+            },
+            {
+              type: SURFACE_SCHEMA_TYPE,
+              id: 'shown',
+              props: {
+                width: 100,
+                height: 100,
+              },
+            },
+          ],
+        },
+      ],
+    }) as Root<TestEvents>
+    const row = app.components.require<Flex<TestEvents>>('row')
+    const hidden = app.components.require<any>('hidden')
+    const shown = app.components.require<any>('shown')
+
+    root.update()
+    row.update()
+
+    expect(hidden.getProps().display).toBe('none')
+    expect(hidden.visible).toBe(false)
+    expect(hidden.active).toBe(false)
+    expect(shown.x).toBe(0)
+
+    root.setProps({ width: 800 })
+    root.update()
+    row.update()
+
+    expect(app.components.require<any>('hidden')).toBe(hidden)
+    expect(hidden.getProps().display).toBe('normal')
+    expect(hidden.visible).toBe(true)
+    expect(hidden.active).toBe(true)
+    expect(shown.x).toBe(100)
 
     app.destroy()
   })

@@ -29,6 +29,7 @@ import {
   applyNodeLayoutRect,
   copyRect,
   createLayoutRect,
+  isNovaUiLayoutDisplayed,
   rectEquals,
   resolveSpacing,
   type NovaUiLayoutRect,
@@ -40,7 +41,9 @@ import {
   borderRadiusToRendererValue,
   createEmptyStyleSheet,
   createEmptyStyleSheetValidationResult,
+  getNovaUiBuiltInUtilityStyleSheet,
   getNovaUiGlobalStyleSheet,
+  getNovaUiStyleMediaSignature,
   isNovaUiStyleTarget,
   isNovaUiStyleSheetAsset,
   matchStyleRules,
@@ -86,6 +89,7 @@ export class Root<E extends EventList = Record<string, any>>
   private effectiveStyleContext = EMPTY_STYLE_CONTEXT
   private tokenResolver: NovaUiStyleTokenResolver | null = null
   private resolvedTokenVersion: number | null = null
+  private mediaSignature = ''
   private readonly disposeGlobalStylesSubscription: () => void
 
   constructor(
@@ -98,6 +102,7 @@ export class Root<E extends EventList = Record<string, any>>
     const resolvedProps = normalizeRootProps(props)
     super(app, surface, descriptor, resolvedProps, options)
     this.__type = 'Root'
+    this.applyDisplayState()
     this.api = {
       setStyleSheetSource: source => this.setStyleSheetSource(source),
       setStyleSheetAsset: asset => this.setStyleSheetAsset(asset),
@@ -211,7 +216,7 @@ export class Root<E extends EventList = Record<string, any>>
 
     if (!isStylableNode(target)) return null
 
-    const rules = matchStyleRules(target, this.styleSheet)
+    const rules = matchStyleRules(target, this.styleSheet, this.getMediaContext())
     const state = this.resolveAppliedState(target)
 
     return {
@@ -252,6 +257,7 @@ export class Root<E extends EventList = Record<string, any>>
 
   update(): void {
     this.refreshStyleTokensIfNeeded()
+    this.refreshMediaCascadeIfNeeded()
     if (!this.layoutDirty) return
 
     const padding = resolveSpacing(this.props.padding)
@@ -265,6 +271,7 @@ export class Root<E extends EventList = Record<string, any>>
     if (!rectEquals(this.childRect, nextRect)) {
       copyRect(this.childRect, nextRect)
       for (const child of this.managedChildren) {
+        if (!isNovaUiLayoutDisplayed(child)) continue
         const changed = applyNodeLayoutRect(child, this.childRect)
         if (changed) child.dirty({ update: true, render: true })
       }
@@ -310,6 +317,7 @@ export class Root<E extends EventList = Record<string, any>>
 
   protected override onPropsChanged(changedKeys: Array<keyof RootResolvedProps>): void {
     this.props = normalizeRootProps(this.props)
+    this.applyDisplayState()
     if (hasRootLayoutChanges(changedKeys)) this.layoutDirty = true
     if (!this.externalLayout && hasRootGeometryChanges(changedKeys)) {
       this.applyResolvedRect({
@@ -354,16 +362,20 @@ export class Root<E extends EventList = Record<string, any>>
 
   private refreshCombinedStyleSheet(): void {
     const globalAsset = getNovaUiGlobalStyleSheet(this.nova)
+    const builtInStyleSheet = getNovaUiBuiltInUtilityStyleSheet()
     const styleSheets = [
+      builtInStyleSheet,
       globalAsset.styleSheet,
       this.localRawStyleSheet,
     ].filter((sheet): sheet is NovaUiCompiledStyleSheet => !!sheet)
 
     this.rawStyleSheet = mergeNovaUiStyleSheets(styleSheets, [
+      builtInStyleSheet.source,
       globalAsset.source,
       this.localRawStyleSheet.source,
     ].filter(Boolean).join('\n'))
     this.styleSheet = this.resolveStyleSheetTokens(this.rawStyleSheet)
+    this.mediaSignature = ''
     this.applyCascade()
   }
 
@@ -380,6 +392,7 @@ export class Root<E extends EventList = Record<string, any>>
   }
 
   private applyCascade(): void {
+    this.mediaSignature = getNovaUiStyleMediaSignature(this.styleSheet, this.getMediaContext())
     this.traverseAll(node => {
       if (isStylableNode(node)) this.applyCascadeToNode(node)
     })
@@ -392,12 +405,13 @@ export class Root<E extends EventList = Record<string, any>>
   }
 
   private applyCascadeToNode(node: NovaUiStylableNode): void {
-    const rules = matchStyleRules(node, this.styleSheet)
+    const rules = matchStyleRules(node, this.styleSheet, this.getMediaContext())
     const declarations = mergeRuleDeclarations(rules)
     const patch = this.createCascadePatch(node, declarations)
     if (!patch) return
 
     node.setProps(patch)
+    if ('display' in patch) this.markLayoutAncestorsDirty(node)
   }
 
   private createCascadePatch(
@@ -437,6 +451,10 @@ export class Root<E extends EventList = Record<string, any>>
     if (declarations.spacing?.padding !== undefined) {
       nextKeys.add('padding')
       patch.padding = declarations.spacing.padding
+    }
+    if (declarations.layout?.display !== undefined) {
+      nextKeys.add('display')
+      patch.display = declarations.layout.display
     }
     if (declarations.cursor !== undefined) {
       nextKeys.add('cursor')
@@ -489,6 +507,7 @@ export class Root<E extends EventList = Record<string, any>>
         border: props.border,
         clip: props.clip,
         padding: props.padding,
+        display: props.display,
         gap: props.gap,
         rowGap: props.rowGap,
         columnGap: props.columnGap,
@@ -506,6 +525,37 @@ export class Root<E extends EventList = Record<string, any>>
     }
     this.appliedCascade.set(node, state)
     return state
+  }
+
+  private refreshMediaCascadeIfNeeded(): void {
+    const nextSignature = getNovaUiStyleMediaSignature(this.styleSheet, this.getMediaContext())
+    if (nextSignature === this.mediaSignature) return
+
+    this.applyCascade()
+  }
+
+  private getMediaContext(): { width: number; height: number } {
+    return {
+      width: this.width,
+      height: this.height,
+    }
+  }
+
+  private applyDisplayState(): void {
+    const displayed = this.props.display !== 'none'
+    this.visible = displayed
+    this.active = displayed
+  }
+
+  private markLayoutAncestorsDirty(node: NovaNode<E>): void {
+    let parent = node.parent
+    while (parent) {
+      const api = typeof (parent as { getApi?: () => unknown }).getApi === 'function'
+        ? (parent as { getApi: () => { relayout?: () => void } }).getApi()
+        : null
+      api?.relayout?.()
+      parent = parent.parent
+    }
   }
 
   private propagateStyleContext(changedMask: NovaUiStyleMask): NovaUiStyleReceiveResult {
@@ -621,6 +671,7 @@ function fallbackCascadeValue(key: string, value: unknown): unknown {
   if (key === 'border') return { width: 0 }
   if (key === 'clip') return false
   if (key === 'padding') return 0
+  if (key === 'display') return 'normal'
   if (key === 'gap' || key === 'rowGap' || key === 'columnGap') return 0
   if (key === 'disabledOpacity') return 0.45
   if (key === 'cursor') return null
@@ -653,5 +704,5 @@ function hasRootGeometryChanges(keys: Array<keyof RootResolvedProps>): boolean {
 }
 
 function hasRootLayoutChanges(keys: Array<keyof RootResolvedProps>): boolean {
-  return keys.includes('width') || keys.includes('height') || keys.includes('padding')
+  return keys.includes('width') || keys.includes('height') || keys.includes('padding') || keys.includes('display')
 }

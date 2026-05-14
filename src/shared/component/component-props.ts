@@ -1,16 +1,15 @@
-import { NovaComponentNode } from '@endge/nova'
+import { NovaComponentNode, createNovaSyncPort } from '@endge/nova'
 import type {
   NovaApp,
   NovaComponentDescriptor,
   NovaComponentSchema,
-  NovaSyncPortMap,
   NovaCursorContext,
   NovaCursorDeclaration,
   NovaSchema,
   NovaSoundCueInput,
+  NovaSyncPortMap,
   NovaSurface,
 } from '@endge/nova'
-import { createNovaSyncPort } from '@endge/nova'
 import type { EventList } from '@endge/utils'
 import type { NovaUiMotionOptions } from '@/domain/domain.types'
 import {
@@ -35,6 +34,7 @@ import {
   type NovaUiFontWeight,
   type NovaUiInheritedTextStyle,
   type NovaUiStyleContext,
+  type NovaUiStyleDisplay,
   type NovaUiStyleIdentityProps,
   type NovaUiStyleReceiveResult,
   type NovaUiStyleTarget,
@@ -63,6 +63,7 @@ export interface NovaUiCommonProps extends NovaUiMotionOptions, NovaUiStyleIdent
   opacity?: number
   border?: NovaUiBorder
   clip?: boolean
+  display?: NovaUiStyleDisplay
   padding?: NovaUiSpacing
   accentColor?: string
   trackColor?: string
@@ -94,6 +95,7 @@ export interface NovaUiCommonResolvedProps extends NovaUiStyleIdentityProps {
   opacity: number
   border?: NovaUiBorder
   clip: boolean
+  display: NovaUiStyleDisplay
   padding: NovaUiSpacing
   accentColor?: string
   trackColor?: string
@@ -148,6 +150,7 @@ export const NOVA_UI_COMMON_FIELD_DEFINITIONS = {
   opacity: { type: 'number' },
   border: { type: 'border' },
   clip: { type: 'boolean' },
+  display: { type: 'string' },
   padding: { type: 'spacing' },
   accentColor: { type: 'string' },
   trackColor: { type: 'string' },
@@ -180,6 +183,7 @@ export const NOVA_UI_COMMON_DIRTY_POLICY = {
     'opacity',
     'border',
     'clip',
+    'display',
     'accentColor',
     'trackColor',
     'thumbColor',
@@ -218,6 +222,7 @@ export function normalizeCommonProps<TProps extends NovaUiCommonProps>(
     opacity: clamp01(finiteNumber(props.opacity, defaults.opacity ?? 1)),
     border: props.border ?? defaults.border,
     clip: props.clip ?? defaults.clip ?? false,
+    display: props.display ?? defaults.display ?? 'normal',
     padding: props.padding ?? defaults.padding ?? 0,
     accentColor: props.accentColor ?? defaults.accentColor,
     trackColor: props.trackColor ?? defaults.trackColor,
@@ -377,6 +382,7 @@ export abstract class NovaUiComponentNode<
   ) {
     super(app, surface, descriptor, props, options)
     this.applyInitialLayoutRect(props)
+    this.applyCommonDisplayState()
     this.options({
       opacity: props.disabled ? props.disabledOpacity : props.opacity,
     })
@@ -473,6 +479,8 @@ export abstract class NovaUiComponentNode<
         disabled: this.props.disabled,
       },
     })
+    this.applyCommonDisplayState()
+    if (changedKeys.includes('display')) this.markLayoutAncestorsDirty()
 
     if (!this.externalLayout && hasGeometryChanges(changedKeys)) {
       this.applyResolvedRect({
@@ -526,6 +534,23 @@ export abstract class NovaUiComponentNode<
 
   protected getResolvedPadding(): ReturnType<typeof resolveSpacing> {
     return resolveSpacing(this.props.padding)
+  }
+
+  protected applyCommonDisplayState(): void {
+    const displayed = this.props.display !== 'none'
+    this.visible = displayed
+    this.active = displayed
+  }
+
+  protected markLayoutAncestorsDirty(): void {
+    let parent = this.parent
+    while (parent) {
+      const api = typeof (parent as { getApi?: () => unknown }).getApi === 'function'
+        ? (parent as { getApi: () => { relayout?: () => void } }).getApi()
+        : null
+      api?.relayout?.()
+      parent = parent.parent
+    }
   }
 }
 

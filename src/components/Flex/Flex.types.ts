@@ -7,6 +7,7 @@ import type {
 import type {
   NovaUiBorder,
   NovaUiInheritedTextStyle,
+  NovaUiStyleDisplay,
   NovaUiStyleIdentityProps,
 } from '@/shared/style'
 import type { NovaUiMotionOptions } from '@/domain/domain.types'
@@ -37,6 +38,7 @@ export interface FlexProps extends NovaUiMotionOptions, NovaUiStyleIdentityProps
   background?: string
   border?: NovaUiBorder
   clip?: boolean
+  display?: NovaUiStyleDisplay
 }
 
 /** Нормализованные параметры Flex контейнера. */
@@ -57,6 +59,7 @@ export interface FlexResolvedProps {
   background?: string
   border?: NovaUiBorder
   clip: boolean
+  display: NovaUiStyleDisplay
   className?: string | Array<string>
   attrs?: NovaUiStyleIdentityProps['attrs']
 }

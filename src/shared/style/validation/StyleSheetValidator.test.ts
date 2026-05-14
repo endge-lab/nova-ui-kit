@@ -61,4 +61,40 @@ describe('Nova UI stylesheet validator', () => {
     expect(result.styleSheet).toBeNull()
     expect(result.diagnostics[0]?.code).toBe('invalid-selector-part')
   })
+
+  it('parses canvas media queries, display declarations and escaped class selectors', () => {
+    const result = validateNovaUiStyleSheetSource(`
+      .hidden { display: none; }
+      .shown { display: normal; }
+      .md\\:box { background: #123456; }
+
+      @media (min-width: 900px) and (max-height: 600) {
+        Flex.panel > TextBlock.title {
+          display: normal;
+          font-size: 18;
+        }
+      }
+    `)
+
+    expect(result.ok).toBe(true)
+    expect(result.diagnostics).toHaveLength(0)
+    expect(result.styleSheet?.rules).toHaveLength(4)
+    expect(result.styleSheet?.rules[0]?.declarations.layout?.display).toBe('none')
+    expect(result.styleSheet?.rules[2]?.selector.parts[0]?.classes).toEqual(['md:box'])
+    expect(result.styleSheet?.rules[3]?.media?.features).toEqual([
+      { name: 'min-width', value: 900 },
+      { name: 'max-height', value: 600 },
+    ])
+  })
+
+  it('diagnoses unsupported display values', () => {
+    const result = validateNovaUiStyleSheetSource(`
+      Flex {
+        display: flex;
+      }
+    `)
+
+    expect(result.ok).toBe(false)
+    expect(result.diagnostics.some(item => item.code === 'unsupported-display')).toBe(true)
+  })
 })

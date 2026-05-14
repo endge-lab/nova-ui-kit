@@ -30,6 +30,7 @@ import {
   applyNodeLayoutRect,
   copyRect,
   createLayoutRect,
+  isNovaUiLayoutDisplayed,
   rectEquals,
   type NovaUiLayoutRect,
   type NovaUiLayoutTarget,
@@ -80,6 +81,7 @@ export class Grid<E extends EventList = Record<string, any>>
     const resolvedProps = normalizeGridProps(props)
     super(app, surface, descriptor, resolvedProps, options)
     this.__type = 'Grid'
+    this.applyDisplayState()
     this.api = {
       setChildren: children => this.setChildren(children),
       setChildLayout: (id, layout) => this.setChildLayout(id, layout),
@@ -148,15 +150,16 @@ export class Grid<E extends EventList = Record<string, any>>
   update(): void {
     if (!this.layoutDirty) return
 
+    const layoutEntries = this.childEntries.filter(entry => isNovaUiLayoutDisplayed(entry.node))
     const result = this.engine.compute({
       props: this.props,
       width: this.width,
       height: this.height,
-      entries: this.childEntries,
+      entries: layoutEntries,
     })
     this.columnCount = result.columnCount
 
-    for (const entry of this.childEntries) {
+    for (const entry of layoutEntries) {
       if (rectEquals(entry.prevRect, entry.nextRect)) continue
 
       const changed = applyNodeLayoutRect(entry.node as NovaNode<any>, entry.nextRect)
@@ -256,6 +259,8 @@ export class Grid<E extends EventList = Record<string, any>>
 
   protected override onPropsChanged(changedKeys: Array<keyof GridResolvedProps>): void {
     this.props = normalizeGridProps(this.props)
+    this.applyDisplayState()
+    if (changedKeys.includes('display')) this.markLayoutAncestorsDirty()
     if (hasGridLayoutChanges(changedKeys)) this.layoutDirty = true
     if (!this.externalLayout && hasGridGeometryChanges(changedKeys)) {
       this.applyResolvedRect({
@@ -327,6 +332,23 @@ export class Grid<E extends EventList = Record<string, any>>
 
     this.subtreeStyleMask = mask
   }
+
+  private applyDisplayState(): void {
+    const displayed = this.props.display !== 'none'
+    this.visible = displayed
+    this.active = displayed
+  }
+
+  private markLayoutAncestorsDirty(): void {
+    let parent = this.parent
+    while (parent) {
+      const api = typeof (parent as { getApi?: () => unknown }).getApi === 'function'
+        ? (parent as { getApi: () => { relayout?: () => void } }).getApi()
+        : null
+      api?.relayout?.()
+      parent = parent.parent
+    }
+  }
 }
 
 function hasGridGeometryChanges(keys: Array<keyof GridResolvedProps>): boolean {
@@ -349,5 +371,6 @@ function hasGridLayoutChanges(keys: Array<keyof GridResolvedProps>): boolean {
     || keys.includes('rowHeight')
     || keys.includes('alignItems')
     || keys.includes('justifyItems')
+    || keys.includes('display')
   )
 }

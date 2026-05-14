@@ -3,10 +3,17 @@ import {
   normalizeStyleClasses,
   readNovaUiStyleIdentityProps,
 } from '@/shared/style/identity/style-identity'
+import {
+  NOVA_UI_RESPONSIVE_VARIANT_RANK,
+  isNovaUiResponsiveVariantActive,
+  matchesNovaUiMediaQuery,
+  resolveNovaUiResponsiveVariant,
+} from '@/shared/style/cascade/style-media'
 import type {
   NovaUiCompiledStyleRule,
   NovaUiCompiledStyleSheet,
   NovaUiStyleComponentName,
+  NovaUiStyleMediaContext,
   NovaUiStyleSelector,
   NovaUiStyleSelectorPart,
   NovaUiStylableNode,
@@ -16,6 +23,7 @@ interface StyleNodeIdentity {
   type: NovaUiStyleComponentName
   id: string
   classes: Array<string>
+  classRanks: Map<string, number>
   attrs: Record<string, string | number | boolean>
 }
 
@@ -82,10 +90,11 @@ export function compileStyleSheetIndexes(
 export function matchStyleRules(
   node: NovaUiStylableNode,
   styleSheet: NovaUiCompiledStyleSheet,
+  mediaContext?: NovaUiStyleMediaContext,
 ): Array<NovaUiCompiledStyleRule> {
   if (styleSheet.rules.length === 0) return []
 
-  const identity = readStyleNodeIdentity(node)
+  const identity = readStyleNodeIdentity(node, mediaContext)
   const candidates: Array<NovaUiCompiledStyleRule> = []
   const seen = new Set<NovaUiCompiledStyleRule>()
 
@@ -96,29 +105,46 @@ export function matchStyleRules(
     collectCandidates(candidates, seen, styleSheet.byClass.get(className))
   }
 
-  const matched = candidates.filter(rule => selectorMatchesWithIdentity(node, identity, rule.selector))
+  const matched: Array<{ rule: NovaUiCompiledStyleRule; variantRank: number }> = []
+  for (const rule of candidates) {
+    if (!matchesNovaUiMediaQuery(rule.media, mediaContext)) continue
+
+    const variantRank = selectorMatchRankWithIdentity(node, identity, rule.selector, mediaContext)
+    if (variantRank < 0) continue
+    matched.push({ rule, variantRank })
+  }
+
   matched.sort((left, right) => {
-    const specificityDiff = left.selector.specificity - right.selector.specificity
-    return specificityDiff || left.order - right.order
+    const specificityDiff = left.rule.selector.specificity - right.rule.selector.specificity
+    const variantDiff = left.variantRank - right.variantRank
+    return specificityDiff || variantDiff || left.rule.order - right.rule.order
   })
 
-  return matched
+  return matched.map(item => item.rule)
 }
 
 /** Проверяет, подходит ли selector к node с учетом ancestor chain. */
-export function selectorMatches(node: NovaUiStylableNode, selector: NovaUiStyleSelector): boolean {
-  return selectorMatchesWithIdentity(node, readStyleNodeIdentity(node), selector)
+export function selectorMatches(
+  node: NovaUiStylableNode,
+  selector: NovaUiStyleSelector,
+  mediaContext?: NovaUiStyleMediaContext,
+): boolean {
+  return selectorMatchRankWithIdentity(node, readStyleNodeIdentity(node, mediaContext), selector, mediaContext) >= 0
 }
 
-function selectorMatchesWithIdentity(
+function selectorMatchRankWithIdentity(
   node: NovaUiStylableNode,
   identity: StyleNodeIdentity,
   selector: NovaUiStyleSelector,
-): boolean {
+  mediaContext?: NovaUiStyleMediaContext,
+): number {
   let current: NovaNode<any> | null = node
   let partIndex = selector.parts.length - 1
+  let variantRank = 0
 
-  if (!matchesIdentityPart(identity, selector.parts[partIndex])) return false
+  const ownPartRank = matchIdentityPartRank(identity, selector.parts[partIndex])
+  if (ownPartRank < 0) return -1
+  variantRank = Math.max(variantRank, ownPartRank)
   partIndex -= 1
 
   while (partIndex >= 0) {
@@ -127,68 +153,105 @@ function selectorMatchesWithIdentity(
 
     if (combinator === 'child') {
       current = current.parent instanceof Object ? current.parent as NovaNode<any> : null
-      if (!current || !matchesPart(current, part)) return false
+      const partRank = current ? matchPartRank(current, part, mediaContext) : -1
+      if (partRank < 0) return -1
+      variantRank = Math.max(variantRank, partRank)
       partIndex -= 1
       continue
     }
 
-    current = findAncestorMatching(current, part)
-    if (!current) return false
+    const ancestor = findAncestorMatching(current, part, mediaContext)
+    if (!ancestor.node) return -1
+    current = ancestor.node
+    variantRank = Math.max(variantRank, ancestor.rank)
     partIndex -= 1
   }
 
-  return true
+  return variantRank
 }
 
 function findAncestorMatching(
   node: NovaNode<any>,
   part: NovaUiStyleSelectorPart,
-): NovaNode<any> | null {
+  mediaContext?: NovaUiStyleMediaContext,
+): { node: NovaNode<any> | null; rank: number } {
   let parent = node.parent
 
   while (parent) {
-    if (matchesPart(parent, part)) return parent as NovaNode<any>
+    const rank = matchPartRank(parent, part, mediaContext)
+    if (rank >= 0) return { node: parent as NovaNode<any>, rank }
     parent = parent.parent
   }
 
-  return null
+  return { node: null, rank: -1 }
 }
 
-function matchesPart(node: unknown, part: NovaUiStyleSelectorPart): boolean {
-  if (!isStylableNode(node)) return false
+function matchPartRank(
+  node: unknown,
+  part: NovaUiStyleSelectorPart,
+  mediaContext?: NovaUiStyleMediaContext,
+): number {
+  if (!isStylableNode(node)) return -1
 
-  return matchesIdentityPart(readStyleNodeIdentity(node), part)
+  return matchIdentityPartRank(readStyleNodeIdentity(node, mediaContext), part)
 }
 
-function matchesIdentityPart(identity: StyleNodeIdentity, part: NovaUiStyleSelectorPart): boolean {
-  if (part.type && identity.type !== part.type) return false
-  if (part.id && identity.id !== part.id) return false
+function matchIdentityPartRank(identity: StyleNodeIdentity, part: NovaUiStyleSelectorPart): number {
+  if (part.type && identity.type !== part.type) return -1
+  if (part.id && identity.id !== part.id) return -1
+
+  let variantRank = 0
 
   for (const className of part.classes) {
-    if (!identity.classes.includes(className)) return false
+    const classRank = identity.classRanks.get(className)
+    if (classRank === undefined) return -1
+    variantRank = Math.max(variantRank, classRank)
   }
 
   for (const [name, expected] of Object.entries(part.attrs)) {
     const actual = identity.attrs[name]
     if (expected === true) {
-      if (actual === undefined) return false
+      if (actual === undefined) return -1
     } else if (String(actual) !== expected) {
-      return false
+      return -1
     }
   }
 
-  return true
+  return variantRank
 }
 
-function readStyleNodeIdentity(node: NovaUiStylableNode): StyleNodeIdentity {
+function readStyleNodeIdentity(
+  node: NovaUiStylableNode,
+  mediaContext?: NovaUiStyleMediaContext,
+): StyleNodeIdentity {
   const props = readNovaUiStyleIdentityProps(node)
+  const rawClasses = normalizeStyleClasses(props.className)
+  const classRanks = new Map<string, number>()
+
+  for (const className of rawClasses) {
+    registerClassRank(classRanks, className, NOVA_UI_RESPONSIVE_VARIANT_RANK.base)
+
+    const responsive = resolveNovaUiResponsiveVariant(className)
+    if (!responsive || !isNovaUiResponsiveVariantActive(responsive.variant, mediaContext)) continue
+
+    registerClassRank(
+      classRanks,
+      responsive.className,
+      NOVA_UI_RESPONSIVE_VARIANT_RANK[responsive.variant],
+    )
+  }
 
   return {
     type: resolveComponentName(node),
     id: node.componentId,
-    classes: normalizeStyleClasses(props.className),
+    classes: [...classRanks.keys()],
+    classRanks,
     attrs: props.attrs ?? {},
   }
+}
+
+function registerClassRank(target: Map<string, number>, className: string, rank: number): void {
+  target.set(className, Math.max(target.get(className) ?? 0, rank))
 }
 
 function resolveComponentName(node: NovaUiStylableNode): NovaUiStyleComponentName {

@@ -85,6 +85,7 @@ export class TextBlock<E extends EventList = Record<string, any>>
       : resolvedProps
     super(app, surface, descriptor, initialProps, options)
     this.__type = 'TextBlock'
+    this.applyDisplayState()
     this.explicitTopLevelStyleMask = textBlockTopLevelStyleMask(props)
     this.localStyleMask = inheritedTextStyleMask(resolvedProps.style)
     this.effectiveTextStyle = resolveTextBlockEffectiveStyle(
@@ -235,6 +236,8 @@ export class TextBlock<E extends EventList = Record<string, any>>
       this.explicitTopLevelStyleMask,
     )
     const styleChangedMask = diffInheritedTextStyle(previousStyle, this.effectiveTextStyle)
+    this.applyDisplayState()
+    if (changedKeys.includes('display')) this.markLayoutAncestorsDirty()
     if (hasTextBlockLayoutChanges(changedKeys) || (styleChangedMask & TEXT_BLOCK_LAYOUT_STYLE_MASK) !== 0) {
       this._layout = null
     }
@@ -317,6 +320,23 @@ export class TextBlock<E extends EventList = Record<string, any>>
       () => measureNovaUiTextWidth(text, options),
     )
   )
+
+  private applyDisplayState(): void {
+    const displayed = this.props.display !== 'none'
+    this.visible = displayed
+    this.active = displayed
+  }
+
+  private markLayoutAncestorsDirty(): void {
+    let parent = this.parent
+    while (parent) {
+      const api = typeof (parent as { getApi?: () => unknown }).getApi === 'function'
+        ? (parent as { getApi: () => { relayout?: () => void } }).getApi()
+        : null
+      api?.relayout?.()
+      parent = parent.parent
+    }
+  }
 }
 
 function hasGeometryChanges(keys: Array<keyof TextBlockResolvedProps>): boolean {

@@ -30,6 +30,7 @@ import {
   applyNodeLayoutRect,
   copyRect,
   createLayoutRect,
+  isNovaUiLayoutDisplayed,
   rectEquals,
   type NovaUiLayoutRect,
   type NovaUiLayoutTarget,
@@ -79,6 +80,7 @@ export class Flex<E extends EventList = Record<string, any>>
     const resolvedProps = normalizeFlexProps(props)
     super(app, surface, descriptor, resolvedProps, options)
     this.__type = 'Flex'
+    this.applyDisplayState()
     this.api = {
       setChildren: children => this.setChildren(children),
       setChildLayout: (id, layout) => this.setChildLayout(id, layout),
@@ -174,14 +176,15 @@ export class Flex<E extends EventList = Record<string, any>>
   update(): void {
     if (!this.layoutDirty) return
 
+    const layoutEntries = this.childEntries.filter(entry => isNovaUiLayoutDisplayed(entry.node))
     this.engine.compute({
       props: this.props,
       width: this.width,
       height: this.height,
-      entries: this.childEntries,
+      entries: layoutEntries,
     })
 
-    for (const entry of this.childEntries) {
+    for (const entry of layoutEntries) {
       if (rectEquals(entry.prevRect, entry.nextRect)) continue
 
       const changed = applyNodeLayoutRect(entry.node as NovaNode<any>, entry.nextRect)
@@ -281,6 +284,8 @@ export class Flex<E extends EventList = Record<string, any>>
 
   protected override onPropsChanged(_changedKeys: Array<keyof FlexResolvedProps>): void {
     this.props = normalizeFlexProps(this.props)
+    this.applyDisplayState()
+    if (_changedKeys.includes('display')) this.markLayoutAncestorsDirty()
     if (hasFlexLayoutChanges(_changedKeys)) this.layoutDirty = true
     if (!this.externalLayout && hasFlexGeometryChanges(_changedKeys)) {
       this.applyResolvedRect({
@@ -337,6 +342,23 @@ export class Flex<E extends EventList = Record<string, any>>
 
     this.subtreeStyleMask = mask
   }
+
+  private applyDisplayState(): void {
+    const displayed = this.props.display !== 'none'
+    this.visible = displayed
+    this.active = displayed
+  }
+
+  private markLayoutAncestorsDirty(): void {
+    let parent = this.parent
+    while (parent) {
+      const api = typeof (parent as { getApi?: () => unknown }).getApi === 'function'
+        ? (parent as { getApi: () => { relayout?: () => void } }).getApi()
+        : null
+      api?.relayout?.()
+      parent = parent.parent
+    }
+  }
 }
 
 function hasFlexGeometryChanges(keys: Array<keyof FlexResolvedProps>): boolean {
@@ -355,5 +377,6 @@ function hasFlexLayoutChanges(keys: Array<keyof FlexResolvedProps>): boolean {
     || keys.includes('padding')
     || keys.includes('justifyContent')
     || keys.includes('alignItems')
+    || keys.includes('display')
   )
 }

@@ -7,6 +7,7 @@ import type {
   NovaUiBorder,
   NovaUiInheritedTextStyle,
   NovaUiStyleDiagnostic,
+  NovaUiStyleDisplay,
   NovaUiStyleInspectionDebug,
   NovaUiStyleSheetAsset,
   NovaUiStyleTokenResolver,
@@ -30,6 +31,7 @@ export interface RootProps extends NovaUiStyleIdentityProps {
   background?: string
   border?: NovaUiBorder
   clip?: boolean
+  display?: NovaUiStyleDisplay
   cursor?: NovaCursorDeclaration
   cursorContext?: NovaCursorContext
 }
@@ -46,6 +48,7 @@ export interface RootResolvedProps extends NovaUiStyleIdentityProps {
   background?: string
   border?: NovaUiBorder
   clip: boolean
+  display: NovaUiStyleDisplay
   cursor?: NovaCursorDeclaration
   cursorContext?: NovaCursorContext
 }

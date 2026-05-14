@@ -3,6 +3,7 @@ import type {
   NovaUiBorder,
   NovaUiFontStyle,
   NovaUiInheritedTextStyle,
+  NovaUiStyleDisplay,
   NovaUiStyleIdentityProps,
 } from '@/shared/style'
 import type { NovaUiSpacing } from '@/shared/layout'
@@ -41,6 +42,7 @@ export interface TextBlockProps extends NovaUiMotionOptions, NovaUiStyleIdentity
   style?: NovaUiInheritedTextStyle
   background?: string
   border?: NovaUiBorder
+  display?: NovaUiStyleDisplay
 }
 
 export interface TextBlockResolvedPadding {
@@ -73,6 +75,7 @@ export interface TextBlockResolvedProps {
   style?: NovaUiInheritedTextStyle
   background?: string
   border?: NovaUiBorder
+  display: NovaUiStyleDisplay
   className?: string | Array<string>
   attrs?: NovaUiStyleIdentityProps['attrs']
 }

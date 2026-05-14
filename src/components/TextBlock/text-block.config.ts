@@ -50,6 +50,7 @@ export const TEXT_BLOCK_RENDER_DIRTY_KEYS: ReadonlyArray<keyof TextBlockResolved
   'opacity',
   'background',
   'border',
+  'display',
   'style',
 ]
 
@@ -71,6 +72,7 @@ export const TEXT_BLOCK_FIELD_DEFINITIONS = {
   maxLines: { type: 'number' },
   wordBreak: { type: 'string' },
   style: { type: 'style' },
+  display: { type: 'string' },
   motion: { type: 'motion' },
   className: { type: 'string' },
   attrs: { type: 'record' },

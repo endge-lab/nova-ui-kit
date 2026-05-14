@@ -15,6 +15,8 @@ import type {
   NovaUiStyleComponentName,
   NovaUiStyleDeclarations,
   NovaUiStyleDiagnostic,
+  NovaUiStyleDisplay,
+  NovaUiStyleMediaQuery,
   NovaUiStyleSelector,
   NovaUiStyleSelectorCombinator,
   NovaUiStyleSelectorPart,
@@ -70,6 +72,7 @@ interface ParsedStyleRule {
   selector: string
   body: string
   offset: number
+  media?: NovaUiStyleMediaQuery
 }
 
 /** Валидирует CSS-подобный stylesheet и возвращает compiled rules для Root. */
@@ -91,6 +94,7 @@ export function validateNovaUiStyleSheetSource(source: string): NovaUiStyleValid
         selector,
         declarations,
         order,
+        media: parsedRule.media,
         rightMostClasses: [],
       })
       order += 1
@@ -123,6 +127,7 @@ function parseStyleRules(
   diagnostics: Array<NovaUiStyleDiagnostic>,
   parentSelectors: Array<string> = [],
   baseOffset = 0,
+  inheritedMedia?: NovaUiStyleMediaQuery,
 ): Array<ParsedStyleRule> {
   const rules: Array<ParsedStyleRule> = []
   let cursor = 0
@@ -151,6 +156,35 @@ function parseStyleRules(
       continue
     }
 
+    if (prelude.startsWith('@media')) {
+      if (separator === ';') {
+        diagnostics.push(createDiagnostic('error', 'invalid-media-rule', `Невалидный @media "${prelude}".`, originalSource, baseOffset + preludeStart))
+        cursor = blockStart + 1
+        continue
+      }
+
+      const media = parseMediaQuery(prelude, originalSource, baseOffset + preludeStart, diagnostics)
+      const blockEnd = findMatchingBrace(cleanedSource, blockStart)
+      if (blockEnd < 0) {
+        diagnostics.push(createDiagnostic('error', 'unclosed-rule', `Незакрытый @media "${prelude}".`, originalSource, baseOffset + blockStart))
+        break
+      }
+
+      if (media) {
+        rules.push(...parseStyleRules(
+          cleanedSource.slice(blockStart + 1, blockEnd),
+          originalSource,
+          diagnostics,
+          parentSelectors,
+          baseOffset + blockStart + 1,
+          mergeMediaQueries(inheritedMedia, media),
+        ))
+      }
+
+      cursor = blockEnd + 1
+      continue
+    }
+
     if (separator === ';') {
       diagnostics.push(createDiagnostic('error', 'invalid-rule', `Невалидная декларация вне selector "${prelude}".`, originalSource, baseOffset + preludeStart))
       cursor = blockStart + 1
@@ -172,6 +206,7 @@ function parseStyleRules(
           selector,
           body: split.declarations,
           offset: baseOffset + blockStart + 1,
+          media: inheritedMedia,
         })
       }
     }
@@ -184,6 +219,7 @@ function parseStyleRules(
         diagnostics,
         selectors,
         baseOffset + blockStart + 1 + nested.offset,
+        inheritedMedia,
       ))
     }
 
@@ -191,6 +227,66 @@ function parseStyleRules(
   }
 
   return rules
+}
+
+function parseMediaQuery(
+  prelude: string,
+  source: string,
+  offset: number,
+  diagnostics: Array<NovaUiStyleDiagnostic>,
+): NovaUiStyleMediaQuery | null {
+  const condition = prelude.replace(/^@media\s*/, '').trim()
+  if (!condition) {
+    diagnostics.push(createDiagnostic('error', 'invalid-media-rule', 'Пустой @media condition.', source, offset))
+    return null
+  }
+
+  const normalized = condition.startsWith('canvas')
+    ? condition.slice('canvas'.length).trim().replace(/^and\s+/i, '')
+    : condition
+
+  if (condition.startsWith('viewport')) {
+    diagnostics.push(createDiagnostic('error', 'unsupported-media-target', '@media viewport не поддерживается; NovaCSS media считаются относительно canvas/root.', source, offset))
+    return null
+  }
+
+  const parts = normalized
+    .split(/\s+and\s+/i)
+    .map(part => part.trim())
+    .filter(Boolean)
+  const features: NovaUiStyleMediaQuery['features'] = []
+
+  for (const part of parts) {
+    const match = part.match(/^\(\s*(min-width|max-width|min-height|max-height)\s*:\s*([0-9]+(?:\.[0-9]+)?)(?:px)?\s*\)$/)
+    if (!match) {
+      diagnostics.push(createDiagnostic('error', 'invalid-media-feature', `Неподдерживаемое @media условие "${part}".`, source, offset))
+      return null
+    }
+
+    features.push({
+      name: match[1] as NovaUiStyleMediaQuery['features'][number]['name'],
+      value: Number(match[2]),
+    })
+  }
+
+  if (features.length === 0) {
+    diagnostics.push(createDiagnostic('error', 'invalid-media-rule', 'Пустой @media condition.', source, offset))
+    return null
+  }
+
+  return { features }
+}
+
+function mergeMediaQueries(
+  parent: NovaUiStyleMediaQuery | undefined,
+  child: NovaUiStyleMediaQuery,
+): NovaUiStyleMediaQuery {
+  return {
+    features: [
+      ...(parent?.features ?? []),
+      ...child.features,
+    ],
+  }
 }
 
 function splitRuleBody(body: string): {
@@ -459,9 +555,10 @@ function parseSelectorPart(raw: string): NovaUiStyleSelectorPart | null {
       continue
     }
 
-    const classMatch = rest.match(/^\.([\w-]+)/)
+    const classMatch = rest.match(/^\.((?:\\.|[\w-])*)/)
     if (classMatch) {
-      part.classes.push(classMatch[1])
+      if (!classMatch[1]) return null
+      part.classes.push(unescapeSelectorIdentifier(classMatch[1]))
       cursor += classMatch[0].length
       continue
     }
@@ -540,6 +637,7 @@ function parseDeclarationValue(
 
   if (key === 'clip') return parseBoolean(value, diagnostics, source, offset)
   if (key === 'cursor') return parseCursor(value, diagnostics, source, offset)
+  if (key === 'display') return parseDisplay(value, diagnostics, source, offset)
   if (value.startsWith('var(') && NUMERIC_KEYS.has(key)) return value
   if (NUMERIC_KEYS.has(key)) return parseFiniteNumber(value, diagnostics, source, offset)
   if (key === 'padding') return parseSpacing(value, diagnostics, source, offset)
@@ -627,6 +725,10 @@ function applyParsedDeclaration(
     target.spacing = { ...target.spacing, padding: value as NovaUiSpacing }
     return
   }
+  if (key === 'display') {
+    target.layout = { ...target.layout, display: value as NovaUiStyleDisplay }
+    return
+  }
   if (key === 'gap' || key === 'rowGap' || key === 'columnGap') {
     target.layout = { ...target.layout, [key]: value as number }
     return
@@ -646,6 +748,18 @@ function applyParsedDeclaration(
   if (key === 'cursor') {
     target.cursor = value as never
   }
+}
+
+function parseDisplay(
+  value: string,
+  diagnostics: Array<NovaUiStyleDiagnostic>,
+  source: string,
+  offset: number,
+): NovaUiStyleDisplay | null {
+  if (value === 'none' || value === 'normal') return value
+
+  diagnostics.push(createDiagnostic('error', 'unsupported-display', `display поддерживает только none или normal, получено "${value}".`, source, offset))
+  return null
 }
 
 function parseSpacing(
@@ -814,6 +928,10 @@ function stripCommentsPreservePositions(source: string): string {
 
 function stripQuotes(value: string): string {
   return value.replace(/^['"]|['"]$/g, '')
+}
+
+function unescapeSelectorIdentifier(value: string): string {
+  return value.replace(/\\(.)/g, '$1')
 }
 
 function createDiagnostic(

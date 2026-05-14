@@ -41,6 +41,7 @@ export const FLEX_FIELD_DEFINITIONS = {
   style: { type: 'style' },
   background: { type: 'string' },
   clip: { type: 'boolean' },
+  display: { type: 'string' },
   motion: { type: 'motion' },
   className: { type: 'string' },
   attrs: { type: 'record' },
@@ -67,6 +68,7 @@ export function normalizeFlexProps(props: FlexProps = {}): FlexResolvedProps {
     background: props.background,
     border: props.border,
     clip: props.clip ?? false,
+    display: props.display ?? 'normal',
     className: props.className,
     attrs: props.attrs,
   }
@@ -99,6 +101,7 @@ export function createFlexDescriptor(createNode?: FlexNodeFactory): FlexDescript
         'background',
         'border',
         'clip',
+        'display',
         'className',
         'attrs',
       ],

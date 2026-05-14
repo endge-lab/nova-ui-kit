@@ -30,6 +30,14 @@ export function isNovaUiLayoutTarget(node: unknown): node is NovaNode<any> & Nov
   return !!node && (node as Partial<NovaUiLayoutTarget>)[NOVA_UI_LAYOUT_TARGET] === true
 }
 
+/** UI Kit-level display:none исключает node из layout без удаления instance. */
+export function isNovaUiLayoutDisplayed(node: unknown): boolean {
+  if (!node || typeof node !== 'object' || !('getProps' in node)) return true
+
+  const props = (node as { getProps: () => Record<string, unknown> }).getProps()
+  return props.display !== 'none'
+}
+
 /** Применяет rect к UI Kit target или к обычному NovaNode через options. */
 export function applyNodeLayoutRect(node: NovaNode<any>, rect: NovaUiLayoutRect): boolean {
   if (isNovaUiLayoutTarget(node)) return node.applyLayoutRect(rect)

@@ -1,4 +1,6 @@
 export * from '@/shared/style/cascade/style-selector-matcher'
 export * from '@/shared/style/cascade/style-sheet'
+export * from '@/shared/style/cascade/style-media'
 export * from '@/shared/style/cascade/style-token-resolver'
 export * from '@/shared/style/cascade/global-style-registry'
+export * from '@/shared/style/cascade/built-in-style-sheet'
