@@ -644,6 +644,66 @@ describe('Nova UI Kit components', () => {
     app.destroy()
   })
 
+  it('reflows UI Kit layout-target panes when SplitPane sizes change', () => {
+    const app = createApp()
+    const surface = app.createSurface('split-pane-layout-target')
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'split-layout-root',
+      props: { width: 300, height: 120 },
+      children: [
+        {
+          type: NovaUIKit.SplitPane,
+          id: 'split-layout',
+          props: {
+            width: 300,
+            height: 120,
+            sizes: [120, 180],
+            resizer: { hitSize: 10 },
+          },
+          children: [
+            {
+              type: NovaUIKit.Flex,
+              id: 'split-layout-left',
+              children: [
+                {
+                  type: NovaUIKit.TextBlock,
+                  id: 'split-layout-left-label',
+                  props: { text: 'Left', layout: { width: 'fill', height: 'fill' } },
+                },
+              ],
+            },
+            {
+              type: NovaUIKit.Flex,
+              id: 'split-layout-right',
+              children: [
+                {
+                  type: NovaUIKit.TextBlock,
+                  id: 'split-layout-right-label',
+                  props: { text: 'Right', layout: { width: 'fill', height: 'fill' } },
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    })
+    app.raph.run()
+    app.raph.run()
+
+    const leftLabel = app.components.require('split-layout-left-label')
+    expect(leftLabel.width).toBe(120)
+
+    app.components.requireApi<SplitPaneApi>('split-layout').setSizes([180, 120])
+    app.raph.run()
+    app.raph.run()
+
+    expect(leftLabel.width).toBe(180)
+
+    app.destroy()
+  })
+
   it('emits ScrollArea semantic scroll lifecycle and fallback part clicks without duplicating slot chrome clicks', () => {
     vi.useFakeTimers()
     const app = createApp()

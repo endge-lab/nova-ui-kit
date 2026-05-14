@@ -19,6 +19,7 @@ import {
   buildBoxSchema,
   clamp,
 } from '@/shared/component'
+import { applyNodeLayoutRect } from '@/shared/layout'
 
 export class SplitPane<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<SplitPaneResolvedProps, SplitPaneApi, SplitPaneProps, E> {
@@ -64,10 +65,8 @@ export class SplitPane<E extends EventList = Record<string, any>>
   update(): void {
     this.ensureResizer()
     const { first, second, resizer } = this.resolveRects()
-    this.panes[0]?.options(first)
-    this.panes[1]?.options(second)
-    this.panes[0]?.dirty({ matrix: true, update: true, render: true })
-    this.panes[1]?.dirty({ matrix: true, update: true, render: true })
+    this.applyPaneRect(0, first)
+    this.applyPaneRect(1, second)
     this.resizerNode?.options({
       ...resizer,
       color: this.props.resizer.color,
@@ -77,6 +76,14 @@ export class SplitPane<E extends EventList = Record<string, any>>
       minSize: 0,
       maxSize: Number.POSITIVE_INFINITY,
     })
+  }
+
+  private applyPaneRect(index: number, rect: { x: number; y: number; width: number; height: number }): void {
+    const pane = this.panes[index]
+    if (!pane) return
+
+    const changed = applyNodeLayoutRect(pane, rect)
+    if (changed) pane.dirty({ matrix: true, update: true, render: true })
   }
 
   render(): void {
