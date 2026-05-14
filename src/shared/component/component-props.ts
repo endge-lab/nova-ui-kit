@@ -3,12 +3,14 @@ import type {
   NovaApp,
   NovaComponentDescriptor,
   NovaComponentSchema,
+  NovaSyncPortMap,
   NovaCursorContext,
   NovaCursorDeclaration,
   NovaSchema,
   NovaSoundCueInput,
   NovaSurface,
 } from '@endge/nova'
+import { createNovaSyncPort } from '@endge/nova'
 import type { EventList } from '@endge/utils'
 import type { NovaUiMotionOptions } from '@/domain/domain.types'
 import {
@@ -401,6 +403,58 @@ export abstract class NovaUiComponentNode<
 
   protected override onMount(): void {
     requireNovaUiRoot(this)
+    super.onMount()
+  }
+
+  override getSyncPorts(): NovaSyncPortMap {
+    const ports = super.getSyncPorts()
+    const geometryPort = (name: 'x' | 'y' | 'width' | 'height') => createNovaSyncPort<number>({
+      read: () => this.layoutRect[name],
+      write: value => {
+        this.setProps({ [name]: value } as Partial<TProps>)
+        this.applyResolvedRect({
+          ...this.layoutRect,
+          [name]: value,
+        })
+      },
+    })
+
+    return {
+      ...ports,
+      x: geometryPort('x'),
+      y: geometryPort('y'),
+      width: geometryPort('width'),
+      height: geometryPort('height'),
+      layoutRect: createNovaSyncPort<NovaUiLayoutRect>({
+        read: () => ({ ...this.layoutRect }),
+        write: rect => {
+          this.setProps({
+            x: rect.x,
+            y: rect.y,
+            width: rect.width,
+            height: rect.height,
+          } as Partial<TProps>)
+          this.applyLayoutRect(rect)
+        },
+        equals: rectEquals,
+      }),
+      opacity: createNovaSyncPort<number>({
+        read: () => this.opacity,
+        write: value => this.setProps({ opacity: value } as Partial<TProps>),
+      }),
+      active: createNovaSyncPort<boolean>({
+        read: () => this.active,
+        write: value => {
+          this.active = value
+        },
+      }),
+      visible: createNovaSyncPort<boolean>({
+        read: () => this.visible,
+        write: value => {
+          this.visible = value
+        },
+      }),
+    }
   }
 
   /**
@@ -462,6 +516,11 @@ export abstract class NovaUiComponentNode<
       height: rect.height,
     })
     this.dirty({ matrix: true, update: sizeChanged, render: true })
+    this.notifySyncPortChanged('x', rect.x)
+    this.notifySyncPortChanged('y', rect.y)
+    this.notifySyncPortChanged('width', rect.width)
+    this.notifySyncPortChanged('height', rect.height)
+    this.notifySyncPortChanged('layoutRect', { ...this.layoutRect })
     return true
   }
 
