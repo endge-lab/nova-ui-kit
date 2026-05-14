@@ -507,9 +507,10 @@ function parseDeclarations(
       continue
     }
 
-    const key = declaration.slice(0, separatorIndex).trim()
+    const rawKey = declaration.slice(0, separatorIndex).trim()
+    const key = normalizeStyleDeclarationKey(rawKey)
     const value = declaration.slice(separatorIndex + 1).trim()
-    const parsed = parseDeclarationValue(key, value, diagnostics, source, offset)
+    const parsed = parseDeclarationValue(key, value, diagnostics, source, offset, rawKey)
     if (parsed === null) continue
 
     applyParsedDeclaration(declarations, key, parsed)
@@ -530,9 +531,10 @@ function parseDeclarationValue(
   diagnostics: Array<NovaUiStyleDiagnostic>,
   source: string,
   offset: number,
+  displayKey = key,
 ): unknown {
   if (!value) {
-    diagnostics.push(createDiagnostic('error', 'empty-value', `Пустое значение "${key}".`, source, offset))
+    diagnostics.push(createDiagnostic('error', 'empty-value', `Пустое значение "${displayKey}".`, source, offset))
     return null
   }
 
@@ -543,8 +545,14 @@ function parseDeclarationValue(
   if (key === 'padding') return parseSpacing(value, diagnostics, source, offset)
   if (STRING_KEYS.has(key)) return stripQuotes(value)
 
-  diagnostics.push(createDiagnostic('warning', 'unknown-declaration', `Неизвестная декларация "${key}" проигнорирована.`, source, offset))
+  diagnostics.push(createDiagnostic('warning', 'unknown-declaration', `Неизвестная декларация "${displayKey}" проигнорирована.`, source, offset))
   return null
+}
+
+function normalizeStyleDeclarationKey(key: string): string {
+  return key.includes('-')
+    ? key.replace(/-([a-zA-Z0-9])/g, (_match, char: string) => char.toUpperCase())
+    : key
 }
 
 function applyParsedDeclaration(
