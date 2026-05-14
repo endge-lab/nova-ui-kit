@@ -13,6 +13,14 @@ export interface SplitPaneResizerProps {
   overlayColor?: string
 }
 
+export interface SplitPaneResizePayload {
+  width?: number
+  height?: number
+  delta: number
+  rect: { x: number; y: number; width: number; height: number }
+  event: MouseEvent
+}
+
 export interface SplitPaneProps extends NovaUiCommonProps {
   direction?: SplitPaneDirection
   sizes?: [number, number]
@@ -20,6 +28,9 @@ export interface SplitPaneProps extends NovaUiCommonProps {
   maxSizes?: [number, number]
   resizer?: SplitPaneResizerProps
   collapsedPane?: SplitPaneCollapsedPane
+  onResizeStart?: (payload: SplitPaneResizePayload) => void
+  onResize?: (payload: SplitPaneResizePayload) => void
+  onResizeEnd?: (payload: SplitPaneResizePayload) => void
 }
 
 export interface SplitPaneResolvedProps extends NovaUiCommonResolvedProps {
@@ -29,6 +40,9 @@ export interface SplitPaneResolvedProps extends NovaUiCommonResolvedProps {
   maxSizes: [number, number]
   resizer: Required<SplitPaneResizerProps>
   collapsedPane: SplitPaneCollapsedPane
+  onResizeStart?: (payload: SplitPaneResizePayload) => void
+  onResize?: (payload: SplitPaneResizePayload) => void
+  onResizeEnd?: (payload: SplitPaneResizePayload) => void
 }
 
 export interface SplitPaneChildSchema<TProps = Record<string, any>> extends NovaElementSchema<TProps> {}

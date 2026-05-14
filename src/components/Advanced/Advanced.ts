@@ -44,7 +44,7 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
     this.api = {
       setProps: patch => this.setProps(patch),
       setValue: (value, event) => this.setValue(value, event),
-      setOpen: open => this.setProps({ open }),
+      setOpen: (open, event) => this.setOpen(open, event),
       toggle: event => this.toggle(event),
       getProps: () => this.props,
     }
@@ -68,6 +68,16 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
     this.setProps({ value })
     this.playUiSound('change')
     this.props.onChange?.(value, event)
+    this.props.onValueChange?.(value, event)
+    this.props.onInput?.(value, event)
+  }
+
+  setOpen(open: boolean, event?: Event): void {
+    if (this.props.open === open) return
+    this.setProps({ open, expanded: open })
+    this.props.onOpenChange?.(open, event)
+    if (open) this.props.onShow?.(event)
+    else this.props.onHide?.(event)
   }
 
   toggle(event?: Event): void {
@@ -76,9 +86,10 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
       this.setProps({ checked: next, value: next })
       this.playUiSound('change')
       this.props.onChange?.(next, event)
+      this.props.onValueChange?.(next, event)
       return
     }
-    this.setProps({ open: !this.props.open, expanded: !this.props.expanded })
+    this.setOpen(!this.props.open, event)
   }
 
   render(): void {
@@ -422,6 +433,10 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
       if (index >= 0 && this.props.items[index]) {
         const item = this.props.items[index]
         this.props.onPress?.(item, index, event)
+        if (this.props.kind === 'Tabs' || this.props.kind === 'Stepper') {
+          this.setProps({ activeIndex: index })
+          if (this.props.kind === 'Stepper') this.props.onStepChange?.(index, event)
+        }
         this.setValue(item.value ?? index, event)
       }
       this.dirty({ render: true })

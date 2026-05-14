@@ -34,6 +34,12 @@ export const SCROLL_AREA_FIELD_DEFINITIONS = {
   axis: { type: 'string' },
   wheelMultiplier: { type: 'number' },
   scrollbar: { type: 'record' },
+  onScroll: { type: 'function' },
+  onScrollStart: { type: 'function' },
+  onScrollEnd: { type: 'function' },
+  onThumbClick: { type: 'function' },
+  onTrackClick: { type: 'function' },
+  onScrollbarClick: { type: 'function' },
 } as const
 
 export function normalizeScrollAreaProps(props: ScrollAreaProps = {}): ScrollAreaResolvedProps {
@@ -62,6 +68,12 @@ export function normalizeScrollAreaProps(props: ScrollAreaProps = {}): ScrollAre
     axis: props.axis ?? 'both',
     wheelMultiplier: Math.max(0, finiteNumber(props.wheelMultiplier, 1)),
     scrollbar: props.scrollbar ?? {},
+    onScroll: props.onScroll,
+    onScrollStart: props.onScrollStart,
+    onScrollEnd: props.onScrollEnd,
+    onThumbClick: props.onThumbClick,
+    onTrackClick: props.onTrackClick,
+    onScrollbarClick: props.onScrollbarClick,
   }
 }
 
@@ -75,7 +87,20 @@ export function createScrollAreaDescriptor(createNode?: ScrollAreaNodeFactory): 
     dirtyPolicy: {
       matrix: NOVA_UI_COMMON_DIRTY_POLICY.matrix,
       update: [...NOVA_UI_COMMON_DIRTY_POLICY.update, 'contentWidth', 'contentHeight', 'scrollbarVisibility', 'scrollbar', 'axis'],
-      render: [...NOVA_UI_COMMON_DIRTY_POLICY.render, 'scrollX', 'scrollY', 'scrollbarIdleDelay', 'scrollbarFadeDuration', 'wheelMultiplier'],
+      render: [
+        ...NOVA_UI_COMMON_DIRTY_POLICY.render,
+        'scrollX',
+        'scrollY',
+        'scrollbarIdleDelay',
+        'scrollbarFadeDuration',
+        'wheelMultiplier',
+        'onScroll',
+        'onScrollStart',
+        'onScrollEnd',
+        'onThumbClick',
+        'onTrackClick',
+        'onScrollbarClick',
+      ],
     },
     fields: SCROLL_AREA_FIELD_DEFINITIONS,
     normalize: schema => normalizeScrollAreaProps(schema.props),

@@ -25,6 +25,7 @@ export const TOGGLE_FIELD_DEFINITIONS = {
   checked: { type: 'boolean' },
   label: { type: 'string' },
   onChange: { type: 'function' },
+  onValueChange: { type: 'function' },
 } as const
 
 export function normalizeToggleProps(props: ToggleProps = {}): ToggleResolvedProps {
@@ -42,6 +43,7 @@ export function normalizeToggleProps(props: ToggleProps = {}): ToggleResolvedPro
     checked: props.checked ?? false,
     label: props.label ?? '',
     onChange: props.onChange,
+    onValueChange: props.onValueChange,
   }
 }
 
@@ -55,7 +57,7 @@ export function createToggleDescriptor(createNode?: ToggleNodeFactory): ToggleDe
     dirtyPolicy: {
       matrix: NOVA_UI_COMMON_DIRTY_POLICY.matrix,
       update: [...NOVA_UI_COMMON_DIRTY_POLICY.update, 'label'],
-      render: [...NOVA_UI_COMMON_DIRTY_POLICY.render, 'checked', 'onChange'],
+      render: [...NOVA_UI_COMMON_DIRTY_POLICY.render, 'checked', 'onChange', 'onValueChange'],
     },
     fields: TOGGLE_FIELD_DEFINITIONS,
     normalize: schema => normalizeToggleProps(schema.props),

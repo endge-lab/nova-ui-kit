@@ -8,6 +8,7 @@ export interface CheckboxProps extends NovaUiCommonProps {
   indeterminate?: boolean
   label?: string
   onChange?: (checked: boolean, event?: Event) => void
+  onValueChange?: (checked: boolean, event?: Event) => void
 }
 
 export interface CheckboxResolvedProps extends NovaUiCommonResolvedProps {
@@ -15,6 +16,7 @@ export interface CheckboxResolvedProps extends NovaUiCommonResolvedProps {
   indeterminate: boolean
   label: string
   onChange?: (checked: boolean, event?: Event) => void
+  onValueChange?: (checked: boolean, event?: Event) => void
 }
 
 export type CheckboxSchema = NovaComponentSchema<CheckboxProps>

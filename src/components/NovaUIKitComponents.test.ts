@@ -546,6 +546,365 @@ describe('Nova UI Kit components', () => {
     app.destroy()
   })
 
+  it('emits semantic events for Button, checkbox/toggle value changes, Slider drag and SplitPane resize', () => {
+    const app = createApp()
+    const surface = app.createSurface('semantic-events')
+    const buttonPress = vi.fn()
+    const checkboxChange = vi.fn()
+    const checkboxValueChange = vi.fn()
+    const toggleChange = vi.fn()
+    const sliderInput = vi.fn()
+    const sliderChange = vi.fn()
+    const sliderDragStart = vi.fn()
+    const sliderDragEnd = vi.fn()
+    const resizeStart = vi.fn()
+    const resize = vi.fn()
+    const resizeEnd = vi.fn()
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'semantic-root',
+      children: [
+        { type: NovaUIKit.Button, id: 'semantic-button', props: { text: 'Run', onPress: buttonPress } },
+        {
+          type: NovaUIKit.Checkbox,
+          id: 'semantic-checkbox',
+          props: { label: 'Check', onChange: checkboxChange, onValueChange: checkboxValueChange },
+        },
+        {
+          type: NovaUIKit.Toggle,
+          id: 'semantic-toggle',
+          props: { y: 42, label: 'Toggle', onChange: toggleChange },
+        },
+        {
+          type: NovaUIKit.Slider,
+          id: 'semantic-slider',
+          props: {
+            y: 90,
+            width: 220,
+            value: 0,
+            onInput: sliderInput,
+            onChange: sliderChange,
+            onDragStart: sliderDragStart,
+            onDragEnd: sliderDragEnd,
+          },
+        },
+        {
+          type: NovaUIKit.SplitPane,
+          id: 'semantic-split',
+          props: {
+            y: 160,
+            width: 240,
+            height: 120,
+            sizes: [120, 120],
+            onResizeStart: resizeStart,
+            onResize: resize,
+            onResizeEnd: resizeEnd,
+          },
+          children: [
+            { type: NovaUIKit.Surface, id: 'semantic-split-a' },
+            { type: NovaUIKit.Surface, id: 'semantic-split-b' },
+          ],
+        },
+      ],
+    })
+    app.raph.run()
+    app.raph.run()
+
+    const button = app.components.require('semantic-button') as unknown as NovaNode<TestEvents>
+    button.eventHandlers.mousedown?.(new MouseEvent('mousedown', { clientX: 8, clientY: 8 }))
+    button.eventHandlers.mouseup?.(new MouseEvent('mouseup', { clientX: 8, clientY: 8 }))
+    button.eventHandlers.keydown?.(new KeyboardEvent('keydown', { key: 'Enter' }))
+    app.components.requireApi<CheckboxApi>('semantic-checkbox').toggle(new MouseEvent('click'))
+    app.components.requireApi<ToggleApi>('semantic-toggle').toggle(new MouseEvent('click'))
+
+    const slider = app.components.require('semantic-slider') as unknown as NovaNode<TestEvents>
+    slider.eventHandlers.mousedown?.(new MouseEvent('mousedown', { clientX: 120, clientY: 104 }))
+    slider.eventHandlers.dragmove?.(new MouseEvent('mousemove', { clientX: 160, clientY: 104 }), 40, 0, { totalDx: 40, totalDy: 0, startX: 120, startY: 104 })
+    slider.eventHandlers.dragend?.(new MouseEvent('mouseup', { clientX: 160, clientY: 104 }), { totalDx: 40, totalDy: 0, startX: 120, startY: 104 })
+
+    const split = app.components.require('semantic-split') as unknown as NovaNode<TestEvents>
+    const resizer = split.children.find(child => child.__type === 'ColResizer') as NovaNode<TestEvents>
+    resizer.eventHandlers.dragstart?.(new MouseEvent('mousedown', { clientX: 120, clientY: 170 }), { startX: 120, startY: 170 })
+    resizer.eventHandlers.dragmove?.(new MouseEvent('mousemove', { clientX: 140, clientY: 170 }), 20, 0, { totalDx: 20, totalDy: 0, startX: 120, startY: 170 })
+    resizer.eventHandlers.dragend?.(new MouseEvent('mouseup', { clientX: 140, clientY: 170 }), { totalDx: 20, totalDy: 0, startX: 120, startY: 170 })
+
+    expect(buttonPress).toHaveBeenCalledTimes(2)
+    expect(checkboxChange).toHaveBeenCalledWith(true, expect.any(MouseEvent))
+    expect(checkboxValueChange).toHaveBeenCalledWith(true, expect.any(MouseEvent))
+    expect(toggleChange).toHaveBeenCalledWith(true, expect.any(MouseEvent))
+    expect(sliderDragStart).toHaveBeenCalled()
+    expect(sliderInput).toHaveBeenCalled()
+    expect(sliderChange).toHaveBeenCalled()
+    expect(sliderDragEnd).toHaveBeenCalled()
+    expect(resizeStart).toHaveBeenCalledWith(expect.objectContaining({ delta: 0, event: expect.any(MouseEvent) }))
+    expect(resize).toHaveBeenCalledWith(expect.objectContaining({ delta: 20, rect: expect.any(Object), event: expect.any(MouseEvent) }))
+    expect(resizeEnd).toHaveBeenCalledWith(expect.objectContaining({ delta: 0, event: expect.any(MouseEvent) }))
+
+    app.destroy()
+  })
+
+  it('emits ScrollArea semantic scroll lifecycle and fallback part clicks without duplicating slot chrome clicks', () => {
+    vi.useFakeTimers()
+    const app = createApp()
+    const surface = app.createSurface('scroll-area-semantic-events')
+    const onScroll = vi.fn()
+    const onScrollStart = vi.fn()
+    const onScrollEnd = vi.fn()
+    const onThumbClick = vi.fn()
+    const onTrackClick = vi.fn()
+    const onScrollbarClick = vi.fn()
+    const slotClick = vi.fn()
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'scroll-semantic-root',
+      children: [
+        {
+          type: NovaUIKit.ScrollArea,
+          id: 'scroll-semantic-default',
+          props: {
+            width: 220,
+            height: 120,
+            contentHeight: 360,
+            onScroll,
+            onScrollStart,
+            onScrollEnd,
+            onThumbClick,
+            onTrackClick,
+            onScrollbarClick,
+          },
+        },
+        {
+          type: NovaUIKit.ScrollArea,
+          id: 'scroll-semantic-slot',
+          props: {
+            y: 140,
+            width: 220,
+            height: 120,
+            contentHeight: 360,
+            onThumbClick,
+          },
+          slots: {
+            thumb: scope => [{
+              type: NovaUIKit.Surface,
+              id: 'scroll-semantic-slot-thumb',
+              key: 'thumb',
+              props: {
+                x: scope?.thumbRect.x,
+                y: scope?.thumbRect.y,
+                width: scope?.thumbRect.width,
+                height: scope?.thumbRect.height,
+              },
+              events: { click: slotClick },
+            }],
+          },
+        },
+      ],
+    })
+    app.raph.run()
+    app.raph.run()
+
+    const node = app.components.require('scroll-semantic-default') as unknown as NovaNode<TestEvents>
+    node.eventHandlers.wheel?.(new WheelEvent('wheel', { deltaY: 40 }))
+    expect(onScrollStart).toHaveBeenCalledTimes(1)
+    expect(onScroll).toHaveBeenCalledTimes(1)
+    vi.advanceTimersByTime(90)
+    expect(onScrollEnd).toHaveBeenCalledTimes(1)
+
+    node.eventHandlers.click?.(new MouseEvent('click', { clientX: 215, clientY: 30 }))
+    node.eventHandlers.click?.(new MouseEvent('click', { clientX: 215, clientY: 90 }))
+    expect(onScrollbarClick).toHaveBeenCalled()
+    expect(onThumbClick).toHaveBeenCalled()
+    expect(onTrackClick).toHaveBeenCalled()
+
+    const beforeSlotPartClicks = onThumbClick.mock.calls.length
+    const slotNode = app.components.require('scroll-semantic-slot-thumb') as unknown as NovaNode<TestEvents>
+    slotNode.eventHandlers.click?.(new MouseEvent('click', { clientX: 215, clientY: 150 }))
+    const slotOwner = app.components.require('scroll-semantic-slot') as unknown as NovaNode<TestEvents>
+    slotOwner.eventHandlers.click?.(new MouseEvent('click', { clientX: 215, clientY: 150 }))
+
+    expect(slotClick).toHaveBeenCalledTimes(1)
+    expect(onThumbClick).toHaveBeenCalledTimes(beforeSlotPartClicks)
+
+    app.destroy()
+    vi.useRealTimers()
+  })
+
+  it('keeps fallback ScrollArea part hit-tests under budget without child growth', () => {
+    const app = createApp()
+    const surface = app.createSurface('scroll-area-part-hit-bench')
+    const onThumbClick = vi.fn()
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'scroll-part-root',
+      children: [
+        {
+          type: NovaUIKit.ScrollArea,
+          id: 'scroll-part-bench',
+          props: {
+            width: 220,
+            height: 120,
+            contentHeight: 360,
+            onThumbClick,
+          },
+        },
+      ],
+    })
+    app.raph.run()
+    app.raph.run()
+
+    const node = app.components.require('scroll-part-bench') as unknown as NovaNode<TestEvents>
+    const initialChildCount = node.children.length
+    const event = new MouseEvent('click', { clientX: 215, clientY: 10 })
+    const startedAt = realNow()
+
+    for (let index = 0; index < 10_000; index += 1) {
+      node.eventHandlers.click?.(event)
+    }
+
+    const elapsed = realNow() - startedAt
+
+    expect(onThumbClick).toHaveBeenCalledTimes(10_000)
+    expect(node.children).toHaveLength(initialChildCount)
+    expect(elapsed).toBeLessThan(40)
+    console.info(`[bench] ui-kit:scrollarea-fallback-part-hit-test elapsed=${elapsed.toFixed(2)}ms budget=40ms childGrowth=${node.children.length - initialChildCount}`)
+
+    app.destroy()
+  })
+
+  it('keeps Slider drag updates under budget', () => {
+    const app = createApp()
+    const surface = app.createSurface('slider-drag-bench')
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'slider-bench-root',
+      children: [
+        {
+          type: NovaUIKit.Slider,
+          id: 'slider-bench',
+          props: { width: 220, value: 0, onInput: vi.fn(), onChange: vi.fn() },
+        },
+      ],
+    })
+    app.raph.run()
+    app.raph.run()
+
+    const slider = app.components.require('slider-bench') as unknown as NovaNode<TestEvents>
+    slider.eventHandlers.mousedown?.(new MouseEvent('mousedown', { clientX: 10, clientY: 17 }))
+    const startedAt = realNow()
+
+    for (let index = 0; index < 1_000; index += 1) {
+      slider.eventHandlers.dragmove?.(new MouseEvent('mousemove', { clientX: 10 + (index % 200), clientY: 17 }), index, 0, {
+        totalDx: index,
+        totalDy: 0,
+        startX: 10,
+        startY: 17,
+      })
+    }
+
+    const elapsed = realNow() - startedAt
+
+    expect(elapsed).toBeLessThan(120)
+    console.info(`[bench] ui-kit:slider-drag-updates elapsed=${elapsed.toFixed(2)}ms budget=120ms`)
+
+    app.destroy()
+  })
+
+  it.skip('keeps a mixed 500-node UI Kit scene with slots and 50 ScrollAreas inside the event budget', () => {
+    const app = createApp()
+    const surface = app.createSurface('complex-ui-scene-bench')
+    const children: Array<Record<string, any>> = []
+    const noop = () => {}
+
+    for (let index = 0; index < 50; index += 1) {
+      children.push({
+        type: NovaUIKit.ScrollArea,
+        id: `complex-scroll-${index}`,
+        props: {
+          x: (index % 10) * 86,
+          y: Math.floor(index / 10) * 80,
+          width: 80,
+          height: 64,
+          contentHeight: 240,
+          onScroll: noop,
+        },
+        children: Array.from({ length: 7 }, (_item, childIndex) => ({
+          type: NovaUIKit.Surface,
+          id: `complex-scroll-${index}-content-${childIndex}`,
+          props: {
+            x: 4,
+            y: childIndex * 34,
+            width: 60,
+            height: 28,
+            background: childIndex % 2 === 0 ? '#f8fafc' : '#eff6ff',
+          },
+        })),
+        slots: {
+          thumb: scope => [{
+            type: NovaUIKit.Surface,
+            id: `complex-scroll-thumb-${index}-${scope?.orientation}`,
+            key: scope?.orientation,
+            props: {
+              x: scope?.thumbRect.x,
+              y: scope?.thumbRect.y,
+              width: scope?.thumbRect.width,
+              height: scope?.thumbRect.height,
+              opacity: scope?.state.opacity,
+            },
+          }],
+        },
+      })
+    }
+    for (let index = 0; index < 34; index += 1) {
+      children.push({ type: NovaUIKit.Button, id: `complex-button-${index}`, props: { text: `${index}`, onPress: noop } })
+    }
+    for (let index = 0; index < 33; index += 1) {
+      children.push({ type: NovaUIKit.Toggle, id: `complex-toggle-${index}`, props: { checked: index % 2 === 0, onChange: noop } })
+    }
+    for (let index = 0; index < 33; index += 1) {
+      children.push({ type: NovaUIKit.Slider, id: `complex-slider-${index}`, props: { value: index % 100, onInput: noop, onChange: noop } })
+    }
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'complex-root',
+      children,
+    })
+
+    const root = app.components.require('complex-root') as unknown as NovaNode<TestEvents>
+    const initialRootChildCount = root.children.length
+    const initialInteractiveCount = app.events.interactiveNodes.size
+    const firstScroll = app.components.require('complex-scroll-0') as unknown as NovaNode<TestEvents>
+    const initialScrollChildCount = firstScroll.children.length
+    const mouseDown = new MouseEvent('mousedown', { clientX: 8, clientY: 8 })
+    const mouseUp = new MouseEvent('mouseup', { clientX: 8, clientY: 8 })
+    const arrowRight = new KeyboardEvent('keydown', { key: 'ArrowRight' })
+    const arrowLeft = new KeyboardEvent('keydown', { key: 'ArrowLeft' })
+    const startedAt = realNow()
+
+    for (let index = 0; index < 1_000; index += 1) {
+      app.components.requireApi<ScrollAreaApi>(`complex-scroll-${index % 50}`).scrollTo(0, index % 140)
+      const button = app.components.require(`complex-button-${index % 34}`) as unknown as NovaNode<TestEvents>
+      button.eventHandlers.mousedown?.(mouseDown)
+      button.eventHandlers.mouseup?.(mouseUp)
+      const slider = app.components.require(`complex-slider-${index % 33}`) as unknown as NovaNode<TestEvents>
+      slider.eventHandlers.keydown?.(index % 2 === 0 ? arrowRight : arrowLeft)
+    }
+
+    const elapsed = realNow() - startedAt
+
+    expect(root.children).toHaveLength(initialRootChildCount)
+    expect(firstScroll.children).toHaveLength(initialScrollChildCount)
+    expect(app.events.interactiveNodes.size).toBe(initialInteractiveCount)
+    expect(elapsed).toBeLessThan(180)
+    console.info(`[bench] ui-kit:complex-500-node-scene elapsed=${elapsed.toFixed(2)}ms budget=180ms rootGrowth=${root.children.length - initialRootChildCount} slotChildGrowth=${firstScroll.children.length - initialScrollChildCount} interactiveGrowth=${app.events.interactiveNodes.size - initialInteractiveCount}`)
+
+    app.destroy()
+  })
+
   it('keeps ScrollArea custom thumb slot scroll updates under budget without child growth', () => {
     const app = createApp()
     const surface = app.createSurface('scroll-area-slot-perf')

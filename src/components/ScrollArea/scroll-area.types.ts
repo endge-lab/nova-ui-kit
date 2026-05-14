@@ -8,6 +8,8 @@ export const SCROLL_AREA_SCHEMA_TYPE = 'nova-ui.scroll-area'
 export type ScrollbarVisibility = 'auto' | 'active' | 'always' | 'hidden'
 export type ScrollAreaAxis = 'x' | 'y' | 'both'
 export type ScrollAreaSlotName = 'scrollbar' | 'scrollbar-x' | 'scrollbar-y' | 'track' | 'thumb' | 'corner'
+export type ScrollAreaOrientation = 'horizontal' | 'vertical'
+export type ScrollAreaPartName = 'thumb' | 'track' | 'scrollbar'
 
 export interface ScrollAreaProps extends NovaUiCommonProps {
   scrollX?: number
@@ -20,6 +22,12 @@ export interface ScrollAreaProps extends NovaUiCommonProps {
   axis?: ScrollAreaAxis
   wheelMultiplier?: number
   scrollbar?: Partial<ScrollbarProps>
+  onScroll?: (state: ScrollAreaState, event?: Event) => void
+  onScrollStart?: (state: ScrollAreaState, event?: Event) => void
+  onScrollEnd?: (state: ScrollAreaState, event?: Event) => void
+  onThumbClick?: (context: ScrollAreaPartEventContext, event: MouseEvent) => void
+  onTrackClick?: (context: ScrollAreaPartEventContext, event: MouseEvent) => void
+  onScrollbarClick?: (context: ScrollAreaPartEventContext, event: MouseEvent) => void
 }
 
 export interface ScrollAreaResolvedProps extends NovaUiCommonResolvedProps {
@@ -33,6 +41,12 @@ export interface ScrollAreaResolvedProps extends NovaUiCommonResolvedProps {
   axis: ScrollAreaAxis
   wheelMultiplier: number
   scrollbar: Partial<ScrollbarProps>
+  onScroll?: (state: ScrollAreaState, event?: Event) => void
+  onScrollStart?: (state: ScrollAreaState, event?: Event) => void
+  onScrollEnd?: (state: ScrollAreaState, event?: Event) => void
+  onThumbClick?: (context: ScrollAreaPartEventContext, event: MouseEvent) => void
+  onTrackClick?: (context: ScrollAreaPartEventContext, event: MouseEvent) => void
+  onScrollbarClick?: (context: ScrollAreaPartEventContext, event: MouseEvent) => void
 }
 
 export interface ScrollAreaChildSchema<TProps = Record<string, any>> extends NovaElementSchema<TProps> {}
@@ -56,7 +70,7 @@ export interface ScrollAreaVisualState {
 }
 
 export interface ScrollAreaSlotContext {
-  orientation: 'horizontal' | 'vertical'
+  orientation: ScrollAreaOrientation
   state: ScrollAreaVisualState
   metrics: ScrollbarState
   thumbRect: NovaUiLayoutRect
@@ -65,6 +79,15 @@ export interface ScrollAreaSlotContext {
     scrollTo: (value: number) => void
     scrollBy: (delta: number) => void
   }
+}
+
+export interface ScrollAreaPartEventContext {
+  part: ScrollAreaPartName
+  orientation: ScrollAreaOrientation
+  state: ScrollAreaVisualState
+  metrics: ScrollbarState
+  thumbRect: NovaUiLayoutRect
+  trackRect: NovaUiLayoutRect
 }
 
 export interface ScrollAreaCornerSlotContext {

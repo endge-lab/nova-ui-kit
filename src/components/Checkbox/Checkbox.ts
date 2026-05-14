@@ -54,6 +54,7 @@ export class Checkbox<E extends EventList = Record<string, any>>
     this.setProps({ checked, indeterminate: false })
     this.playUiSound('change')
     this.props.onChange?.(checked, event)
+    this.props.onValueChange?.(checked, event)
   }
 
   render(): void {

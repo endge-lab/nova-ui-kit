@@ -29,6 +29,9 @@ export const SPLIT_PANE_FIELD_DEFINITIONS = {
   maxSizes: { type: 'tuple' },
   resizer: { type: 'record' },
   collapsedPane: { type: 'string' },
+  onResizeStart: { type: 'function' },
+  onResize: { type: 'function' },
+  onResizeEnd: { type: 'function' },
 } as const
 
 export function normalizeSplitPaneProps(props: SplitPaneProps = {}): SplitPaneResolvedProps {
@@ -51,6 +54,9 @@ export function normalizeSplitPaneProps(props: SplitPaneProps = {}): SplitPaneRe
       overlayColor: props.resizer?.overlayColor ?? 'rgba(37,99,235,0.14)',
     },
     collapsedPane: props.collapsedPane ?? null,
+    onResizeStart: props.onResizeStart,
+    onResize: props.onResize,
+    onResizeEnd: props.onResizeEnd,
   }
 }
 
@@ -64,7 +70,7 @@ export function createSplitPaneDescriptor(createNode?: SplitPaneNodeFactory): Sp
     dirtyPolicy: {
       matrix: NOVA_UI_COMMON_DIRTY_POLICY.matrix,
       update: [...NOVA_UI_COMMON_DIRTY_POLICY.update, 'direction', 'sizes', 'minSizes', 'maxSizes', 'resizer', 'collapsedPane'],
-      render: NOVA_UI_COMMON_DIRTY_POLICY.render,
+      render: [...NOVA_UI_COMMON_DIRTY_POLICY.render, 'onResizeStart', 'onResize', 'onResizeEnd'],
     },
     fields: SPLIT_PANE_FIELD_DEFINITIONS,
     normalize: schema => normalizeSplitPaneProps(schema.props),

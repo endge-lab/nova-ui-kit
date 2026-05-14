@@ -17,6 +17,9 @@ import type {
   ScrollAreaApi,
   ScrollAreaChildSchema,
   ScrollAreaCornerSlotContext,
+  ScrollAreaOrientation,
+  ScrollAreaPartEventContext,
+  ScrollAreaPartName,
   ScrollAreaProps,
   ScrollAreaResolvedProps,
   ScrollAreaSlotContext,
@@ -31,8 +34,10 @@ import {
 } from '@/shared/component'
 import { applyNodeLayoutRect } from '@/shared/layout'
 import type { NovaUiLayoutRect } from '@/shared/layout'
+import { hitTestRectPart, toLocalEventPoint, type NovaUiEventPoint, type NovaUiRectPart } from '@/shared/component'
 
 type ScrollbarOrientation = 'horizontal' | 'vertical'
+type ScrollAreaFallbackPartKey = 'horizontal-thumb' | 'horizontal-track' | 'vertical-thumb' | 'vertical-track'
 
 export class ScrollArea<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<ScrollAreaResolvedProps, ScrollAreaApi, ScrollAreaProps, E> {
@@ -43,10 +48,18 @@ export class ScrollArea<E extends EventList = Record<string, any>>
   private readonly api: ScrollAreaApi
   private slots: NovaTemplateSlots = {}
   private idleTimer = 0
+  private scrollEndTimer = 0
   private lastScrollbarActivityAt = 0
   private scrollSyncPending = false
   private scrollVersion = 0
   private flushedScrollVersion = 0
+  private scrollLifecycleActive = false
+  private readonly partEventPoint: NovaUiEventPoint = { x: 0, y: 0 }
+  private readonly fallbackParts: Array<NovaUiRectPart<ScrollAreaFallbackPartKey>> = []
+  private verticalTrackRect: NovaUiLayoutRect = { x: 0, y: 0, width: 0, height: 0 }
+  private verticalThumbRect: NovaUiLayoutRect = { x: 0, y: 0, width: 0, height: 0 }
+  private horizontalTrackRect: NovaUiLayoutRect = { x: 0, y: 0, width: 0, height: 0 }
+  private horizontalThumbRect: NovaUiLayoutRect = { x: 0, y: 0, width: 0, height: 0 }
   private visualState: ScrollAreaVisualState = {
     hovered: false,
     scrolling: false,
@@ -102,13 +115,16 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     this.dirty({ update: true, render: true })
   }
 
-  scrollTo(x: number, y: number): void {
+  scrollTo(x: number, y: number, event?: Event): void {
     const nextX = clamp(Number.isFinite(x) ? x : 0, 0, Math.max(0, this.props.contentWidth - this.props.width))
     const nextY = clamp(Number.isFinite(y) ? y : 0, 0, Math.max(0, this.props.contentHeight - this.props.height))
     if (nextX === this.props.scrollX && nextY === this.props.scrollY) return
+    this.emitScrollStart(event)
     this.markScrollbarsActive(false)
     this.props.scrollX = nextX
     this.props.scrollY = nextY
+    this.props.onScroll?.(this.getScrollState(), event)
+    this.scheduleScrollEnd(event)
     this.scrollVersion += 1
     if (!this.scrollSyncPending) {
       this.scrollSyncPending = true
@@ -182,8 +198,13 @@ export class ScrollArea<E extends EventList = Record<string, any>>
       this.scrollTo(
         this.props.scrollX + dx,
         this.props.scrollY + dy,
+        event,
       )
       return false
+    })
+    this.on('click', event => {
+      if (this.props.disabled) return
+      this.emitFallbackPartClick(event)
     })
   }
 
@@ -206,7 +227,7 @@ export class ScrollArea<E extends EventList = Record<string, any>>
         id: `${this.componentId}-scrollbar-y`,
         props: {
           orientation: 'vertical',
-          onChange: (value: number) => this.scrollTo(this.props.scrollX, value),
+          onChange: (value: number, event?: Event) => this.scrollTo(this.props.scrollX, value, event),
         },
       }) as NovaNode<E>
     }
@@ -219,7 +240,7 @@ export class ScrollArea<E extends EventList = Record<string, any>>
         id: `${this.componentId}-scrollbar-x`,
         props: {
           orientation: 'horizontal',
-          onChange: (value: number) => this.scrollTo(value, this.props.scrollY),
+          onChange: (value: number, event?: Event) => this.scrollTo(value, this.props.scrollY, event),
         },
       }) as NovaNode<E>
     }
@@ -240,6 +261,7 @@ export class ScrollArea<E extends EventList = Record<string, any>>
         visible: false,
         opacity: 0,
       }
+      this.fallbackParts.length = 0
       return
     }
 
@@ -272,6 +294,11 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     }
     const verticalThumbRect = this.resolveThumbRect('vertical', verticalTrackRect)
     const horizontalThumbRect = this.resolveThumbRect('horizontal', horizontalTrackRect)
+    this.verticalTrackRect = verticalTrackRect
+    this.verticalThumbRect = verticalThumbRect
+    this.horizontalTrackRect = horizontalTrackRect
+    this.horizontalThumbRect = horizontalThumbRect
+    this.syncFallbackParts(showX, showY)
 
     this.verticalScrollbar?.options({
       x: verticalTrackRect.x,
@@ -459,6 +486,22 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     this.reconcileSlot('corner', this.slots.corner(context))
   }
 
+  private syncFallbackParts(showX: boolean, showY: boolean): void {
+    this.fallbackParts.length = 0
+    if (showY && !this.hasCustomScrollbar('vertical')) {
+      this.fallbackParts.push(
+        { part: 'vertical-track', rect: this.verticalTrackRect },
+        { part: 'vertical-thumb', rect: this.verticalThumbRect },
+      )
+    }
+    if (showX && !this.hasCustomScrollbar('horizontal')) {
+      this.fallbackParts.push(
+        { part: 'horizontal-track', rect: this.horizontalTrackRect },
+        { part: 'horizontal-thumb', rect: this.horizontalThumbRect },
+      )
+    }
+  }
+
   private createSlotContext(
     orientation: ScrollbarOrientation,
     trackRect: NovaUiLayoutRect,
@@ -481,6 +524,45 @@ export class ScrollArea<E extends EventList = Record<string, any>>
           else this.scrollTo(this.props.scrollX + delta, this.props.scrollY)
         },
       },
+    }
+  }
+
+  private emitScrollStart(event?: Event): void {
+    if (this.scrollLifecycleActive) return
+    this.scrollLifecycleActive = true
+    this.props.onScrollStart?.(this.getScrollState(), event)
+  }
+
+  private scheduleScrollEnd(event?: Event): void {
+    window.clearTimeout(this.scrollEndTimer)
+    this.scrollEndTimer = window.setTimeout(() => {
+      this.scrollEndTimer = 0
+      this.scrollLifecycleActive = false
+      this.props.onScrollEnd?.(this.getScrollState(), event)
+    }, 80)
+  }
+
+  private emitFallbackPartClick(event: MouseEvent): void {
+    if (this.fallbackParts.length === 0) return
+    const part = hitTestRectPart(this.fallbackParts, toLocalEventPoint(this, event, this.partEventPoint))
+    if (!part) return
+    const orientation: ScrollAreaOrientation = part.startsWith('vertical') ? 'vertical' : 'horizontal'
+    const semanticPart: ScrollAreaPartName = part.endsWith('thumb') ? 'thumb' : 'track'
+    const context = this.createPartEventContext(semanticPart, orientation)
+    this.props.onScrollbarClick?.({ ...context, part: 'scrollbar' }, event)
+    if (semanticPart === 'thumb') this.props.onThumbClick?.(context, event)
+    else this.props.onTrackClick?.(context, event)
+  }
+
+  private createPartEventContext(part: ScrollAreaPartName, orientation: ScrollAreaOrientation): ScrollAreaPartEventContext {
+    const vertical = orientation === 'vertical'
+    return {
+      part,
+      orientation,
+      state: { ...this.visualState },
+      metrics: vertical ? this.getScrollState().y : this.getScrollState().x,
+      thumbRect: { ...(vertical ? this.verticalThumbRect : this.horizontalThumbRect) },
+      trackRect: { ...(vertical ? this.verticalTrackRect : this.horizontalTrackRect) },
     }
   }
 
@@ -516,6 +598,7 @@ export class ScrollArea<E extends EventList = Record<string, any>>
 
   override dispose(): void {
     window.clearTimeout(this.idleTimer)
+    window.clearTimeout(this.scrollEndTimer)
     this.clearSlotRuntimes()
     super.dispose()
   }

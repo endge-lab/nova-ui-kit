@@ -10,6 +10,9 @@ export interface TooltipProps extends NovaUiCommonProps {
   placement?: TooltipPlacement
   delay?: number
   open?: boolean
+  onOpenChange?: (open: boolean, event?: Event) => void
+  onShow?: (event?: Event) => void
+  onHide?: (event?: Event) => void
 }
 
 export interface TooltipResolvedProps extends NovaUiCommonResolvedProps {
@@ -17,6 +20,9 @@ export interface TooltipResolvedProps extends NovaUiCommonResolvedProps {
   placement: TooltipPlacement
   delay: number
   open: boolean
+  onOpenChange?: (open: boolean, event?: Event) => void
+  onShow?: (event?: Event) => void
+  onHide?: (event?: Event) => void
 }
 
 export interface TooltipSchema extends NovaComponentSchema<TooltipProps> {
@@ -25,9 +31,9 @@ export interface TooltipSchema extends NovaComponentSchema<TooltipProps> {
 }
 
 export interface TooltipApi {
-  open: () => void
-  close: () => void
-  toggle: () => void
+  open: (event?: Event) => void
+  close: (event?: Event) => void
+  toggle: (event?: Event) => void
   setProps: (patch: TooltipProps) => void
   getProps: () => Readonly<TooltipResolvedProps>
 }

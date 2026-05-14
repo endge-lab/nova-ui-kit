@@ -27,6 +27,9 @@ export const TOOLTIP_FIELD_DEFINITIONS = {
   placement: { type: 'string' },
   delay: { type: 'number' },
   open: { type: 'boolean' },
+  onOpenChange: { type: 'function' },
+  onShow: { type: 'function' },
+  onHide: { type: 'function' },
 } as const
 
 export function normalizeTooltipProps(props: TooltipProps = {}): TooltipResolvedProps {
@@ -43,6 +46,9 @@ export function normalizeTooltipProps(props: TooltipProps = {}): TooltipResolved
     placement: props.placement ?? 'top',
     delay: Math.max(0, finiteNumber(props.delay, 180)),
     open: props.open ?? false,
+    onOpenChange: props.onOpenChange,
+    onShow: props.onShow,
+    onHide: props.onHide,
   }
 }
 
@@ -56,7 +62,7 @@ export function createTooltipDescriptor(createNode?: TooltipNodeFactory): Toolti
     dirtyPolicy: {
       matrix: NOVA_UI_COMMON_DIRTY_POLICY.matrix,
       update: [...NOVA_UI_COMMON_DIRTY_POLICY.update, 'content', 'placement'],
-      render: [...NOVA_UI_COMMON_DIRTY_POLICY.render, 'delay', 'open'],
+      render: [...NOVA_UI_COMMON_DIRTY_POLICY.render, 'delay', 'open', 'onOpenChange', 'onShow', 'onHide'],
     },
     fields: TOOLTIP_FIELD_DEFINITIONS,
     normalize: schema => normalizeTooltipProps(schema.props),

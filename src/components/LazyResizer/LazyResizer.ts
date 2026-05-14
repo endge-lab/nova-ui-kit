@@ -252,15 +252,21 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
           break
       }
 
+      if (this._isHover === isNearLine) return false
+
       this._isHover = isNearLine
       this.animateHoverLine(isNearLine)
       this.dirty({ render: true })
+      return false
     })
 
     this.on('mouseleave', () => {
+      if (!this._isHover) return false
+
       this._isHover = false
       this.animateHoverLine(false)
       this.dirty({ render: true })
+      return false
     })
   }
 

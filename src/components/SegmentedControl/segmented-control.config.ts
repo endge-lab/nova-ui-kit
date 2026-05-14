@@ -27,6 +27,7 @@ export const SEGMENTED_CONTROL_FIELD_DEFINITIONS = {
   value: { type: 'string' },
   size: { type: 'string' },
   onChange: { type: 'function' },
+  onValueChange: { type: 'function' },
 } as const
 
 export function normalizeSegmentedControlProps(props: SegmentedControlProps = {}): SegmentedControlResolvedProps {
@@ -48,6 +49,7 @@ export function normalizeSegmentedControlProps(props: SegmentedControlProps = {}
     value,
     size,
     onChange: props.onChange,
+    onValueChange: props.onValueChange,
   }
 }
 
@@ -61,7 +63,7 @@ export function createSegmentedControlDescriptor(createNode?: SegmentedControlNo
     dirtyPolicy: {
       matrix: NOVA_UI_COMMON_DIRTY_POLICY.matrix,
       update: [...NOVA_UI_COMMON_DIRTY_POLICY.update, 'items', 'size'],
-      render: [...NOVA_UI_COMMON_DIRTY_POLICY.render, 'value', 'onChange'],
+      render: [...NOVA_UI_COMMON_DIRTY_POLICY.render, 'value', 'onChange', 'onValueChange'],
     },
     fields: SEGMENTED_CONTROL_FIELD_DEFINITIONS,
     normalize: schema => normalizeSegmentedControlProps(schema.props),

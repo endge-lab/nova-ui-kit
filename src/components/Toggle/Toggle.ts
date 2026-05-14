@@ -52,6 +52,7 @@ export class Toggle<E extends EventList = Record<string, any>>
     this.setProps({ checked })
     this.playUiSound('change')
     this.props.onChange?.(checked, event)
+    this.props.onValueChange?.(checked, event)
   }
 
   render(): void {

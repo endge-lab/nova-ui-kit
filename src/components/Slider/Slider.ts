@@ -51,6 +51,7 @@ export class Slider<E extends EventList = Record<string, any>>
     this.setProps({ value: next })
     this.playUiSound('change')
     this.props.onChange?.(next, event)
+    this.props.onValueChange?.(next, event)
   }
 
   render(): void {
@@ -124,19 +125,27 @@ export class Slider<E extends EventList = Record<string, any>>
       }
       this.focus(event)
       this.dragging = true
-      this.setValue(this.valueFromEvent(event), event)
+      const next = this.valueFromEvent(event)
+      this.props.onDragStart?.(this.props.value, event)
+      this.props.onInput?.(next, event)
+      this.setValue(next, event)
       this.dirty({ render: true })
       return false
     })
     this.on('dragmove', event => {
       if (!this.dragging) return false
-      this.setValue(this.valueFromEvent(event), event)
+      const next = this.valueFromEvent(event)
+      this.props.onInput?.(next, event)
+      this.setValue(next, event)
       return false
     })
     this.on('dragend', event => {
       if (!this.dragging) return false
       this.dragging = false
-      this.setValue(this.valueFromEvent(event), event)
+      const next = this.valueFromEvent(event)
+      this.props.onInput?.(next, event)
+      this.setValue(next, event)
+      this.props.onDragEnd?.(this.props.value, event)
       this.dirty({ render: true })
       return false
     })

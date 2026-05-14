@@ -32,6 +32,10 @@ export const SLIDER_FIELD_DEFINITIONS = {
   orientation: { type: 'string' },
   marks: { type: 'array' },
   onChange: { type: 'function' },
+  onValueChange: { type: 'function' },
+  onInput: { type: 'function' },
+  onDragStart: { type: 'function' },
+  onDragEnd: { type: 'function' },
 } as const
 
 export function normalizeSliderProps(props: SliderProps = {}): SliderResolvedProps {
@@ -59,6 +63,10 @@ export function normalizeSliderProps(props: SliderProps = {}): SliderResolvedPro
     orientation,
     marks: props.marks ?? [],
     onChange: props.onChange,
+    onValueChange: props.onValueChange,
+    onInput: props.onInput,
+    onDragStart: props.onDragStart,
+    onDragEnd: props.onDragEnd,
   }
 }
 
@@ -72,7 +80,7 @@ export function createSliderDescriptor(createNode?: SliderNodeFactory): SliderDe
     dirtyPolicy: {
       matrix: NOVA_UI_COMMON_DIRTY_POLICY.matrix,
       update: [...NOVA_UI_COMMON_DIRTY_POLICY.update, 'min', 'max', 'step', 'orientation', 'marks'],
-      render: [...NOVA_UI_COMMON_DIRTY_POLICY.render, 'value', 'onChange'],
+      render: [...NOVA_UI_COMMON_DIRTY_POLICY.render, 'value', 'onChange', 'onValueChange', 'onInput', 'onDragStart', 'onDragEnd'],
     },
     fields: SLIDER_FIELD_DEFINITIONS,
     normalize: schema => normalizeSliderProps(schema.props),

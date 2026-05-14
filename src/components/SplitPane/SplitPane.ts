@@ -11,6 +11,7 @@ import type {
   SplitPaneApi,
   SplitPaneChildSchema,
   SplitPaneProps,
+  SplitPaneResizePayload,
   SplitPaneResolvedProps,
 } from '@/components/SplitPane/split-pane.types'
 import {
@@ -101,15 +102,30 @@ export class SplitPane<E extends EventList = Record<string, any>>
       ? new ColResizer<E>(this.nova, this.surface, this.props.resizer.color, this.props.resizer.lineWidth)
       : new RowResizer<E>(this.nova, this.surface, this.props.resizer.color, this.props.resizer.lineWidth)
     this.addChild(this.resizerNode)
-    this.resizerNode.onChangeMove((_event, delta) => this.resizeBy(delta))
+    this.resizerNode
+      .onChangeStart(event => this.props.onResizeStart?.(this.createResizePayload(0, event)))
+      .onChangeMove((event, delta) => this.props.onResize?.(this.resizeBy(delta, event)))
+      .onChangeEnd(event => this.props.onResizeEnd?.(this.createResizePayload(0, event)))
   }
 
-  private resizeBy(delta: number): void {
+  private resizeBy(delta: number, event: MouseEvent): SplitPaneResizePayload {
     const total = this.props.direction === 'horizontal' ? this.width : this.height
     const [first] = this.resolvePixelSizes(total)
     const nextFirst = first + delta
     const nextSecond = total - nextFirst
     this.setProps({ sizes: [nextFirst, nextSecond] })
+    return this.createResizePayload(delta, event)
+  }
+
+  private createResizePayload(delta: number, event: MouseEvent): SplitPaneResizePayload {
+    const { resizer } = this.resolveRects()
+    return {
+      width: this.props.direction === 'horizontal' ? resizer.x : this.width,
+      height: this.props.direction === 'vertical' ? resizer.y : this.height,
+      delta,
+      rect: resizer,
+      event,
+    }
   }
 
   private resolveRects(): {

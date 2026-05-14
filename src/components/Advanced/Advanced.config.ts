@@ -98,7 +98,13 @@ export const ADVANCED_COMPONENT_FIELD_DEFINITIONS = {
   animation: { type: 'string' },
   parts: { type: 'record' },
   onChange: { type: 'function' },
+  onValueChange: { type: 'function' },
+  onInput: { type: 'function' },
   onPress: { type: 'function' },
+  onOpenChange: { type: 'function' },
+  onShow: { type: 'function' },
+  onHide: { type: 'function' },
+  onStepChange: { type: 'function' },
 } as const
 
 export function normalizeAdvancedComponentProps(
@@ -133,7 +139,13 @@ export function normalizeAdvancedComponentProps(
     animation: props.animation ?? defaults.animation ?? 'fade',
     parts: props.parts ?? defaults.parts,
     onChange: props.onChange,
+    onValueChange: props.onValueChange,
+    onInput: props.onInput,
     onPress: props.onPress,
+    onOpenChange: props.onOpenChange,
+    onShow: props.onShow,
+    onHide: props.onHide,
+    onStepChange: props.onStepChange,
   }
 }
 
@@ -170,6 +182,14 @@ export function createAdvancedComponentDescriptor(
         'autoPlay',
         'animation',
         'parts',
+        'onChange',
+        'onValueChange',
+        'onInput',
+        'onPress',
+        'onOpenChange',
+        'onShow',
+        'onHide',
+        'onStepChange',
       ],
     },
     fields: ADVANCED_COMPONENT_FIELD_DEFINITIONS,

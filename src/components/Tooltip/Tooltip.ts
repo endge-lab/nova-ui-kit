@@ -35,9 +35,9 @@ export class Tooltip<E extends EventList = Record<string, any>>
   ) {
     super(app, surface, descriptor, normalizeTooltipProps(props), options)
     this.api = {
-      open: () => this.setProps({ open: true }),
-      close: () => this.setProps({ open: false }),
-      toggle: () => this.setProps({ open: !this.props.open }),
+      open: event => this.setOpen(true, event),
+      close: event => this.setOpen(false, event),
+      toggle: event => this.setOpen(!this.props.open, event),
       setProps: patch => this.setProps(patch),
       getProps: () => this.props,
     }
@@ -114,16 +114,24 @@ export class Tooltip<E extends EventList = Record<string, any>>
     this.on('mouseenter', () => {
       if (this.props.disabled) return
       window.clearTimeout(this.openTimer)
-      this.openTimer = window.setTimeout(() => this.setProps({ open: true }), this.props.delay)
+      this.openTimer = window.setTimeout(() => this.setOpen(true), this.props.delay)
     })
     this.on('mouseleave', () => {
       window.clearTimeout(this.openTimer)
-      this.setProps({ open: false })
+      this.setOpen(false)
     })
     this.on('focus', () => {
-      if (!this.props.disabled) this.setProps({ open: true })
+      if (!this.props.disabled) this.setOpen(true)
     })
-    this.on('blur', () => this.setProps({ open: false }))
+    this.on('blur', () => this.setOpen(false))
+  }
+
+  private setOpen(open: boolean, event?: Event): void {
+    if (this.props.open === open) return
+    this.setProps({ open })
+    this.props.onOpenChange?.(open, event)
+    if (open) this.props.onShow?.(event)
+    else this.props.onHide?.(event)
   }
 
   private resolveBubbleRect(): { x: number; y: number; width: number; height: number } {

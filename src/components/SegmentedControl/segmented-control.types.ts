@@ -15,6 +15,7 @@ export interface SegmentedControlProps extends NovaUiCommonProps {
   value?: string
   size?: 'sm' | 'md' | 'lg'
   onChange?: (value: string, event?: Event) => void
+  onValueChange?: (value: string, event?: Event) => void
 }
 
 export interface SegmentedControlResolvedProps extends NovaUiCommonResolvedProps {
@@ -22,6 +23,7 @@ export interface SegmentedControlResolvedProps extends NovaUiCommonResolvedProps
   value: string
   size: 'sm' | 'md' | 'lg'
   onChange?: (value: string, event?: Event) => void
+  onValueChange?: (value: string, event?: Event) => void
 }
 
 export type SegmentedControlSchema = NovaComponentSchema<SegmentedControlProps>

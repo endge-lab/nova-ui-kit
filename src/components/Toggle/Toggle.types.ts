@@ -7,12 +7,14 @@ export interface ToggleProps extends NovaUiCommonProps {
   checked?: boolean
   label?: string
   onChange?: (checked: boolean, event?: Event) => void
+  onValueChange?: (checked: boolean, event?: Event) => void
 }
 
 export interface ToggleResolvedProps extends NovaUiCommonResolvedProps {
   checked: boolean
   label: string
   onChange?: (checked: boolean, event?: Event) => void
+  onValueChange?: (checked: boolean, event?: Event) => void
 }
 
 export type ToggleSchema = NovaComponentSchema<ToggleProps>

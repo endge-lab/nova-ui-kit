@@ -89,7 +89,13 @@ export interface AdvancedComponentProps extends NovaUiCommonProps, NovaUiPartSty
   autoPlay?: boolean
   animation?: false | 'fade' | 'slide' | 'scale' | 'radial' | 'shimmer' | 'spring' | 'meterSweep' | 'activeIndicator' | 'maskFade' | 'stepAdvance'
   onChange?: (value: number | string | boolean, event?: Event) => void
+  onValueChange?: (value: number | string | boolean, event?: Event) => void
+  onInput?: (value: number | string | boolean, event?: Event) => void
   onPress?: (item: AdvancedItem, index: number, event?: Event) => void
+  onOpenChange?: (open: boolean, event?: Event) => void
+  onShow?: (event?: Event) => void
+  onHide?: (event?: Event) => void
+  onStepChange?: (activeIndex: number, event?: Event) => void
 }
 
 export interface AdvancedComponentResolvedProps extends NovaUiCommonResolvedProps, NovaUiPartStyleOptions {
@@ -116,13 +122,19 @@ export interface AdvancedComponentResolvedProps extends NovaUiCommonResolvedProp
   autoPlay: boolean
   animation: false | 'fade' | 'slide' | 'scale' | 'radial' | 'shimmer' | 'spring' | 'meterSweep' | 'activeIndicator' | 'maskFade' | 'stepAdvance'
   onChange?: (value: number | string | boolean, event?: Event) => void
+  onValueChange?: (value: number | string | boolean, event?: Event) => void
+  onInput?: (value: number | string | boolean, event?: Event) => void
   onPress?: (item: AdvancedItem, index: number, event?: Event) => void
+  onOpenChange?: (open: boolean, event?: Event) => void
+  onShow?: (event?: Event) => void
+  onHide?: (event?: Event) => void
+  onStepChange?: (activeIndex: number, event?: Event) => void
 }
 
 export interface AdvancedComponentApi {
   setProps: (patch: AdvancedComponentProps) => void
   setValue: (value: number | string | boolean, event?: Event) => void
-  setOpen: (open: boolean) => void
+  setOpen: (open: boolean, event?: Event) => void
   toggle: (event?: Event) => void
   getProps: () => Readonly<AdvancedComponentResolvedProps>
 }

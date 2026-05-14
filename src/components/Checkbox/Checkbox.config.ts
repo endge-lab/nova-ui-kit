@@ -26,6 +26,7 @@ export const CHECKBOX_FIELD_DEFINITIONS = {
   indeterminate: { type: 'boolean' },
   label: { type: 'string' },
   onChange: { type: 'function' },
+  onValueChange: { type: 'function' },
 } as const
 
 export function normalizeCheckboxProps(props: CheckboxProps = {}): CheckboxResolvedProps {
@@ -45,6 +46,7 @@ export function normalizeCheckboxProps(props: CheckboxProps = {}): CheckboxResol
     indeterminate: props.indeterminate ?? false,
     label: props.label ?? '',
     onChange: props.onChange,
+    onValueChange: props.onValueChange,
   }
 }
 
@@ -58,7 +60,7 @@ export function createCheckboxDescriptor(createNode?: CheckboxNodeFactory): Chec
     dirtyPolicy: {
       matrix: NOVA_UI_COMMON_DIRTY_POLICY.matrix,
       update: [...NOVA_UI_COMMON_DIRTY_POLICY.update, 'label'],
-      render: [...NOVA_UI_COMMON_DIRTY_POLICY.render, 'checked', 'indeterminate', 'onChange'],
+      render: [...NOVA_UI_COMMON_DIRTY_POLICY.render, 'checked', 'indeterminate', 'onChange', 'onValueChange'],
     },
     fields: CHECKBOX_FIELD_DEFINITIONS,
     normalize: schema => normalizeCheckboxProps(schema.props),

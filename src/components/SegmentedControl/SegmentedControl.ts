@@ -57,6 +57,7 @@ export class SegmentedControl<E extends EventList = Record<string, any>>
     this.setProps({ value })
     this.playUiSound('change')
     this.props.onChange?.(value, event)
+    this.props.onValueChange?.(value, event)
   }
 
   render(): void {

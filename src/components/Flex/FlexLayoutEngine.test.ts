@@ -37,7 +37,7 @@ describe('FlexLayoutEngine', () => {
     const entry = createEntry('full', { width: '100%', height: 40 })
 
     engine.compute({
-      props: normalizeFlexProps({ width: 500, height: 120, padding: 10 }),
+      props: normalizeFlexProps({ width: 500, height: 120, padding: 10, alignItems: 'start' }),
       width: 500,
       height: 120,
       entries: [entry],
@@ -52,7 +52,7 @@ describe('FlexLayoutEngine', () => {
     const second = createEntry('second', { flexBasis: 100, height: 40, flexGrow: 1 })
 
     engine.compute({
-      props: normalizeFlexProps({ width: 800, height: 120, gap: 10 }),
+      props: normalizeFlexProps({ width: 800, height: 120, gap: 10, alignItems: 'start' }),
       width: 800,
       height: 120,
       entries: [first, second],
@@ -86,7 +86,7 @@ describe('FlexLayoutEngine', () => {
     const second = createEntry('second', { flexBasis: 200, height: 40, flexShrink: 1 })
 
     engine.compute({
-      props: normalizeFlexProps({ width: 310, height: 120, gap: 10 }),
+      props: normalizeFlexProps({ width: 310, height: 120, gap: 10, alignItems: 'start' }),
       width: 310,
       height: 120,
       entries: [first, second],
@@ -101,7 +101,7 @@ describe('FlexLayoutEngine', () => {
     const entry = createMeasuredEntry('auto', { width: 'auto', height: 'auto' }, 180, 44)
 
     engine.compute({
-      props: normalizeFlexProps({ width: 500, height: 120 }),
+      props: normalizeFlexProps({ width: 500, height: 120, alignItems: 'start' }),
       width: 500,
       height: 120,
       entries: [entry],

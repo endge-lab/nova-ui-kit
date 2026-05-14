@@ -16,6 +16,10 @@ export interface SliderProps extends NovaUiCommonProps {
   orientation?: NovaUiOrientation
   marks?: Array<SliderMark>
   onChange?: (value: number, event?: Event) => void
+  onValueChange?: (value: number, event?: Event) => void
+  onInput?: (value: number, event?: Event) => void
+  onDragStart?: (value: number, event: MouseEvent) => void
+  onDragEnd?: (value: number, event: MouseEvent) => void
 }
 
 export interface SliderResolvedProps extends NovaUiCommonResolvedProps {
@@ -26,6 +30,10 @@ export interface SliderResolvedProps extends NovaUiCommonResolvedProps {
   orientation: NovaUiOrientation
   marks: Array<SliderMark>
   onChange?: (value: number, event?: Event) => void
+  onValueChange?: (value: number, event?: Event) => void
+  onInput?: (value: number, event?: Event) => void
+  onDragStart?: (value: number, event: MouseEvent) => void
+  onDragEnd?: (value: number, event: MouseEvent) => void
 }
 
 export type SliderSchema = NovaComponentSchema<SliderProps>
