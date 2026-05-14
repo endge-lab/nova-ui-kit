@@ -151,7 +151,7 @@ export class Surface<E extends EventList = Record<string, any>>
     if (this.props.motion !== 'shimmer') return
 
     this.motionPlayback = this.transitionTo(
-      { opacity: 0.58 },
+      { background: this.props.accentColor ?? '#22d3ee', opacity: 0.66 },
       {
         ...resolveNovaUiMotionOptions('shimmer'),
         duration: 760,

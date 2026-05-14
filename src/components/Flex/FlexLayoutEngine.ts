@@ -290,6 +290,9 @@ export class FlexLayoutEngine {
 
     for (const line of this.lines) {
       this.resolveLineMainSizes(line, context.mainSize)
+      if (context.props.wrap === 'nowrap') {
+        line.cross = Math.max(line.cross, context.crossSize)
+      }
       this.resolveLineCrossSizes(line, context.props.alignItems)
       this.placeLine(line, context, crossCursor)
       crossCursor += line.cross + context.crossGap
