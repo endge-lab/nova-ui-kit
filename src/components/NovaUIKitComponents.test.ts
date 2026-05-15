@@ -708,6 +708,48 @@ describe('Nova UI Kit components', () => {
     app.destroy()
   })
 
+  it('resizes SplitPane panes on drag without requiring onResize callback', () => {
+    const app = createApp()
+    const surface = app.createSurface('split-pane-drag-default')
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'split-drag-default-root',
+      props: { width: 300, height: 120 },
+      children: [
+        {
+          type: NovaUIKit.SplitPane,
+          id: 'split-drag-default',
+          props: {
+            width: 300,
+            height: 120,
+            sizes: [120, 180],
+            resizer: { hitSize: 10 },
+          },
+          children: [
+            { type: NovaUIKit.Surface, id: 'split-drag-left' },
+            { type: NovaUIKit.Surface, id: 'split-drag-right' },
+          ],
+        },
+      ],
+    })
+    app.raph.run()
+    app.raph.run()
+
+    const split = app.components.require('split-drag-default') as unknown as NovaNode<TestEvents>
+    const resizer = split.children.find(child => child.__type === 'ColResizer') as NovaNode<TestEvents>
+
+    resizer.eventHandlers.dragstart?.(new MouseEvent('mousedown', { clientX: 120, clientY: 10 }), { startX: 120, startY: 10 })
+    resizer.eventHandlers.dragmove?.(new MouseEvent('mousemove', { clientX: 150, clientY: 10 }), 30, 0, { totalDx: 30, totalDy: 0, startX: 120, startY: 10 })
+    app.raph.run()
+    app.raph.run()
+
+    expect(app.components.require('split-drag-left').width).toBe(150)
+    expect(app.components.require('split-drag-right').width).toBe(140)
+
+    app.destroy()
+  })
+
   it('emits ScrollArea semantic scroll lifecycle and fallback part clicks without duplicating slot chrome clicks', () => {
     vi.useFakeTimers()
     const app = createApp()

@@ -111,7 +111,10 @@ export class SplitPane<E extends EventList = Record<string, any>>
     this.addChild(this.resizerNode)
     this.resizerNode
       .onChangeStart(event => this.props.onResizeStart?.(this.createResizePayload(0, event)))
-      .onChangeMove((event, delta) => this.props.onResize?.(this.resizeBy(delta, event)))
+      .onChangeMove((event, delta) => {
+        const payload = this.resizeBy(delta, event)
+        this.props.onResize?.(payload)
+      })
       .onChangeEnd(event => this.props.onResizeEnd?.(this.createResizePayload(0, event)))
   }
 
