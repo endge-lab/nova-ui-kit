@@ -41,6 +41,7 @@ import { TAG_SCHEMA_TYPE } from '@/components/Tag/tag.types'
 import { TEXT_BLOCK_SCHEMA_TYPE } from '@/components/TextBlock/text-block.types'
 import { TOGGLE_SCHEMA_TYPE } from '@/components/Toggle/toggle.types'
 import { TOOLTIP_SCHEMA_TYPE } from '@/components/Tooltip/tooltip.types'
+import { createTooltipSchema } from '@/components/Tooltip/tooltip.config'
 
 /** Группировка schema type для более читаемого UI Kit DSL. */
 export const NovaUIKit = {
@@ -58,6 +59,7 @@ export const NovaUIKit = {
   Checkbox: CHECKBOX_SCHEMA_TYPE,
   Toggle: TOGGLE_SCHEMA_TYPE,
   Tooltip: TOOLTIP_SCHEMA_TYPE,
+  tooltipSchema: createTooltipSchema,
   SegmentedControl: SEGMENTED_CONTROL_SCHEMA_TYPE,
   Panel: PANEL_SCHEMA_TYPE,
   SpeedDial: SPEED_DIAL_SCHEMA_TYPE,

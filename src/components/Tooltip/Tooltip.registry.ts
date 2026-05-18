@@ -3,7 +3,6 @@ import { Tooltip } from '@/components/Tooltip/Tooltip'
 import {
   TOOLTIP_FIELD_DEFINITIONS,
   createTooltipDescriptor,
-  normalizeTooltipProps,
   type TooltipDescriptor,
 } from '@/components/Tooltip/tooltip.config'
 import type { TooltipSchema } from '@/components/Tooltip/tooltip.types'
@@ -13,7 +12,7 @@ export const TOOLTIP_DESCRIPTOR: TooltipDescriptor = createTooltipDescriptor((co
   return new Tooltip(
     context.app,
     context.surface,
-    normalizeTooltipProps(tooltipSchema.props),
+    tooltipSchema.props,
     {
       componentId: tooltipSchema.id,
       trigger: tooltipSchema.trigger,
