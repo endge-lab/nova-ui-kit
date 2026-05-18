@@ -1,7 +1,7 @@
 {
   "name": "@endge/nova-ui-kit",
   "private": false,
-  "version": "0.4.0",
+  "version": "0.5.0",
   "type": "module",
   "module": "./dist/nova-ui-kit.js",
   "types": "./dist/index.d.ts",
@@ -22,7 +22,9 @@
     "dev": "vite build --watch",
     "dev:watch": "vite build --watch",
     "build": "vite build",
-    "test": "vitest"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "bench": "vitest bench --run"
   },
   "dependencies": {
     "@endge/nova": "workspace:*",

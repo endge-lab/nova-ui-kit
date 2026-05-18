@@ -29,6 +29,16 @@ import {
 } from '@/components/Advanced/advanced.types'
 import { FLEX_SCHEMA_TYPE } from '@/components/Flex/flex.types'
 import { GRID_SCHEMA_TYPE } from '@/components/Grid/grid.types'
+import {
+  INPUT_FIELD_SCHEMA_TYPE,
+  INPUT_SCHEMA_TYPE,
+  NUMBER_INPUT_SCHEMA_TYPE,
+  PASSWORD_INPUT_SCHEMA_TYPE,
+  SEARCH_INPUT_SCHEMA_TYPE,
+  SELECT_INPUT_SCHEMA_TYPE,
+  TEXT_AREA_SCHEMA_TYPE,
+  TEXT_INPUT_SCHEMA_TYPE,
+} from '@/components/Input/input.types'
 import { PANEL_SCHEMA_TYPE } from '@/components/Panel/panel.types'
 import { ROOT_SCHEMA_TYPE } from '@/components/Root/root.types'
 import { SCROLL_AREA_SCHEMA_TYPE } from '@/components/ScrollArea/scroll-area.types'
@@ -51,6 +61,14 @@ export const NovaUIKit = {
   TextBlock: TEXT_BLOCK_SCHEMA_TYPE,
   Surface: SURFACE_SCHEMA_TYPE,
   Button: BUTTON_SCHEMA_TYPE,
+  Input: INPUT_SCHEMA_TYPE,
+  TextInput: TEXT_INPUT_SCHEMA_TYPE,
+  PasswordInput: PASSWORD_INPUT_SCHEMA_TYPE,
+  SearchInput: SEARCH_INPUT_SCHEMA_TYPE,
+  NumberInput: NUMBER_INPUT_SCHEMA_TYPE,
+  TextArea: TEXT_AREA_SCHEMA_TYPE,
+  InputField: INPUT_FIELD_SCHEMA_TYPE,
+  SelectInput: SELECT_INPUT_SCHEMA_TYPE,
   Tag: TAG_SCHEMA_TYPE,
   SplitPane: SPLIT_PANE_SCHEMA_TYPE,
   ScrollArea: SCROLL_AREA_SCHEMA_TYPE,
