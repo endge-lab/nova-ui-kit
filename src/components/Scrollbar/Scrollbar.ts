@@ -12,6 +12,10 @@ import type {
   ScrollbarState,
 } from '@/components/Scrollbar/scrollbar.types'
 import {
+  createNovaScrollbarGeometry,
+  createNovaScrollbarSchema,
+} from '@/components/Scrollbar/scrollbar-geometry'
+import {
   NovaUiComponentNode,
   clamp,
 } from '@/shared/component'
@@ -66,33 +70,34 @@ export class Scrollbar<E extends EventList = Record<string, any>>
   }
 
   render(): void {
-    const schema: NovaSchema = []
     const horizontal = this.props.orientation === 'horizontal'
     const length = Math.max(1, horizontal ? this.width : this.height)
     const cross = Math.max(4, horizontal ? this.height : this.width)
-    const max = this.maxValue()
-    const thumbLength = Math.max(20, length * (this.props.viewportSize / Math.max(this.props.viewportSize, this.props.contentSize)))
-    const travel = Math.max(0, length - thumbLength)
-    const offset = max > 0 ? travel * (this.props.value / max) : 0
-    const thumbColor = this.hovered || this.dragging
-      ? this.props.hoverBackground ?? this.props.thumbColor
-      : this.props.thumbColor
-
-    schema.push({
-      type: 'rect',
-      x: horizontal ? 0 : (cross - this.props.thickness) / 2,
-      y: horizontal ? (cross - this.props.thickness) / 2 : 0,
-      width: horizontal ? length : this.props.thickness,
-      height: horizontal ? this.props.thickness : length,
-      styles: { background: this.props.trackColor ?? 'rgba(148,163,184,0.24)', opacity: this.props.opacity, border: { radius: 999, width: 0 } },
+    const thickness = Math.min(cross, this.props.thickness)
+    const geometry = createNovaScrollbarGeometry({
+      axis: this.props.orientation,
+      value: this.props.value,
+      viewportSize: this.props.viewportSize,
+      contentSize: this.props.contentSize,
+      track: {
+        x: horizontal ? 0 : (cross - thickness) / 2,
+        y: horizontal ? (cross - thickness) / 2 : 0,
+        width: horizontal ? length : thickness,
+        height: horizontal ? thickness : length,
+      },
+      options: {
+        thickness: this.props.thickness,
+        minThumbSize: this.props.minThumbSize,
+        radius: this.props.radius,
+        trackColor: this.props.trackColor ?? undefined,
+        thumbColor: this.props.thumbColor ?? undefined,
+        thumbHoverColor: this.props.hoverBackground ?? this.props.thumbColor ?? undefined,
+      },
     })
-    schema.push({
-      type: 'rect',
-      x: horizontal ? offset : (cross - this.props.thickness) / 2,
-      y: horizontal ? (cross - this.props.thickness) / 2 : offset,
-      width: horizontal ? thumbLength : this.props.thickness,
-      height: horizontal ? this.props.thickness : thumbLength,
-      styles: { background: thumbColor ?? 'rgba(71,85,105,0.72)', opacity: this.props.opacity, border: { radius: 999, width: 0 } },
+    const schema: NovaSchema = createNovaScrollbarSchema(geometry, {
+      alpha: this.props.opacity,
+      hoveredAxis: this.hovered ? this.props.orientation : null,
+      draggingAxis: this.dragging ? this.props.orientation : null,
     })
     this.renderer.schema(schema)
   }
@@ -138,7 +143,7 @@ export class Scrollbar<E extends EventList = Record<string, any>>
     const [localX, localY] = this.toLocal(x, y)
     const horizontal = this.props.orientation === 'horizontal'
     const length = Math.max(1, horizontal ? this.width : this.height)
-    const thumbLength = Math.max(20, length * (this.props.viewportSize / Math.max(this.props.viewportSize, this.props.contentSize)))
+    const thumbLength = Math.max(this.props.minThumbSize, length * (this.props.viewportSize / Math.max(this.props.viewportSize, this.props.contentSize)))
     const travel = Math.max(1, length - thumbLength)
     const raw = horizontal ? localX - thumbLength / 2 : localY - thumbLength / 2
     return clamp(raw / travel, 0, 1) * this.maxValue()
