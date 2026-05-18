@@ -5,8 +5,8 @@ import {
   NovaClipboardService,
   NovaInputProxyService,
   NovaInputValidationController,
+  NovaInputTextLayoutEngine,
   NovaTextInputController,
-  NovaTextLayoutEngine,
   type NovaInputValidationResult,
   type NovaRectLike,
   type NovaTextInputLayoutResult,
@@ -31,7 +31,7 @@ import {
 } from '@/shared/component/component-props'
 import { pushIcon, pushText } from '@/shared/component/component-render'
 
-const layoutEngine = new NovaTextLayoutEngine()
+const layoutEngine = new NovaInputTextLayoutEngine()
 const clipboard = new NovaClipboardService()
 
 export class Input<E extends EventList = Record<string, any>>
@@ -560,7 +560,7 @@ export class Input<E extends EventList = Record<string, any>>
     const left = text.slice(0, index).search(/\S+$/)
     const start = left < 0 ? index : left
     const match = text.slice(index).match(/\s/)
-    const end = match ? index + match.index : text.length
+    const end = match ? index + (match.index ?? 0) : text.length
     this.controller.select(start, end)
     this.syncProxy()
     this.dirty({ render: true })
@@ -714,7 +714,7 @@ export class InputField<E extends EventList = Record<string, any>> extends Input
     })
     const invalid = this.isInvalid()
     schema.push({
-      type: 'rect',
+      type: 'rect' as const,
       x: 0,
       y: inputY,
       width: this.width,
@@ -727,7 +727,7 @@ export class InputField<E extends EventList = Record<string, any>> extends Input
           radius: this.props.border?.radius ?? 8,
         },
       },
-    })
+    } as any)
     const text = this.controller.getState().draft || this.props.placeholder
     pushText(schema, text, 10, inputY, this.width - 20, inputHeight, {
       ...style,
