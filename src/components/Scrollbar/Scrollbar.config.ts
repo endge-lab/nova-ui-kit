@@ -29,6 +29,8 @@ export const SCROLLBAR_FIELD_DEFINITIONS = {
   viewportSize: { type: 'number' },
   contentSize: { type: 'number' },
   thickness: { type: 'number' },
+  minThumbSize: { type: 'number' },
+  radius: { type: 'number' },
   onChange: { type: 'function' },
 } as const
 
@@ -52,6 +54,8 @@ export function normalizeScrollbarProps(props: ScrollbarProps = {}): ScrollbarRe
     viewportSize,
     contentSize,
     thickness: Math.max(4, finiteNumber(props.thickness, 8)),
+    minThumbSize: Math.max(12, finiteNumber(props.minThumbSize, 20)),
+    radius: Math.max(0, finiteNumber(props.radius, 999)),
     onChange: props.onChange,
   }
 }
@@ -61,11 +65,11 @@ export function createScrollbarDescriptor(createNode?: ScrollbarNodeFactory): Sc
     type: SCROLLBAR_SCHEMA_TYPE,
     name: 'Scrollbar',
     title: 'Scrollbar',
-    version: '0.1.0',
+    version: '0.2.0',
     kind: 'node-component',
     dirtyPolicy: {
       matrix: NOVA_UI_COMMON_DIRTY_POLICY.matrix,
-      update: [...NOVA_UI_COMMON_DIRTY_POLICY.update, 'orientation', 'viewportSize', 'contentSize', 'thickness'],
+      update: [...NOVA_UI_COMMON_DIRTY_POLICY.update, 'orientation', 'viewportSize', 'contentSize', 'thickness', 'minThumbSize', 'radius'],
       render: [...NOVA_UI_COMMON_DIRTY_POLICY.render, 'value', 'onChange'],
     },
     fields: SCROLLBAR_FIELD_DEFINITIONS,
