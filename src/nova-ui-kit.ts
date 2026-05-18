@@ -40,8 +40,8 @@ import { SURFACE_SCHEMA_TYPE } from '@/components/Surface/surface.types'
 import { TAG_SCHEMA_TYPE } from '@/components/Tag/tag.types'
 import { TEXT_BLOCK_SCHEMA_TYPE } from '@/components/TextBlock/text-block.types'
 import { TOGGLE_SCHEMA_TYPE } from '@/components/Toggle/toggle.types'
-import { TOOLTIP_SCHEMA_TYPE } from '@/components/Tooltip/tooltip.types'
 import { createTooltipSchema } from '@/components/Tooltip/tooltip.config'
+import { TOOLTIP_SCHEMA_TYPE } from '@/components/Tooltip/tooltip.types'
 
 /** Группировка schema type для более читаемого UI Kit DSL. */
 export const NovaUIKit = {

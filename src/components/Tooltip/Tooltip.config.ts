@@ -150,8 +150,8 @@ export function createTooltipSchema(props: TooltipProps): NovaSchema {
   if (!resolved.open || !resolved.content) return []
 
   const padding = resolveSpacing(resolved.padding)
-  const contentSchema = createTooltipContentSchema(resolved)
-  const contentBounds = measureTooltipContent(contentSchema, resolved)
+  const measuredContentSchema = createTooltipContentSchema(resolved)
+  const contentBounds = measureTooltipContent(measuredContentSchema, resolved)
   const width = Math.max(
     resolved.width,
     props.width ?? 0,
@@ -162,7 +162,13 @@ export function createTooltipSchema(props: TooltipProps): NovaSchema {
     props.height ?? 0,
     contentBounds.height + padding.top + padding.bottom,
   )
-  const rect = resolveTooltipRect(resolved, width, height)
+  const finalResolved: TooltipResolvedProps = {
+    ...resolved,
+    width,
+    height,
+  }
+  const contentSchema = createTooltipContentSchema(finalResolved)
+  const rect = resolveTooltipRect(finalResolved, width, height)
   const schema: NovaSchema = []
 
   schema.push({
