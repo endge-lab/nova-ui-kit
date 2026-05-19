@@ -12,11 +12,17 @@ import {
   resolveComponentTextStyle,
  pushText } from '@/shared/component'
 
+/**
+ * Описывает ответственность Toggle в архитектуре проекта.
+ */
 export class Toggle<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<ToggleResolvedProps, ToggleApi, ToggleProps, E> {
   private pressed = false
   private readonly api: ToggleApi
 
+  /**
+   * Создает экземпляр Toggle и подготавливает базовое состояние.
+   */
   constructor(
     app: NovaApp<E>,
     surface: NovaSurface<E>,
@@ -35,14 +41,23 @@ export class Toggle<E extends EventList = Record<string, any>>
     this.setupEvents()
   }
 
+  /**
+   * Обновляет значение состояния Toggle.
+   */
   override setProps(patch: ToggleProps): this {
     return super.setProps(patch as Partial<ToggleResolvedProps>)
   }
 
+  /**
+   * Возвращает значение состояния Toggle.
+   */
   override getApi(): ToggleApi {
     return this.api
   }
 
+  /**
+   * Переключает флаг состояния Toggle.
+   */
   toggle(event?: Event): void {
     if (this.props.disabled) {
       this.playUiSound('disabledPress')
@@ -55,6 +70,9 @@ export class Toggle<E extends EventList = Record<string, any>>
     this.props.onValueChange?.(checked, event)
   }
 
+  /**
+   * Выполняет отрисовку Toggle.
+   */
   render(): void {
     const schema: NovaSchema = []
     const trackWidth = 42
@@ -89,12 +107,18 @@ export class Toggle<E extends EventList = Record<string, any>>
     this.renderer.schema(schema)
   }
 
+  /**
+   * Обрабатывает входящее событие Toggle.
+   */
   protected override onPropsChanged(changedKeys: Array<keyof ToggleResolvedProps>): void {
     this.props = normalizeToggleProps(this.props)
     this.options({ interactive: !this.props.disabled })
     this.applyCommonPropsChanged(changedKeys)
   }
 
+  /**
+   * Обновляет значение состояния Toggle.
+   */
   private setupEvents(): void {
     this.on('mouseenter', () => {
       if (this.props.disabled) return

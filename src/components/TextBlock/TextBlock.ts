@@ -73,6 +73,9 @@ export class TextBlock<E extends EventList = Record<string, any>>
   private localStyleMask = NovaUiStyleMask.None
   private effectiveTextStyle: NovaUiInheritedTextStyle = {}
 
+  /**
+   * Создает экземпляр TextBlock и подготавливает базовое состояние.
+   */
   constructor(
     app: NovaApp<E>,
     surface: NovaSurface<E>,
@@ -109,15 +112,24 @@ export class TextBlock<E extends EventList = Record<string, any>>
     }
   }
 
+  /**
+   * Обновляет значение состояния TextBlock.
+   */
   override setProps(patch: TextBlockProps): this {
     this.explicitTopLevelStyleMask |= textBlockTopLevelStyleMask(patch)
     return super.setProps(patch as Partial<TextBlockResolvedProps>)
   }
 
+  /**
+   * Возвращает значение состояния TextBlock.
+   */
   override getApi(): TextBlockApi {
     return this._api
   }
 
+  /**
+   * Выполняет действие fadeIn в рамках ответственности TextBlock.
+   */
   fadeIn(options: { to?: number } = {}): void {
     this.transitionTo(
       { opacity: options.to ?? 1 },
@@ -125,6 +137,9 @@ export class TextBlock<E extends EventList = Record<string, any>>
     )
   }
 
+  /**
+   * Выполняет действие textColorPulse в рамках ответственности TextBlock.
+   */
   textColorPulse(accent = '#4f7cff'): void {
     const current = this.props.color
     this.transitionTo(
@@ -186,6 +201,9 @@ export class TextBlock<E extends EventList = Record<string, any>>
     }
   }
 
+  /**
+   * Возвращает значение состояния TextBlock.
+   */
   getSubtreeStyleMask(): NovaUiStyleMask {
     return TEXT_BLOCK_CONSUMED_STYLE_MASK & ~(this.explicitTopLevelStyleMask | this.localStyleMask)
   }
@@ -215,18 +233,30 @@ export class TextBlock<E extends EventList = Record<string, any>>
     }
   }
 
+  /**
+   * Обновляет runtime-состояние TextBlock.
+   */
   update(): void {
     this._layout = this.computeLayout()
   }
 
+  /**
+   * Выполняет отрисовку TextBlock.
+   */
   render(): void {
     this.renderSchema(buildTextBlockSchema(this.resolveCurrentLayoutProps(), this.measureText, 'node'))
   }
 
+  /**
+   * Обрабатывает входящее событие TextBlock.
+   */
   protected override onMount(): void {
     requireNovaUiRoot(this)
   }
 
+  /**
+   * Обрабатывает входящее событие TextBlock.
+   */
   protected override onPropsChanged(changedKeys: Array<keyof TextBlockResolvedProps>): void {
     const previousStyle = this.effectiveTextStyle
     this.props = normalizeTextBlockProps(this.props)
@@ -255,6 +285,9 @@ export class TextBlock<E extends EventList = Record<string, any>>
     }
   }
 
+  /**
+   * Применяет подготовленное состояние TextBlock.
+   */
   private applyInitialLayoutRect(props: TextBlockResolvedProps): void {
     copyRect(this.layoutRect, {
       x: props.x,
@@ -270,6 +303,9 @@ export class TextBlock<E extends EventList = Record<string, any>>
     })
   }
 
+  /**
+   * Применяет подготовленное состояние TextBlock.
+   */
   private applyResolvedRect(rect: NovaUiLayoutRect): boolean {
     if (rectEquals(this.layoutRect, rect)) return false
 
@@ -286,19 +322,31 @@ export class TextBlock<E extends EventList = Record<string, any>>
     return true
   }
 
+  /**
+   * Выполняет внутренний шаг ensureLayout для TextBlock.
+   */
   private ensureLayout(): TextBlockLayout {
     if (!this._layout) this._layout = this.computeLayout()
     return this._layout
   }
 
+  /**
+   * Вычисляет производное значение TextBlock.
+   */
   private computeLayout(): TextBlockLayout {
     return layoutTextBlock(this.resolveCurrentLayoutProps(), this.measureText)
   }
 
+  /**
+   * Нормализует и возвращает итоговое значение TextBlock.
+   */
   private resolveCurrentLayoutProps(): TextBlockResolvedProps {
     return this.resolveLayoutProps(this.layoutRect.width, this.layoutRect.height)
   }
 
+  /**
+   * Нормализует и возвращает итоговое значение TextBlock.
+   */
   private resolveLayoutProps(width: number, height: number): TextBlockResolvedProps {
     return {
       ...this.props,
@@ -322,12 +370,18 @@ export class TextBlock<E extends EventList = Record<string, any>>
     )
   )
 
+  /**
+   * Применяет подготовленное состояние TextBlock.
+   */
   private applyDisplayState(): void {
     const displayed = this.props.display !== 'none'
     this.visible = displayed
     this.active = displayed
   }
 
+  /**
+   * Выполняет внутренний шаг markLayoutAncestorsDirty для TextBlock.
+   */
   private markLayoutAncestorsDirty(): void {
     relayoutNovaUiLayoutAncestors(this)
   }

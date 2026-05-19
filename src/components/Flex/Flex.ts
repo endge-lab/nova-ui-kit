@@ -71,6 +71,9 @@ export class Flex<E extends EventList = Record<string, any>>
   private effectiveStyleContext = EMPTY_STYLE_CONTEXT
   private subtreeStyleMask = NovaUiStyleMask.None
 
+  /**
+   * Создает экземпляр Flex и подготавливает базовое состояние.
+   */
   constructor(
     app: NovaApp<E>,
     surface: NovaSurface<E>,
@@ -98,14 +101,23 @@ export class Flex<E extends EventList = Record<string, any>>
     this.setChildren(options.children ?? [])
   }
 
+  /**
+   * Обновляет значение состояния Flex.
+   */
   override setProps(patch: FlexProps): this {
     return super.setProps(patch as Partial<FlexResolvedProps>)
   }
 
+  /**
+   * Возвращает значение состояния Flex.
+   */
   override getApi(): FlexApi {
     return this.api
   }
 
+  /**
+   * Выполняет действие expandCollapse в рамках ответственности Flex.
+   */
   expandCollapse(expandedHeight: number, collapsedHeight = 0): void {
     const nextHeight = this.props.height === expandedHeight ? collapsedHeight : expandedHeight
     this.transitionTo(
@@ -114,6 +126,9 @@ export class Flex<E extends EventList = Record<string, any>>
     )
   }
 
+  /**
+   * Выполняет действие gapShift в рамках ответственности Flex.
+   */
   gapShift(to = 20, backTo = 8): void {
     this.transitionTo(
       { gap: to, rowGap: to, columnGap: to },
@@ -153,11 +168,17 @@ export class Flex<E extends EventList = Record<string, any>>
     return result
   }
 
+  /**
+   * Возвращает значение состояния Flex.
+   */
   getSubtreeStyleMask(): NovaUiStyleMask {
     this.recomputeSubtreeStyleMask()
     return this.subtreeStyleMask & ~inheritedTextStyleMask(this.props.style)
   }
 
+  /**
+   * Применяет подготовленное состояние Flex.
+   */
   private applyResolvedRect(rect: NovaUiLayoutRect): boolean {
     if (rectEquals(this.ownRect, rect)) return false
 
@@ -275,14 +296,23 @@ export class Flex<E extends EventList = Record<string, any>>
     this.dirty({ update: true, render: true })
   }
 
+  /**
+   * Возвращает значение состояния Flex.
+   */
   getChildRect(id: string): Readonly<NovaUiLayoutRect> | undefined {
     return this.rectsById.get(id)
   }
 
+  /**
+   * Обрабатывает входящее событие Flex.
+   */
   protected override onMount(): void {
     requireNovaUiRoot(this)
   }
 
+  /**
+   * Обрабатывает входящее событие Flex.
+   */
   protected override onPropsChanged(_changedKeys: Array<keyof FlexResolvedProps>): void {
     this.props = normalizeFlexProps(this.props)
     this.applyDisplayState()
@@ -309,6 +339,9 @@ export class Flex<E extends EventList = Record<string, any>>
     }
   }
 
+  /**
+   * Выполняет внутренний шаг propagateStyleContext для Flex.
+   */
   private propagateStyleContext(changedMask: NovaUiStyleMask): NovaUiStyleReceiveResult {
     const result: NovaUiStyleReceiveResult = {
       update: false,
@@ -332,6 +365,9 @@ export class Flex<E extends EventList = Record<string, any>>
     return result
   }
 
+  /**
+   * Выполняет внутренний шаг recomputeSubtreeStyleMask для Flex.
+   */
   private recomputeSubtreeStyleMask(): void {
     let mask = NovaUiStyleMask.None
 
@@ -344,12 +380,18 @@ export class Flex<E extends EventList = Record<string, any>>
     this.subtreeStyleMask = mask
   }
 
+  /**
+   * Применяет подготовленное состояние Flex.
+   */
   private applyDisplayState(): void {
     const displayed = this.props.display !== 'none'
     this.visible = displayed
     this.active = displayed
   }
 
+  /**
+   * Выполняет внутренний шаг markLayoutAncestorsDirty для Flex.
+   */
   private markLayoutAncestorsDirty(): void {
     relayoutNovaUiLayoutAncestors(this)
   }

@@ -47,8 +47,14 @@ import { ColResizer } from '@/components/ColResizer/ColResizer'
 
 type TestEvents = Record<string, any>
 
+/**
+ * Описывает Nova-node InspectorCardNode и его runtime-поведение.
+ */
 @NovaComponent({ tag: 'InspectorCard' })
 class InspectorCardNode extends NovaNode<TestEvents> {
+  /**
+   * Выполняет отрисовку InspectorCardNode.
+   */
   render(): void {}
 }
 
@@ -58,10 +64,16 @@ function create2DContextStub(): CanvasRenderingContext2D {
     createPattern: vi.fn(() => ({})),
   }
   return new Proxy(state, {
+    /**
+     * Возвращает значение состояния текущего класса.
+     */
     get(target, prop) {
       if (!(prop in target)) target[prop] = vi.fn()
       return target[prop]
     },
+    /**
+     * Обновляет значение состояния текущего класса.
+     */
     set(target, prop, value) {
       target[prop] = value
       return true

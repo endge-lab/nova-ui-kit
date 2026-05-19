@@ -42,14 +42,23 @@ interface BenchStats {
   rating: 'плохо' | 'приемлемо' | 'хорошо' | 'отлично' | 'идеально'
 }
 
+/**
+ * Описывает ответственность BenchTextTarget в архитектуре проекта.
+ */
 class BenchTextTarget implements NovaUiStyleTarget {
   readonly [NOVA_UI_STYLE_TARGET] = true as const
   renderCount = 0
   updateCount = 0
   receiveCount = 0
 
+  /**
+   * Создает экземпляр BenchTextTarget и подготавливает базовое состояние.
+   */
   constructor(private readonly explicitMask = NovaUiStyleMask.None) {}
 
+  /**
+   * Выполняет действие receiveStyleContext в рамках ответственности BenchTextTarget.
+   */
   receiveStyleContext(_context: NovaUiStyleContext, changedMask: NovaUiStyleMask): NovaUiStyleReceiveResult {
     this.receiveCount += 1
     const affected = changedMask & this.getSubtreeStyleMask()
@@ -72,21 +81,33 @@ class BenchTextTarget implements NovaUiStyleTarget {
     return { update: false, render: false, layout: false }
   }
 
+  /**
+   * Возвращает значение состояния BenchTextTarget.
+   */
   getSubtreeStyleMask(): NovaUiStyleMask {
     return NovaUiStyleMask.AllText & ~this.explicitMask
   }
 }
 
+/**
+ * Описывает ответственность BenchContainerTarget в архитектуре проекта.
+ */
 class BenchContainerTarget implements NovaUiStyleTarget {
   readonly [NOVA_UI_STYLE_TARGET] = true as const
   receiveCount = 0
   skippedCount = 0
 
+  /**
+   * Создает экземпляр BenchContainerTarget и подготавливает базовое состояние.
+   */
   constructor(
     private readonly children: Array<NovaUiStyleTarget>,
     private readonly ownStyleMask = NovaUiStyleMask.None,
   ) {}
 
+  /**
+   * Выполняет действие receiveStyleContext в рамках ответственности BenchContainerTarget.
+   */
   receiveStyleContext(context: NovaUiStyleContext, changedMask: NovaUiStyleMask): NovaUiStyleReceiveResult {
     this.receiveCount += 1
     const result: NovaUiStyleReceiveResult = { update: false, render: false, layout: false }
@@ -107,6 +128,9 @@ class BenchContainerTarget implements NovaUiStyleTarget {
     return result
   }
 
+  /**
+   * Возвращает значение состояния BenchContainerTarget.
+   */
   getSubtreeStyleMask(): NovaUiStyleMask {
     let mask = NovaUiStyleMask.None
     for (const child of this.children) {

@@ -11,11 +11,17 @@ import {
   clamp,
 } from '@/shared/component'
 
+/**
+ * Описывает ответственность Slider в архитектуре проекта.
+ */
 export class Slider<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<SliderResolvedProps, SliderApi, SliderProps, E> {
   private dragging = false
   private readonly api: SliderApi
 
+  /**
+   * Создает экземпляр Slider и подготавливает базовое состояние.
+   */
   constructor(
     app: NovaApp<E>,
     surface: NovaSurface<E>,
@@ -33,14 +39,23 @@ export class Slider<E extends EventList = Record<string, any>>
     this.setupEvents()
   }
 
+  /**
+   * Обновляет значение состояния Slider.
+   */
   override setProps(patch: SliderProps): this {
     return super.setProps(patch as Partial<SliderResolvedProps>)
   }
 
+  /**
+   * Возвращает значение состояния Slider.
+   */
   override getApi(): SliderApi {
     return this.api
   }
 
+  /**
+   * Обновляет значение состояния Slider.
+   */
   setValue(value: number, event?: Event): void {
     if (this.props.disabled) {
       this.playUiSound('disabledPress')
@@ -54,6 +69,9 @@ export class Slider<E extends EventList = Record<string, any>>
     this.props.onValueChange?.(next, event)
   }
 
+  /**
+   * Выполняет отрисовку Slider.
+   */
   render(): void {
     const schema: NovaSchema = []
     const horizontal = this.props.orientation === 'horizontal'
@@ -107,12 +125,18 @@ export class Slider<E extends EventList = Record<string, any>>
     this.renderer.schema(schema)
   }
 
+  /**
+   * Обрабатывает входящее событие Slider.
+   */
   protected override onPropsChanged(changedKeys: Array<keyof SliderResolvedProps>): void {
     this.props = normalizeSliderProps(this.props)
     this.options({ interactive: !this.props.disabled })
     this.applyCommonPropsChanged(changedKeys)
   }
 
+  /**
+   * Обновляет значение состояния Slider.
+   */
   private setupEvents(): void {
     this.on('mouseenter', () => {
       if (this.props.disabled) return
@@ -159,6 +183,9 @@ export class Slider<E extends EventList = Record<string, any>>
     })
   }
 
+  /**
+   * Выполняет внутренний шаг valueFromEvent для Slider.
+   */
   private valueFromEvent(event: MouseEvent): number {
     const { x, y } = this.events.getCanvasMousePosition(event)
     const [localX, localY] = this.toLocal(x, y)
@@ -171,10 +198,16 @@ export class Slider<E extends EventList = Record<string, any>>
     return this.props.min + (this.props.max - this.props.min) * percent
   }
 
+  /**
+   * Выполняет внутренний шаг valuePercent для Slider.
+   */
   private valuePercent(): number {
     return this.percentForValue(this.props.value)
   }
 
+  /**
+   * Выполняет внутренний шаг percentForValue для Slider.
+   */
   private percentForValue(value: number): number {
     if (this.props.max === this.props.min) return 0
     return clamp((value - this.props.min) / (this.props.max - this.props.min), 0, 1)

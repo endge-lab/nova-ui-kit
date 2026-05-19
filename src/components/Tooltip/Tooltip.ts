@@ -24,6 +24,9 @@ import {
   NovaUiComponentNode,
 } from '@/shared/component'
 
+/**
+ * Описывает ответственность Tooltip в архитектуре проекта.
+ */
 export class Tooltip<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<TooltipResolvedProps, TooltipApi, TooltipProps, E> {
   private triggerNode: NovaNode<E> | null = null
@@ -33,6 +36,9 @@ export class Tooltip<E extends EventList = Record<string, any>>
   private anchorY = 0
   private readonly api: TooltipApi
 
+  /**
+   * Создает экземпляр Tooltip и подготавливает базовое состояние.
+   */
   constructor(
     app: NovaApp<E>,
     surface: NovaSurface<E>,
@@ -55,14 +61,23 @@ export class Tooltip<E extends EventList = Record<string, any>>
     this.setupEvents()
   }
 
+  /**
+   * Обновляет значение состояния Tooltip.
+   */
   override setProps(patch: TooltipProps | Partial<TooltipResolvedProps>): this {
     return super.setProps(patch as Partial<TooltipResolvedProps>)
   }
 
+  /**
+   * Возвращает значение состояния Tooltip.
+   */
   override getApi(): TooltipApi {
     return this.api
   }
 
+  /**
+   * Обновляет значение состояния Tooltip.
+   */
   setTrigger(schema: NovaComponentSchema | undefined): void {
     const reconciled = reconcileNovaTemplateChildren(
       this,
@@ -73,6 +88,9 @@ export class Tooltip<E extends EventList = Record<string, any>>
     this.dirty({ update: true, render: true })
   }
 
+  /**
+   * Обновляет runtime-состояние Tooltip.
+   */
   update(): void {
     this.triggerNode?.options({
       x: 0,
@@ -82,6 +100,9 @@ export class Tooltip<E extends EventList = Record<string, any>>
     })
   }
 
+  /**
+   * Выполняет отрисовку Tooltip.
+   */
   render(): void {
     const schema = createTooltipSchema({
       ...this.props,
@@ -95,12 +116,18 @@ export class Tooltip<E extends EventList = Record<string, any>>
     this.renderer.schema(schema)
   }
 
+  /**
+   * Обрабатывает входящее событие Tooltip.
+   */
   protected override onPropsChanged(changedKeys: Array<keyof TooltipResolvedProps>): void {
     this.props = normalizeTooltipProps(this.props)
     this.options({ interactive: !this.props.disabled })
     this.applyCommonPropsChanged(changedKeys)
   }
 
+  /**
+   * Обновляет значение состояния Tooltip.
+   */
   private setupEvents(): void {
     this.on('mouseenter', () => {
       if (this.shouldOpenOnPointer('hover')) this.scheduleOpen()
@@ -119,6 +146,9 @@ export class Tooltip<E extends EventList = Record<string, any>>
     })
   }
 
+  /**
+   * Обновляет значение состояния Tooltip.
+   */
   private setOpen(open: boolean, event?: Event): void {
     window.clearTimeout(this.openTimer)
     window.clearTimeout(this.hideTimer)
@@ -129,16 +159,25 @@ export class Tooltip<E extends EventList = Record<string, any>>
     else this.props.onHide?.(event)
   }
 
+  /**
+   * Выполняет внутренний шаг moveTo для Tooltip.
+   */
   private moveTo(x: number, y: number): void {
     this.anchorX = x
     this.anchorY = y
     if (this.props.open && this.props.followCursor) this.dirty({ render: true })
   }
 
+  /**
+   * Обновляет значение состояния Tooltip.
+   */
   private setContent(content: TooltipContent): void {
     this.setProps({ content })
   }
 
+  /**
+   * Планирует отложенное выполнение Tooltip.
+   */
   private scheduleOpen(event?: Event): void {
     if (this.props.disabled) return
     window.clearTimeout(this.hideTimer)
@@ -146,12 +185,18 @@ export class Tooltip<E extends EventList = Record<string, any>>
     this.openTimer = window.setTimeout(() => this.setOpen(true, event), this.props.delay)
   }
 
+  /**
+   * Планирует отложенное выполнение Tooltip.
+   */
   private scheduleClose(event?: Event): void {
     window.clearTimeout(this.openTimer)
     window.clearTimeout(this.hideTimer)
     this.hideTimer = window.setTimeout(() => this.setOpen(false, event), this.props.hideDelay)
   }
 
+  /**
+   * Выполняет внутренний шаг shouldOpenOnFocus для Tooltip.
+   */
   private shouldOpenOnFocus(): boolean {
     if (this.props.disabled || this.props.trigger === 'manual') return false
     if (this.props.trigger === 'focus') return true
@@ -160,6 +205,9 @@ export class Tooltip<E extends EventList = Record<string, any>>
     return this.props.trigger === 'hover'
   }
 
+  /**
+   * Выполняет внутренний шаг shouldOpenOnPointer для Tooltip.
+   */
   private shouldOpenOnPointer(kind: 'hover' | 'click', event?: PointerEvent): boolean {
     if (this.props.disabled || this.props.trigger === 'manual') return false
     if (this.props.trigger === kind) return true
@@ -173,6 +221,9 @@ export class Tooltip<E extends EventList = Record<string, any>>
     return true
   }
 
+  /**
+   * Применяет подготовленное состояние Tooltip.
+   */
   private applyCollision(schema: NovaSchema): void {
     if (schema.length === 0 || !this.props.collision.shift) return
 

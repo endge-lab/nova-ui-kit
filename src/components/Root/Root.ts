@@ -93,6 +93,9 @@ export class Root<E extends EventList = Record<string, any>>
   private mediaSignature = ''
   private readonly disposeGlobalStylesSubscription: () => void
 
+  /**
+   * Создает экземпляр Root и подготавливает базовое состояние.
+   */
   constructor(
     app: NovaApp<E>,
     surface: NovaSurface<E>,
@@ -139,10 +142,16 @@ export class Root<E extends EventList = Record<string, any>>
     this.setChildren(options.children ?? [])
   }
 
+  /**
+   * Обновляет значение состояния Root.
+   */
   override setProps(patch: RootProps): this {
     return super.setProps(patch as Partial<RootResolvedProps>)
   }
 
+  /**
+   * Возвращает значение состояния Root.
+   */
   override getApi(): RootApi {
     return this.api
   }
@@ -256,6 +265,9 @@ export class Root<E extends EventList = Record<string, any>>
     this.dirty({ update: true, render: true })
   }
 
+  /**
+   * Обновляет runtime-состояние Root.
+   */
   update(): void {
     this.refreshStyleTokensIfNeeded()
     this.refreshMediaCascadeIfNeeded()
@@ -281,6 +293,9 @@ export class Root<E extends EventList = Record<string, any>>
     this.layoutDirty = false
   }
 
+  /**
+   * Выполняет отрисовку Root.
+   */
   render(): void {
     const schema = []
 
@@ -316,6 +331,9 @@ export class Root<E extends EventList = Record<string, any>>
     if (schema.length > 0) this.renderer.schema(schema)
   }
 
+  /**
+   * Обрабатывает входящее событие Root.
+   */
   protected override onPropsChanged(changedKeys: Array<keyof RootResolvedProps>): void {
     this.props = normalizeRootProps(this.props)
     this.applyDisplayState()
@@ -344,6 +362,9 @@ export class Root<E extends EventList = Record<string, any>>
     }
   }
 
+  /**
+   * Применяет подготовленное состояние Root.
+   */
   private applyResolvedRect(rect: NovaUiLayoutRect): boolean {
     if (rectEquals(this.ownRect, rect)) return false
 
@@ -361,6 +382,9 @@ export class Root<E extends EventList = Record<string, any>>
     return true
   }
 
+  /**
+   * Синхронизирует актуальное состояние Root.
+   */
   private refreshCombinedStyleSheet(): void {
     const globalAsset = getNovaUiGlobalStyleSheet(this.nova)
     const builtInStyleSheet = getNovaUiBuiltInUtilityStyleSheet()
@@ -380,6 +404,9 @@ export class Root<E extends EventList = Record<string, any>>
     this.applyCascade()
   }
 
+  /**
+   * Синхронизирует актуальное состояние Root.
+   */
   private refreshStyleTokensIfNeeded(): void {
     const version = this.tokenResolver?.version ?? null
     if (version === this.resolvedTokenVersion) return
@@ -387,11 +414,17 @@ export class Root<E extends EventList = Record<string, any>>
     this.refreshStyleTokens()
   }
 
+  /**
+   * Нормализует и возвращает итоговое значение Root.
+   */
   private resolveStyleSheetTokens(sheet: NovaUiCompiledStyleSheet): NovaUiCompiledStyleSheet {
     this.resolvedTokenVersion = this.tokenResolver?.version ?? null
     return resolveNovaUiStyleSheetTokens(sheet, this.tokenResolver)
   }
 
+  /**
+   * Применяет подготовленное состояние Root.
+   */
   private applyCascade(): void {
     this.mediaSignature = getNovaUiStyleMediaSignature(this.styleSheet, this.getMediaContext())
     this.traverseAll(node => {
@@ -405,6 +438,9 @@ export class Root<E extends EventList = Record<string, any>>
     this.dirty({ update: true, render: true })
   }
 
+  /**
+   * Применяет подготовленное состояние Root.
+   */
   private applyCascadeToNode(node: NovaUiStylableNode): void {
     const rules = matchStyleRules(node, this.styleSheet, this.getMediaContext())
     const declarations = mergeRuleDeclarations(rules)
@@ -415,6 +451,9 @@ export class Root<E extends EventList = Record<string, any>>
     if ('display' in patch) this.markLayoutAncestorsDirty(node)
   }
 
+  /**
+   * Создает runtime-сущность Root.
+   */
   private createCascadePatch(
     node: NovaUiStylableNode,
     declarations: NovaUiStyleDeclarations,
@@ -495,6 +534,9 @@ export class Root<E extends EventList = Record<string, any>>
     return Object.keys(patch).length > 0 ? patch : null
   }
 
+  /**
+   * Нормализует и возвращает итоговое значение Root.
+   */
   private resolveAppliedState(node: NovaUiStylableNode): AppliedCascadeState {
     const existing = this.appliedCascade.get(node)
     if (existing) return existing
@@ -528,6 +570,9 @@ export class Root<E extends EventList = Record<string, any>>
     return state
   }
 
+  /**
+   * Синхронизирует актуальное состояние Root.
+   */
   private refreshMediaCascadeIfNeeded(): void {
     const nextSignature = getNovaUiStyleMediaSignature(this.styleSheet, this.getMediaContext())
     if (nextSignature === this.mediaSignature) return
@@ -535,6 +580,9 @@ export class Root<E extends EventList = Record<string, any>>
     this.applyCascade()
   }
 
+  /**
+   * Возвращает значение состояния Root.
+   */
   private getMediaContext(): { width: number; height: number } {
     return {
       width: this.width,
@@ -542,16 +590,25 @@ export class Root<E extends EventList = Record<string, any>>
     }
   }
 
+  /**
+   * Применяет подготовленное состояние Root.
+   */
   private applyDisplayState(): void {
     const displayed = this.props.display !== 'none'
     this.visible = displayed
     this.active = displayed
   }
 
+  /**
+   * Выполняет внутренний шаг markLayoutAncestorsDirty для Root.
+   */
   private markLayoutAncestorsDirty(node: { parent?: unknown }): void {
     relayoutNovaUiLayoutAncestors(node)
   }
 
+  /**
+   * Выполняет внутренний шаг propagateStyleContext для Root.
+   */
   private propagateStyleContext(changedMask: NovaUiStyleMask): NovaUiStyleReceiveResult {
     const result: NovaUiStyleReceiveResult = {
       update: false,
@@ -575,6 +632,9 @@ export class Root<E extends EventList = Record<string, any>>
     return result
   }
 
+  /**
+   * Освобождает runtime-ресурсы и подписки Root.
+   */
   override dispose(): void {
     this.disposeGlobalStylesSubscription()
     super.dispose()

@@ -12,10 +12,16 @@ import {
   resolveComponentTextStyle,
  pushIcon, pushText, sizeTokenPadding } from '@/shared/component'
 
+/**
+ * Описывает ответственность Tag в архитектуре проекта.
+ */
 export class Tag<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<TagResolvedProps, TagApi, TagProps, E> {
   private readonly api: TagApi
 
+  /**
+   * Создает экземпляр Tag и подготавливает базовое состояние.
+   */
   constructor(
     app: NovaApp<E>,
     surface: NovaSurface<E>,
@@ -32,14 +38,23 @@ export class Tag<E extends EventList = Record<string, any>>
     }
   }
 
+  /**
+   * Обновляет значение состояния Tag.
+   */
   override setProps(patch: TagProps): this {
     return super.setProps(patch as Partial<TagResolvedProps>)
   }
 
+  /**
+   * Возвращает значение состояния Tag.
+   */
   override getApi(): TagApi {
     return this.api
   }
 
+  /**
+   * Выполняет отрисовку Tag.
+   */
   render(): void {
     const schema: NovaSchema = buildBoxSchema(this.props, this.width, this.height)
     const textStyle = resolveComponentTextStyle(this.props, this.inheritedStyleContext)
@@ -52,6 +67,9 @@ export class Tag<E extends EventList = Record<string, any>>
     this.renderer.schema(schema)
   }
 
+  /**
+   * Обрабатывает входящее событие Tag.
+   */
   protected override onPropsChanged(changedKeys: Array<keyof TagResolvedProps>): void {
     this.props = normalizeTagProps(this.props)
     this.applyCommonPropsChanged(changedKeys)

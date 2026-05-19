@@ -16,12 +16,18 @@ import {
   resolveComponentTextStyle,
  pushIcon, pushText, sizeTokenPadding } from '@/shared/component'
 
+/**
+ * Описывает ответственность SegmentedControl в архитектуре проекта.
+ */
 export class SegmentedControl<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<SegmentedControlResolvedProps, SegmentedControlApi, SegmentedControlProps, E> {
   private hoveredIndex = -1
   private pressedIndex = -1
   private readonly api: SegmentedControlApi
 
+  /**
+   * Создает экземпляр SegmentedControl и подготавливает базовое состояние.
+   */
   constructor(
     app: NovaApp<E>,
     surface: NovaSurface<E>,
@@ -39,14 +45,23 @@ export class SegmentedControl<E extends EventList = Record<string, any>>
     this.setupEvents()
   }
 
+  /**
+   * Обновляет значение состояния SegmentedControl.
+   */
   override setProps(patch: SegmentedControlProps): this {
     return super.setProps(patch as Partial<SegmentedControlResolvedProps>)
   }
 
+  /**
+   * Возвращает значение состояния SegmentedControl.
+   */
   override getApi(): SegmentedControlApi {
     return this.api
   }
 
+  /**
+   * Обновляет значение состояния SegmentedControl.
+   */
   setValue(value: string, event?: Event): void {
     if (this.props.disabled) {
       this.playUiSound('disabledPress')
@@ -60,6 +75,9 @@ export class SegmentedControl<E extends EventList = Record<string, any>>
     this.props.onValueChange?.(value, event)
   }
 
+  /**
+   * Выполняет отрисовку SegmentedControl.
+   */
   render(): void {
     const schema: NovaSchema = buildBoxSchema(this.props, this.width, this.height)
     const count = Math.max(1, this.props.items.length)
@@ -106,12 +124,18 @@ export class SegmentedControl<E extends EventList = Record<string, any>>
     this.renderer.schema(schema)
   }
 
+  /**
+   * Обрабатывает входящее событие SegmentedControl.
+   */
   protected override onPropsChanged(changedKeys: Array<keyof SegmentedControlResolvedProps>): void {
     this.props = normalizeSegmentedControlProps(this.props)
     this.options({ interactive: !this.props.disabled })
     this.applyCommonPropsChanged(changedKeys)
   }
 
+  /**
+   * Обновляет значение состояния SegmentedControl.
+   */
   private setupEvents(): void {
     this.on('mousemove', event => {
       if (this.props.disabled) return
@@ -145,6 +169,9 @@ export class SegmentedControl<E extends EventList = Record<string, any>>
     })
   }
 
+  /**
+   * Выполняет внутренний шаг indexFromEvent для SegmentedControl.
+   */
   private indexFromEvent(event: MouseEvent): number {
     const { x, y } = this.events.getCanvasMousePosition(event)
     const [localX, localY] = this.toLocal(x, y)

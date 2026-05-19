@@ -13,12 +13,18 @@ import {
   resolveInteractionBackground,
  pushText } from '@/shared/component'
 
+/**
+ * Описывает ответственность Checkbox в архитектуре проекта.
+ */
 export class Checkbox<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<CheckboxResolvedProps, CheckboxApi, CheckboxProps, E> {
   private hovered = false
   private pressed = false
   private readonly api: CheckboxApi
 
+  /**
+   * Создает экземпляр Checkbox и подготавливает базовое состояние.
+   */
   constructor(
     app: NovaApp<E>,
     surface: NovaSurface<E>,
@@ -37,14 +43,23 @@ export class Checkbox<E extends EventList = Record<string, any>>
     this.setupEvents()
   }
 
+  /**
+   * Обновляет значение состояния Checkbox.
+   */
   override setProps(patch: CheckboxProps): this {
     return super.setProps(patch as Partial<CheckboxResolvedProps>)
   }
 
+  /**
+   * Возвращает значение состояния Checkbox.
+   */
   override getApi(): CheckboxApi {
     return this.api
   }
 
+  /**
+   * Переключает флаг состояния Checkbox.
+   */
   toggle(event?: Event): void {
     if (this.props.disabled) {
       this.playUiSound('disabledPress')
@@ -57,6 +72,9 @@ export class Checkbox<E extends EventList = Record<string, any>>
     this.props.onValueChange?.(checked, event)
   }
 
+  /**
+   * Выполняет отрисовку Checkbox.
+   */
   render(): void {
     const schema: NovaSchema = []
     const boxSize = Math.min(18, Math.max(14, this.height - 8))
@@ -88,12 +106,18 @@ export class Checkbox<E extends EventList = Record<string, any>>
     this.renderer.schema(schema)
   }
 
+  /**
+   * Обрабатывает входящее событие Checkbox.
+   */
   protected override onPropsChanged(changedKeys: Array<keyof CheckboxResolvedProps>): void {
     this.props = normalizeCheckboxProps(this.props)
     this.options({ interactive: !this.props.disabled })
     this.applyCommonPropsChanged(changedKeys)
   }
 
+  /**
+   * Обновляет значение состояния Checkbox.
+   */
   private setupEvents(): void {
     this.on('mouseenter', () => {
       if (this.props.disabled) return

@@ -38,9 +38,15 @@ export function createNovaUiCssVariableTokenResolver(element: Element): NovaUiSt
   let cache: CSSStyleDeclaration | null = null
 
   return {
+    /**
+     * Возвращает version для текущего класса.
+     */
     get version() {
       return cacheVersion
     },
+    /**
+     * Нормализует и возвращает итоговое значение текущего класса.
+     */
     resolve(name, fallback) {
       if (!cache) {
         cache = window.getComputedStyle(element)

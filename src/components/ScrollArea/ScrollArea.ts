@@ -39,6 +39,9 @@ import { hitTestRectPart, toLocalEventPoint, type NovaUiEventPoint, type NovaUiR
 type ScrollbarOrientation = 'horizontal' | 'vertical'
 type ScrollAreaFallbackPartKey = 'horizontal-thumb' | 'horizontal-track' | 'vertical-thumb' | 'vertical-track'
 
+/**
+ * Описывает ответственность ScrollArea в архитектуре проекта.
+ */
 export class ScrollArea<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<ScrollAreaResolvedProps, ScrollAreaApi, ScrollAreaProps, E> {
   private readonly contentChildren: Array<NovaNode<E>> = []
@@ -69,6 +72,9 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     opacity: 0,
   }
 
+  /**
+   * Создает экземпляр ScrollArea и подготавливает базовое состояние.
+   */
   constructor(
     app: NovaApp<E>,
     surface: NovaSurface<E>,
@@ -94,14 +100,23 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     this.setupEvents()
   }
 
+  /**
+   * Обновляет значение состояния ScrollArea.
+   */
   override setProps(patch: ScrollAreaProps): this {
     return super.setProps(patch as Partial<ScrollAreaResolvedProps>)
   }
 
+  /**
+   * Возвращает значение состояния ScrollArea.
+   */
   override getApi(): ScrollAreaApi {
     return this.api
   }
 
+  /**
+   * Обновляет значение состояния ScrollArea.
+   */
   setChildren(children: Array<ScrollAreaChildSchema>): void {
     const reconciled = reconcileNovaTemplateChildren(this, this.contentChildren, children)
     this.contentChildren.length = 0
@@ -109,12 +124,18 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     this.dirty({ update: true, render: true })
   }
 
+  /**
+   * Обновляет значение состояния ScrollArea.
+   */
   setSlots(slots: NovaTemplateSlots = {}): void {
     this.slots = { ...slots }
     this.ensureScrollbars()
     this.dirty({ update: true, render: true })
   }
 
+  /**
+   * Выполняет действие scrollTo в рамках ответственности ScrollArea.
+   */
   scrollTo(x: number, y: number, event?: Event): void {
     const nextX = clamp(Number.isFinite(x) ? x : 0, 0, Math.max(0, this.props.contentWidth - this.props.width))
     const nextY = clamp(Number.isFinite(y) ? y : 0, 0, Math.max(0, this.props.contentHeight - this.props.height))
@@ -133,6 +154,9 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     }
   }
 
+  /**
+   * Возвращает значение состояния ScrollArea.
+   */
   getScrollState(): ScrollAreaState {
     return {
       x: {
@@ -150,6 +174,9 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     }
   }
 
+  /**
+   * Обновляет runtime-состояние ScrollArea.
+   */
   update(): void {
     this.flushedScrollVersion = this.scrollVersion
     for (const child of this.contentChildren) {
@@ -164,12 +191,18 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     this.syncScrollbars()
   }
 
+  /**
+   * Выполняет отрисовку ScrollArea.
+   */
   render(): void {
     const schema = buildBoxSchema(this.props, this.width, this.height)
     if (schema.length > 0) this.renderer.schema(schema)
     this.renderer.clip(0, 0, this.width, this.height)
   }
 
+  /**
+   * Обрабатывает входящее событие ScrollArea.
+   */
   protected override onPropsChanged(changedKeys: Array<keyof ScrollAreaResolvedProps>): void {
     this.props = normalizeScrollAreaProps(this.props)
     this.options({ interactive: !this.props.disabled })
@@ -179,6 +212,9 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     this.dirty({ update: true, render: true })
   }
 
+  /**
+   * Обновляет значение состояния ScrollArea.
+   */
   private setupEvents(): void {
     this.on('mouseenter', () => {
       if (this.props.disabled) return
@@ -208,6 +244,9 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     })
   }
 
+  /**
+   * Выполняет внутренний шаг ensureScrollbars для ScrollArea.
+   */
   private ensureScrollbars(): void {
     if (this.props.scrollbarVisibility === 'hidden') {
       this.verticalScrollbar?.remove()
@@ -247,6 +286,9 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     this.syncScrollbars()
   }
 
+  /**
+   * Синхронизирует состояние между слоями ScrollArea.
+   */
   private syncScrollbars(): void {
     if (this.props.scrollbarVisibility === 'hidden') {
       this.reconcileSlot('scrollbar-y', [])
@@ -350,24 +392,36 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     })
   }
 
+  /**
+   * Выполняет внутренний шаг verticalScrollbarApi для ScrollArea.
+   */
   private verticalScrollbarApi(): ScrollbarApi | null {
     return this.verticalScrollbar && 'getApi' in this.verticalScrollbar
       ? (this.verticalScrollbar as unknown as { getApi: () => ScrollbarApi }).getApi()
       : null
   }
 
+  /**
+   * Выполняет внутренний шаг horizontalScrollbarApi для ScrollArea.
+   */
   private horizontalScrollbarApi(): ScrollbarApi | null {
     return this.horizontalScrollbar && 'getApi' in this.horizontalScrollbar
       ? (this.horizontalScrollbar as unknown as { getApi: () => ScrollbarApi }).getApi()
       : null
   }
 
+  /**
+   * Нормализует и возвращает итоговое значение ScrollArea.
+   */
   private resolveScrollbarOpacity(hasVisibleScrollbar: boolean): number {
     if (!hasVisibleScrollbar) return 0
     if (this.props.scrollbarVisibility !== 'active') return 1
     return this.visualState.opacity
   }
 
+  /**
+   * Выполняет внутренний шаг markScrollbarsActive для ScrollArea.
+   */
   private markScrollbarsActive(sync = true): void {
     if (this.props.scrollbarVisibility !== 'active') return
     this.lastScrollbarActivityAt = Date.now()
@@ -383,6 +437,9 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     this.scheduleScrollbarIdle()
   }
 
+  /**
+   * Выполняет внутренний шаг hasStructuralScrollbarChanges для ScrollArea.
+   */
   private hasStructuralScrollbarChanges(changedKeys: Array<keyof ScrollAreaResolvedProps>): boolean {
     return changedKeys.some(key => (
       key === 'contentWidth'
@@ -395,6 +452,9 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     ))
   }
 
+  /**
+   * Выполняет внутренний шаг shouldDeferScrollbarSync для ScrollArea.
+   */
   private shouldDeferScrollbarSync(changedKeys: Array<keyof ScrollAreaResolvedProps>): boolean {
     return changedKeys.every(key => (
       key === 'scrollX'
@@ -405,6 +465,9 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     ))
   }
 
+  /**
+   * Принудительно завершает накопленные изменения ScrollArea.
+   */
   private flushDeferredScrollSync(): void {
     if (this.lifecycleState === 'destroyed') return
     this.scrollSyncPending = false
@@ -413,12 +476,18 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     }
   }
 
+  /**
+   * Планирует отложенное выполнение ScrollArea.
+   */
   private scheduleScrollbarIdle(): void {
     if (this.props.scrollbarVisibility !== 'active') return
     if (this.idleTimer !== 0) return
     this.idleTimer = window.setTimeout(() => this.flushScrollbarIdle(), this.props.scrollbarIdleDelay)
   }
 
+  /**
+   * Принудительно завершает накопленные изменения ScrollArea.
+   */
   private flushScrollbarIdle(): void {
     this.idleTimer = 0
     const elapsed = Date.now() - this.lastScrollbarActivityAt
@@ -438,11 +507,17 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     this.dirty({ render: true })
   }
 
+  /**
+   * Выполняет внутренний шаг hasCustomScrollbar для ScrollArea.
+   */
   private hasCustomScrollbar(orientation: ScrollbarOrientation): boolean {
     const axisSlot = orientation === 'vertical' ? this.slots['scrollbar-y'] : this.slots['scrollbar-x']
     return !!axisSlot || !!this.slots.scrollbar || !!this.slots.track || !!this.slots.thumb
   }
 
+  /**
+   * Синхронизирует состояние между слоями ScrollArea.
+   */
   private syncCustomSlots(
     orientation: ScrollbarOrientation,
     visible: boolean,
@@ -473,6 +548,9 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     this.reconcileSlot(`thumb-${suffix}`, this.slots.thumb?.(context) ?? [])
   }
 
+  /**
+   * Синхронизирует состояние между слоями ScrollArea.
+   */
   private syncCornerSlot(visible: boolean, rect: NovaUiLayoutRect): void {
     if (!visible || !this.slots.corner) {
       this.reconcileSlot('corner', [])
@@ -486,6 +564,9 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     this.reconcileSlot('corner', this.slots.corner(context))
   }
 
+  /**
+   * Синхронизирует состояние между слоями ScrollArea.
+   */
   private syncFallbackParts(showX: boolean, showY: boolean): void {
     this.fallbackParts.length = 0
     if (showY && !this.hasCustomScrollbar('vertical')) {
@@ -502,6 +583,9 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     }
   }
 
+  /**
+   * Создает runtime-сущность ScrollArea.
+   */
   private createSlotContext(
     orientation: ScrollbarOrientation,
     trackRect: NovaUiLayoutRect,
@@ -527,12 +611,18 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     }
   }
 
+  /**
+   * Публикует событие во внутренний event bus ScrollArea.
+   */
   private emitScrollStart(event?: Event): void {
     if (this.scrollLifecycleActive) return
     this.scrollLifecycleActive = true
     this.props.onScrollStart?.(this.getScrollState(), event)
   }
 
+  /**
+   * Планирует отложенное выполнение ScrollArea.
+   */
   private scheduleScrollEnd(event?: Event): void {
     window.clearTimeout(this.scrollEndTimer)
     this.scrollEndTimer = window.setTimeout(() => {
@@ -542,6 +632,9 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     }, 80)
   }
 
+  /**
+   * Публикует событие во внутренний event bus ScrollArea.
+   */
   private emitFallbackPartClick(event: MouseEvent): void {
     if (this.fallbackParts.length === 0) return
     const part = hitTestRectPart(this.fallbackParts, toLocalEventPoint(this, event, this.partEventPoint))
@@ -554,6 +647,9 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     else this.props.onTrackClick?.(context, event)
   }
 
+  /**
+   * Создает runtime-сущность ScrollArea.
+   */
   private createPartEventContext(part: ScrollAreaPartName, orientation: ScrollAreaOrientation): ScrollAreaPartEventContext {
     const vertical = orientation === 'vertical'
     return {
@@ -566,6 +662,9 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     }
   }
 
+  /**
+   * Нормализует и возвращает итоговое значение ScrollArea.
+   */
   private resolveThumbRect(orientation: ScrollbarOrientation, trackRect: NovaUiLayoutRect): NovaUiLayoutRect {
     const vertical = orientation === 'vertical'
     const viewportSize = vertical ? this.height : this.width
@@ -582,6 +681,9 @@ export class ScrollArea<E extends EventList = Record<string, any>>
       : { x: trackRect.x + offset, y: trackRect.y, width: thumbLength, height: trackRect.height }
   }
 
+  /**
+   * Согласует runtime-состояние ScrollArea.
+   */
   private reconcileSlot(key: string, schemas: Array<NovaTemplateChildSchema>): void {
     let runtime = this.slotRuntimes.get(key)
     if (!runtime) {
@@ -591,11 +693,17 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     runtime.reconcile(schemas)
   }
 
+  /**
+   * Очищает накопленное состояние ScrollArea.
+   */
   private clearSlotRuntimes(): void {
     for (const runtime of this.slotRuntimes.values()) runtime.dispose()
     this.slotRuntimes.clear()
   }
 
+  /**
+   * Освобождает runtime-ресурсы и подписки ScrollArea.
+   */
   override dispose(): void {
     window.clearTimeout(this.idleTimer)
     window.clearTimeout(this.scrollEndTimer)

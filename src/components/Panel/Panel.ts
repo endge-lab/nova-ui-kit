@@ -23,12 +23,18 @@ import {
   resolveSpacing,
 } from '@/shared/layout'
 
+/**
+ * Описывает ответственность Panel в архитектуре проекта.
+ */
 export class Panel<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<PanelResolvedProps, PanelApi, PanelProps, E> {
   private readonly childrenNodes: Array<NovaNode<E>> = []
   private readonly bodyRect = createLayoutRect()
   private readonly api: PanelApi
 
+  /**
+   * Создает экземпляр Panel и подготавливает базовое состояние.
+   */
   constructor(
     app: NovaApp<E>,
     surface: NovaSurface<E>,
@@ -47,14 +53,23 @@ export class Panel<E extends EventList = Record<string, any>>
     this.setChildren(options.children ?? [])
   }
 
+  /**
+   * Обновляет значение состояния Panel.
+   */
   override setProps(patch: PanelProps): this {
     return super.setProps(patch as Partial<PanelResolvedProps>)
   }
 
+  /**
+   * Возвращает значение состояния Panel.
+   */
   override getApi(): PanelApi {
     return this.api
   }
 
+  /**
+   * Обновляет значение состояния Panel.
+   */
   setChildren(children: Array<PanelChildSchema>): void {
     const reconciled = reconcileNovaTemplateChildren(this, this.childrenNodes, children)
     this.childrenNodes.length = 0
@@ -62,6 +77,9 @@ export class Panel<E extends EventList = Record<string, any>>
     this.dirty({ update: true, render: true })
   }
 
+  /**
+   * Обновляет runtime-состояние Panel.
+   */
   update(): void {
     const padding = resolveSpacing(this.props.padding)
     const headerHeight = this.props.title || this.props.subtitle
@@ -79,6 +97,9 @@ export class Panel<E extends EventList = Record<string, any>>
     }
   }
 
+  /**
+   * Выполняет отрисовку Panel.
+   */
   render(): void {
     const schema: NovaSchema = buildBoxSchema(this.props, this.width, this.height)
     const padding = resolveSpacing(this.props.padding)
@@ -103,6 +124,9 @@ export class Panel<E extends EventList = Record<string, any>>
     if (this.props.clip) this.renderer.clip(0, 0, this.width, this.height)
   }
 
+  /**
+   * Обрабатывает входящее событие Panel.
+   */
   protected override onPropsChanged(changedKeys: Array<keyof PanelResolvedProps>): void {
     this.props = normalizePanelProps(this.props)
     this.applyCommonPropsChanged(changedKeys)

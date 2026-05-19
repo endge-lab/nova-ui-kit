@@ -72,6 +72,9 @@ export class Grid<E extends EventList = Record<string, any>>
   private effectiveStyleContext = EMPTY_STYLE_CONTEXT
   private subtreeStyleMask = NovaUiStyleMask.None
 
+  /**
+   * Создает экземпляр Grid и подготавливает базовое состояние.
+   */
   constructor(
     app: NovaApp<E>,
     surface: NovaSurface<E>,
@@ -100,14 +103,23 @@ export class Grid<E extends EventList = Record<string, any>>
     this.setChildren(options.children ?? [])
   }
 
+  /**
+   * Обновляет значение состояния Grid.
+   */
   override setProps(patch: GridProps): this {
     return super.setProps(patch as Partial<GridResolvedProps>)
   }
 
+  /**
+   * Возвращает значение состояния Grid.
+   */
   override getApi(): GridApi {
     return this.api
   }
 
+  /**
+   * Выполняет действие responsiveReflow в рамках ответственности Grid.
+   */
   responsiveReflow(columns: number, gap = this.props.gap): void {
     this.transitionTo(
       { columns, gap, rowGap: gap, columnGap: gap },
@@ -142,6 +154,9 @@ export class Grid<E extends EventList = Record<string, any>>
     return result
   }
 
+  /**
+   * Возвращает значение состояния Grid.
+   */
   getSubtreeStyleMask(): NovaUiStyleMask {
     this.recomputeSubtreeStyleMask()
     return this.subtreeStyleMask & ~inheritedTextStyleMask(this.props.style)
@@ -250,14 +265,23 @@ export class Grid<E extends EventList = Record<string, any>>
     this.dirty({ update: true, render: true })
   }
 
+  /**
+   * Возвращает значение состояния Grid.
+   */
   getChildRect(id: string): Readonly<NovaUiLayoutRect> | undefined {
     return this.rectsById.get(id)
   }
 
+  /**
+   * Обрабатывает входящее событие Grid.
+   */
   protected override onMount(): void {
     requireNovaUiRoot(this)
   }
 
+  /**
+   * Обрабатывает входящее событие Grid.
+   */
   protected override onPropsChanged(changedKeys: Array<keyof GridResolvedProps>): void {
     this.props = normalizeGridProps(this.props)
     this.applyDisplayState()
@@ -284,6 +308,9 @@ export class Grid<E extends EventList = Record<string, any>>
     }
   }
 
+  /**
+   * Применяет подготовленное состояние Grid.
+   */
   private applyResolvedRect(rect: NovaUiLayoutRect): boolean {
     if (rectEquals(this.ownRect, rect)) return false
 
@@ -299,6 +326,9 @@ export class Grid<E extends EventList = Record<string, any>>
     return true
   }
 
+  /**
+   * Выполняет внутренний шаг propagateStyleContext для Grid.
+   */
   private propagateStyleContext(changedMask: NovaUiStyleMask): NovaUiStyleReceiveResult {
     const result: NovaUiStyleReceiveResult = {
       update: false,
@@ -322,6 +352,9 @@ export class Grid<E extends EventList = Record<string, any>>
     return result
   }
 
+  /**
+   * Выполняет внутренний шаг recomputeSubtreeStyleMask для Grid.
+   */
   private recomputeSubtreeStyleMask(): void {
     let mask = NovaUiStyleMask.None
 
@@ -334,12 +367,18 @@ export class Grid<E extends EventList = Record<string, any>>
     this.subtreeStyleMask = mask
   }
 
+  /**
+   * Применяет подготовленное состояние Grid.
+   */
   private applyDisplayState(): void {
     const displayed = this.props.display !== 'none'
     this.visible = displayed
     this.active = displayed
   }
 
+  /**
+   * Выполняет внутренний шаг markLayoutAncestorsDirty для Grid.
+   */
   private markLayoutAncestorsDirty(): void {
     relayoutNovaUiLayoutAncestors(this)
   }

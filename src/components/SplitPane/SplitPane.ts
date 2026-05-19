@@ -21,12 +21,18 @@ import {
 } from '@/shared/component'
 import { applyNodeLayoutRect } from '@/shared/layout'
 
+/**
+ * Описывает ответственность SplitPane в архитектуре проекта.
+ */
 export class SplitPane<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<SplitPaneResolvedProps, SplitPaneApi, SplitPaneProps, E> {
   private readonly panes: Array<NovaNode<E>> = []
   private resizerNode: RowResizer<E> | ColResizer<E> | null = null
   private readonly api: SplitPaneApi
 
+  /**
+   * Создает экземпляр SplitPane и подготавливает базовое состояние.
+   */
   constructor(
     app: NovaApp<E>,
     surface: NovaSurface<E>,
@@ -46,14 +52,23 @@ export class SplitPane<E extends EventList = Record<string, any>>
     this.ensureResizer()
   }
 
+  /**
+   * Обновляет значение состояния SplitPane.
+   */
   override setProps(patch: SplitPaneProps): this {
     return super.setProps(patch as Partial<SplitPaneResolvedProps>)
   }
 
+  /**
+   * Возвращает значение состояния SplitPane.
+   */
   override getApi(): SplitPaneApi {
     return this.api
   }
 
+  /**
+   * Обновляет значение состояния SplitPane.
+   */
   setChildren(children: Array<SplitPaneChildSchema>): void {
     const nextSchemas = children.slice(0, 2)
     const reconciled = reconcileNovaTemplateChildren(this, this.panes, nextSchemas)
@@ -62,6 +77,9 @@ export class SplitPane<E extends EventList = Record<string, any>>
     this.dirty({ update: true, render: true })
   }
 
+  /**
+   * Обновляет runtime-состояние SplitPane.
+   */
   update(): void {
     this.ensureResizer()
     const { first, second, resizer } = this.resolveRects()
@@ -78,6 +96,9 @@ export class SplitPane<E extends EventList = Record<string, any>>
     })
   }
 
+  /**
+   * Применяет подготовленное состояние SplitPane.
+   */
   private applyPaneRect(index: number, rect: { x: number; y: number; width: number; height: number }): void {
     const pane = this.panes[index]
     if (!pane) return
@@ -86,12 +107,18 @@ export class SplitPane<E extends EventList = Record<string, any>>
     if (changed) pane.dirty({ matrix: true, update: true, render: true })
   }
 
+  /**
+   * Выполняет отрисовку SplitPane.
+   */
   render(): void {
     const schema = buildBoxSchema(this.props, this.width, this.height)
     if (schema.length > 0) this.renderer.schema(schema)
     if (this.props.clip) this.renderer.clip(0, 0, this.width, this.height)
   }
 
+  /**
+   * Обрабатывает входящее событие SplitPane.
+   */
   protected override onPropsChanged(changedKeys: Array<keyof SplitPaneResolvedProps>): void {
     const previousDirection = this.props.direction
     this.props = normalizeSplitPaneProps(this.props)
@@ -103,6 +130,9 @@ export class SplitPane<E extends EventList = Record<string, any>>
     this.dirty({ update: true, render: true })
   }
 
+  /**
+   * Выполняет внутренний шаг ensureResizer для SplitPane.
+   */
   private ensureResizer(): void {
     if (this.resizerNode) return
     this.resizerNode = this.props.direction === 'horizontal'
@@ -118,6 +148,9 @@ export class SplitPane<E extends EventList = Record<string, any>>
       .onChangeEnd(event => this.props.onResizeEnd?.(this.createResizePayload(0, event)))
   }
 
+  /**
+   * Обновляет размеры runtime-представления SplitPane.
+   */
   private resizeBy(delta: number, event: MouseEvent): SplitPaneResizePayload {
     const total = this.props.direction === 'horizontal' ? this.width : this.height
     const [first] = this.resolvePixelSizes(total)
@@ -127,6 +160,9 @@ export class SplitPane<E extends EventList = Record<string, any>>
     return this.createResizePayload(delta, event)
   }
 
+  /**
+   * Создает runtime-сущность SplitPane.
+   */
   private createResizePayload(delta: number, event: MouseEvent): SplitPaneResizePayload {
     const { resizer } = this.resolveRects()
     return {
@@ -138,6 +174,9 @@ export class SplitPane<E extends EventList = Record<string, any>>
     }
   }
 
+  /**
+   * Нормализует и возвращает итоговое значение SplitPane.
+   */
   private resolveRects(): {
     first: { x: number; y: number; width: number; height: number }
     second: { x: number; y: number; width: number; height: number }
@@ -161,6 +200,9 @@ export class SplitPane<E extends EventList = Record<string, any>>
     }
   }
 
+  /**
+   * Нормализует и возвращает итоговое значение SplitPane.
+   */
   private resolvePixelSizes(total: number): [number, number] {
     if (this.props.collapsedPane === 'first') return [0, total]
     if (this.props.collapsedPane === 'second') return [total, 0]

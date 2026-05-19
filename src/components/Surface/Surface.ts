@@ -43,6 +43,9 @@ export class Surface<E extends EventList = Record<string, any>>
   private readonly motionPlaybacks: Array<NovaMotionPlayback> = []
   private layoutDirty = true
 
+  /**
+   * Создает экземпляр Surface и подготавливает базовое состояние.
+   */
   constructor(
     app: NovaApp<E>,
     surface: NovaSurface<E>,
@@ -60,20 +63,32 @@ export class Surface<E extends EventList = Record<string, any>>
     this.setChildren(options.children ?? [])
   }
 
+  /**
+   * Обновляет значение состояния Surface.
+   */
   override setProps(patch: SurfaceProps): this {
     return super.setProps(patch as Partial<SurfaceResolvedProps>)
   }
 
+  /**
+   * Возвращает значение состояния Surface.
+   */
   override getApi(): SurfaceApi {
     return this.api
   }
 
+  /**
+   * Применяет подготовленное состояние Surface.
+   */
   override applyLayoutRect(rect: NovaUiLayoutRect): boolean {
     const changed = super.applyLayoutRect(rect)
     if (changed || hasActiveMotionTransform(this.props)) this.applyMotionTransform()
     return changed
   }
 
+  /**
+   * Обновляет значение состояния Surface.
+   */
   setChildren(children: Array<SurfaceChildSchema>): void {
     const reconciled = reconcileNovaTemplateChildren(this, this.managedChildren, children)
     this.managedChildren.length = 0
@@ -83,11 +98,17 @@ export class Surface<E extends EventList = Record<string, any>>
     this.relayout()
   }
 
+  /**
+   * Выполняет действие relayout в рамках ответственности Surface.
+   */
   relayout(): void {
     this.layoutDirty = true
     this.dirty({ update: true, render: true })
   }
 
+  /**
+   * Выполняет действие receiveStyleContext в рамках ответственности Surface.
+   */
   override receiveStyleContext(context: NovaUiStyleContext, _changedMask: NovaUiStyleMask): NovaUiStyleReceiveResult {
     const previous = mergeStyleContext(this.inheritedStyleContext, this.props.style)
     this.inheritedStyleContext = context
@@ -98,6 +119,9 @@ export class Surface<E extends EventList = Record<string, any>>
     return mergeStyleReceiveResult(result, { update: false, render: true, layout: result.layout })
   }
 
+  /**
+   * Обновляет runtime-состояние Surface.
+   */
   update(): void {
     if (!this.layoutDirty) return
 
@@ -117,21 +141,33 @@ export class Surface<E extends EventList = Record<string, any>>
     this.layoutDirty = false
   }
 
+  /**
+   * Выполняет отрисовку Surface.
+   */
   render(): void {
     const schema = buildBoxSchema(this.props, this.width, this.height)
     if (schema.length > 0) this.renderer.schema(schema)
     if (this.props.clip) this.renderer.clip(0, 0, this.width, this.height)
   }
 
+  /**
+   * Обрабатывает входящее событие Surface.
+   */
   protected override onMount(): void {
     super.onMount()
     this.syncMotion()
   }
 
+  /**
+   * Обрабатывает входящее событие Surface.
+   */
   protected override onUnmount(): void {
     this.stopMotion()
   }
 
+  /**
+   * Обрабатывает входящее событие Surface.
+   */
   protected override onPropsChanged(changedKeys: Array<keyof SurfaceResolvedProps>): void {
     this.props = normalizeSurfaceProps(this.props)
     this.applyCommonPropsChanged(changedKeys)
@@ -140,6 +176,9 @@ export class Surface<E extends EventList = Record<string, any>>
     if (changedKeys.includes('motion')) this.syncMotion()
   }
 
+  /**
+   * Выполняет внутренний шаг propagateStyleContext для Surface.
+   */
   private propagateStyleContext(changedMask: NovaUiStyleMask): NovaUiStyleReceiveResult {
     const result: NovaUiStyleReceiveResult = { update: false, render: false, layout: false }
     if (changedMask === NovaUiStyleMask.None) return result
@@ -154,6 +193,9 @@ export class Surface<E extends EventList = Record<string, any>>
     return result
   }
 
+  /**
+   * Синхронизирует состояние между слоями Surface.
+   */
   private syncMotion(): void {
     this.stopMotion(true)
     const motions = resolveNovaUiMotionDeclarations(this.props.motion)
@@ -198,6 +240,9 @@ export class Surface<E extends EventList = Record<string, any>>
     }
   }
 
+  /**
+   * Останавливает runtime-процесс Surface.
+   */
   private stopMotion(resetOffset = false): void {
     for (const playback of this.motionPlaybacks) playback.cancel()
     this.motionPlaybacks.length = 0
@@ -209,6 +254,9 @@ export class Surface<E extends EventList = Record<string, any>>
     }
   }
 
+  /**
+   * Применяет подготовленное состояние Surface.
+   */
   private applyMotionTransform(): void {
     const rotation = this.props.motionRotation
     const offsetY = this.props.motionOffsetY

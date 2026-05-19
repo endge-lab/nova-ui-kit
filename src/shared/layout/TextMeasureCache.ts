@@ -4,6 +4,9 @@ const DEFAULT_TEXT_MEASURE_CACHE_LIMIT = 2000
 export class TextMeasureCache {
   private readonly values = new Map<string, number>()
 
+  /**
+   * Создает экземпляр TextMeasureCache и подготавливает базовое состояние.
+   */
   constructor(private readonly limit = DEFAULT_TEXT_MEASURE_CACHE_LIMIT) {}
 
   /** Возвращает cached width или вычисляет его через переданную функцию. */

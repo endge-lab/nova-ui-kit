@@ -32,6 +32,9 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
   private pressedIndex = -1
   private readonly api: AdvancedComponentApi
 
+  /**
+   * Создает экземпляр AdvancedComponent и подготавливает базовое состояние.
+   */
   constructor(
     app: NovaApp<E>,
     surface: NovaSurface<E>,
@@ -52,14 +55,23 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
     this.setupEvents()
   }
 
+  /**
+   * Обновляет значение состояния AdvancedComponent.
+   */
   override setProps(patch: AdvancedComponentProps): this {
     return super.setProps(patch as Partial<AdvancedComponentResolvedProps>)
   }
 
+  /**
+   * Возвращает значение состояния AdvancedComponent.
+   */
   override getApi(): AdvancedComponentApi {
     return this.api
   }
 
+  /**
+   * Обновляет значение состояния AdvancedComponent.
+   */
   setValue(value: number | string | boolean, event?: Event): void {
     if (this.props.disabled) {
       this.playUiSound('disabledPress')
@@ -72,6 +84,9 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
     this.props.onInput?.(value, event)
   }
 
+  /**
+   * Обновляет значение состояния AdvancedComponent.
+   */
   setOpen(open: boolean, event?: Event): void {
     if (this.props.open === open) return
     this.setProps({ open, expanded: open })
@@ -80,6 +95,9 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
     else this.props.onHide?.(event)
   }
 
+  /**
+   * Переключает флаг состояния AdvancedComponent.
+   */
   toggle(event?: Event): void {
     if (this.props.kind === 'ToggleSwitch') {
       const next = !this.props.checked
@@ -92,6 +110,9 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
     this.setOpen(!this.props.open, event)
   }
 
+  /**
+   * Выполняет отрисовку AdvancedComponent.
+   */
   render(): void {
     const schema: NovaSchema = buildBoxSchema(this.props, this.width, this.height)
 
@@ -168,12 +189,18 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
     this.renderer.schema(schema)
   }
 
+  /**
+   * Обрабатывает входящее событие AdvancedComponent.
+   */
   protected override onPropsChanged(changedKeys: Array<keyof AdvancedComponentResolvedProps>): void {
     this.props = normalizeAdvancedComponentProps(this.props.kind, this.props)
     this.options({ interactive: !this.props.disabled })
     this.applyCommonPropsChanged(changedKeys)
   }
 
+  /**
+   * Выполняет отрисовку AdvancedComponent.
+   */
   private renderSpeedDial(schema: NovaSchema): void {
     const cx = this.width / 2
     const cy = this.height - 38
@@ -190,6 +217,9 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
     this.pushRoundAction(schema, cx - 24, cy - 24, 48, { label: '+', color: this.props.accentColor ?? '#2563eb' }, true)
   }
 
+  /**
+   * Выполняет отрисовку AdvancedComponent.
+   */
   private renderDock(schema: NovaSchema): void {
     const items = this.props.items
     const gap = 12
@@ -205,6 +235,9 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
     })
   }
 
+  /**
+   * Выполняет отрисовку AdvancedComponent.
+   */
   private renderGallery(schema: NovaSchema): void {
     const items = this.props.items
     const active = items[Math.min(items.length - 1, this.props.activeIndex)] ?? items[0]
@@ -220,6 +253,9 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
     })
   }
 
+  /**
+   * Выполняет отрисовку AdvancedComponent.
+   */
   private renderImagePreview(schema: NovaSchema): void {
     this.pushRect(schema, 12, 12, this.width - 24, this.height - 24, this.props.parts?.image?.background ?? '#bae6fd', 'image', 14)
     if (this.props.image) pushIcon(schema, this.props.image, 20, 20, Math.max(24, Math.min(this.width, this.height) - 40))
@@ -227,6 +263,9 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
     pushText(schema, this.props.title || 'Preview', 24, this.height / 2 - 12, this.width - 48, 24, this.textStyle({ color: '#ffffff', fontWeight: '700' }), { align: 'center' })
   }
 
+  /**
+   * Выполняет отрисовку AdvancedComponent.
+   */
   private renderImageCompare(schema: NovaSchema): void {
     const split = (clamp(Number(this.props.value), 0, 100) / 100) * this.width
     this.pushRect(schema, 10, 10, this.width - 20, this.height - 20, this.props.parts?.before?.background ?? '#bfdbfe', 'before', 14)
@@ -235,6 +274,9 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
     this.pushRect(schema, split - 10, this.height / 2 - 16, 20, 32, '#ffffff', 'handle', 999, '#0ea5e9')
   }
 
+  /**
+   * Выполняет отрисовку AdvancedComponent.
+   */
   private renderSkeleton(schema: NovaSchema): void {
     const part = this.part('shimmer')
     this.pushRect(schema, 16, 16, this.width * 0.42, 14, '#cbd5e1', 'line', 999)
@@ -243,11 +285,17 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
     this.pushRect(schema, this.width * 0.16, 0, this.width * 0.28, this.height, part.background ?? 'rgba(255,255,255,0.42)', 'shimmer', 0)
   }
 
+  /**
+   * Выполняет отрисовку AdvancedComponent.
+   */
   private renderProgressBar(schema: NovaSchema): void {
     const pct = this.percent()
     this.pushRect(schema, 2, 2, Math.max(0, (this.width - 4) * pct), this.height - 4, this.props.accentColor ?? '#2563eb', 'value', 999)
   }
 
+  /**
+   * Выполняет отрисовку AdvancedComponent.
+   */
   private renderProgressSpinner(schema: NovaSchema): void {
     const r = Math.min(this.width, this.height) / 2 - 8
     const cx = this.width / 2
@@ -257,6 +305,9 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
     schema.push({ type: 'line', x1: cx, y1: cy - r, x2: cx + Math.cos(angle) * r, y2: cy + Math.sin(angle) * r, styles: { color: this.props.accentColor ?? '#2563eb', width: 6 } })
   }
 
+  /**
+   * Выполняет отрисовку AdvancedComponent.
+   */
   private renderMeterGroup(schema: NovaSchema): void {
     const total = this.props.items.reduce((sum, item) => sum + Number(item.value ?? 0), 0) || 1
     let x = 12
@@ -275,6 +326,9 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
     })
   }
 
+  /**
+   * Выполняет отрисовку AdvancedComponent.
+   */
   private renderKnob(schema: NovaSchema): void {
     const cx = this.width / 2
     const cy = this.height / 2
@@ -287,6 +341,9 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
     pushText(schema, `${Math.round(pct * 100)}%`, cx - 28, cy - 10, 56, 20, this.textStyle({ fontWeight: '700' }), { align: 'center' })
   }
 
+  /**
+   * Выполняет отрисовку AdvancedComponent.
+   */
   private renderToggleSwitch(schema: NovaSchema): void {
     const checked = this.props.checked
     const h = this.height
@@ -295,6 +352,9 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
     this.pushRect(schema, checked ? this.width - knob - 4 : 4, 4, knob, knob, '#ffffff', 'thumb', 999)
   }
 
+  /**
+   * Выполняет отрисовку AdvancedComponent.
+   */
   private renderRadioButton(schema: NovaSchema): void {
     const size = Math.min(20, this.height - 6)
     const y = (this.height - size) / 2
@@ -303,6 +363,9 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
     pushText(schema, this.props.text, size + 10, 0, this.width - size - 10, this.height, this.textStyle())
   }
 
+  /**
+   * Выполняет отрисовку AdvancedComponent.
+   */
   private renderRating(schema: NovaSchema): void {
     const count = Math.max(1, this.props.items.length || 5)
     const active = Math.round(this.props.rating || Number(this.props.value) || 0)
@@ -312,6 +375,9 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
     }
   }
 
+  /**
+   * Выполняет отрисовку AdvancedComponent.
+   */
   private renderSelectButton(schema: NovaSchema): void {
     const items = this.props.items
     const count = Math.max(1, items.length)
@@ -327,6 +393,9 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
     })
   }
 
+  /**
+   * Выполняет отрисовку AdvancedComponent.
+   */
   private renderOverlay(schema: NovaSchema): void {
     const isDrawer = this.props.kind === 'Drawer'
     const isPopover = this.props.kind === 'Popover'
@@ -341,6 +410,9 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
     this.pushRect(schema, x + 16, y + h - 38, 72, 24, this.props.accentColor ?? '#2563eb', 'action', 8)
   }
 
+  /**
+   * Выполняет отрисовку AdvancedComponent.
+   */
   private renderToast(schema: NovaSchema): void {
     const tone = severityPalette(this.props.severity)
     schema.push({ type: 'circle', x: 26, y: this.height / 2, radius: 9, styles: { background: tone.accent } })
@@ -348,12 +420,18 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
     pushText(schema, this.props.subtitle, 44, 38, this.width - 58, 20, this.textStyle({ color: '#64748b', fontSize: 12 }))
   }
 
+  /**
+   * Выполняет отрисовку AdvancedComponent.
+   */
   private renderMessage(schema: NovaSchema): void {
     const tone = severityPalette(this.props.severity)
     schema.push({ type: 'circle', x: 22, y: this.height / 2, radius: 7, styles: { background: tone.accent } })
     pushText(schema, this.props.text, 40, 0, this.width - 52, this.height, this.textStyle({ color: tone.color, fontWeight: '600' }))
   }
 
+  /**
+   * Выполняет отрисовку AdvancedComponent.
+   */
   private renderBlockUi(schema: NovaSchema): void {
     pushText(schema, this.props.title, 18, 18, this.width - 36, 24, this.textStyle({ fontWeight: '700' }))
     pushText(schema, this.props.subtitle, 18, 48, this.width - 36, 38, this.textStyle({ color: '#64748b', fontSize: 12 }))
@@ -364,6 +442,9 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
     }
   }
 
+  /**
+   * Выполняет отрисовку AdvancedComponent.
+   */
   private renderDisclosure(schema: NovaSchema): void {
     pushText(schema, this.props.title, 16, 12, this.width - 48, 22, this.textStyle({ fontWeight: '700' }))
     pushText(schema, this.props.expanded ? 'v' : '>', this.width - 34, 12, 18, 22, this.textStyle({ fontWeight: '700' }), { align: 'center' })
@@ -375,6 +456,9 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
     })
   }
 
+  /**
+   * Выполняет отрисовку AdvancedComponent.
+   */
   private renderTabs(schema: NovaSchema): void {
     const items = this.props.items
     const count = Math.max(1, items.length)
@@ -388,6 +472,9 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
     pushText(schema, items[active]?.label ?? 'Tab', 32, 72, this.width - 64, 20, this.textStyle({ fontWeight: '700' }))
   }
 
+  /**
+   * Выполняет отрисовку AdvancedComponent.
+   */
   private renderStepper(schema: NovaSchema): void {
     const items = this.props.items
     const count = Math.max(1, items.length)
@@ -403,6 +490,9 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
     })
   }
 
+  /**
+   * Обновляет значение состояния AdvancedComponent.
+   */
   private setupEvents(): void {
     this.on('mousemove', event => {
       if (this.props.disabled) return
@@ -444,6 +534,9 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
     })
   }
 
+  /**
+   * Выполняет внутренний шаг indexFromEvent для AdvancedComponent.
+   */
   private indexFromEvent(event: MouseEvent): number {
     const items = this.props.items
     if (items.length === 0) return -1
@@ -454,17 +547,26 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
     return Math.min(items.length - 1, Math.floor((localX / this.width) * items.length))
   }
 
+  /**
+   * Выполняет внутренний шаг percent для AdvancedComponent.
+   */
   private percent(): number {
     const raw = typeof this.props.value === 'number' ? this.props.value : Number(this.props.value)
     return clamp((raw - this.props.min) / Math.max(1, this.props.max - this.props.min), 0, 1)
   }
 
+  /**
+   * Выполняет внутренний шаг pushRoundAction для AdvancedComponent.
+   */
   private pushRoundAction(schema: NovaSchema, x: number, y: number, size: number, item: AdvancedItem, active: boolean): void {
     const background = item.color ?? this.props.accentColor ?? '#2563eb'
     this.pushRect(schema, x, y, size, size, active ? background : '#ffffff', 'item', 999, active ? background : '#cbd5e1')
     pushText(schema, item.icon ? '' : (item.label ?? '').slice(0, 1), x, y, size, size, this.textStyle({ color: active ? '#ffffff' : background, fontWeight: '800' }), { align: 'center' })
   }
 
+  /**
+   * Выполняет внутренний шаг pushRect для AdvancedComponent.
+   */
   private pushRect(schema: NovaSchema, x: number, y: number, width: number, height: number, background: string, part: string, radius = 0, borderColor?: string): void {
     const style = this.part(part)
     schema.push({
@@ -485,6 +587,9 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
     })
   }
 
+  /**
+   * Выполняет внутренний шаг pushStar для AdvancedComponent.
+   */
   private pushStar(schema: NovaSchema, cx: number, cy: number, radius: number, color: string): void {
     const points = Array.from({ length: 10 }, (_, index) => {
       const r = index % 2 === 0 ? radius : radius * 0.45
@@ -494,10 +599,16 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
     schema.push({ type: 'polygon', points, styles: { background: color, stroke: color, lineWidth: 1 } })
   }
 
+  /**
+   * Выполняет внутренний шаг part для AdvancedComponent.
+   */
   private part(name: string): NovaUiPartStyle {
     return this.props.parts?.[name] ?? {}
   }
 
+  /**
+   * Выполняет внутренний шаг textStyle для AdvancedComponent.
+   */
   private textStyle(patch: Partial<ReturnType<typeof resolveComponentTextStyle>> = {}): ReturnType<typeof resolveComponentTextStyle> {
     return {
       ...resolveComponentTextStyle(this.props, this.inheritedStyleContext),

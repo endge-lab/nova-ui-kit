@@ -4,6 +4,9 @@ import type { EventList } from '@endge/utils'
 import type { ResizerOptions } from '@/domain/domain.types'
 import { resolveNovaUiMotionOptions } from '@/shared/motion'
 
+/**
+ * Описывает ответственность RowResizer в архитектуре проекта.
+ */
 export class RowResizer<E extends EventList> extends NovaNode<E> {
   private _color: string
   private _hoverColor: string
@@ -22,6 +25,9 @@ export class RowResizer<E extends EventList> extends NovaNode<E> {
   private _onChangeMove: (e: MouseEvent, dy: number) => void = () => {}
   private _onChangeEnd: (e: MouseEvent) => void = () => {}
 
+  /**
+   * Создает экземпляр RowResizer и подготавливает базовое состояние.
+   */
   constructor(
     app: NovaApp<E>,
     surface: NovaSurface<E>,
@@ -40,6 +46,9 @@ export class RowResizer<E extends EventList> extends NovaNode<E> {
     this.setupEvents()
   }
 
+  /**
+   * Обновляет значение состояния RowResizer.
+   */
   private setupEvents(): void {
     this.on('dragstart', e => {
       if (this._disabled) return false
@@ -87,21 +96,33 @@ export class RowResizer<E extends EventList> extends NovaNode<E> {
     })
   }
 
+  /**
+   * Обрабатывает входящее событие RowResizer.
+   */
   onChangeStart(handler: (e: MouseEvent) => void): RowResizer<E> {
     this._onChangeStart = handler
     return this
   }
 
+  /**
+   * Обрабатывает входящее событие RowResizer.
+   */
   onChangeMove(handler: (e: MouseEvent, dy: number) => void): RowResizer<E> {
     this._onChangeMove = handler
     return this
   }
 
+  /**
+   * Обрабатывает входящее событие RowResizer.
+   */
   onChangeEnd(handler: (e: MouseEvent) => void): RowResizer<E> {
     this._onChangeEnd = handler
     return this
   }
 
+  /**
+   * Выполняет действие options в рамках ответственности RowResizer.
+   */
   options(opts: Partial<ResizerOptions>): this {
     const {
       color,
@@ -136,6 +157,9 @@ export class RowResizer<E extends EventList> extends NovaNode<E> {
     return this
   }
 
+  /**
+   * Выполняет отрисовку RowResizer.
+   */
   render(): void {
     const centerY = this.height / 2
 
@@ -166,6 +190,9 @@ export class RowResizer<E extends EventList> extends NovaNode<E> {
     ])
   }
 
+  /**
+   * Создает runtime-сущность RowResizer.
+   */
   static create<E extends EventList>(
     app: NovaApp<E>,
     surface: NovaSurface<E>,

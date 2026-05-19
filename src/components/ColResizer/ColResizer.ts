@@ -4,6 +4,9 @@ import type { EventList } from '@endge/utils'
 import type { ResizerOptions } from '@/domain/domain.types'
 import { resolveNovaUiMotionOptions } from '@/shared/motion'
 
+/**
+ * Описывает ответственность ColResizer в архитектуре проекта.
+ */
 export class ColResizer<E extends EventList> extends NovaNode<E> {
   private color: string
   private hoverColor: string
@@ -19,6 +22,9 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
   private _onChangeMove: (e: MouseEvent, dx: number) => void = () => {}
   private _onChangeEnd: (e: MouseEvent) => void = () => {}
 
+  /**
+   * Создает экземпляр ColResizer и подготавливает базовое состояние.
+   */
   constructor(
     app: NovaApp<E>,
     surface: NovaSurface<E>,
@@ -37,6 +43,9 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
     this.setupEvents()
   }
 
+  /**
+   * Обновляет значение состояния ColResizer.
+   */
   private setupEvents(): void {
     this.on('dragstart', e => {
       if (this.disabled) return false
@@ -92,21 +101,33 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
     })
   }
 
+  /**
+   * Обрабатывает входящее событие ColResizer.
+   */
   onChangeStart(handler: (e: MouseEvent) => void): ColResizer<E> {
     this._onChangeStart = handler
     return this
   }
 
+  /**
+   * Обрабатывает входящее событие ColResizer.
+   */
   onChangeMove(handler: (e: MouseEvent, dx: number) => void): ColResizer<E> {
     this._onChangeMove = handler
     return this
   }
 
+  /**
+   * Обрабатывает входящее событие ColResizer.
+   */
   onChangeEnd(handler: (e: MouseEvent) => void): ColResizer<E> {
     this._onChangeEnd = handler
     return this
   }
 
+  /**
+   * Выполняет отрисовку ColResizer.
+   */
   render(): void {
     const centerX = this.width / 2
     const y1 = 0
@@ -137,6 +158,9 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
     ])
   }
 
+  /**
+   * Выполняет действие options в рамках ответственности ColResizer.
+   */
   options(opts: Partial<ResizerOptions>): this {
     const {
       color,
@@ -169,6 +193,9 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
   }
 
   // --- Новый статический метод для создания ресайзера ---
+  /**
+   * Создает runtime-сущность ColResizer.
+   */
   static create<E extends EventList>(
     app: NovaApp<E>,
     surface: NovaSurface<E>,

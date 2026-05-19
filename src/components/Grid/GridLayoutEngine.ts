@@ -84,6 +84,9 @@ export class GridLayoutEngine {
   private readonly rowHeights: Array<number> = []
   private readonly rowOffsets: Array<number> = []
 
+  /**
+   * Вычисляет производное значение GridLayoutEngine.
+   */
   compute(context: GridLayoutContext): GridLayoutResult {
     const props = context.props
     const padding = resolveSpacing(props.padding)
@@ -115,6 +118,9 @@ export class GridLayoutEngine {
     }
   }
 
+  /**
+   * Подготавливает данные к использованию GridLayoutEngine.
+   */
   private prepareSortedEntries(entries: Array<GridChildEntry>): void {
     this.sortedEntries.length = 0
     if (isAlreadyOrdered(entries)) {
@@ -130,6 +136,9 @@ export class GridLayoutEngine {
     })
   }
 
+  /**
+   * Выполняет внутренний шаг collectMeasuredItems для GridLayoutEngine.
+   */
   private collectMeasuredItems(context: {
     props: GridResolvedProps
     padding: NovaUiResolvedSpacing
@@ -184,6 +193,9 @@ export class GridLayoutEngine {
     this.measuredItems.length = itemIndex
   }
 
+  /**
+   * Выполняет внутренний шаг placeMeasuredItems для GridLayoutEngine.
+   */
   private placeMeasuredItems(context: {
     props: GridResolvedProps
     padding: NovaUiResolvedSpacing
@@ -212,6 +224,9 @@ export class GridLayoutEngine {
     }
   }
 
+  /**
+   * Нормализует и возвращает итоговое значение GridLayoutEngine.
+   */
   private resolveColumnCount(props: GridResolvedProps, innerWidth: number): number {
     if (!props.responsive) return Math.max(1, props.columns)
 
@@ -226,11 +241,17 @@ export class GridLayoutEngine {
     )
   }
 
+  /**
+   * Нормализует и возвращает итоговое значение GridLayoutEngine.
+   */
   private resolveColumnWidth(innerWidth: number, columnCount: number, columnGap: number): number {
     const gapTotal = Math.max(0, columnCount - 1) * columnGap
     return Math.max(0, (innerWidth - gapTotal) / columnCount)
   }
 
+  /**
+   * Нормализует и возвращает итоговое значение GridLayoutEngine.
+   */
   private resolveItemHeight(
     entry: GridChildEntry,
     rowHeight: NovaUiCompiledLayoutValue,
@@ -248,6 +269,9 @@ export class GridLayoutEngine {
     return clampLayoutNumber(rawHeight, layout.minHeight, layout.maxHeight)
   }
 
+  /**
+   * Измеряет layout или runtime-метрики GridLayoutEngine.
+   */
   private measureAutoItem(entry: GridChildEntry, cellWidth: number, innerHeight: number): { width: number; height: number } | undefined {
     const layout = entry.compiledLayout
 
@@ -262,6 +286,9 @@ export class GridLayoutEngine {
     })
   }
 
+  /**
+   * Нормализует и возвращает итоговое значение GridLayoutEngine.
+   */
   private resolveRowOffsets(rowGap: number): void {
     this.rowOffsets.length = this.rowHeights.length
     let offset = 0
@@ -272,6 +299,9 @@ export class GridLayoutEngine {
     }
   }
 
+  /**
+   * Нормализует и возвращает итоговое значение GridLayoutEngine.
+   */
   private resolveOffset(align: GridAlign, available: number, target: number): number {
     const free = Math.max(0, available - target)
     if (align === 'center') return free / 2

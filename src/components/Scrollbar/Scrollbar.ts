@@ -20,12 +20,18 @@ import {
   clamp,
 } from '@/shared/component'
 
+/**
+ * Описывает ответственность Scrollbar в архитектуре проекта.
+ */
 export class Scrollbar<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<ScrollbarResolvedProps, ScrollbarApi, ScrollbarProps, E> {
   private dragging = false
   private hovered = false
   private readonly api: ScrollbarApi
 
+  /**
+   * Создает экземпляр Scrollbar и подготавливает базовое состояние.
+   */
   constructor(
     app: NovaApp<E>,
     surface: NovaSurface<E>,
@@ -44,14 +50,23 @@ export class Scrollbar<E extends EventList = Record<string, any>>
     this.setupEvents()
   }
 
+  /**
+   * Обновляет значение состояния Scrollbar.
+   */
   override setProps(patch: ScrollbarProps): this {
     return super.setProps(patch as Partial<ScrollbarResolvedProps>)
   }
 
+  /**
+   * Возвращает значение состояния Scrollbar.
+   */
   override getApi(): ScrollbarApi {
     return this.api
   }
 
+  /**
+   * Обновляет значение состояния Scrollbar.
+   */
   setValue(value: number, event?: Event): void {
     if (this.props.disabled) return
     const next = normalizeScrollbarProps({ ...this.props, value }).value
@@ -60,6 +75,9 @@ export class Scrollbar<E extends EventList = Record<string, any>>
     this.props.onChange?.(next, event)
   }
 
+  /**
+   * Возвращает значение состояния Scrollbar.
+   */
   getScrollState(): ScrollbarState {
     return {
       value: this.props.value,
@@ -69,6 +87,9 @@ export class Scrollbar<E extends EventList = Record<string, any>>
     }
   }
 
+  /**
+   * Выполняет отрисовку Scrollbar.
+   */
   render(): void {
     const horizontal = this.props.orientation === 'horizontal'
     const length = Math.max(1, horizontal ? this.width : this.height)
@@ -102,12 +123,18 @@ export class Scrollbar<E extends EventList = Record<string, any>>
     this.renderer.schema(schema)
   }
 
+  /**
+   * Обрабатывает входящее событие Scrollbar.
+   */
   protected override onPropsChanged(changedKeys: Array<keyof ScrollbarResolvedProps>): void {
     this.props = normalizeScrollbarProps(this.props)
     this.options({ interactive: !this.props.disabled })
     this.applyCommonPropsChanged(changedKeys)
   }
 
+  /**
+   * Обновляет значение состояния Scrollbar.
+   */
   private setupEvents(): void {
     this.on('mouseenter', () => {
       if (this.props.disabled) return
@@ -138,6 +165,9 @@ export class Scrollbar<E extends EventList = Record<string, any>>
     })
   }
 
+  /**
+   * Выполняет внутренний шаг valueFromEvent для Scrollbar.
+   */
   private valueFromEvent(event: MouseEvent): number {
     const { x, y } = this.events.getCanvasMousePosition(event)
     const [localX, localY] = this.toLocal(x, y)
@@ -149,6 +179,9 @@ export class Scrollbar<E extends EventList = Record<string, any>>
     return clamp(raw / travel, 0, 1) * this.maxValue()
   }
 
+  /**
+   * Выполняет внутренний шаг maxValue для Scrollbar.
+   */
   private maxValue(): number {
     return Math.max(0, this.props.contentSize - this.props.viewportSize)
   }

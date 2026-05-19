@@ -34,6 +34,9 @@ import { pushIcon, pushText } from '@/shared/component/component-render'
 const layoutEngine = new NovaInputTextLayoutEngine()
 const clipboard = new NovaClipboardService()
 
+/**
+ * Описывает ответственность Input в архитектуре проекта.
+ */
 export class Input<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<InputResolvedProps, InputApi, InputProps, E> {
   protected hovered = false
@@ -49,6 +52,9 @@ export class Input<E extends EventList = Record<string, any>>
   protected revealed = false
   protected scrollY = 0
 
+  /**
+   * Создает экземпляр Input и подготавливает базовое состояние.
+   */
   constructor(
     app: NovaApp<E>,
     surface: NovaSurface<E>,
@@ -70,14 +76,23 @@ export class Input<E extends EventList = Record<string, any>>
 
   protected kindName: InputComponentKind = 'input'
 
+  /**
+   * Обновляет значение состояния Input.
+   */
   override setProps(patch: InputProps): this {
     return super.setProps(patch as Partial<InputResolvedProps>)
   }
 
+  /**
+   * Возвращает значение состояния Input.
+   */
   override getApi(): InputApi {
     return this.api
   }
 
+  /**
+   * Выполняет отрисовку Input.
+   */
   render(): void {
     this.layoutCache = this.createTextLayout()
     const schema = this.renderInputFrame()
@@ -86,6 +101,9 @@ export class Input<E extends EventList = Record<string, any>>
     this.renderer.schema(schema)
   }
 
+  /**
+   * Обрабатывает входящее событие Input.
+   */
   protected override onPropsChanged(changedKeys: Array<keyof InputResolvedProps>): void {
     const previousValue = this.props.value
     this.props = normalizeInputProps(this.props, this.kindName)
@@ -100,6 +118,9 @@ export class Input<E extends EventList = Record<string, any>>
     if (changedKeys.includes('validate')) this.validator = this.createValidator()
   }
 
+  /**
+   * Обрабатывает входящее событие Input.
+   */
   protected override onUnmount(): void {
     this.caret.stop()
     this.proxy.dispose()
@@ -111,6 +132,9 @@ export class Input<E extends EventList = Record<string, any>>
     this.dirty({ render: true })
   })
 
+  /**
+   * Создает runtime-сущность Input.
+   */
   protected createApi(): InputApi {
     return {
       focus: () => this.focusInput(),
@@ -153,6 +177,9 @@ export class Input<E extends EventList = Record<string, any>>
     }
   }
 
+  /**
+   * Выполняет отрисовку Input.
+   */
   protected renderInputFrame(): NovaSchema {
     const focused = this.controller.getState().focused
     const invalid = this.isInvalid()
@@ -186,6 +213,9 @@ export class Input<E extends EventList = Record<string, any>>
     return schema
   }
 
+  /**
+   * Выполняет расширяемый шаг pushInputContent для Input.
+   */
   protected pushInputContent(schema: NovaSchema): void {
     const textStyle = resolveComponentTextStyle(this.props, this.inheritedStyleContext)
     const state = this.controller.getState()
@@ -241,6 +271,9 @@ export class Input<E extends EventList = Record<string, any>>
     if (this.isInvalid() && this.kindName !== 'field') this.pushErrorMark(schema)
   }
 
+  /**
+   * Выполняет расширяемый шаг pushMultilineText для Input.
+   */
   protected pushMultilineText(
     schema: NovaSchema,
     layout: NovaTextInputLayoutResult,
@@ -263,6 +296,9 @@ export class Input<E extends EventList = Record<string, any>>
     }
   }
 
+  /**
+   * Выполняет расширяемый шаг pushSelectMenu для Input.
+   */
   protected pushSelectMenu(schema: NovaSchema): void {
     const textStyle = resolveComponentTextStyle(this.props, this.inheritedStyleContext)
     const optionHeight = 28
@@ -292,6 +328,9 @@ export class Input<E extends EventList = Record<string, any>>
     })
   }
 
+  /**
+   * Обновляет значение состояния Input.
+   */
   protected setupEvents(): void {
     this.on('mouseenter', () => {
       if (this.props.disabled) return
@@ -374,6 +413,9 @@ export class Input<E extends EventList = Record<string, any>>
     })
   }
 
+  /**
+   * Обрабатывает runtime-событие Input.
+   */
   protected handleKeydown(event: KeyboardEvent): void {
     if (this.props.disabled) return
     const command = event.metaKey || event.ctrlKey
@@ -410,6 +452,9 @@ export class Input<E extends EventList = Record<string, any>>
     if (this.kindName === 'search' && event.key === 'Enter') this.props.onSearch?.(this.controller.getState().draft, this.context('search', event))
   }
 
+  /**
+   * Обновляет значение состояния Input.
+   */
   protected setInputValue(value: string | number, context: { event?: Event; reason?: string } = {}): void {
     this.controller.setValue(this.formatValue(value), context)
     this.syncProxy()
@@ -418,6 +463,9 @@ export class Input<E extends EventList = Record<string, any>>
     this.dirty({ render: true })
   }
 
+  /**
+   * Фиксирует подготовленные изменения Input.
+   */
   protected commitInput(context: { event?: Event; reason?: string } = {}): void {
     this.controller.commit(context)
     this.runValidationIfNeeded('onCommit', context.event)
@@ -426,6 +474,9 @@ export class Input<E extends EventList = Record<string, any>>
     this.dirty({ render: true })
   }
 
+  /**
+   * Выполняет расширяемый шаг cancelInput для Input.
+   */
   protected cancelInput(context: { event?: Event; reason?: string } = {}): void {
     this.controller.cancel(context)
     this.props.onCancel?.(this.context(context.reason ?? 'cancel', context.event))
@@ -433,6 +484,9 @@ export class Input<E extends EventList = Record<string, any>>
     this.dirty({ render: true })
   }
 
+  /**
+   * Переводит focus в целевое состояние Input.
+   */
   protected focusInput(event?: Event): void {
     this.focus(event)
     this.controller.focus()
@@ -444,6 +498,9 @@ export class Input<E extends EventList = Record<string, any>>
     this.dirty({ render: true })
   }
 
+  /**
+   * Снимает focus с целевого состояния Input.
+   */
   protected blurInput(): void {
     this.controller.blur()
     this.proxy.blur()
@@ -453,6 +510,9 @@ export class Input<E extends EventList = Record<string, any>>
     this.dirty({ render: true })
   }
 
+  /**
+   * Выполняет расширяемый шаг afterInput для Input.
+   */
   protected afterInput(reason: string, event?: Event): void {
     this.syncProxy()
     this.caret.reset()
@@ -462,6 +522,9 @@ export class Input<E extends EventList = Record<string, any>>
     this.dirty({ render: true })
   }
 
+  /**
+   * Выполняет расширяемый шаг runValidation для Input.
+   */
   protected async runValidation(reason: string): Promise<{ result: NovaInputValidationResult; message?: string }> {
     const state = await this.validator.validate(this.readParsedValue(), this.context(reason))
     this.validationMessage = state.message
@@ -470,6 +533,9 @@ export class Input<E extends EventList = Record<string, any>>
     return { result: state.result, message: state.message }
   }
 
+  /**
+   * Выполняет расширяемый шаг runValidationIfNeeded для Input.
+   */
   protected runValidationIfNeeded(mode: InputResolvedProps['validation'], event?: Event): void {
     if (this.props.validation !== mode || !this.props.validate) return
     void this.validator.validate(this.readParsedValue(), this.context(mode, event)).then(state => {
@@ -479,6 +545,9 @@ export class Input<E extends EventList = Record<string, any>>
     })
   }
 
+  /**
+   * Выполняет расширяемый шаг readParsedValue для Input.
+   */
   protected readParsedValue(): unknown {
     const text = this.controller.getState().draft
     if (this.props.parse) return this.props.parse(text, this.context('parse'))
@@ -489,6 +558,9 @@ export class Input<E extends EventList = Record<string, any>>
     return text
   }
 
+  /**
+   * Выполняет расширяемый шаг formatValue для Input.
+   */
   protected formatValue(value: unknown): string {
     if (this.props.format) return this.props.format(value, this.context('format'))
     if (this.kindName === 'number' && typeof value === 'number' && Number.isFinite(value) && this.props.precision !== undefined) {
@@ -497,6 +569,9 @@ export class Input<E extends EventList = Record<string, any>>
     return value === undefined || value === null ? '' : String(value)
   }
 
+  /**
+   * Создает runtime-сущность Input.
+   */
   protected createController(value?: string): NovaTextInputController {
     return new NovaTextInputController({
       value: value ?? this.formatValue(this.props.value ?? this.props.defaultValue ?? ''),
@@ -511,10 +586,16 @@ export class Input<E extends EventList = Record<string, any>>
     })
   }
 
+  /**
+   * Создает runtime-сущность Input.
+   */
   protected createValidator(): NovaInputValidationController<unknown, any> {
     return new NovaInputValidationController(this.props.validate)
   }
 
+  /**
+   * Создает runtime-сущность Input.
+   */
   protected createProxy(): NovaInputProxyService {
     return new NovaInputProxyService({
       engine: this.props.inputEngine,
@@ -530,6 +611,9 @@ export class Input<E extends EventList = Record<string, any>>
     })
   }
 
+  /**
+   * Создает runtime-сущность Input.
+   */
   protected createTextLayout(): NovaTextInputLayoutResult {
     const style = resolveComponentTextStyle(this.props, this.inheritedStyleContext)
     const leftInset = (this.props.icon || this.kindName === 'search') ? 34 : this.props.prefix ? 44 : 10
@@ -552,6 +636,9 @@ export class Input<E extends EventList = Record<string, any>>
     })
   }
 
+  /**
+   * Выполняет расширяемый шаг displayText для Input.
+   */
   protected displayText(value: string): string {
     if (this.kindName === 'password' && !this.revealed) return '*'.repeat(value.length)
     const selected = this.kindName === 'select'
@@ -560,17 +647,26 @@ export class Input<E extends EventList = Record<string, any>>
     return selected?.label ?? value
   }
 
+  /**
+   * Возвращает значение состояния Input.
+   */
   protected getCaretRect(): NovaRectLike {
     const layout = this.layoutCache ?? this.createTextLayout()
     return layoutEngine.caretRect(layout, this.controller.getState().selectionEnd)
   }
 
+  /**
+   * Выполняет расширяемый шаг indexFromEvent для Input.
+   */
   protected indexFromEvent(event: MouseEvent): number {
     const { x, y } = this.events.getCanvasMousePosition(event)
     const [localX, localY] = this.toLocal(x, y)
     return layoutEngine.coordinateToIndex(this.layoutCache ?? this.createTextLayout(), localX, localY)
   }
 
+  /**
+   * Обновляет состояние выбора Input.
+   */
   protected selectWord(index: number): void {
     const text = this.controller.getState().draft
     const left = text.slice(0, index).search(/\S+$/)
@@ -582,17 +678,26 @@ export class Input<E extends EventList = Record<string, any>>
     this.dirty({ render: true })
   }
 
+  /**
+   * Синхронизирует состояние между слоями Input.
+   */
   protected syncProxy(): void {
     const state = this.controller.getState()
     this.proxy.sync(state.draft, state.selectionStart, state.selectionEnd)
   }
 
+  /**
+   * Синхронизирует состояние между слоями Input.
+   */
   protected syncControllerSelectionFromProxy(): void {
     const element = this.proxy.element
     if (!element) return
     this.controller.select(element.selectionStart ?? 0, element.selectionEnd ?? element.selectionStart ?? 0)
   }
 
+  /**
+   * Выполняет расширяемый шаг shouldDelegateKeyToProxy для Input.
+   */
   protected shouldDelegateKeyToProxy(event: KeyboardEvent): boolean {
     const element = this.proxy.element
     if (!element || this.props.inputEngine === 'canvas') return false
@@ -608,6 +713,9 @@ export class Input<E extends EventList = Record<string, any>>
     return false
   }
 
+  /**
+   * Выполняет расширяемый шаг stepNumber для Input.
+   */
   protected stepNumber(direction: number, event?: Event): void {
     const current = Number(this.controller.getState().draft)
     const base = Number.isFinite(current) ? current : 0
@@ -618,10 +726,16 @@ export class Input<E extends EventList = Record<string, any>>
     this.setInputValue(clamped, { event, reason: 'step' })
   }
 
+  /**
+   * Переключает флаг состояния Input.
+   */
   protected toggleSelect(): void {
     this.setProps({ opened: !this.props.opened })
   }
 
+  /**
+   * Выполняет расширяемый шаг optionFromEvent для Input.
+   */
   protected optionFromEvent(event: MouseEvent): SelectInputOption | undefined {
     if (this.kindName !== 'select' || !this.props.opened) return undefined
     const { x, y } = this.events.getCanvasMousePosition(event)
@@ -631,6 +745,9 @@ export class Input<E extends EventList = Record<string, any>>
     return this.props.options[index]
   }
 
+  /**
+   * Выполняет расширяемый шаг pickOption для Input.
+   */
   protected pickOption(option: SelectInputOption, event?: Event): void {
     if (option.disabled) return
     this.setInputValue(option.value, { event, reason: 'select' })
@@ -638,6 +755,9 @@ export class Input<E extends EventList = Record<string, any>>
     this.setProps({ opened: false })
   }
 
+  /**
+   * Выполняет расширяемый шаг hitClearButton для Input.
+   */
   protected hitClearButton(event: MouseEvent): boolean {
     if (!this.props.clearable) return false
     const { x, y } = this.events.getCanvasMousePosition(event)
@@ -645,6 +765,9 @@ export class Input<E extends EventList = Record<string, any>>
     return localX >= this.width - 30 && localX <= this.width - 8 && localY >= 6 && localY <= this.height - 6
   }
 
+  /**
+   * Выполняет расширяемый шаг hitRevealButton для Input.
+   */
   protected hitRevealButton(event: MouseEvent): boolean {
     if (this.kindName !== 'password' || !this.props.revealable) return false
     const { x, y } = this.events.getCanvasMousePosition(event)
@@ -652,14 +775,23 @@ export class Input<E extends EventList = Record<string, any>>
     return localX >= this.width - 30 && localX <= this.width - 8 && localY >= 6 && localY <= this.height - 6
   }
 
+  /**
+   * Выполняет расширяемый шаг context для Input.
+   */
   protected context(reason: string, event?: Event): { event?: Event; reason: string; component: InputComponentKind } {
     return { event, reason, component: this.kindName }
   }
 
+  /**
+   * Выполняет расширяемый шаг isInvalid для Input.
+   */
   protected isInvalid(): boolean {
     return !!this.props.error || this.validator.getState().result !== true
   }
 
+  /**
+   * Выполняет расширяемый шаг pushClearButton для Input.
+   */
   protected pushClearButton(schema: NovaSchema): void {
     const x = this.width - 22
     const y = this.height / 2
@@ -668,6 +800,9 @@ export class Input<E extends EventList = Record<string, any>>
     schema.push({ type: 'line', x1: x + 3, y1: y - 3, x2: x - 3, y2: y + 3, styles: { color: '#64748b', width: 1.5 } })
   }
 
+  /**
+   * Выполняет расширяемый шаг pushRevealButton для Input.
+   */
   protected pushRevealButton(schema: NovaSchema): void {
     pushText(schema, this.revealed ? 'hide' : 'show', this.width - 42, 0, 38, this.height, {
       ...resolveComponentTextStyle(this.props, this.inheritedStyleContext),
@@ -676,41 +811,74 @@ export class Input<E extends EventList = Record<string, any>>
     }, { align: 'center' })
   }
 
+  /**
+   * Выполняет расширяемый шаг pushSelectChevron для Input.
+   */
   protected pushSelectChevron(schema: NovaSchema): void {
     const cx = this.width - 18
     const cy = this.height / 2
     schema.push({ type: 'polygon', points: [{ x: cx - 4, y: cy - 2 }, { x: cx + 4, y: cy - 2 }, { x: cx, y: cy + 4 }], styles: { background: '#64748b' } })
   }
 
+  /**
+   * Выполняет расширяемый шаг pushSearchGlyph для Input.
+   */
   protected pushSearchGlyph(schema: NovaSchema, x: number, y: number, size: number): void {
     schema.push({ type: 'circle', x: x + size / 2 - 2, y: y - 1, radius: size / 3, styles: { border: { color: '#64748b', width: 1.6 } } })
     schema.push({ type: 'line', x1: x + size - 3, y1: y + size / 4, x2: x + size + 3, y2: y + size / 2, styles: { color: '#64748b', width: 1.6 } })
   }
 
+  /**
+   * Выполняет расширяемый шаг pushErrorMark для Input.
+   */
   protected pushErrorMark(schema: NovaSchema): void {
     schema.push({ type: 'circle', x: this.width - 10, y: 10, radius: 3, styles: { background: this.props.errorColor } })
   }
 }
 
+/**
+ * Описывает ответственность TextInput в архитектуре проекта.
+ */
 export class TextInput<E extends EventList = Record<string, any>> extends Input<E> {}
 
+/**
+ * Описывает ответственность PasswordInput в архитектуре проекта.
+ */
 export class PasswordInput<E extends EventList = Record<string, any>> extends Input<E> {
+  /**
+   * Создает экземпляр PasswordInput и подготавливает базовое состояние.
+   */
   constructor(app: NovaApp<E>, surface: NovaSurface<E>, props: InputProps = {}, options: { componentId?: string } = {}, descriptor: InputDescriptor = INPUT_NODE_DESCRIPTOR) {
     super(app, surface, props, { ...options, kind: 'password' }, descriptor)
   }
 }
 
+/**
+ * Описывает ответственность SearchInput в архитектуре проекта.
+ */
 export class SearchInput<E extends EventList = Record<string, any>> extends Input<E> {
+  /**
+   * Создает экземпляр SearchInput и подготавливает базовое состояние.
+   */
   constructor(app: NovaApp<E>, surface: NovaSurface<E>, props: InputProps = {}, options: { componentId?: string } = {}, descriptor: InputDescriptor = INPUT_NODE_DESCRIPTOR) {
     super(app, surface, props, { ...options, kind: 'search' }, descriptor)
   }
 }
 
+/**
+ * Описывает ответственность NumberInput в архитектуре проекта.
+ */
 export class NumberInput<E extends EventList = Record<string, any>> extends Input<E> {
+  /**
+   * Создает экземпляр NumberInput и подготавливает базовое состояние.
+   */
   constructor(app: NovaApp<E>, surface: NovaSurface<E>, props: InputProps = {}, options: { componentId?: string } = {}, descriptor: InputDescriptor = INPUT_NODE_DESCRIPTOR) {
     super(app, surface, props, { ...options, kind: 'number' }, descriptor)
   }
 
+  /**
+   * Обрабатывает runtime-событие NumberInput.
+   */
   protected override handleKeydown(event: KeyboardEvent): void {
     const command = event.metaKey || event.ctrlKey
     const printable = event.key.length === 1
@@ -722,17 +890,32 @@ export class NumberInput<E extends EventList = Record<string, any>> extends Inpu
   }
 }
 
+/**
+ * Описывает ответственность TextArea в архитектуре проекта.
+ */
 export class TextArea<E extends EventList = Record<string, any>> extends Input<E> {
+  /**
+   * Создает экземпляр TextArea и подготавливает базовое состояние.
+   */
   constructor(app: NovaApp<E>, surface: NovaSurface<E>, props: InputProps = {}, options: { componentId?: string } = {}, descriptor: InputDescriptor = INPUT_NODE_DESCRIPTOR) {
     super(app, surface, props, { ...options, kind: 'textarea' }, descriptor)
   }
 }
 
+/**
+ * Описывает ответственность InputField в архитектуре проекта.
+ */
 export class InputField<E extends EventList = Record<string, any>> extends Input<E> {
+  /**
+   * Создает экземпляр InputField и подготавливает базовое состояние.
+   */
   constructor(app: NovaApp<E>, surface: NovaSurface<E>, props: InputProps = {}, options: { componentId?: string } = {}, descriptor: InputDescriptor = INPUT_NODE_DESCRIPTOR) {
     super(app, surface, props, { ...options, kind: 'field' }, descriptor)
   }
 
+  /**
+   * Выполняет отрисовку InputField.
+   */
   override render(): void {
     const schema: NovaSchema = []
     const style = resolveComponentTextStyle(this.props, this.inheritedStyleContext)
@@ -782,11 +965,20 @@ export class InputField<E extends EventList = Record<string, any>> extends Input
   }
 }
 
+/**
+ * Описывает ответственность SelectInput в архитектуре проекта.
+ */
 export class SelectInput<E extends EventList = Record<string, any>> extends Input<E> {
+  /**
+   * Создает экземпляр SelectInput и подготавливает базовое состояние.
+   */
   constructor(app: NovaApp<E>, surface: NovaSurface<E>, props: InputProps = {}, options: { componentId?: string } = {}, descriptor: InputDescriptor = INPUT_NODE_DESCRIPTOR) {
     super(app, surface, props, { ...options, kind: 'select' }, descriptor)
   }
 
+  /**
+   * Обрабатывает runtime-событие SelectInput.
+   */
   protected override handleKeydown(event: KeyboardEvent): void {
     if (event.key === 'Enter' || event.key === ' ') {
       this.toggleSelect()

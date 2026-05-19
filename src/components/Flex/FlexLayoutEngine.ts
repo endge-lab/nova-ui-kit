@@ -104,6 +104,9 @@ export class FlexLayoutEngine {
   private readonly sortedEntries: Array<FlexChildEntry> = []
   private readonly lines: Array<FlexLine> = []
 
+  /**
+   * Вычисляет производное значение FlexLayoutEngine.
+   */
   compute(context: FlexLayoutContext): void {
     const props = context.props
     const padding = resolveSpacing(props.padding)
@@ -135,6 +138,9 @@ export class FlexLayoutEngine {
     })
   }
 
+  /**
+   * Подготавливает данные к использованию FlexLayoutEngine.
+   */
   private prepareSortedEntries(entries: Array<FlexChildEntry>): void {
     this.sortedEntries.length = 0
     if (isAlreadyOrdered(entries)) {
@@ -150,6 +156,9 @@ export class FlexLayoutEngine {
     })
   }
 
+  /**
+   * Выполняет внутренний шаг collectLines для FlexLayoutEngine.
+   */
   private collectLines(context: {
     entries: Array<FlexChildEntry>
     props: FlexResolvedProps
@@ -182,6 +191,9 @@ export class FlexLayoutEngine {
     if (line.items.length > 0) this.lines.push(line)
   }
 
+  /**
+   * Измеряет layout или runtime-метрики FlexLayoutEngine.
+   */
   private measureItem(
     entry: FlexChildEntry,
     mainSize: number,
@@ -225,6 +237,9 @@ export class FlexLayoutEngine {
     }
   }
 
+  /**
+   * Нормализует и возвращает итоговое значение FlexLayoutEngine.
+   */
   private resolveMain(
     layout: CompiledFlexChildLayout,
     available: number,
@@ -244,6 +259,9 @@ export class FlexLayoutEngine {
     return resolveLayoutValue(value, available, fallback)
   }
 
+  /**
+   * Нормализует и возвращает итоговое значение FlexLayoutEngine.
+   */
   private resolveCross(
     layout: CompiledFlexChildLayout,
     available: number,
@@ -259,6 +277,9 @@ export class FlexLayoutEngine {
     return resolveLayoutValue(value, available, fallback)
   }
 
+  /**
+   * Измеряет layout или runtime-метрики FlexLayoutEngine.
+   */
   private measureAutoItem(entry: FlexChildEntry, mainSize: number, crossSize: number, isRow: boolean): { width: number; height: number } | undefined {
     const layout = entry.compiledLayout
     const mainValue = isRow ? layout.width : layout.height
@@ -277,6 +298,9 @@ export class FlexLayoutEngine {
     })
   }
 
+  /**
+   * Выполняет внутренний шаг placeLines для FlexLayoutEngine.
+   */
   private placeLines(context: {
     props: FlexResolvedProps
     padding: NovaUiResolvedSpacing
@@ -299,6 +323,9 @@ export class FlexLayoutEngine {
     }
   }
 
+  /**
+   * Нормализует и возвращает итоговое значение FlexLayoutEngine.
+   */
   private resolveLineMainSizes(line: FlexLine, mainSize: number): void {
     const free = mainSize - line.main
 
@@ -326,6 +353,9 @@ export class FlexLayoutEngine {
     }
   }
 
+  /**
+   * Нормализует и возвращает итоговое значение FlexLayoutEngine.
+   */
   private resolveLineCrossSizes(line: FlexLine, parentAlign: FlexAlign): void {
     for (const item of line.items) {
       const align = item.alignSelf ?? parentAlign
@@ -339,6 +369,9 @@ export class FlexLayoutEngine {
     }
   }
 
+  /**
+   * Выполняет внутренний шаг placeLine для FlexLayoutEngine.
+   */
   private placeLine(
     line: FlexLine,
     context: {
@@ -381,12 +414,18 @@ export class FlexLayoutEngine {
     }
   }
 
+  /**
+   * Нормализует и возвращает итоговое значение FlexLayoutEngine.
+   */
   private resolveJustifiedStart(justify: FlexResolvedProps['justifyContent'], freeMain: number): number {
     if (justify === 'center') return freeMain / 2
     if (justify === 'end') return freeMain
     return 0
   }
 
+  /**
+   * Нормализует и возвращает итоговое значение FlexLayoutEngine.
+   */
   private resolveJustifiedGap(
     justify: FlexResolvedProps['justifyContent'],
     baseGap: number,
@@ -399,6 +438,9 @@ export class FlexLayoutEngine {
     return baseGap
   }
 
+  /**
+   * Нормализует и возвращает итоговое значение FlexLayoutEngine.
+   */
   private resolveCrossOffset(
     align: FlexAlign,
     lineCross: number,

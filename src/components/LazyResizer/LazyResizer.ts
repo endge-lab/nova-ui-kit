@@ -4,6 +4,9 @@ import type { EventList , Side } from '@endge/utils'
 import type { LazyResizerOptions } from '@/domain/domain.types'
 import { resolveNovaUiMotionOptions } from '@/shared/motion'
 
+/**
+ * Описывает ответственность LazyResizer в архитектуре проекта.
+ */
 export class LazyResizer<E extends EventList> extends NovaNode<E> {
   private _isDragging = false
   private _isHover = false
@@ -28,6 +31,9 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
   private _onChangeMove: (e: MouseEvent, delta: number) => void = () => {}
   private _onChangeEnd: (e: MouseEvent, size: number) => void = () => {}
 
+  /**
+   * Создает экземпляр LazyResizer и подготавливает базовое состояние.
+   */
   constructor(app: NovaApp<E>, surface: NovaSurface<E>, opts: LazyResizerOptions) {
     super(app, surface)
     this.__type = 'LazyResizer'
@@ -35,10 +41,16 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
     this.setupEvents()
   }
 
+  /**
+   * Возвращает is Dragging для LazyResizer.
+   */
   get isDragging(): boolean {
     return this._isDragging
   }
 
+  /**
+   * Выполняет действие options в рамках ответственности LazyResizer.
+   */
   options(opts: Partial<LazyResizerOptions>): this {
     const { color, direction, activeOverlayColor, lineWidth, minSize, maxSize, lineWidthHover, motion, ...rest } = opts
     this._color = color ?? this._color
@@ -67,6 +79,9 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
     return this
   }
 
+  /**
+   * Обновляет runtime-состояние LazyResizer.
+   */
   private updateHitBounds(): void {
     const size = this._lineWidthHover
 
@@ -86,6 +101,9 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
     }
   }
 
+  /**
+   * Обновляет значение состояния LazyResizer.
+   */
   private setupEvents(): void {
     this.on('dragstart', (e, meta: { startX: number; startY: number }) => {
       e.stopPropagation()
@@ -270,6 +288,9 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
     })
   }
 
+  /**
+   * Сбрасывает состояние к базовым значениям LazyResizer.
+   */
   private resetState(): void {
     if (!this._isDragging) return
     this.x = this._initialX
@@ -283,45 +304,75 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
     this.dirty({ render: true })
   }
 
+  /**
+   * Возвращает motion Line Width для LazyResizer.
+   */
   get motionLineWidth(): number {
     return this._motionLineWidth ?? this._lineWidth
   }
 
+  /**
+   * Обновляет motion Line Width для LazyResizer.
+   */
   set motionLineWidth(value: number) {
     this._motionLineWidth = value
   }
 
+  /**
+   * Возвращает motion Color для LazyResizer.
+   */
   get motionColor(): string {
     return this._motionColor ?? this._color
   }
 
+  /**
+   * Обновляет motion Color для LazyResizer.
+   */
   set motionColor(value: string) {
     this._motionColor = value
   }
 
+  /**
+   * Возвращает overlay Opacity для LazyResizer.
+   */
   get overlayOpacity(): number {
     return this._overlayOpacity
   }
 
+  /**
+   * Обновляет overlay Opacity для LazyResizer.
+   */
   set overlayOpacity(value: number) {
     this._overlayOpacity = Math.max(0, Math.min(1, value))
   }
 
+  /**
+   * Обрабатывает входящее событие LazyResizer.
+   */
   onChangeStart(handler: (e: MouseEvent) => void): LazyResizer<E> {
     this._onChangeStart = handler
     return this
   }
 
+  /**
+   * Обрабатывает входящее событие LazyResizer.
+   */
   onChangeMove(handler: (e: MouseEvent, delta: number) => void): LazyResizer<E> {
     this._onChangeMove = handler
     return this
   }
 
+  /**
+   * Обрабатывает входящее событие LazyResizer.
+   */
   onChangeEnd(handler: (e: MouseEvent, size: number) => void): LazyResizer<E> {
     this._onChangeEnd = handler
     return this
   }
 
+  /**
+   * Выполняет отрисовку LazyResizer.
+   */
   render(): void {
     const t = this._lineWidthHover
     const lineWidth = this._motionLineWidth ?? (this._isHover ? this._lineWidthHover : this._lineWidth)
@@ -412,6 +463,9 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
     this.renderer.schema([line, rect])
   }
 
+  /**
+   * Выполняет внутренний шаг animateHoverLine для LazyResizer.
+   */
   private animateHoverLine(active: boolean): void {
     if (!this._motionEnabled) {
       this._motionLineWidth = active ? this._lineWidthHover : this._lineWidth
@@ -424,6 +478,9 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
     }, resolveNovaUiMotionOptions('hoverLine'))
   }
 
+  /**
+   * Выполняет внутренний шаг animateDragOverlay для LazyResizer.
+   */
   private animateDragOverlay(opacity: number): void {
     if (!this._motionEnabled) {
       this._overlayOpacity = opacity
@@ -435,6 +492,9 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
     }, resolveNovaUiMotionOptions('dragOverlay'))
   }
 
+  /**
+   * Возвращает значение состояния LazyResizer.
+   */
   private getCursorByDirection(): string {
     switch (this._direction) {
       case 'top':

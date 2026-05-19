@@ -22,12 +22,18 @@ import {
   sizeTokenPadding,
 } from '@/shared/component/component-render'
 
+/**
+ * Описывает ответственность Button в архитектуре проекта.
+ */
 export class Button<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<ButtonResolvedProps, ButtonApi, ButtonProps, E> {
   private hovered = false
   private pressed = false
   private readonly api: ButtonApi
 
+  /**
+   * Создает экземпляр Button и подготавливает базовое состояние.
+   */
   constructor(
     app: NovaApp<E>,
     surface: NovaSurface<E>,
@@ -47,14 +53,23 @@ export class Button<E extends EventList = Record<string, any>>
     this.setupEvents()
   }
 
+  /**
+   * Обновляет значение состояния Button.
+   */
   override setProps(patch: ButtonProps): this {
     return super.setProps(patch as Partial<ButtonResolvedProps>)
   }
 
+  /**
+   * Возвращает значение состояния Button.
+   */
   override getApi(): ButtonApi {
     return this.api
   }
 
+  /**
+   * Выполняет действие press в рамках ответственности Button.
+   */
   press(event?: Event): void {
     if (this.props.disabled || this.props.loading) {
       this.playUiSound('disabledPress')
@@ -64,6 +79,9 @@ export class Button<E extends EventList = Record<string, any>>
     this.props.onPress?.(event)
   }
 
+  /**
+   * Выполняет отрисовку Button.
+   */
   render(): void {
     const schema: NovaSchema = buildBoxSchema(this.props, this.width, this.height, {
       background: resolveInteractionBackground(this.props, {
@@ -102,12 +120,18 @@ export class Button<E extends EventList = Record<string, any>>
     this.renderer.schema(schema)
   }
 
+  /**
+   * Обрабатывает входящее событие Button.
+   */
   protected override onPropsChanged(changedKeys: Array<keyof ButtonResolvedProps>): void {
     this.props = normalizeButtonProps(this.props)
     this.options({ interactive: !this.props.disabled })
     this.applyCommonPropsChanged(changedKeys)
   }
 
+  /**
+   * Обновляет значение состояния Button.
+   */
   private setupEvents(): void {
     this.on('mouseenter', () => {
       if (this.props.disabled) return

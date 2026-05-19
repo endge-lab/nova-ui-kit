@@ -360,6 +360,9 @@ export function commonMeasureBounds<TProps extends NovaUiCommonProps>(
   }
 }
 
+/**
+ * Описывает Nova-node NovaUiComponentNode и его runtime-поведение.
+ */
 export abstract class NovaUiComponentNode<
   TProps extends NovaUiCommonResolvedProps,
   TApi,
@@ -374,6 +377,9 @@ export abstract class NovaUiComponentNode<
   protected inheritedStyleContext = EMPTY_STYLE_CONTEXT
   protected externalLayout = false
 
+  /**
+   * Создает экземпляр NovaUiComponentNode и подготавливает базовое состояние.
+   */
   protected constructor(
     app: NovaApp<E>,
     surface: NovaSurface<E>,
@@ -389,11 +395,17 @@ export abstract class NovaUiComponentNode<
     })
   }
 
+  /**
+   * Применяет подготовленное состояние NovaUiComponentNode.
+   */
   applyLayoutRect(rect: NovaUiLayoutRect): boolean {
     this.externalLayout = true
     return this.applyResolvedRect(rect)
   }
 
+  /**
+   * Выполняет действие receiveStyleContext в рамках ответственности NovaUiComponentNode.
+   */
   receiveStyleContext(context: NovaUiStyleContext, changedMask: NovaUiStyleMask): NovaUiStyleReceiveResult {
     this.inheritedStyleContext = context
     if ((changedMask & NovaUiStyleMask.AllText) === 0) {
@@ -404,15 +416,24 @@ export abstract class NovaUiComponentNode<
     return { update: true, render: true, layout: true }
   }
 
+  /**
+   * Возвращает значение состояния NovaUiComponentNode.
+   */
   getSubtreeStyleMask(): NovaUiStyleMask {
     return NovaUiStyleMask.AllText
   }
 
+  /**
+   * Обрабатывает входящее событие NovaUiComponentNode.
+   */
   protected override onMount(): void {
     requireNovaUiRoot(this)
     super.onMount()
   }
 
+  /**
+   * Возвращает значение состояния NovaUiComponentNode.
+   */
   override getSyncPorts(): NovaSyncPortMap {
     const ports = super.getSyncPorts()
     const geometryPort = (name: 'x' | 'y' | 'width' | 'height') => createNovaSyncPort<number>({
@@ -471,6 +492,9 @@ export abstract class NovaUiComponentNode<
     this.nova.sound.playCue(this.props.sound?.[eventName])
   }
 
+  /**
+   * Применяет подготовленное состояние NovaUiComponentNode.
+   */
   protected applyCommonPropsChanged(changedKeys: Array<keyof TProps>): void {
     this.options({
       opacity: this.props.disabled ? this.props.disabledOpacity : this.props.opacity,
@@ -493,6 +517,9 @@ export abstract class NovaUiComponentNode<
     }
   }
 
+  /**
+   * Применяет подготовленное состояние NovaUiComponentNode.
+   */
   protected applyInitialLayoutRect(props: TProps): void {
     copyRect(this.layoutRect, {
       x: props.x,
@@ -513,6 +540,9 @@ export abstract class NovaUiComponentNode<
     })
   }
 
+  /**
+   * Применяет подготовленное состояние NovaUiComponentNode.
+   */
   protected applyResolvedRect(rect: NovaUiLayoutRect): boolean {
     if (rectEquals(this.layoutRect, rect)) return false
 
@@ -533,16 +563,25 @@ export abstract class NovaUiComponentNode<
     return true
   }
 
+  /**
+   * Возвращает значение состояния NovaUiComponentNode.
+   */
   protected getResolvedPadding(): ReturnType<typeof resolveSpacing> {
     return resolveSpacing(this.props.padding)
   }
 
+  /**
+   * Применяет подготовленное состояние NovaUiComponentNode.
+   */
   protected applyCommonDisplayState(): void {
     const displayed = this.props.display !== 'none'
     this.visible = displayed
     this.active = displayed
   }
 
+  /**
+   * Выполняет расширяемый шаг markLayoutAncestorsDirty для NovaUiComponentNode.
+   */
   protected markLayoutAncestorsDirty(): void {
     relayoutNovaUiLayoutAncestors(this)
   }
