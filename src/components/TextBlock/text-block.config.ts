@@ -51,6 +51,9 @@ export const TEXT_BLOCK_RENDER_DIRTY_KEYS: ReadonlyArray<keyof TextBlockResolved
   'background',
   'border',
   'display',
+  'selectable',
+  'copyable',
+  'selectionScope',
   'style',
 ]
 
@@ -73,6 +76,9 @@ export const TEXT_BLOCK_FIELD_DEFINITIONS = {
   wordBreak: { type: 'string' },
   style: { type: 'style' },
   display: { type: 'string' },
+  selectable: { type: 'boolean' },
+  copyable: { type: 'boolean' },
+  selectionScope: { type: 'string' },
   motion: { type: 'motion' },
   className: { type: 'string' },
   attrs: { type: 'record' },

@@ -43,6 +43,9 @@ export function normalizeTextBlockProps(props: TextBlockProps = {}): TextBlockRe
     background: props.background,
     border: props.border,
     display: props.display ?? 'normal',
+    selectable: props.selectable ?? false,
+    copyable: props.copyable ?? true,
+    selectionScope: props.selectionScope,
     className: props.className,
     attrs: props.attrs,
   }

@@ -43,6 +43,9 @@ export interface TextBlockProps extends NovaUiMotionOptions, NovaUiStyleIdentity
   background?: string
   border?: NovaUiBorder
   display?: NovaUiStyleDisplay
+  selectable?: boolean
+  copyable?: boolean
+  selectionScope?: string
 }
 
 export interface TextBlockResolvedPadding {
@@ -76,6 +79,9 @@ export interface TextBlockResolvedProps {
   background?: string
   border?: NovaUiBorder
   display: NovaUiStyleDisplay
+  selectable: boolean
+  copyable: boolean
+  selectionScope?: string
   className?: string | Array<string>
   attrs?: NovaUiStyleIdentityProps['attrs']
 }

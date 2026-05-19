@@ -218,7 +218,7 @@ export class Input<E extends EventList = Record<string, any>>
     }
 
     if (this.kindName === 'textarea') {
-      this.pushMultilineText(schema, text, contentX, contentY, contentWidth, textStyle, textColor)
+      this.pushMultilineText(schema, layout, text, contentY, textStyle, textColor)
     } else {
       pushText(schema, text, contentX, contentY, contentWidth, contentHeight, { ...textStyle, color: textColor }, { align: this.props.align, ellipsis: true })
     }
@@ -241,11 +241,25 @@ export class Input<E extends EventList = Record<string, any>>
     if (this.isInvalid() && this.kindName !== 'field') this.pushErrorMark(schema)
   }
 
-  protected pushMultilineText(schema: NovaSchema, text: string, x: number, y: number, width: number, style: ReturnType<typeof resolveComponentTextStyle>, color: string): void {
-    const lines = text.length ? text.split('\n') : [this.props.placeholder]
-    const maxLines = Math.max(1, Math.floor((this.height - y) / style.lineHeight))
-    for (let index = 0; index < Math.min(lines.length, maxLines); index += 1) {
-      pushText(schema, lines[index], x, y + index * style.lineHeight, width, style.lineHeight, { ...style, color }, { align: this.props.align, ellipsis: true })
+  protected pushMultilineText(
+    schema: NovaSchema,
+    layout: NovaTextInputLayoutResult,
+    text: string,
+    contentY: number,
+    style: ReturnType<typeof resolveComponentTextStyle>,
+    color: string,
+  ): void {
+    if (text.length === 0 && this.props.placeholder) {
+      pushText(schema, this.props.placeholder, layout.contentX, contentY, layout.contentWidth, style.lineHeight, { ...style, color }, { align: this.props.align, ellipsis: true })
+      return
+    }
+
+    const top = layout.contentY
+    const bottom = layout.contentY + layout.contentHeight
+    for (const line of layout.lines) {
+      if (line.y + line.height < top) continue
+      if (line.y > bottom) continue
+      pushText(schema, line.text, layout.contentX, line.y, layout.contentWidth, line.height, { ...style, color }, { align: this.props.align, ellipsis: false })
     }
   }
 
@@ -363,6 +377,7 @@ export class Input<E extends EventList = Record<string, any>>
   protected handleKeydown(event: KeyboardEvent): void {
     if (this.props.disabled) return
     const command = event.metaKey || event.ctrlKey
+    if (this.shouldDelegateKeyToProxy(event)) return
     if (command && event.key.toLowerCase() === 'c') {
       void clipboard.writeText(this.controller.getSelectedText(), this.proxy.element)
       event.preventDefault()
@@ -506,6 +521,7 @@ export class Input<E extends EventList = Record<string, any>>
       onInput: (value, event) => {
         if (this.props.inputEngine === 'canvas') return
         this.controller.setDraft(value, { event, reason: 'proxy' })
+        this.syncControllerSelectionFromProxy()
         this.afterInput('proxy', event)
       },
       onCompositionStart: () => this.controller.startComposition(),
@@ -569,6 +585,27 @@ export class Input<E extends EventList = Record<string, any>>
   protected syncProxy(): void {
     const state = this.controller.getState()
     this.proxy.sync(state.draft, state.selectionStart, state.selectionEnd)
+  }
+
+  protected syncControllerSelectionFromProxy(): void {
+    const element = this.proxy.element
+    if (!element) return
+    this.controller.select(element.selectionStart ?? 0, element.selectionEnd ?? element.selectionStart ?? 0)
+  }
+
+  protected shouldDelegateKeyToProxy(event: KeyboardEvent): boolean {
+    const element = this.proxy.element
+    if (!element || this.props.inputEngine === 'canvas') return false
+    if (element.ownerDocument.activeElement !== element) return false
+    if (this.props.readonly) return false
+
+    const command = event.metaKey || event.ctrlKey
+    const key = event.key.toLowerCase()
+    if (command && (key === 'x' || key === 'v')) return true
+    if (!command && (event.key === 'Backspace' || event.key === 'Delete')) return true
+    if (!command && event.key.length === 1 && !event.altKey) return true
+    if (this.kindName === 'textarea' && event.key === 'Enter' && !event.metaKey && !event.ctrlKey) return true
+    return false
   }
 
   protected stepNumber(direction: number, event?: Event): void {

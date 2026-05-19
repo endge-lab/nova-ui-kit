@@ -53,6 +53,15 @@ export function buildTextBlockSchema(
       width: line.widthLimit,
       height: line.height,
       clip: props.overflow !== 'visible' ? true : undefined,
+      meta: props.selectable
+        ? {
+            textSelection: {
+              selectable: props.selectable,
+              copyable: props.copyable,
+              scope: props.selectionScope,
+            },
+          }
+        : undefined,
       styles: {
         color: props.color,
         opacity: props.opacity,
