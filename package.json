@@ -27,8 +27,8 @@
     "bench": "vitest bench --run"
   },
   "dependencies": {
-    "@endge/nova": "workspace:*",
-    "@endge/utils": "workspace:*"
+    "@endge/nova": "^0.5.1",
+    "@endge/utils": "^0.23.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.1",
