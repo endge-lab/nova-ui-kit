@@ -1,5 +1,4 @@
 import type { EventList } from '@endge/utils'
-import type { NovaApp, NovaSchema, NovaSurface } from '@endge/nova'
 import {
   NovaCaretBlinkController,
   NovaClipboardService,
@@ -7,8 +6,11 @@ import {
   NovaInputValidationController,
   NovaInputTextLayoutEngine,
   NovaTextInputController,
+  type NovaApp,
   type NovaInputValidationResult,
   type NovaRectLike,
+  type NovaSchema,
+  type NovaSurface,
   type NovaTextInputLayoutResult,
 } from '@endge/nova'
 import {
