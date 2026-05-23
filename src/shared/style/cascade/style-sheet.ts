@@ -48,6 +48,7 @@ export type NovaUiStyleComponentName =
   | 'Fieldset'
   | 'Tabs'
   | 'Stepper'
+  | 'TimelineChart'
 export type NovaUiStyleSelectorCombinator = 'descendant' | 'child'
 export type NovaUiStyleDisplay = 'normal' | 'none'
 export type NovaUiStyleResponsiveVariant = 'base' | 'sm' | 'md' | 'lg'
@@ -86,6 +87,7 @@ export interface NovaUiStyleSelector {
 
 /** Набор деклараций, который selector engine может применить к UI Kit node. */
 export interface NovaUiStyleDeclarations {
+  customProperties?: Record<string, string>
   inheritedText?: NovaUiInheritedTextStyle
   box?: {
     background?: string
@@ -138,11 +140,19 @@ export interface NovaUiCompiledStyleSheet {
   tokenDependencies?: Array<string>
 }
 
+/** Theme block, extracted from `.novacss @theme`. */
+export interface NovaUiStyleThemeDefinition {
+  id: string
+  tokens: Record<`--${string}`, string | number>
+  styleSheet: NovaUiCompiledStyleSheet | null
+}
+
 /** Precompiled stylesheet asset для `.novacss` и `<style>` блоков `.nova`. */
 export interface NovaUiStyleSheetAsset {
   ok: boolean
   source: string
   styleSheet: NovaUiCompiledStyleSheet | null
+  themes?: Array<NovaUiStyleThemeDefinition>
   diagnostics: Array<NovaUiStyleDiagnostic>
   tokenDependencies: Array<string>
   scopeId?: string

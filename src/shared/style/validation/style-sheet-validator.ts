@@ -65,6 +65,7 @@ const COMPONENT_NAMES: Array<NovaUiStyleComponentName> = [
   'Fieldset',
   'Tabs',
   'Stepper',
+  'TimelineChart',
 ]
 const COMPONENT_NAME_MAP = new Map(COMPONENT_NAMES.map(name => [name.toLowerCase(), name]))
 
@@ -605,7 +606,7 @@ function parseDeclarations(
     }
 
     const rawKey = declaration.slice(0, separatorIndex).trim()
-    const key = normalizeStyleDeclarationKey(rawKey)
+    const key = rawKey.startsWith('--') ? rawKey : normalizeStyleDeclarationKey(rawKey)
     const value = declaration.slice(separatorIndex + 1).trim()
     const parsed = parseDeclarationValue(key, value, diagnostics, source, offset, rawKey)
     if (parsed === null) continue
@@ -635,6 +636,7 @@ function parseDeclarationValue(
     return null
   }
 
+  if (key.startsWith('--')) return stripQuotes(value)
   if (key === 'clip') return parseBoolean(value, diagnostics, source, offset)
   if (key === 'cursor') return parseCursor(value, diagnostics, source, offset)
   if (key === 'display') return parseDisplay(value, diagnostics, source, offset)
@@ -658,6 +660,13 @@ function applyParsedDeclaration(
   key: string,
   value: unknown,
 ): void {
+  if (key.startsWith('--')) {
+    target.customProperties = {
+      ...target.customProperties,
+      [key]: String(value),
+    }
+    return
+  }
   if (key === 'color') {
     target.inheritedText = { ...target.inheritedText, color: value as string }
     target.mask |= NovaUiStyleMask.Color
