@@ -1,9 +1,11 @@
 import type {} from 'vue'
 import type { AdvancedComponentProps } from '@/components/Advanced/advanced.types'
+import type { BadgeProps } from '@/components/Badge/badge.types'
 import type { ButtonProps } from '@/components/Button/button.types'
 import type { CheckboxProps } from '@/components/Checkbox/checkbox.types'
 import type { FlexChildLayout, FlexProps } from '@/components/Flex/flex.types'
 import type { GridChildLayout, GridProps } from '@/components/Grid/grid.types'
+import type { ImageProps } from '@/components/Image/image.types'
 import type { InputProps } from '@/components/Input/input.types'
 import type { PanelProps } from '@/components/Panel/panel.types'
 import type { RootProps } from '@/components/Root/root.types'
@@ -58,6 +60,7 @@ declare module 'vue' {
     TextBlock: NovaDslComponent<TextBlockProps>
     Surface: NovaDslComponent<SurfaceProps>
     Button: NovaDslComponent<ButtonProps>
+    Badge: NovaDslComponent<BadgeProps>
     Input: NovaDslComponent<InputProps>
     TextInput: NovaDslComponent<InputProps>
     PasswordInput: NovaDslComponent<InputProps>
@@ -66,6 +69,7 @@ declare module 'vue' {
     TextArea: NovaDslComponent<InputProps>
     InputField: NovaDslComponent<InputProps>
     SelectInput: NovaDslComponent<InputProps>
+    Image: NovaDslComponent<ImageProps>
     Tag: NovaDslComponent<TagProps>
     Scrollbar: NovaDslComponent<ScrollbarProps>
     ScrollArea: NovaDslComponent<ScrollAreaProps>

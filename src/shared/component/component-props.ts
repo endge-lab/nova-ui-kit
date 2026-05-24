@@ -1,6 +1,7 @@
 import { NovaComponentNode, createNovaSyncPort } from '@endge/nova'
 import type {
   NovaApp,
+  NovaAssetRef,
   NovaComponentDescriptor,
   NovaComponentSchema,
   NovaCursorContext,
@@ -44,7 +45,7 @@ import { requireNovaUiRoot } from '@/components/Root/root-target'
 
 export type NovaUiComponentSize = 'sm' | 'md' | 'lg'
 export type NovaUiOrientation = 'horizontal' | 'vertical'
-export type NovaUiIconSource = CanvasImageSource | string
+export type NovaUiIconSource = CanvasImageSource | string | NovaAssetRef<'icon' | 'image'> | undefined | null
 export type NovaUiSoundEventName = 'hover' | 'press' | 'change' | 'disabledPress'
 export type NovaUiSoundMap = Partial<Record<NovaUiSoundEventName, NovaSoundCueInput>>
 

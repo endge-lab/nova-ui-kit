@@ -1,3 +1,4 @@
+import { BADGE_SCHEMA_TYPE } from '@/components/Badge/badge.types'
 import { BUTTON_SCHEMA_TYPE } from '@/components/Button/button.types'
 import { CHECKBOX_SCHEMA_TYPE } from '@/components/Checkbox/checkbox.types'
 import {
@@ -39,6 +40,7 @@ import {
   TEXT_AREA_SCHEMA_TYPE,
   TEXT_INPUT_SCHEMA_TYPE,
 } from '@/components/Input/input.types'
+import { IMAGE_SCHEMA_TYPE } from '@/components/Image/image.types'
 import { PANEL_SCHEMA_TYPE } from '@/components/Panel/panel.types'
 import { createProgressRingSchema } from '@/components/ProgressRing/progress-ring.schema'
 import { ROOT_SCHEMA_TYPE } from '@/components/Root/root.types'
@@ -62,6 +64,7 @@ export const NovaUIKit = {
   TextBlock: TEXT_BLOCK_SCHEMA_TYPE,
   Surface: SURFACE_SCHEMA_TYPE,
   Button: BUTTON_SCHEMA_TYPE,
+  Badge: BADGE_SCHEMA_TYPE,
   Input: INPUT_SCHEMA_TYPE,
   TextInput: TEXT_INPUT_SCHEMA_TYPE,
   PasswordInput: PASSWORD_INPUT_SCHEMA_TYPE,
@@ -70,6 +73,7 @@ export const NovaUIKit = {
   TextArea: TEXT_AREA_SCHEMA_TYPE,
   InputField: INPUT_FIELD_SCHEMA_TYPE,
   SelectInput: SELECT_INPUT_SCHEMA_TYPE,
+  Image: IMAGE_SCHEMA_TYPE,
   Tag: TAG_SCHEMA_TYPE,
   SplitPane: SPLIT_PANE_SCHEMA_TYPE,
   ScrollArea: SCROLL_AREA_SCHEMA_TYPE,

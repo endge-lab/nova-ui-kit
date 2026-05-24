@@ -1,9 +1,11 @@
 import type { NovaComponentDescriptor, NovaSchemaRegistry } from '@endge/nova'
 import { ADVANCED_COMPONENT_DESCRIPTORS } from '@/components/Advanced/advanced.registry'
+import { BADGE_DESCRIPTOR } from '@/components/Badge/badge.registry'
 import { BUTTON_DESCRIPTOR } from '@/components/Button/button.registry'
 import { CHECKBOX_DESCRIPTOR } from '@/components/Checkbox/checkbox.registry'
 import { FLEX_DESCRIPTOR } from '@/components/Flex/flex.registry'
 import { GRID_DESCRIPTOR } from '@/components/Grid/grid.registry'
+import { IMAGE_DESCRIPTOR } from '@/components/Image/image.registry'
 import { INPUT_DESCRIPTORS } from '@/components/Input/input.registry'
 import { PANEL_DESCRIPTOR } from '@/components/Panel/panel.registry'
 import { ROOT_DESCRIPTOR } from '@/components/Root/root.registry'
@@ -25,7 +27,9 @@ const NOVA_UI_KIT_DESCRIPTORS: Array<NovaComponentDescriptor<any, any, any, any>
   TEXT_BLOCK_DESCRIPTOR,
   SURFACE_DESCRIPTOR,
   BUTTON_DESCRIPTOR,
+  BADGE_DESCRIPTOR,
   ...INPUT_DESCRIPTORS,
+  IMAGE_DESCRIPTOR,
   TAG_DESCRIPTOR,
   SCROLLBAR_DESCRIPTOR,
   SCROLL_AREA_DESCRIPTOR,

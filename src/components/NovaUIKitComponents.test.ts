@@ -11,10 +11,12 @@ import {
 } from '@endge/nova'
 import {
   NovaUIKit,
+  type BadgeApi,
   type ButtonApi,
   type CheckboxApi,
   type FlexApi,
   type GridApi,
+  type ImageApi,
   type PanelApi,
   type RootApi,
   type ScrollAreaApi,
@@ -30,8 +32,10 @@ import {
   validateNovaUiStyleSheetSource,
 } from '@/index'
 import { registerNovaUIKit } from '@/registerNovaUIKit'
+import { normalizeBadgeProps } from '@/components/Badge/badge.config'
 import { normalizeButtonProps } from '@/components/Button/button.config'
 import { normalizeCheckboxProps } from '@/components/Checkbox/checkbox.config'
+import { normalizeImageProps } from '@/components/Image/image.config'
 import { normalizePanelProps } from '@/components/Panel/panel.config'
 import { normalizeScrollAreaProps } from '@/components/ScrollArea/scroll-area.config'
 import { normalizeScrollbarProps } from '@/components/Scrollbar/scrollbar.config'
@@ -79,6 +83,13 @@ function create2DContextStub(): CanvasRenderingContext2D {
       return true
     },
   }) as CanvasRenderingContext2D
+}
+
+function createCanvasDrawable(): HTMLCanvasElement {
+  const canvas = document.createElement('canvas')
+  canvas.width = 24
+  canvas.height = 24
+  return canvas
 }
 
 function installCanvasMocks(): void {
@@ -156,6 +167,8 @@ describe('Nova UI Kit components', () => {
       children: [
         { type: NovaUIKit.Surface, id: 'surface', props: { width: 160, height: 80 } },
         { type: NovaUIKit.Button, id: 'button', props: { text: 'Run' } },
+        { type: NovaUIKit.Badge, id: 'badge', props: { value: 3 } },
+        { type: NovaUIKit.Image, id: 'image', props: { src: createCanvasDrawable(), radius: 8 } },
         { type: NovaUIKit.Tag, id: 'tag', props: { text: 'Ready' } },
         {
           type: NovaUIKit.SplitPane,
@@ -206,6 +219,8 @@ describe('Nova UI Kit components', () => {
     })
 
     app.components.requireApi<ButtonApi>('button').setSelected(true)
+    app.components.requireApi<BadgeApi>('badge').setValue(4)
+    app.components.requireApi<ImageApi>('image').setSrc(createCanvasDrawable())
     app.components.requireApi<TagApi>('tag').setTone('success')
     app.components.requireApi<SplitPaneApi>('split').setSizes([120, 180])
     app.components.requireApi<ScrollAreaApi>('scroll-area').scrollTo(0, 80)
@@ -218,6 +233,8 @@ describe('Nova UI Kit components', () => {
     app.components.requireApi<PanelApi>('panel').setTitle('Updated')
 
     expect(app.components.requireApi<ButtonApi>('button').getProps().selected).toBe(true)
+    expect(app.components.requireApi<BadgeApi>('badge').getProps().value).toBe(4)
+    expect(app.components.requireApi<ImageApi>('image').getProps().radius).toBe(8)
     expect(app.components.requireApi<TagApi>('tag').getProps().tone).toBe('success')
     expect(app.components.requireApi<ScrollAreaApi>('scroll-area').getScrollState().y.value).toBe(80)
     expect(app.components.requireApi<ScrollbarApi>('scrollbar').getScrollState().value).toBe(40)
@@ -1309,6 +1326,8 @@ describe('Nova UI Kit components', () => {
     const normalizers = [
       normalizeSurfaceProps,
       normalizeButtonProps,
+      normalizeBadgeProps,
+      normalizeImageProps,
       normalizeTagProps,
       normalizeSplitPaneProps,
       normalizeScrollAreaProps,
