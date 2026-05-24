@@ -6,6 +6,9 @@
   "module": "./dist/nova-ui-kit.js",
   "types": "./dist/index.d.ts",
   "web-types": "./web-types.json",
+  "nova": {
+    "components": "./nova-components.json"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -15,7 +18,8 @@
   "sideEffects": false,
   "files": [
     "dist",
-    "web-types.json"
+    "web-types.json",
+    "nova-components.json"
   ],
   "scripts": {
     "clean": "rimraf dist tsconfig.tsbuildinfo",
