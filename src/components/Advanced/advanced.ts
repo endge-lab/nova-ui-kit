@@ -160,13 +160,8 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
       case 'SelectButton':
         this.renderSelectButton(schema)
         break
-      case 'Dialog':
       case 'Drawer':
-      case 'Popover':
         this.renderOverlay(schema)
-        break
-      case 'Toast':
-        this.renderToast(schema)
         break
       case 'Message':
         this.renderMessage(schema)
@@ -398,26 +393,15 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
    */
   private renderOverlay(schema: NovaSchema): void {
     const isDrawer = this.props.kind === 'Drawer'
-    const isPopover = this.props.kind === 'Popover'
-    if (!isPopover) this.pushRect(schema, 0, 0, this.width, this.height, 'rgba(15,23,42,0.10)', 'mask', 14)
+    this.pushRect(schema, 0, 0, this.width, this.height, 'rgba(15,23,42,0.10)', 'mask', 14)
     const x = isDrawer ? (this.props.direction === 'left' ? 12 : this.width * 0.26) : 18
-    const y = isPopover ? 18 : 24
+    const y = 24
     const w = isDrawer ? this.width * 0.68 : this.width - 36
-    const h = isPopover ? this.height - 36 : this.height - 48
+    const h = this.height - 48
     this.pushRect(schema, x, y, w, h, '#ffffff', 'surface', 12, '#cbd5e1')
     pushText(schema, this.props.title, x + 16, y + 14, w - 32, 24, this.textStyle({ fontWeight: '700', fontSize: 15 }))
     pushText(schema, this.props.subtitle, x + 16, y + 44, w - 32, 22, this.textStyle({ color: '#64748b', fontSize: 12 }))
     this.pushRect(schema, x + 16, y + h - 38, 72, 24, this.props.accentColor ?? '#2563eb', 'action', 8)
-  }
-
-  /**
-   * Выполняет отрисовку AdvancedComponent.
-   */
-  private renderToast(schema: NovaSchema): void {
-    const tone = severityPalette(this.props.severity)
-    schema.push({ type: 'circle', x: 26, y: this.height / 2, radius: 9, styles: { background: tone.accent } })
-    pushText(schema, this.props.title, 44, 13, this.width - 58, 22, this.textStyle({ color: tone.color, fontWeight: '700' }))
-    pushText(schema, this.props.subtitle, 44, 38, this.width - 58, 20, this.textStyle({ color: '#64748b', fontSize: 12 }))
   }
 
   /**

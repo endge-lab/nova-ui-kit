@@ -1,11 +1,13 @@
+import { ACTION_LIST_SCHEMA_TYPE } from '@/components/ActionList/action-list.types'
 import { BADGE_SCHEMA_TYPE } from '@/components/Badge/badge.types'
 import { BUTTON_SCHEMA_TYPE } from '@/components/Button/button.types'
 import { CHECKBOX_SCHEMA_TYPE } from '@/components/Checkbox/checkbox.types'
+import { CHIP_SCHEMA_TYPE } from '@/components/Chip/chip.types'
+import { DIALOG_SCHEMA_TYPE } from '@/components/Dialog/dialog.types'
 import {
   ACCORDION_SCHEMA_TYPE,
   BLOCK_UI_SCHEMA_TYPE,
   CAROUSEL_SCHEMA_TYPE,
-  DIALOG_SCHEMA_TYPE,
   DOCK_SCHEMA_TYPE,
   DRAWER_SCHEMA_TYPE,
   FIELDSET_SCHEMA_TYPE,
@@ -15,7 +17,6 @@ import {
   KNOB_SCHEMA_TYPE,
   MESSAGE_SCHEMA_TYPE,
   METER_GROUP_SCHEMA_TYPE,
-  POPOVER_SCHEMA_TYPE,
   PROGRESS_BAR_SCHEMA_TYPE,
   PROGRESS_SPINNER_SCHEMA_TYPE,
   RADIO_BUTTON_SCHEMA_TYPE,
@@ -25,7 +26,6 @@ import {
   SPEED_DIAL_SCHEMA_TYPE,
   STEPPER_SCHEMA_TYPE,
   TABS_SCHEMA_TYPE,
-  TOAST_SCHEMA_TYPE,
   TOGGLE_SWITCH_SCHEMA_TYPE,
 } from '@/components/Advanced/advanced.types'
 import { FLEX_SCHEMA_TYPE } from '@/components/Flex/flex.types'
@@ -42,6 +42,7 @@ import {
 } from '@/components/Input/input.types'
 import { IMAGE_SCHEMA_TYPE } from '@/components/Image/image.types'
 import { PANEL_SCHEMA_TYPE } from '@/components/Panel/panel.types'
+import { POPOVER_SCHEMA_TYPE } from '@/components/Popover/popover.types'
 import { createProgressRingSchema } from '@/components/ProgressRing/progress-ring.schema'
 import { ROOT_SCHEMA_TYPE } from '@/components/Root/root.types'
 import { SCROLL_AREA_SCHEMA_TYPE } from '@/components/ScrollArea/scroll-area.types'
@@ -55,6 +56,7 @@ import { TEXT_BLOCK_SCHEMA_TYPE } from '@/components/TextBlock/text-block.types'
 import { TOGGLE_SCHEMA_TYPE } from '@/components/Toggle/toggle.types'
 import { createTooltipSchema } from '@/components/Tooltip/tooltip.config'
 import { TOOLTIP_SCHEMA_TYPE } from '@/components/Tooltip/tooltip.types'
+import { TOAST_REGION_SCHEMA_TYPE, TOAST_SCHEMA_TYPE } from '@/components/Toast/toast.types'
 
 /** Группировка schema type для более читаемого UI Kit DSL. */
 export const NovaUIKit = {
@@ -75,6 +77,7 @@ export const NovaUIKit = {
   SelectInput: SELECT_INPUT_SCHEMA_TYPE,
   Image: IMAGE_SCHEMA_TYPE,
   Tag: TAG_SCHEMA_TYPE,
+  Chip: CHIP_SCHEMA_TYPE,
   SplitPane: SPLIT_PANE_SCHEMA_TYPE,
   ScrollArea: SCROLL_AREA_SCHEMA_TYPE,
   Scrollbar: SCROLLBAR_SCHEMA_TYPE,
@@ -82,6 +85,8 @@ export const NovaUIKit = {
   Checkbox: CHECKBOX_SCHEMA_TYPE,
   Toggle: TOGGLE_SCHEMA_TYPE,
   Tooltip: TOOLTIP_SCHEMA_TYPE,
+  Popover: POPOVER_SCHEMA_TYPE,
+  ActionList: ACTION_LIST_SCHEMA_TYPE,
   tooltipSchema: createTooltipSchema,
   progressRingSchema: createProgressRingSchema,
   SegmentedControl: SEGMENTED_CONTROL_SCHEMA_TYPE,
@@ -103,8 +108,8 @@ export const NovaUIKit = {
   SelectButton: SELECT_BUTTON_SCHEMA_TYPE,
   Dialog: DIALOG_SCHEMA_TYPE,
   Drawer: DRAWER_SCHEMA_TYPE,
-  Popover: POPOVER_SCHEMA_TYPE,
   Toast: TOAST_SCHEMA_TYPE,
+  ToastRegion: TOAST_REGION_SCHEMA_TYPE,
   Message: MESSAGE_SCHEMA_TYPE,
   BlockUI: BLOCK_UI_SCHEMA_TYPE,
   Accordion: ACCORDION_SCHEMA_TYPE,

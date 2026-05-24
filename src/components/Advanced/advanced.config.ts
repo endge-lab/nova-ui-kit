@@ -10,7 +10,6 @@ import {
   ACCORDION_SCHEMA_TYPE,
   BLOCK_UI_SCHEMA_TYPE,
   CAROUSEL_SCHEMA_TYPE,
-  DIALOG_SCHEMA_TYPE,
   DOCK_SCHEMA_TYPE,
   DRAWER_SCHEMA_TYPE,
   FIELDSET_SCHEMA_TYPE,
@@ -20,7 +19,6 @@ import {
   KNOB_SCHEMA_TYPE,
   MESSAGE_SCHEMA_TYPE,
   METER_GROUP_SCHEMA_TYPE,
-  POPOVER_SCHEMA_TYPE,
   PROGRESS_BAR_SCHEMA_TYPE,
   PROGRESS_SPINNER_SCHEMA_TYPE,
   RADIO_BUTTON_SCHEMA_TYPE,
@@ -30,7 +28,6 @@ import {
   SPEED_DIAL_SCHEMA_TYPE,
   STEPPER_SCHEMA_TYPE,
   TABS_SCHEMA_TYPE,
-  TOAST_SCHEMA_TYPE,
   TOGGLE_SWITCH_SCHEMA_TYPE,
   type AdvancedComponentApi,
   type AdvancedComponentKind,
@@ -61,10 +58,7 @@ export const ADVANCED_COMPONENT_SCHEMA_TYPES: Record<AdvancedComponentKind, stri
   RadioButton: RADIO_BUTTON_SCHEMA_TYPE,
   Rating: RATING_SCHEMA_TYPE,
   SelectButton: SELECT_BUTTON_SCHEMA_TYPE,
-  Dialog: DIALOG_SCHEMA_TYPE,
   Drawer: DRAWER_SCHEMA_TYPE,
-  Popover: POPOVER_SCHEMA_TYPE,
-  Toast: TOAST_SCHEMA_TYPE,
   Message: MESSAGE_SCHEMA_TYPE,
   BlockUI: BLOCK_UI_SCHEMA_TYPE,
   Accordion: ACCORDION_SCHEMA_TYPE,
@@ -237,14 +231,8 @@ function resolveAdvancedDefaults(
       return { width: 160, height: 32, background: 'rgba(255,255,255,0)', rating: 4, accentColor: '#f59e0b', animation: 'spring' }
     case 'SelectButton':
       return { width: 260, height: 40, background: '#e2e8f0', border: { color: '#dbe4ef', width: 1, radius: 10 }, items: defaultSelectItems(), value: 'canvas', animation: 'activeIndicator' }
-    case 'Dialog':
-      return { width: 320, height: 180, background: '#ffffff', border: { color: '#cbd5e1', width: 1, radius: 14 }, title: 'Dialog', subtitle: 'Layered modal surface', open: true, animation: 'scale' }
     case 'Drawer':
       return { width: 280, height: 190, background: '#ffffff', border: { color: '#cbd5e1', width: 1, radius: 14 }, title: 'Drawer', subtitle: 'Pinned command panel', direction: 'right', animation: 'slide' }
-    case 'Popover':
-      return { width: 240, height: 118, background: '#ffffff', border: { color: '#cbd5e1', width: 1, radius: 12 }, title: 'Popover', subtitle: 'Anchored contextual layer', animation: 'fade' }
-    case 'Toast':
-      return { width: 300, height: 76, background: tone.background, border: { color: tone.border, width: 1, radius: 12 }, title: 'Saved', subtitle: 'Runtime settings updated', severity, animation: 'slide' }
     case 'Message':
       return { width: 300, height: 48, background: tone.background, border: { color: tone.border, width: 1, radius: 10 }, text: 'Message with configurable tone', severity }
     case 'BlockUI':

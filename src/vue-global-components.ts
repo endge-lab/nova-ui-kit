@@ -1,8 +1,11 @@
 import type {} from 'vue'
+import type { ActionListProps } from '@/components/ActionList/action-list.types'
 import type { AdvancedComponentProps } from '@/components/Advanced/advanced.types'
 import type { BadgeProps } from '@/components/Badge/badge.types'
 import type { ButtonProps } from '@/components/Button/button.types'
 import type { CheckboxProps } from '@/components/Checkbox/checkbox.types'
+import type { ChipProps } from '@/components/Chip/chip.types'
+import type { DialogProps } from '@/components/Dialog/dialog.types'
 import type { FlexChildLayout, FlexProps } from '@/components/Flex/flex.types'
 import type { GridChildLayout, GridProps } from '@/components/Grid/grid.types'
 import type { ImageProps } from '@/components/Image/image.types'
@@ -19,6 +22,8 @@ import type { TagProps } from '@/components/Tag/tag.types'
 import type { TextBlockProps } from '@/components/TextBlock/text-block.types'
 import type { ToggleProps } from '@/components/Toggle/toggle.types'
 import type { TooltipProps } from '@/components/Tooltip/tooltip.types'
+import type { PopoverProps } from '@/components/Popover/popover.types'
+import type { ToastProps, ToastRegionProps } from '@/components/Toast/toast.types'
 
 type NovaDslClassValue = string | Array<string | Record<string, boolean>> | Record<string, boolean>
 type NovaDslLayout = FlexChildLayout | GridChildLayout | Record<string, unknown>
@@ -71,6 +76,7 @@ declare module 'vue' {
     SelectInput: NovaDslComponent<InputProps>
     Image: NovaDslComponent<ImageProps>
     Tag: NovaDslComponent<TagProps>
+    Chip: NovaDslComponent<ChipProps>
     Scrollbar: NovaDslComponent<ScrollbarProps>
     ScrollArea: NovaDslComponent<ScrollAreaProps>
     Slider: NovaDslComponent<SliderProps>
@@ -79,6 +85,8 @@ declare module 'vue' {
     SegmentedControl: NovaDslComponent<SegmentedControlProps>
     SplitPane: NovaDslComponent<SplitPaneProps>
     Tooltip: NovaDslComponent<TooltipProps>
+    Popover: NovaDslComponent<PopoverProps>
+    ActionList: NovaDslComponent<ActionListProps>
     Panel: NovaDslComponent<PanelProps>
     SpeedDial: NovaDslComponent<AdvancedComponentProps>
     Dock: NovaDslComponent<AdvancedComponentProps>
@@ -95,10 +103,10 @@ declare module 'vue' {
     RadioButton: NovaDslComponent<AdvancedComponentProps>
     Rating: NovaDslComponent<AdvancedComponentProps>
     SelectButton: NovaDslComponent<AdvancedComponentProps>
-    Dialog: NovaDslComponent<AdvancedComponentProps>
+    Dialog: NovaDslComponent<DialogProps>
     Drawer: NovaDslComponent<AdvancedComponentProps>
-    Popover: NovaDslComponent<AdvancedComponentProps>
-    Toast: NovaDslComponent<AdvancedComponentProps>
+    Toast: NovaDslComponent<ToastProps>
+    ToastRegion: NovaDslComponent<ToastRegionProps>
     Message: NovaDslComponent<AdvancedComponentProps>
     BlockUI: NovaDslComponent<AdvancedComponentProps>
     Accordion: NovaDslComponent<AdvancedComponentProps>

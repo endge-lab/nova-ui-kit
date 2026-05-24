@@ -11,9 +11,12 @@ import {
 } from '@endge/nova'
 import {
   NovaUIKit,
+  type ActionListApi,
   type BadgeApi,
   type ButtonApi,
   type CheckboxApi,
+  type ChipApi,
+  type DialogApi,
   type FlexApi,
   type GridApi,
   type ImageApi,
@@ -27,7 +30,9 @@ import {
   type TagApi,
   type TextBlockApi,
   type ToggleApi,
+  type ToastRegionApi,
   type TooltipApi,
+  type PopoverApi,
   registerNovaUiGlobalStyleSheet,
   validateNovaUiStyleSheetSource,
 } from '@/index'
@@ -152,7 +157,7 @@ describe('Nova UI Kit components', () => {
       id: 'root',
       props: {
         styleSheet: `
-          Surface, Panel, Button, Tag, Checkbox, Toggle, Slider, Scrollbar, ScrollArea, SplitPane, Tooltip, SegmentedControl {
+          Surface, Panel, Button, Tag, Chip, Checkbox, Toggle, Slider, Scrollbar, ScrollArea, SplitPane, Tooltip, Popover, ActionList, Dialog, Toast, ToastRegion, SegmentedControl {
             color: #123456;
             accentColor: #2563eb;
             trackColor: #dbe4ef;
@@ -170,6 +175,7 @@ describe('Nova UI Kit components', () => {
         { type: NovaUIKit.Badge, id: 'badge', props: { value: 3 } },
         { type: NovaUIKit.Image, id: 'image', props: { src: createCanvasDrawable(), radius: 8 } },
         { type: NovaUIKit.Tag, id: 'tag', props: { text: 'Ready' } },
+        { type: NovaUIKit.Chip, id: 'chip', props: { label: 'Filter', removable: true } },
         {
           type: NovaUIKit.SplitPane,
           id: 'split',
@@ -215,6 +221,34 @@ describe('Nova UI Kit components', () => {
             { type: NovaUIKit.TextBlock, id: 'panel-text', props: { text: 'Content' } },
           ],
         },
+        {
+          type: NovaUIKit.Popover,
+          id: 'popover',
+          props: { open: true, anchor: { kind: 'rect', x: 24, y: 24, width: 80, height: 32 }, width: 180, height: 90 },
+          children: [{ type: NovaUIKit.TextBlock, id: 'popover-text', props: { text: 'Custom panel' } }],
+        },
+        {
+          type: NovaUIKit.ActionList,
+          id: 'action-list',
+          props: {
+            items: [
+              { id: 'copy', label: 'Copy', shortcut: '⌘C' },
+              { type: 'separator' },
+              { id: 'delete', label: 'Delete', tone: 'danger' },
+            ],
+          },
+        },
+        {
+          type: NovaUIKit.Dialog,
+          id: 'dialog',
+          props: { open: true, title: 'Dialog', draggable: true, resizable: true },
+          children: [{ type: NovaUIKit.TextBlock, id: 'dialog-body', props: { text: 'Body' } }],
+        },
+        {
+          type: NovaUIKit.ToastRegion,
+          id: 'toast-region',
+          props: { autoDismiss: false, items: [{ id: 'saved', title: 'Saved', message: 'Done', tone: 'success' }] },
+        },
       ],
     })
 
@@ -222,6 +256,7 @@ describe('Nova UI Kit components', () => {
     app.components.requireApi<BadgeApi>('badge').setValue(4)
     app.components.requireApi<ImageApi>('image').setSrc(createCanvasDrawable())
     app.components.requireApi<TagApi>('tag').setTone('success')
+    app.components.requireApi<ChipApi>('chip').setSelected(true)
     app.components.requireApi<SplitPaneApi>('split').setSizes([120, 180])
     app.components.requireApi<ScrollAreaApi>('scroll-area').scrollTo(0, 80)
     app.components.requireApi<ScrollbarApi>('scrollbar').setValue(40)
@@ -229,6 +264,10 @@ describe('Nova UI Kit components', () => {
     app.components.requireApi<CheckboxApi>('checkbox').toggle()
     app.components.requireApi<ToggleApi>('toggle').toggle()
     app.components.requireApi<TooltipApi>('tooltip').close()
+    app.components.requireApi<PopoverApi>('popover').close()
+    app.components.requireApi<ActionListApi>('action-list').focusNext()
+    app.components.requireApi<DialogApi>('dialog').resizeTo(440, 280)
+    app.components.requireApi<ToastRegionApi>('toast-region').push({ id: 'queued', title: 'Queued' })
     app.components.requireApi<SegmentedControlApi>('segmented').setValue('b')
     app.components.requireApi<PanelApi>('panel').setTitle('Updated')
 
@@ -236,12 +275,17 @@ describe('Nova UI Kit components', () => {
     expect(app.components.requireApi<BadgeApi>('badge').getProps().value).toBe(4)
     expect(app.components.requireApi<ImageApi>('image').getProps().radius).toBe(8)
     expect(app.components.requireApi<TagApi>('tag').getProps().tone).toBe('success')
+    expect(app.components.requireApi<ChipApi>('chip').getProps().selected).toBe(true)
     expect(app.components.requireApi<ScrollAreaApi>('scroll-area').getScrollState().y.value).toBe(80)
     expect(app.components.requireApi<ScrollbarApi>('scrollbar').getScrollState().value).toBe(40)
     expect(app.components.requireApi<SliderApi>('slider').getProps().value).toBe(50)
     expect(app.components.requireApi<CheckboxApi>('checkbox').getProps().checked).toBe(true)
     expect(app.components.requireApi<ToggleApi>('toggle').getProps().checked).toBe(true)
     expect(app.components.requireApi<TooltipApi>('tooltip').getProps().open).toBe(false)
+    expect(app.components.requireApi<PopoverApi>('popover').getProps().open).toBe(false)
+    expect(app.components.requireApi<ActionListApi>('action-list').getProps().activeIndex).toBe(2)
+    expect(app.components.requireApi<DialogApi>('dialog').getProps().open).toBe(true)
+    expect(app.components.requireApi<ToastRegionApi>('toast-region').getProps().items).toHaveLength(2)
     expect(app.components.requireApi<SegmentedControlApi>('segmented').getProps().value).toBe('b')
     expect(app.components.requireApi<PanelApi>('panel').getProps().title).toBe('Updated')
 

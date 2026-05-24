@@ -1,8 +1,11 @@
 import type { NovaComponentDescriptor, NovaSchemaRegistry } from '@endge/nova'
+import { ACTION_LIST_DESCRIPTOR } from '@/components/ActionList/action-list.registry'
 import { ADVANCED_COMPONENT_DESCRIPTORS } from '@/components/Advanced/advanced.registry'
 import { BADGE_DESCRIPTOR } from '@/components/Badge/badge.registry'
 import { BUTTON_DESCRIPTOR } from '@/components/Button/button.registry'
 import { CHECKBOX_DESCRIPTOR } from '@/components/Checkbox/checkbox.registry'
+import { CHIP_DESCRIPTOR } from '@/components/Chip/chip.registry'
+import { DIALOG_DESCRIPTOR } from '@/components/Dialog/dialog.registry'
 import { FLEX_DESCRIPTOR } from '@/components/Flex/flex.registry'
 import { GRID_DESCRIPTOR } from '@/components/Grid/grid.registry'
 import { IMAGE_DESCRIPTOR } from '@/components/Image/image.registry'
@@ -17,8 +20,10 @@ import { SPLIT_PANE_DESCRIPTOR } from '@/components/SplitPane/split-pane.registr
 import { SURFACE_DESCRIPTOR } from '@/components/Surface/surface.registry'
 import { TAG_DESCRIPTOR } from '@/components/Tag/tag.registry'
 import { TEXT_BLOCK_DESCRIPTOR } from '@/components/TextBlock/text-block.registry'
+import { POPOVER_DESCRIPTOR } from '@/components/Popover/popover.registry'
 import { TOGGLE_DESCRIPTOR } from '@/components/Toggle/toggle.registry'
 import { TOOLTIP_DESCRIPTOR } from '@/components/Tooltip/tooltip.registry'
+import { TOAST_DESCRIPTOR, TOAST_REGION_DESCRIPTOR } from '@/components/Toast/toast.registry'
 
 const NOVA_UI_KIT_DESCRIPTORS: Array<NovaComponentDescriptor<any, any, any, any>> = [
   ROOT_DESCRIPTOR,
@@ -31,6 +36,7 @@ const NOVA_UI_KIT_DESCRIPTORS: Array<NovaComponentDescriptor<any, any, any, any>
   ...INPUT_DESCRIPTORS,
   IMAGE_DESCRIPTOR,
   TAG_DESCRIPTOR,
+  CHIP_DESCRIPTOR,
   SCROLLBAR_DESCRIPTOR,
   SCROLL_AREA_DESCRIPTOR,
   SLIDER_DESCRIPTOR,
@@ -39,6 +45,11 @@ const NOVA_UI_KIT_DESCRIPTORS: Array<NovaComponentDescriptor<any, any, any, any>
   SEGMENTED_CONTROL_DESCRIPTOR,
   SPLIT_PANE_DESCRIPTOR,
   TOOLTIP_DESCRIPTOR,
+  POPOVER_DESCRIPTOR,
+  ACTION_LIST_DESCRIPTOR,
+  DIALOG_DESCRIPTOR,
+  TOAST_DESCRIPTOR,
+  TOAST_REGION_DESCRIPTOR,
   PANEL_DESCRIPTOR,
   ...ADVANCED_COMPONENT_DESCRIPTORS,
 ]

@@ -39,10 +39,7 @@ export const TOGGLE_SWITCH_DESCRIPTOR = createDescriptor('ToggleSwitch')
 export const RADIO_BUTTON_DESCRIPTOR = createDescriptor('RadioButton')
 export const RATING_DESCRIPTOR = createDescriptor('Rating')
 export const SELECT_BUTTON_DESCRIPTOR = createDescriptor('SelectButton')
-export const DIALOG_DESCRIPTOR = createDescriptor('Dialog')
 export const DRAWER_DESCRIPTOR = createDescriptor('Drawer')
-export const POPOVER_DESCRIPTOR = createDescriptor('Popover')
-export const TOAST_DESCRIPTOR = createDescriptor('Toast')
 export const MESSAGE_DESCRIPTOR = createDescriptor('Message')
 export const BLOCK_UI_DESCRIPTOR = createDescriptor('BlockUI')
 export const ACCORDION_DESCRIPTOR = createDescriptor('Accordion')
@@ -66,10 +63,7 @@ export const ADVANCED_COMPONENT_DESCRIPTORS: Array<AdvancedComponentDescriptor> 
   RADIO_BUTTON_DESCRIPTOR,
   RATING_DESCRIPTOR,
   SELECT_BUTTON_DESCRIPTOR,
-  DIALOG_DESCRIPTOR,
   DRAWER_DESCRIPTOR,
-  POPOVER_DESCRIPTOR,
-  TOAST_DESCRIPTOR,
   MESSAGE_DESCRIPTOR,
   BLOCK_UI_DESCRIPTOR,
   ACCORDION_DESCRIPTOR,

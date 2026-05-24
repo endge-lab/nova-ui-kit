@@ -1,6 +1,6 @@
 {
   "packageName": "@endge/nova-ui-kit",
-  "version": "0.6.3",
+  "version": "0.7.0",
   "groups": [
     {
       "id": "nova-ui-kit",
@@ -6264,6 +6264,3024 @@
               }
             }
           ]
+        },
+        {
+          "name": "ActionList",
+          "title": "ActionList",
+          "description": {
+            "ru": "ActionList composable action/menu/listbox primitive for Popover recipes.",
+            "en": "ActionList composable action/menu/listbox primitive for Popover recipes."
+          },
+          "source": "packages/@endge-nova-ui-kit/src/components/ActionList/ActionList.ts",
+          "snippet": "<ActionList>\n  $END$\n</ActionList>",
+          "props": [
+            {
+              "name": "id",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Стабильный идентификатор компонента.",
+                "en": "Stable component id. Nova runtime uses it for component lookup, refs and diagnostics."
+              }
+            },
+            {
+              "name": "key",
+              "type": "string | number",
+              "required": false,
+              "description": {
+                "ru": "Ключ для reconcile списка.",
+                "en": "Stable key for Nova template reconciliation."
+              }
+            },
+            {
+              "name": "ref",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Имя template ref.",
+                "en": "Template ref name exposed through Nova scope refs."
+              }
+            },
+            {
+              "name": "ref-key",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Dynamic ref bucket key for repeated Nova template nodes.",
+                "en": "Dynamic ref bucket key for repeated Nova template nodes."
+              }
+            },
+            {
+              "name": "context",
+              "type": "Record<string, unknown>",
+              "required": false,
+              "description": {
+                "ru": "Explicit Nova context object forwarded to this node subtree.",
+                "en": "Explicit Nova context object forwarded to this node subtree."
+              }
+            },
+            {
+              "name": "layout",
+              "type": "FlexChildLayout | GridChildLayout | Record<string, unknown>",
+              "required": false,
+              "description": {
+                "ru": "Layout-настройки внутри родителя.",
+                "en": "Parent layout intent for Flex/Grid containers: size, span, margins, order, alignment and flex behavior."
+              }
+            },
+            {
+              "name": "if",
+              "type": "unknown",
+              "required": false,
+              "description": {
+                "ru": "Nova compiler conditional render expression. Use instead of Vue v-if inside NovaCanvas DSL.",
+                "en": "Nova compiler conditional render expression. Use instead of Vue v-if inside NovaCanvas DSL."
+              }
+            },
+            {
+              "name": "else-if",
+              "type": "unknown",
+              "required": false,
+              "description": {
+                "ru": "Nova compiler else-if condition for the previous conditional DSL node.",
+                "en": "Nova compiler else-if condition for the previous conditional DSL node."
+              }
+            },
+            {
+              "name": "else",
+              "type": "boolean | \"\"",
+              "required": false,
+              "description": {
+                "ru": "Nova compiler fallback branch marker for the previous conditional DSL node.",
+                "en": "Nova compiler fallback branch marker for the previous conditional DSL node."
+              }
+            },
+            {
+              "name": "for",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Nova compiler repeat expression, for example `item in items`. Use instead of Vue v-for inside NovaCanvas DSL.",
+                "en": "Nova compiler repeat expression, for example `item in items`. Use instead of Vue v-for inside NovaCanvas DSL."
+              }
+            },
+            {
+              "name": "class",
+              "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
+              "required": false,
+              "description": {
+                "ru": "NovaCSS class компонента.",
+                "en": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`."
+              }
+            },
+            {
+              "name": "attrs",
+              "type": "Record<string, unknown>",
+              "required": false,
+              "description": {
+                "ru": "Raw style-engine attributes. Scoped Nova styles also write their scope marker here.",
+                "en": "Raw style-engine attributes. Scoped Nova styles also write their scope marker here."
+              }
+            },
+            {
+              "name": "x",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Координата X.",
+                "en": "Local X coordinate in canvas pixels."
+              }
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Координата Y.",
+                "en": "Local Y coordinate in canvas pixels."
+              }
+            },
+            {
+              "name": "width",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Ширина компонента.",
+                "en": "Node width in canvas pixels."
+              }
+            },
+            {
+              "name": "height",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Высота компонента.",
+                "en": "Node height in canvas pixels."
+              }
+            },
+            {
+              "name": "style",
+              "type": "NovaUiInheritedTextStyle",
+              "required": false,
+              "description": {
+                "ru": "Inherited text style object propagated through UI Kit nodes.",
+                "en": "Inherited text style object propagated through UI Kit nodes."
+              }
+            },
+            {
+              "name": "color",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Цвет текста или элемента.",
+                "en": "Foreground/text color."
+              }
+            },
+            {
+              "name": "fontFamily",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Text font family.",
+                "en": "Text font family."
+              }
+            },
+            {
+              "name": "fontSize",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Text font size in canvas pixels.",
+                "en": "Text font size in canvas pixels."
+              }
+            },
+            {
+              "name": "fontWeight",
+              "type": "NovaUiFontWeight",
+              "required": false,
+              "description": {
+                "ru": "Text font weight.",
+                "en": "Text font weight."
+              }
+            },
+            {
+              "name": "fontStyle",
+              "type": "NovaUiFontStyle",
+              "required": false,
+              "description": {
+                "ru": "Text font style.",
+                "en": "Text font style."
+              }
+            },
+            {
+              "name": "lineHeight",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Text line height in canvas pixels.",
+                "en": "Text line height in canvas pixels."
+              }
+            },
+            {
+              "name": "background",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Фон компонента.",
+                "en": "Background fill color."
+              }
+            },
+            {
+              "name": "opacity",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Node opacity from 0 to 1.",
+                "en": "Node opacity from 0 to 1."
+              }
+            },
+            {
+              "name": "border",
+              "type": "NovaUiBorder",
+              "required": false,
+              "description": {
+                "ru": "Описание обводки.",
+                "en": "Border declaration: width, color and radius."
+              }
+            },
+            {
+              "name": "clip",
+              "type": "boolean",
+              "required": false,
+              "description": {
+                "ru": "Clip children to component bounds.",
+                "en": "Clip children to component bounds."
+              }
+            },
+            {
+              "name": "display",
+              "type": "\"normal\" | \"none\"",
+              "required": false,
+              "description": {
+                "ru": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying t...",
+                "en": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it."
+              }
+            },
+            {
+              "name": "padding",
+              "type": "NovaUiSpacing",
+              "required": false,
+              "description": {
+                "ru": "Inner spacing. Supports number or side/horizontal/vertical object.",
+                "en": "Inner spacing. Supports number or side/horizontal/vertical object."
+              }
+            },
+            {
+              "name": "accentColor",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Primary accent color for active indicators and controls.",
+                "en": "Primary accent color for active indicators and controls."
+              }
+            },
+            {
+              "name": "trackColor",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Track color for sliders, toggles, progress and scrollbars.",
+                "en": "Track color for sliders, toggles, progress and scrollbars."
+              }
+            },
+            {
+              "name": "thumbColor",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Thumb/handle color for sliders, toggles and scrollbars.",
+                "en": "Thumb/handle color for sliders, toggles and scrollbars."
+              }
+            },
+            {
+              "name": "hoverBackground",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Background used in hover state.",
+                "en": "Background used in hover state."
+              }
+            },
+            {
+              "name": "pressedBackground",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Background used in pressed state.",
+                "en": "Background used in pressed state."
+              }
+            },
+            {
+              "name": "activeBackground",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Background used in active/selected state.",
+                "en": "Background used in active/selected state."
+              }
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false,
+              "description": {
+                "ru": "Disables pointer interaction and state changes.",
+                "en": "Disables pointer interaction and state changes."
+              }
+            },
+            {
+              "name": "disabledOpacity",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Opacity applied when disabled.",
+                "en": "Opacity applied when disabled."
+              }
+            },
+            {
+              "name": "sound",
+              "type": "NovaUiSoundMap",
+              "required": false,
+              "description": {
+                "ru": "Optional sound cue map for hover, press, change and disabledPress.",
+                "en": "Optional sound cue map for hover, press, change and disabledPress."
+              }
+            },
+            {
+              "name": "cursor",
+              "type": "NovaCursorDeclaration",
+              "required": false,
+              "description": {
+                "ru": "Cursor declaration for hover, pressed, dragging and disabled states.",
+                "en": "Cursor declaration for hover, pressed, dragging and disabled states."
+              }
+            },
+            {
+              "name": "cursorContext",
+              "type": "NovaCursorContext",
+              "required": false,
+              "description": {
+                "ru": "Additional cursor metadata propagated to Nova input runtime.",
+                "en": "Additional cursor metadata propagated to Nova input runtime."
+              }
+            },
+            {
+              "name": "motion",
+              "type": "NovaUiMotionDeclaration",
+              "required": false,
+              "description": {
+                "ru": "UI Kit motion preset or preset sequence. Supports fadeIn, shimmer, bounce, spin and other presets.",
+                "en": "UI Kit motion preset or preset sequence. Supports fadeIn, shimmer, bounce, spin and other presets."
+              }
+            },
+            {
+              "name": "className",
+              "type": "string | Array<string>",
+              "required": false,
+              "description": {
+                "ru": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
+                "en": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid."
+              }
+            },
+            {
+              "name": "items",
+              "type": "Array<ActionListItem>",
+              "required": false,
+              "description": {
+                "ru": "Action, group, separator and submenu items.",
+                "en": "Action, group, separator and submenu items."
+              }
+            },
+            {
+              "name": "value",
+              "type": "string | number | boolean",
+              "required": false,
+              "description": {
+                "ru": "Selected value.",
+                "en": "Selected value."
+              }
+            },
+            {
+              "name": "activeIndex",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Focused item index.",
+                "en": "Focused item index."
+              }
+            },
+            {
+              "name": "itemHeight",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Row height in canvas pixels.",
+                "en": "Row height in canvas pixels."
+              }
+            },
+            {
+              "name": "loop",
+              "type": "boolean",
+              "required": false,
+              "description": {
+                "ru": "Wrap keyboard navigation.",
+                "en": "Wrap keyboard navigation."
+              }
+            },
+            {
+              "name": "selectable",
+              "type": "boolean",
+              "required": false,
+              "description": {
+                "ru": "Update value on activation.",
+                "en": "Update value on activation."
+              }
+            },
+            {
+              "name": "parts",
+              "type": "Record<string, NovaUiPartStyle>",
+              "required": false,
+              "description": {
+                "ru": "Part-level style overrides.",
+                "en": "Part-level style overrides."
+              }
+            },
+            {
+              "name": "onAction",
+              "type": "(item: ActionListItem, index: number, event?: Event) => void",
+              "required": false,
+              "description": {
+                "ru": "Action handler.",
+                "en": "Action handler."
+              }
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: string | number | boolean | undefined, item: ActionListItem, event?: Event) => void",
+              "required": false,
+              "description": {
+                "ru": "Value change handler.",
+                "en": "Value change handler."
+              }
+            }
+          ],
+          "slots": [
+            {
+              "name": "default",
+              "description": {
+                "ru": "Nova DSL children compiled into this component.",
+                "en": "Nova DSL children compiled into this component."
+              }
+            }
+          ]
+        },
+        {
+          "name": "Chip",
+          "title": "Chip",
+          "description": {
+            "ru": "Compact interactive token with selected and removable states.",
+            "en": "Compact interactive token with selected and removable states."
+          },
+          "source": "packages/@endge-nova-ui-kit/src/components/Chip/Chip.ts",
+          "snippet": "<Chip>\n  $END$\n</Chip>",
+          "props": [
+            {
+              "name": "id",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Стабильный идентификатор компонента.",
+                "en": "Stable component id. Nova runtime uses it for component lookup, refs and diagnostics."
+              }
+            },
+            {
+              "name": "key",
+              "type": "string | number",
+              "required": false,
+              "description": {
+                "ru": "Ключ для reconcile списка.",
+                "en": "Stable key for Nova template reconciliation."
+              }
+            },
+            {
+              "name": "ref",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Имя template ref.",
+                "en": "Template ref name exposed through Nova scope refs."
+              }
+            },
+            {
+              "name": "ref-key",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Dynamic ref bucket key for repeated Nova template nodes.",
+                "en": "Dynamic ref bucket key for repeated Nova template nodes."
+              }
+            },
+            {
+              "name": "context",
+              "type": "Record<string, unknown>",
+              "required": false,
+              "description": {
+                "ru": "Explicit Nova context object forwarded to this node subtree.",
+                "en": "Explicit Nova context object forwarded to this node subtree."
+              }
+            },
+            {
+              "name": "layout",
+              "type": "FlexChildLayout | GridChildLayout | Record<string, unknown>",
+              "required": false,
+              "description": {
+                "ru": "Layout-настройки внутри родителя.",
+                "en": "Parent layout intent for Flex/Grid containers: size, span, margins, order, alignment and flex behavior."
+              }
+            },
+            {
+              "name": "if",
+              "type": "unknown",
+              "required": false,
+              "description": {
+                "ru": "Nova compiler conditional render expression. Use instead of Vue v-if inside NovaCanvas DSL.",
+                "en": "Nova compiler conditional render expression. Use instead of Vue v-if inside NovaCanvas DSL."
+              }
+            },
+            {
+              "name": "else-if",
+              "type": "unknown",
+              "required": false,
+              "description": {
+                "ru": "Nova compiler else-if condition for the previous conditional DSL node.",
+                "en": "Nova compiler else-if condition for the previous conditional DSL node."
+              }
+            },
+            {
+              "name": "else",
+              "type": "boolean | \"\"",
+              "required": false,
+              "description": {
+                "ru": "Nova compiler fallback branch marker for the previous conditional DSL node.",
+                "en": "Nova compiler fallback branch marker for the previous conditional DSL node."
+              }
+            },
+            {
+              "name": "for",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Nova compiler repeat expression, for example `item in items`. Use instead of Vue v-for inside NovaCanvas DSL.",
+                "en": "Nova compiler repeat expression, for example `item in items`. Use instead of Vue v-for inside NovaCanvas DSL."
+              }
+            },
+            {
+              "name": "class",
+              "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
+              "required": false,
+              "description": {
+                "ru": "NovaCSS class компонента.",
+                "en": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`."
+              }
+            },
+            {
+              "name": "attrs",
+              "type": "Record<string, unknown>",
+              "required": false,
+              "description": {
+                "ru": "Raw style-engine attributes. Scoped Nova styles also write their scope marker here.",
+                "en": "Raw style-engine attributes. Scoped Nova styles also write their scope marker here."
+              }
+            },
+            {
+              "name": "x",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Координата X.",
+                "en": "Local X coordinate in canvas pixels."
+              }
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Координата Y.",
+                "en": "Local Y coordinate in canvas pixels."
+              }
+            },
+            {
+              "name": "width",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Ширина компонента.",
+                "en": "Node width in canvas pixels."
+              }
+            },
+            {
+              "name": "height",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Высота компонента.",
+                "en": "Node height in canvas pixels."
+              }
+            },
+            {
+              "name": "style",
+              "type": "NovaUiInheritedTextStyle",
+              "required": false,
+              "description": {
+                "ru": "Inherited text style object propagated through UI Kit nodes.",
+                "en": "Inherited text style object propagated through UI Kit nodes."
+              }
+            },
+            {
+              "name": "color",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Цвет текста или элемента.",
+                "en": "Foreground/text color."
+              }
+            },
+            {
+              "name": "fontFamily",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Text font family.",
+                "en": "Text font family."
+              }
+            },
+            {
+              "name": "fontSize",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Text font size in canvas pixels.",
+                "en": "Text font size in canvas pixels."
+              }
+            },
+            {
+              "name": "fontWeight",
+              "type": "NovaUiFontWeight",
+              "required": false,
+              "description": {
+                "ru": "Text font weight.",
+                "en": "Text font weight."
+              }
+            },
+            {
+              "name": "fontStyle",
+              "type": "NovaUiFontStyle",
+              "required": false,
+              "description": {
+                "ru": "Text font style.",
+                "en": "Text font style."
+              }
+            },
+            {
+              "name": "lineHeight",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Text line height in canvas pixels.",
+                "en": "Text line height in canvas pixels."
+              }
+            },
+            {
+              "name": "background",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Фон компонента.",
+                "en": "Background fill color."
+              }
+            },
+            {
+              "name": "opacity",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Node opacity from 0 to 1.",
+                "en": "Node opacity from 0 to 1."
+              }
+            },
+            {
+              "name": "border",
+              "type": "NovaUiBorder",
+              "required": false,
+              "description": {
+                "ru": "Описание обводки.",
+                "en": "Border declaration: width, color and radius."
+              }
+            },
+            {
+              "name": "clip",
+              "type": "boolean",
+              "required": false,
+              "description": {
+                "ru": "Clip children to component bounds.",
+                "en": "Clip children to component bounds."
+              }
+            },
+            {
+              "name": "display",
+              "type": "\"normal\" | \"none\"",
+              "required": false,
+              "description": {
+                "ru": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying t...",
+                "en": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it."
+              }
+            },
+            {
+              "name": "padding",
+              "type": "NovaUiSpacing",
+              "required": false,
+              "description": {
+                "ru": "Inner spacing. Supports number or side/horizontal/vertical object.",
+                "en": "Inner spacing. Supports number or side/horizontal/vertical object."
+              }
+            },
+            {
+              "name": "accentColor",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Primary accent color for active indicators and controls.",
+                "en": "Primary accent color for active indicators and controls."
+              }
+            },
+            {
+              "name": "trackColor",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Track color for sliders, toggles, progress and scrollbars.",
+                "en": "Track color for sliders, toggles, progress and scrollbars."
+              }
+            },
+            {
+              "name": "thumbColor",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Thumb/handle color for sliders, toggles and scrollbars.",
+                "en": "Thumb/handle color for sliders, toggles and scrollbars."
+              }
+            },
+            {
+              "name": "hoverBackground",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Background used in hover state.",
+                "en": "Background used in hover state."
+              }
+            },
+            {
+              "name": "pressedBackground",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Background used in pressed state.",
+                "en": "Background used in pressed state."
+              }
+            },
+            {
+              "name": "activeBackground",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Background used in active/selected state.",
+                "en": "Background used in active/selected state."
+              }
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false,
+              "description": {
+                "ru": "Disables pointer interaction and state changes.",
+                "en": "Disables pointer interaction and state changes."
+              }
+            },
+            {
+              "name": "disabledOpacity",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Opacity applied when disabled.",
+                "en": "Opacity applied when disabled."
+              }
+            },
+            {
+              "name": "sound",
+              "type": "NovaUiSoundMap",
+              "required": false,
+              "description": {
+                "ru": "Optional sound cue map for hover, press, change and disabledPress.",
+                "en": "Optional sound cue map for hover, press, change and disabledPress."
+              }
+            },
+            {
+              "name": "cursor",
+              "type": "NovaCursorDeclaration",
+              "required": false,
+              "description": {
+                "ru": "Cursor declaration for hover, pressed, dragging and disabled states.",
+                "en": "Cursor declaration for hover, pressed, dragging and disabled states."
+              }
+            },
+            {
+              "name": "cursorContext",
+              "type": "NovaCursorContext",
+              "required": false,
+              "description": {
+                "ru": "Additional cursor metadata propagated to Nova input runtime.",
+                "en": "Additional cursor metadata propagated to Nova input runtime."
+              }
+            },
+            {
+              "name": "motion",
+              "type": "NovaUiMotionDeclaration",
+              "required": false,
+              "description": {
+                "ru": "UI Kit motion preset or preset sequence. Supports fadeIn, shimmer, bounce, spin and other presets.",
+                "en": "UI Kit motion preset or preset sequence. Supports fadeIn, shimmer, bounce, spin and other presets."
+              }
+            },
+            {
+              "name": "className",
+              "type": "string | Array<string>",
+              "required": false,
+              "description": {
+                "ru": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
+                "en": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid."
+              }
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Chip label.",
+                "en": "Chip label."
+              }
+            },
+            {
+              "name": "icon",
+              "type": "NovaUiIconSource",
+              "required": false,
+              "description": {
+                "ru": "Иконка или asset ref.",
+                "en": "Optional icon."
+              }
+            },
+            {
+              "name": "avatar",
+              "type": "NovaUiIconSource",
+              "required": false,
+              "description": {
+                "ru": "Optional avatar.",
+                "en": "Optional avatar."
+              }
+            },
+            {
+              "name": "selected",
+              "type": "boolean",
+              "required": false,
+              "description": {
+                "ru": "Selected state.",
+                "en": "Selected state."
+              }
+            },
+            {
+              "name": "removable",
+              "type": "boolean",
+              "required": false,
+              "description": {
+                "ru": "Show remove affordance.",
+                "en": "Show remove affordance."
+              }
+            },
+            {
+              "name": "tone",
+              "type": "'neutral' | 'brand' | 'success' | 'warning' | 'danger' | 'info'",
+              "required": false,
+              "description": {
+                "ru": "Semantic tone.",
+                "en": "Semantic tone."
+              }
+            },
+            {
+              "name": "size",
+              "type": "'sm' | 'md' | 'lg'",
+              "required": false,
+              "description": {
+                "ru": "Component size.",
+                "en": "Component size."
+              }
+            },
+            {
+              "name": "parts",
+              "type": "Record<string, NovaUiPartStyle>",
+              "required": false,
+              "description": {
+                "ru": "Part-level style overrides.",
+                "en": "Part-level style overrides."
+              }
+            },
+            {
+              "name": "onPress",
+              "type": "(event?: Event) => void",
+              "required": false,
+              "description": {
+                "ru": "Press handler.",
+                "en": "Press handler."
+              }
+            },
+            {
+              "name": "onRemove",
+              "type": "(event?: Event) => void",
+              "required": false,
+              "description": {
+                "ru": "Remove handler.",
+                "en": "Remove handler."
+              }
+            }
+          ],
+          "slots": []
+        },
+        {
+          "name": "Popover",
+          "title": "Popover",
+          "description": {
+            "ru": "Controlled overlay box with arbitrary Nova DSL content and external triggers.",
+            "en": "Controlled overlay box with arbitrary Nova DSL content and external triggers."
+          },
+          "source": "packages/@endge-nova-ui-kit/src/components/Popover/Popover.ts",
+          "snippet": "<Popover>\n  $END$\n</Popover>",
+          "props": [
+            {
+              "name": "id",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Стабильный идентификатор компонента.",
+                "en": "Stable component id. Nova runtime uses it for component lookup, refs and diagnostics."
+              }
+            },
+            {
+              "name": "key",
+              "type": "string | number",
+              "required": false,
+              "description": {
+                "ru": "Ключ для reconcile списка.",
+                "en": "Stable key for Nova template reconciliation."
+              }
+            },
+            {
+              "name": "ref",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Имя template ref.",
+                "en": "Template ref name exposed through Nova scope refs."
+              }
+            },
+            {
+              "name": "ref-key",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Dynamic ref bucket key for repeated Nova template nodes.",
+                "en": "Dynamic ref bucket key for repeated Nova template nodes."
+              }
+            },
+            {
+              "name": "context",
+              "type": "Record<string, unknown>",
+              "required": false,
+              "description": {
+                "ru": "Explicit Nova context object forwarded to this node subtree.",
+                "en": "Explicit Nova context object forwarded to this node subtree."
+              }
+            },
+            {
+              "name": "layout",
+              "type": "FlexChildLayout | GridChildLayout | Record<string, unknown>",
+              "required": false,
+              "description": {
+                "ru": "Layout-настройки внутри родителя.",
+                "en": "Parent layout intent for Flex/Grid containers: size, span, margins, order, alignment and flex behavior."
+              }
+            },
+            {
+              "name": "if",
+              "type": "unknown",
+              "required": false,
+              "description": {
+                "ru": "Nova compiler conditional render expression. Use instead of Vue v-if inside NovaCanvas DSL.",
+                "en": "Nova compiler conditional render expression. Use instead of Vue v-if inside NovaCanvas DSL."
+              }
+            },
+            {
+              "name": "else-if",
+              "type": "unknown",
+              "required": false,
+              "description": {
+                "ru": "Nova compiler else-if condition for the previous conditional DSL node.",
+                "en": "Nova compiler else-if condition for the previous conditional DSL node."
+              }
+            },
+            {
+              "name": "else",
+              "type": "boolean | \"\"",
+              "required": false,
+              "description": {
+                "ru": "Nova compiler fallback branch marker for the previous conditional DSL node.",
+                "en": "Nova compiler fallback branch marker for the previous conditional DSL node."
+              }
+            },
+            {
+              "name": "for",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Nova compiler repeat expression, for example `item in items`. Use instead of Vue v-for inside NovaCanvas DSL.",
+                "en": "Nova compiler repeat expression, for example `item in items`. Use instead of Vue v-for inside NovaCanvas DSL."
+              }
+            },
+            {
+              "name": "class",
+              "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
+              "required": false,
+              "description": {
+                "ru": "NovaCSS class компонента.",
+                "en": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`."
+              }
+            },
+            {
+              "name": "attrs",
+              "type": "Record<string, unknown>",
+              "required": false,
+              "description": {
+                "ru": "Raw style-engine attributes. Scoped Nova styles also write their scope marker here.",
+                "en": "Raw style-engine attributes. Scoped Nova styles also write their scope marker here."
+              }
+            },
+            {
+              "name": "x",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Координата X.",
+                "en": "Local X coordinate in canvas pixels."
+              }
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Координата Y.",
+                "en": "Local Y coordinate in canvas pixels."
+              }
+            },
+            {
+              "name": "width",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Ширина компонента.",
+                "en": "Node width in canvas pixels."
+              }
+            },
+            {
+              "name": "height",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Высота компонента.",
+                "en": "Node height in canvas pixels."
+              }
+            },
+            {
+              "name": "style",
+              "type": "NovaUiInheritedTextStyle",
+              "required": false,
+              "description": {
+                "ru": "Inherited text style object propagated through UI Kit nodes.",
+                "en": "Inherited text style object propagated through UI Kit nodes."
+              }
+            },
+            {
+              "name": "color",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Цвет текста или элемента.",
+                "en": "Foreground/text color."
+              }
+            },
+            {
+              "name": "fontFamily",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Text font family.",
+                "en": "Text font family."
+              }
+            },
+            {
+              "name": "fontSize",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Text font size in canvas pixels.",
+                "en": "Text font size in canvas pixels."
+              }
+            },
+            {
+              "name": "fontWeight",
+              "type": "NovaUiFontWeight",
+              "required": false,
+              "description": {
+                "ru": "Text font weight.",
+                "en": "Text font weight."
+              }
+            },
+            {
+              "name": "fontStyle",
+              "type": "NovaUiFontStyle",
+              "required": false,
+              "description": {
+                "ru": "Text font style.",
+                "en": "Text font style."
+              }
+            },
+            {
+              "name": "lineHeight",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Text line height in canvas pixels.",
+                "en": "Text line height in canvas pixels."
+              }
+            },
+            {
+              "name": "background",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Фон компонента.",
+                "en": "Background fill color."
+              }
+            },
+            {
+              "name": "opacity",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Node opacity from 0 to 1.",
+                "en": "Node opacity from 0 to 1."
+              }
+            },
+            {
+              "name": "border",
+              "type": "NovaUiBorder",
+              "required": false,
+              "description": {
+                "ru": "Описание обводки.",
+                "en": "Border declaration: width, color and radius."
+              }
+            },
+            {
+              "name": "clip",
+              "type": "boolean",
+              "required": false,
+              "description": {
+                "ru": "Clip children to component bounds.",
+                "en": "Clip children to component bounds."
+              }
+            },
+            {
+              "name": "display",
+              "type": "\"normal\" | \"none\"",
+              "required": false,
+              "description": {
+                "ru": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying t...",
+                "en": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it."
+              }
+            },
+            {
+              "name": "padding",
+              "type": "NovaUiSpacing",
+              "required": false,
+              "description": {
+                "ru": "Inner spacing. Supports number or side/horizontal/vertical object.",
+                "en": "Inner spacing. Supports number or side/horizontal/vertical object."
+              }
+            },
+            {
+              "name": "accentColor",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Primary accent color for active indicators and controls.",
+                "en": "Primary accent color for active indicators and controls."
+              }
+            },
+            {
+              "name": "trackColor",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Track color for sliders, toggles, progress and scrollbars.",
+                "en": "Track color for sliders, toggles, progress and scrollbars."
+              }
+            },
+            {
+              "name": "thumbColor",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Thumb/handle color for sliders, toggles and scrollbars.",
+                "en": "Thumb/handle color for sliders, toggles and scrollbars."
+              }
+            },
+            {
+              "name": "hoverBackground",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Background used in hover state.",
+                "en": "Background used in hover state."
+              }
+            },
+            {
+              "name": "pressedBackground",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Background used in pressed state.",
+                "en": "Background used in pressed state."
+              }
+            },
+            {
+              "name": "activeBackground",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Background used in active/selected state.",
+                "en": "Background used in active/selected state."
+              }
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false,
+              "description": {
+                "ru": "Disables pointer interaction and state changes.",
+                "en": "Disables pointer interaction and state changes."
+              }
+            },
+            {
+              "name": "disabledOpacity",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Opacity applied when disabled.",
+                "en": "Opacity applied when disabled."
+              }
+            },
+            {
+              "name": "sound",
+              "type": "NovaUiSoundMap",
+              "required": false,
+              "description": {
+                "ru": "Optional sound cue map for hover, press, change and disabledPress.",
+                "en": "Optional sound cue map for hover, press, change and disabledPress."
+              }
+            },
+            {
+              "name": "cursor",
+              "type": "NovaCursorDeclaration",
+              "required": false,
+              "description": {
+                "ru": "Cursor declaration for hover, pressed, dragging and disabled states.",
+                "en": "Cursor declaration for hover, pressed, dragging and disabled states."
+              }
+            },
+            {
+              "name": "cursorContext",
+              "type": "NovaCursorContext",
+              "required": false,
+              "description": {
+                "ru": "Additional cursor metadata propagated to Nova input runtime.",
+                "en": "Additional cursor metadata propagated to Nova input runtime."
+              }
+            },
+            {
+              "name": "motion",
+              "type": "NovaUiMotionDeclaration",
+              "required": false,
+              "description": {
+                "ru": "UI Kit motion preset or preset sequence. Supports fadeIn, shimmer, bounce, spin and other presets.",
+                "en": "UI Kit motion preset or preset sequence. Supports fadeIn, shimmer, bounce, spin and other presets."
+              }
+            },
+            {
+              "name": "className",
+              "type": "string | Array<string>",
+              "required": false,
+              "description": {
+                "ru": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
+                "en": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid."
+              }
+            },
+            {
+              "name": "open",
+              "type": "boolean",
+              "required": false,
+              "description": {
+                "ru": "Controlled open state.",
+                "en": "Controlled open state."
+              }
+            },
+            {
+              "name": "anchor",
+              "type": "NovaUiOverlayAnchor",
+              "required": false,
+              "description": {
+                "ru": "Anchor rect/root/pointer.",
+                "en": "Anchor rect/root/pointer."
+              }
+            },
+            {
+              "name": "placement",
+              "type": "NovaUiOverlayPlacement",
+              "required": false,
+              "description": {
+                "ru": "Preferred placement.",
+                "en": "Preferred placement."
+              }
+            },
+            {
+              "name": "offset",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Anchor offset.",
+                "en": "Anchor offset."
+              }
+            },
+            {
+              "name": "collision",
+              "type": "NovaUiOverlayCollisionOptions",
+              "required": false,
+              "description": {
+                "ru": "Flip/shift/clamp collision options.",
+                "en": "Flip/shift/clamp collision options."
+              }
+            },
+            {
+              "name": "dismiss",
+              "type": "NovaUiOverlayDismissMode",
+              "required": false,
+              "description": {
+                "ru": "Outside/Escape dismiss options.",
+                "en": "Outside/Escape dismiss options."
+              }
+            },
+            {
+              "name": "arrow",
+              "type": "boolean",
+              "required": false,
+              "description": {
+                "ru": "Render arrow.",
+                "en": "Render arrow."
+              }
+            },
+            {
+              "name": "backdrop",
+              "type": "boolean",
+              "required": false,
+              "description": {
+                "ru": "Render backdrop.",
+                "en": "Render backdrop."
+              }
+            },
+            {
+              "name": "surface",
+              "type": "Partial<NovaUiCommonProps>",
+              "required": false,
+              "description": {
+                "ru": "Surface overrides.",
+                "en": "Surface overrides."
+              }
+            },
+            {
+              "name": "parts",
+              "type": "Record<string, NovaUiPartStyle>",
+              "required": false,
+              "description": {
+                "ru": "Part overrides.",
+                "en": "Part overrides."
+              }
+            },
+            {
+              "name": "onOpenChange",
+              "type": "(open: boolean, event?: Event) => void",
+              "required": false,
+              "description": {
+                "ru": "Open state callback.",
+                "en": "Open state callback."
+              }
+            }
+          ],
+          "slots": [
+            {
+              "name": "default",
+              "description": {
+                "ru": "Nova DSL children compiled into this component.",
+                "en": "Nova DSL children compiled into this component."
+              }
+            }
+          ]
+        },
+        {
+          "name": "Dialog",
+          "title": "Dialog",
+          "description": {
+            "ru": "Modal or non-modal overlay surface with backdrop, arbitrary body, drag and resize controls.",
+            "en": "Modal or non-modal overlay surface with backdrop, arbitrary body, drag and resize controls."
+          },
+          "source": "packages/@endge-nova-ui-kit/src/components/Dialog/Dialog.ts",
+          "snippet": "<Dialog>\n  $END$\n</Dialog>",
+          "props": [
+            {
+              "name": "id",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Стабильный идентификатор компонента.",
+                "en": "Stable component id. Nova runtime uses it for component lookup, refs and diagnostics."
+              }
+            },
+            {
+              "name": "key",
+              "type": "string | number",
+              "required": false,
+              "description": {
+                "ru": "Ключ для reconcile списка.",
+                "en": "Stable key for Nova template reconciliation."
+              }
+            },
+            {
+              "name": "ref",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Имя template ref.",
+                "en": "Template ref name exposed through Nova scope refs."
+              }
+            },
+            {
+              "name": "ref-key",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Dynamic ref bucket key for repeated Nova template nodes.",
+                "en": "Dynamic ref bucket key for repeated Nova template nodes."
+              }
+            },
+            {
+              "name": "context",
+              "type": "Record<string, unknown>",
+              "required": false,
+              "description": {
+                "ru": "Explicit Nova context object forwarded to this node subtree.",
+                "en": "Explicit Nova context object forwarded to this node subtree."
+              }
+            },
+            {
+              "name": "layout",
+              "type": "FlexChildLayout | GridChildLayout | Record<string, unknown>",
+              "required": false,
+              "description": {
+                "ru": "Layout-настройки внутри родителя.",
+                "en": "Parent layout intent for Flex/Grid containers: size, span, margins, order, alignment and flex behavior."
+              }
+            },
+            {
+              "name": "if",
+              "type": "unknown",
+              "required": false,
+              "description": {
+                "ru": "Nova compiler conditional render expression. Use instead of Vue v-if inside NovaCanvas DSL.",
+                "en": "Nova compiler conditional render expression. Use instead of Vue v-if inside NovaCanvas DSL."
+              }
+            },
+            {
+              "name": "else-if",
+              "type": "unknown",
+              "required": false,
+              "description": {
+                "ru": "Nova compiler else-if condition for the previous conditional DSL node.",
+                "en": "Nova compiler else-if condition for the previous conditional DSL node."
+              }
+            },
+            {
+              "name": "else",
+              "type": "boolean | \"\"",
+              "required": false,
+              "description": {
+                "ru": "Nova compiler fallback branch marker for the previous conditional DSL node.",
+                "en": "Nova compiler fallback branch marker for the previous conditional DSL node."
+              }
+            },
+            {
+              "name": "for",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Nova compiler repeat expression, for example `item in items`. Use instead of Vue v-for inside NovaCanvas DSL.",
+                "en": "Nova compiler repeat expression, for example `item in items`. Use instead of Vue v-for inside NovaCanvas DSL."
+              }
+            },
+            {
+              "name": "class",
+              "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
+              "required": false,
+              "description": {
+                "ru": "NovaCSS class компонента.",
+                "en": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`."
+              }
+            },
+            {
+              "name": "attrs",
+              "type": "Record<string, unknown>",
+              "required": false,
+              "description": {
+                "ru": "Raw style-engine attributes. Scoped Nova styles also write their scope marker here.",
+                "en": "Raw style-engine attributes. Scoped Nova styles also write their scope marker here."
+              }
+            },
+            {
+              "name": "x",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Координата X.",
+                "en": "Local X coordinate in canvas pixels."
+              }
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Координата Y.",
+                "en": "Local Y coordinate in canvas pixels."
+              }
+            },
+            {
+              "name": "width",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Ширина компонента.",
+                "en": "Node width in canvas pixels."
+              }
+            },
+            {
+              "name": "height",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Высота компонента.",
+                "en": "Node height in canvas pixels."
+              }
+            },
+            {
+              "name": "style",
+              "type": "NovaUiInheritedTextStyle",
+              "required": false,
+              "description": {
+                "ru": "Inherited text style object propagated through UI Kit nodes.",
+                "en": "Inherited text style object propagated through UI Kit nodes."
+              }
+            },
+            {
+              "name": "color",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Цвет текста или элемента.",
+                "en": "Foreground/text color."
+              }
+            },
+            {
+              "name": "fontFamily",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Text font family.",
+                "en": "Text font family."
+              }
+            },
+            {
+              "name": "fontSize",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Text font size in canvas pixels.",
+                "en": "Text font size in canvas pixels."
+              }
+            },
+            {
+              "name": "fontWeight",
+              "type": "NovaUiFontWeight",
+              "required": false,
+              "description": {
+                "ru": "Text font weight.",
+                "en": "Text font weight."
+              }
+            },
+            {
+              "name": "fontStyle",
+              "type": "NovaUiFontStyle",
+              "required": false,
+              "description": {
+                "ru": "Text font style.",
+                "en": "Text font style."
+              }
+            },
+            {
+              "name": "lineHeight",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Text line height in canvas pixels.",
+                "en": "Text line height in canvas pixels."
+              }
+            },
+            {
+              "name": "background",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Фон компонента.",
+                "en": "Background fill color."
+              }
+            },
+            {
+              "name": "opacity",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Node opacity from 0 to 1.",
+                "en": "Node opacity from 0 to 1."
+              }
+            },
+            {
+              "name": "border",
+              "type": "NovaUiBorder",
+              "required": false,
+              "description": {
+                "ru": "Описание обводки.",
+                "en": "Border declaration: width, color and radius."
+              }
+            },
+            {
+              "name": "clip",
+              "type": "boolean",
+              "required": false,
+              "description": {
+                "ru": "Clip children to component bounds.",
+                "en": "Clip children to component bounds."
+              }
+            },
+            {
+              "name": "display",
+              "type": "\"normal\" | \"none\"",
+              "required": false,
+              "description": {
+                "ru": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying t...",
+                "en": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it."
+              }
+            },
+            {
+              "name": "padding",
+              "type": "NovaUiSpacing",
+              "required": false,
+              "description": {
+                "ru": "Inner spacing. Supports number or side/horizontal/vertical object.",
+                "en": "Inner spacing. Supports number or side/horizontal/vertical object."
+              }
+            },
+            {
+              "name": "accentColor",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Primary accent color for active indicators and controls.",
+                "en": "Primary accent color for active indicators and controls."
+              }
+            },
+            {
+              "name": "trackColor",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Track color for sliders, toggles, progress and scrollbars.",
+                "en": "Track color for sliders, toggles, progress and scrollbars."
+              }
+            },
+            {
+              "name": "thumbColor",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Thumb/handle color for sliders, toggles and scrollbars.",
+                "en": "Thumb/handle color for sliders, toggles and scrollbars."
+              }
+            },
+            {
+              "name": "hoverBackground",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Background used in hover state.",
+                "en": "Background used in hover state."
+              }
+            },
+            {
+              "name": "pressedBackground",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Background used in pressed state.",
+                "en": "Background used in pressed state."
+              }
+            },
+            {
+              "name": "activeBackground",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Background used in active/selected state.",
+                "en": "Background used in active/selected state."
+              }
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false,
+              "description": {
+                "ru": "Disables pointer interaction and state changes.",
+                "en": "Disables pointer interaction and state changes."
+              }
+            },
+            {
+              "name": "disabledOpacity",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Opacity applied when disabled.",
+                "en": "Opacity applied when disabled."
+              }
+            },
+            {
+              "name": "sound",
+              "type": "NovaUiSoundMap",
+              "required": false,
+              "description": {
+                "ru": "Optional sound cue map for hover, press, change and disabledPress.",
+                "en": "Optional sound cue map for hover, press, change and disabledPress."
+              }
+            },
+            {
+              "name": "cursor",
+              "type": "NovaCursorDeclaration",
+              "required": false,
+              "description": {
+                "ru": "Cursor declaration for hover, pressed, dragging and disabled states.",
+                "en": "Cursor declaration for hover, pressed, dragging and disabled states."
+              }
+            },
+            {
+              "name": "cursorContext",
+              "type": "NovaCursorContext",
+              "required": false,
+              "description": {
+                "ru": "Additional cursor metadata propagated to Nova input runtime.",
+                "en": "Additional cursor metadata propagated to Nova input runtime."
+              }
+            },
+            {
+              "name": "motion",
+              "type": "NovaUiMotionDeclaration",
+              "required": false,
+              "description": {
+                "ru": "UI Kit motion preset or preset sequence. Supports fadeIn, shimmer, bounce, spin and other presets.",
+                "en": "UI Kit motion preset or preset sequence. Supports fadeIn, shimmer, bounce, spin and other presets."
+              }
+            },
+            {
+              "name": "className",
+              "type": "string | Array<string>",
+              "required": false,
+              "description": {
+                "ru": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
+                "en": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid."
+              }
+            },
+            {
+              "name": "open",
+              "type": "boolean",
+              "required": false,
+              "description": {
+                "ru": "Controlled open state.",
+                "en": "Controlled open state."
+              }
+            },
+            {
+              "name": "modal",
+              "type": "boolean",
+              "required": false,
+              "description": {
+                "ru": "Modal interaction mode.",
+                "en": "Modal interaction mode."
+              }
+            },
+            {
+              "name": "backdrop",
+              "type": "boolean",
+              "required": false,
+              "description": {
+                "ru": "Render dimmer/backdrop.",
+                "en": "Render dimmer/backdrop."
+              }
+            },
+            {
+              "name": "title",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Header title.",
+                "en": "Header title."
+              }
+            },
+            {
+              "name": "description",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Header description.",
+                "en": "Header description."
+              }
+            },
+            {
+              "name": "placement",
+              "type": "NovaUiOverlayPlacement",
+              "required": false,
+              "description": {
+                "ru": "Initial placement.",
+                "en": "Initial placement."
+              }
+            },
+            {
+              "name": "position",
+              "type": "{ x?: number; y?: number }",
+              "required": false,
+              "description": {
+                "ru": "Controlled position.",
+                "en": "Controlled position."
+              }
+            },
+            {
+              "name": "dismiss",
+              "type": "NovaUiOverlayDismissMode",
+              "required": false,
+              "description": {
+                "ru": "Outside/Escape dismiss options.",
+                "en": "Outside/Escape dismiss options."
+              }
+            },
+            {
+              "name": "closeButton",
+              "type": "boolean",
+              "required": false,
+              "description": {
+                "ru": "Show close button.",
+                "en": "Show close button."
+              }
+            },
+            {
+              "name": "draggable",
+              "type": "boolean",
+              "required": false,
+              "description": {
+                "ru": "Enable drag move.",
+                "en": "Enable drag move."
+              }
+            },
+            {
+              "name": "resizable",
+              "type": "boolean",
+              "required": false,
+              "description": {
+                "ru": "Enable resize handle.",
+                "en": "Enable resize handle."
+              }
+            },
+            {
+              "name": "scale",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Surface scale.",
+                "en": "Surface scale."
+              }
+            },
+            {
+              "name": "minWidth",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Minimum width.",
+                "en": "Minimum width."
+              }
+            },
+            {
+              "name": "minHeight",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Minimum height.",
+                "en": "Minimum height."
+              }
+            },
+            {
+              "name": "maxWidth",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Maximum width.",
+                "en": "Maximum width."
+              }
+            },
+            {
+              "name": "maxHeight",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Maximum height.",
+                "en": "Maximum height."
+              }
+            },
+            {
+              "name": "header",
+              "type": "Array<NovaComponentSchema>",
+              "required": false,
+              "description": {
+                "ru": "Header slot schemas.",
+                "en": "Header slot schemas."
+              }
+            },
+            {
+              "name": "footer",
+              "type": "Array<NovaComponentSchema>",
+              "required": false,
+              "description": {
+                "ru": "Footer slot schemas.",
+                "en": "Footer slot schemas."
+              }
+            },
+            {
+              "name": "parts",
+              "type": "Record<string, NovaUiPartStyle>",
+              "required": false,
+              "description": {
+                "ru": "Part overrides.",
+                "en": "Part overrides."
+              }
+            },
+            {
+              "name": "onOpenChange",
+              "type": "(open: boolean, event?: Event) => void",
+              "required": false,
+              "description": {
+                "ru": "Open callback.",
+                "en": "Open callback."
+              }
+            },
+            {
+              "name": "onMove",
+              "type": "(position: { x: number; y: number }, event?: Event) => void",
+              "required": false,
+              "description": {
+                "ru": "Move callback.",
+                "en": "Move callback."
+              }
+            },
+            {
+              "name": "onResize",
+              "type": "(size: { width: number; height: number }, event?: Event) => void",
+              "required": false,
+              "description": {
+                "ru": "Resize callback.",
+                "en": "Resize callback."
+              }
+            }
+          ],
+          "slots": [
+            {
+              "name": "default",
+              "description": {
+                "ru": "Nova DSL children compiled into this component.",
+                "en": "Nova DSL children compiled into this component."
+              }
+            }
+          ]
+        },
+        {
+          "name": "Toast",
+          "title": "Toast",
+          "description": {
+            "ru": "Single notification item for manual composition or ToastRegion children.",
+            "en": "Single notification item for manual composition or ToastRegion children."
+          },
+          "source": "packages/@endge-nova-ui-kit/src/components/Toast/Toast.ts",
+          "snippet": "<Toast>\n  $END$\n</Toast>",
+          "props": [
+            {
+              "name": "id",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Стабильный идентификатор компонента.",
+                "en": "Stable component id. Nova runtime uses it for component lookup, refs and diagnostics."
+              }
+            },
+            {
+              "name": "key",
+              "type": "string | number",
+              "required": false,
+              "description": {
+                "ru": "Ключ для reconcile списка.",
+                "en": "Stable key for Nova template reconciliation."
+              }
+            },
+            {
+              "name": "ref",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Имя template ref.",
+                "en": "Template ref name exposed through Nova scope refs."
+              }
+            },
+            {
+              "name": "ref-key",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Dynamic ref bucket key for repeated Nova template nodes.",
+                "en": "Dynamic ref bucket key for repeated Nova template nodes."
+              }
+            },
+            {
+              "name": "context",
+              "type": "Record<string, unknown>",
+              "required": false,
+              "description": {
+                "ru": "Explicit Nova context object forwarded to this node subtree.",
+                "en": "Explicit Nova context object forwarded to this node subtree."
+              }
+            },
+            {
+              "name": "layout",
+              "type": "FlexChildLayout | GridChildLayout | Record<string, unknown>",
+              "required": false,
+              "description": {
+                "ru": "Layout-настройки внутри родителя.",
+                "en": "Parent layout intent for Flex/Grid containers: size, span, margins, order, alignment and flex behavior."
+              }
+            },
+            {
+              "name": "if",
+              "type": "unknown",
+              "required": false,
+              "description": {
+                "ru": "Nova compiler conditional render expression. Use instead of Vue v-if inside NovaCanvas DSL.",
+                "en": "Nova compiler conditional render expression. Use instead of Vue v-if inside NovaCanvas DSL."
+              }
+            },
+            {
+              "name": "else-if",
+              "type": "unknown",
+              "required": false,
+              "description": {
+                "ru": "Nova compiler else-if condition for the previous conditional DSL node.",
+                "en": "Nova compiler else-if condition for the previous conditional DSL node."
+              }
+            },
+            {
+              "name": "else",
+              "type": "boolean | \"\"",
+              "required": false,
+              "description": {
+                "ru": "Nova compiler fallback branch marker for the previous conditional DSL node.",
+                "en": "Nova compiler fallback branch marker for the previous conditional DSL node."
+              }
+            },
+            {
+              "name": "for",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Nova compiler repeat expression, for example `item in items`. Use instead of Vue v-for inside NovaCanvas DSL.",
+                "en": "Nova compiler repeat expression, for example `item in items`. Use instead of Vue v-for inside NovaCanvas DSL."
+              }
+            },
+            {
+              "name": "class",
+              "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
+              "required": false,
+              "description": {
+                "ru": "NovaCSS class компонента.",
+                "en": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`."
+              }
+            },
+            {
+              "name": "attrs",
+              "type": "Record<string, unknown>",
+              "required": false,
+              "description": {
+                "ru": "Raw style-engine attributes. Scoped Nova styles also write their scope marker here.",
+                "en": "Raw style-engine attributes. Scoped Nova styles also write their scope marker here."
+              }
+            },
+            {
+              "name": "x",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Координата X.",
+                "en": "Local X coordinate in canvas pixels."
+              }
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Координата Y.",
+                "en": "Local Y coordinate in canvas pixels."
+              }
+            },
+            {
+              "name": "width",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Ширина компонента.",
+                "en": "Node width in canvas pixels."
+              }
+            },
+            {
+              "name": "height",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Высота компонента.",
+                "en": "Node height in canvas pixels."
+              }
+            },
+            {
+              "name": "style",
+              "type": "NovaUiInheritedTextStyle",
+              "required": false,
+              "description": {
+                "ru": "Inherited text style object propagated through UI Kit nodes.",
+                "en": "Inherited text style object propagated through UI Kit nodes."
+              }
+            },
+            {
+              "name": "color",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Цвет текста или элемента.",
+                "en": "Foreground/text color."
+              }
+            },
+            {
+              "name": "fontFamily",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Text font family.",
+                "en": "Text font family."
+              }
+            },
+            {
+              "name": "fontSize",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Text font size in canvas pixels.",
+                "en": "Text font size in canvas pixels."
+              }
+            },
+            {
+              "name": "fontWeight",
+              "type": "NovaUiFontWeight",
+              "required": false,
+              "description": {
+                "ru": "Text font weight.",
+                "en": "Text font weight."
+              }
+            },
+            {
+              "name": "fontStyle",
+              "type": "NovaUiFontStyle",
+              "required": false,
+              "description": {
+                "ru": "Text font style.",
+                "en": "Text font style."
+              }
+            },
+            {
+              "name": "lineHeight",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Text line height in canvas pixels.",
+                "en": "Text line height in canvas pixels."
+              }
+            },
+            {
+              "name": "background",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Фон компонента.",
+                "en": "Background fill color."
+              }
+            },
+            {
+              "name": "opacity",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Node opacity from 0 to 1.",
+                "en": "Node opacity from 0 to 1."
+              }
+            },
+            {
+              "name": "border",
+              "type": "NovaUiBorder",
+              "required": false,
+              "description": {
+                "ru": "Описание обводки.",
+                "en": "Border declaration: width, color and radius."
+              }
+            },
+            {
+              "name": "clip",
+              "type": "boolean",
+              "required": false,
+              "description": {
+                "ru": "Clip children to component bounds.",
+                "en": "Clip children to component bounds."
+              }
+            },
+            {
+              "name": "display",
+              "type": "\"normal\" | \"none\"",
+              "required": false,
+              "description": {
+                "ru": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying t...",
+                "en": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it."
+              }
+            },
+            {
+              "name": "padding",
+              "type": "NovaUiSpacing",
+              "required": false,
+              "description": {
+                "ru": "Inner spacing. Supports number or side/horizontal/vertical object.",
+                "en": "Inner spacing. Supports number or side/horizontal/vertical object."
+              }
+            },
+            {
+              "name": "accentColor",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Primary accent color for active indicators and controls.",
+                "en": "Primary accent color for active indicators and controls."
+              }
+            },
+            {
+              "name": "trackColor",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Track color for sliders, toggles, progress and scrollbars.",
+                "en": "Track color for sliders, toggles, progress and scrollbars."
+              }
+            },
+            {
+              "name": "thumbColor",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Thumb/handle color for sliders, toggles and scrollbars.",
+                "en": "Thumb/handle color for sliders, toggles and scrollbars."
+              }
+            },
+            {
+              "name": "hoverBackground",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Background used in hover state.",
+                "en": "Background used in hover state."
+              }
+            },
+            {
+              "name": "pressedBackground",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Background used in pressed state.",
+                "en": "Background used in pressed state."
+              }
+            },
+            {
+              "name": "activeBackground",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Background used in active/selected state.",
+                "en": "Background used in active/selected state."
+              }
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false,
+              "description": {
+                "ru": "Disables pointer interaction and state changes.",
+                "en": "Disables pointer interaction and state changes."
+              }
+            },
+            {
+              "name": "disabledOpacity",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Opacity applied when disabled.",
+                "en": "Opacity applied when disabled."
+              }
+            },
+            {
+              "name": "sound",
+              "type": "NovaUiSoundMap",
+              "required": false,
+              "description": {
+                "ru": "Optional sound cue map for hover, press, change and disabledPress.",
+                "en": "Optional sound cue map for hover, press, change and disabledPress."
+              }
+            },
+            {
+              "name": "cursor",
+              "type": "NovaCursorDeclaration",
+              "required": false,
+              "description": {
+                "ru": "Cursor declaration for hover, pressed, dragging and disabled states.",
+                "en": "Cursor declaration for hover, pressed, dragging and disabled states."
+              }
+            },
+            {
+              "name": "cursorContext",
+              "type": "NovaCursorContext",
+              "required": false,
+              "description": {
+                "ru": "Additional cursor metadata propagated to Nova input runtime.",
+                "en": "Additional cursor metadata propagated to Nova input runtime."
+              }
+            },
+            {
+              "name": "motion",
+              "type": "NovaUiMotionDeclaration",
+              "required": false,
+              "description": {
+                "ru": "UI Kit motion preset or preset sequence. Supports fadeIn, shimmer, bounce, spin and other presets.",
+                "en": "UI Kit motion preset or preset sequence. Supports fadeIn, shimmer, bounce, spin and other presets."
+              }
+            },
+            {
+              "name": "className",
+              "type": "string | Array<string>",
+              "required": false,
+              "description": {
+                "ru": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
+                "en": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid."
+              }
+            },
+            {
+              "name": "title",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Toast title.",
+                "en": "Toast title."
+              }
+            },
+            {
+              "name": "message",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Toast message.",
+                "en": "Toast message."
+              }
+            },
+            {
+              "name": "icon",
+              "type": "NovaUiIconSource",
+              "required": false,
+              "description": {
+                "ru": "Иконка или asset ref.",
+                "en": "Toast icon."
+              }
+            },
+            {
+              "name": "tone",
+              "type": "'neutral' | 'info' | 'success' | 'warning' | 'danger'",
+              "required": false,
+              "description": {
+                "ru": "Semantic tone.",
+                "en": "Semantic tone."
+              }
+            },
+            {
+              "name": "actionLabel",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Action label.",
+                "en": "Action label."
+              }
+            },
+            {
+              "name": "progress",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Progress ratio.",
+                "en": "Progress ratio."
+              }
+            },
+            {
+              "name": "closeButton",
+              "type": "boolean",
+              "required": false,
+              "description": {
+                "ru": "Show close button.",
+                "en": "Show close button."
+              }
+            },
+            {
+              "name": "parts",
+              "type": "Record<string, NovaUiPartStyle>",
+              "required": false,
+              "description": {
+                "ru": "Part overrides.",
+                "en": "Part overrides."
+              }
+            },
+            {
+              "name": "onAction",
+              "type": "(event?: Event) => void",
+              "required": false,
+              "description": {
+                "ru": "Action handler.",
+                "en": "Action handler."
+              }
+            },
+            {
+              "name": "onClose",
+              "type": "(event?: Event) => void",
+              "required": false,
+              "description": {
+                "ru": "Close handler.",
+                "en": "Close handler."
+              }
+            }
+          ],
+          "slots": []
+        },
+        {
+          "name": "ToastRegion",
+          "title": "ToastRegion",
+          "description": {
+            "ru": "Optimized keyed notification stack.",
+            "en": "Optimized keyed notification stack."
+          },
+          "source": "packages/@endge-nova-ui-kit/src/components/Toast/Toast.ts",
+          "snippet": "<ToastRegion>\n  $END$\n</ToastRegion>",
+          "props": [
+            {
+              "name": "id",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Стабильный идентификатор компонента.",
+                "en": "Stable component id. Nova runtime uses it for component lookup, refs and diagnostics."
+              }
+            },
+            {
+              "name": "key",
+              "type": "string | number",
+              "required": false,
+              "description": {
+                "ru": "Ключ для reconcile списка.",
+                "en": "Stable key for Nova template reconciliation."
+              }
+            },
+            {
+              "name": "ref",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Имя template ref.",
+                "en": "Template ref name exposed through Nova scope refs."
+              }
+            },
+            {
+              "name": "ref-key",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Dynamic ref bucket key for repeated Nova template nodes.",
+                "en": "Dynamic ref bucket key for repeated Nova template nodes."
+              }
+            },
+            {
+              "name": "context",
+              "type": "Record<string, unknown>",
+              "required": false,
+              "description": {
+                "ru": "Explicit Nova context object forwarded to this node subtree.",
+                "en": "Explicit Nova context object forwarded to this node subtree."
+              }
+            },
+            {
+              "name": "layout",
+              "type": "FlexChildLayout | GridChildLayout | Record<string, unknown>",
+              "required": false,
+              "description": {
+                "ru": "Layout-настройки внутри родителя.",
+                "en": "Parent layout intent for Flex/Grid containers: size, span, margins, order, alignment and flex behavior."
+              }
+            },
+            {
+              "name": "if",
+              "type": "unknown",
+              "required": false,
+              "description": {
+                "ru": "Nova compiler conditional render expression. Use instead of Vue v-if inside NovaCanvas DSL.",
+                "en": "Nova compiler conditional render expression. Use instead of Vue v-if inside NovaCanvas DSL."
+              }
+            },
+            {
+              "name": "else-if",
+              "type": "unknown",
+              "required": false,
+              "description": {
+                "ru": "Nova compiler else-if condition for the previous conditional DSL node.",
+                "en": "Nova compiler else-if condition for the previous conditional DSL node."
+              }
+            },
+            {
+              "name": "else",
+              "type": "boolean | \"\"",
+              "required": false,
+              "description": {
+                "ru": "Nova compiler fallback branch marker for the previous conditional DSL node.",
+                "en": "Nova compiler fallback branch marker for the previous conditional DSL node."
+              }
+            },
+            {
+              "name": "for",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Nova compiler repeat expression, for example `item in items`. Use instead of Vue v-for inside NovaCanvas DSL.",
+                "en": "Nova compiler repeat expression, for example `item in items`. Use instead of Vue v-for inside NovaCanvas DSL."
+              }
+            },
+            {
+              "name": "class",
+              "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
+              "required": false,
+              "description": {
+                "ru": "NovaCSS class компонента.",
+                "en": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`."
+              }
+            },
+            {
+              "name": "attrs",
+              "type": "Record<string, unknown>",
+              "required": false,
+              "description": {
+                "ru": "Raw style-engine attributes. Scoped Nova styles also write their scope marker here.",
+                "en": "Raw style-engine attributes. Scoped Nova styles also write their scope marker here."
+              }
+            },
+            {
+              "name": "x",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Координата X.",
+                "en": "Local X coordinate in canvas pixels."
+              }
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Координата Y.",
+                "en": "Local Y coordinate in canvas pixels."
+              }
+            },
+            {
+              "name": "width",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Ширина компонента.",
+                "en": "Node width in canvas pixels."
+              }
+            },
+            {
+              "name": "height",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Высота компонента.",
+                "en": "Node height in canvas pixels."
+              }
+            },
+            {
+              "name": "style",
+              "type": "NovaUiInheritedTextStyle",
+              "required": false,
+              "description": {
+                "ru": "Inherited text style object propagated through UI Kit nodes.",
+                "en": "Inherited text style object propagated through UI Kit nodes."
+              }
+            },
+            {
+              "name": "color",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Цвет текста или элемента.",
+                "en": "Foreground/text color."
+              }
+            },
+            {
+              "name": "fontFamily",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Text font family.",
+                "en": "Text font family."
+              }
+            },
+            {
+              "name": "fontSize",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Text font size in canvas pixels.",
+                "en": "Text font size in canvas pixels."
+              }
+            },
+            {
+              "name": "fontWeight",
+              "type": "NovaUiFontWeight",
+              "required": false,
+              "description": {
+                "ru": "Text font weight.",
+                "en": "Text font weight."
+              }
+            },
+            {
+              "name": "fontStyle",
+              "type": "NovaUiFontStyle",
+              "required": false,
+              "description": {
+                "ru": "Text font style.",
+                "en": "Text font style."
+              }
+            },
+            {
+              "name": "lineHeight",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Text line height in canvas pixels.",
+                "en": "Text line height in canvas pixels."
+              }
+            },
+            {
+              "name": "background",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Фон компонента.",
+                "en": "Background fill color."
+              }
+            },
+            {
+              "name": "opacity",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Node opacity from 0 to 1.",
+                "en": "Node opacity from 0 to 1."
+              }
+            },
+            {
+              "name": "border",
+              "type": "NovaUiBorder",
+              "required": false,
+              "description": {
+                "ru": "Описание обводки.",
+                "en": "Border declaration: width, color and radius."
+              }
+            },
+            {
+              "name": "clip",
+              "type": "boolean",
+              "required": false,
+              "description": {
+                "ru": "Clip children to component bounds.",
+                "en": "Clip children to component bounds."
+              }
+            },
+            {
+              "name": "display",
+              "type": "\"normal\" | \"none\"",
+              "required": false,
+              "description": {
+                "ru": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying t...",
+                "en": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it."
+              }
+            },
+            {
+              "name": "padding",
+              "type": "NovaUiSpacing",
+              "required": false,
+              "description": {
+                "ru": "Inner spacing. Supports number or side/horizontal/vertical object.",
+                "en": "Inner spacing. Supports number or side/horizontal/vertical object."
+              }
+            },
+            {
+              "name": "accentColor",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Primary accent color for active indicators and controls.",
+                "en": "Primary accent color for active indicators and controls."
+              }
+            },
+            {
+              "name": "trackColor",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Track color for sliders, toggles, progress and scrollbars.",
+                "en": "Track color for sliders, toggles, progress and scrollbars."
+              }
+            },
+            {
+              "name": "thumbColor",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Thumb/handle color for sliders, toggles and scrollbars.",
+                "en": "Thumb/handle color for sliders, toggles and scrollbars."
+              }
+            },
+            {
+              "name": "hoverBackground",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Background used in hover state.",
+                "en": "Background used in hover state."
+              }
+            },
+            {
+              "name": "pressedBackground",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Background used in pressed state.",
+                "en": "Background used in pressed state."
+              }
+            },
+            {
+              "name": "activeBackground",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Background used in active/selected state.",
+                "en": "Background used in active/selected state."
+              }
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false,
+              "description": {
+                "ru": "Disables pointer interaction and state changes.",
+                "en": "Disables pointer interaction and state changes."
+              }
+            },
+            {
+              "name": "disabledOpacity",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Opacity applied when disabled.",
+                "en": "Opacity applied when disabled."
+              }
+            },
+            {
+              "name": "sound",
+              "type": "NovaUiSoundMap",
+              "required": false,
+              "description": {
+                "ru": "Optional sound cue map for hover, press, change and disabledPress.",
+                "en": "Optional sound cue map for hover, press, change and disabledPress."
+              }
+            },
+            {
+              "name": "cursor",
+              "type": "NovaCursorDeclaration",
+              "required": false,
+              "description": {
+                "ru": "Cursor declaration for hover, pressed, dragging and disabled states.",
+                "en": "Cursor declaration for hover, pressed, dragging and disabled states."
+              }
+            },
+            {
+              "name": "cursorContext",
+              "type": "NovaCursorContext",
+              "required": false,
+              "description": {
+                "ru": "Additional cursor metadata propagated to Nova input runtime.",
+                "en": "Additional cursor metadata propagated to Nova input runtime."
+              }
+            },
+            {
+              "name": "motion",
+              "type": "NovaUiMotionDeclaration",
+              "required": false,
+              "description": {
+                "ru": "UI Kit motion preset or preset sequence. Supports fadeIn, shimmer, bounce, spin and other presets.",
+                "en": "UI Kit motion preset or preset sequence. Supports fadeIn, shimmer, bounce, spin and other presets."
+              }
+            },
+            {
+              "name": "className",
+              "type": "string | Array<string>",
+              "required": false,
+              "description": {
+                "ru": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
+                "en": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid."
+              }
+            },
+            {
+              "name": "items",
+              "type": "Array<ToastItem>",
+              "required": false,
+              "description": {
+                "ru": "Toast items.",
+                "en": "Toast items."
+              }
+            },
+            {
+              "name": "placement",
+              "type": "ToastPlacement",
+              "required": false,
+              "description": {
+                "ru": "Region placement.",
+                "en": "Region placement."
+              }
+            },
+            {
+              "name": "limit",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Maximum visible toasts.",
+                "en": "Maximum visible toasts."
+              }
+            },
+            {
+              "name": "gap",
+              "type": "number",
+              "required": false,
+              "description": {
+                "ru": "Gap between toasts.",
+                "en": "Gap between toasts."
+              }
+            },
+            {
+              "name": "newestFirst",
+              "type": "boolean",
+              "required": false,
+              "description": {
+                "ru": "Render newest first.",
+                "en": "Render newest first."
+              }
+            },
+            {
+              "name": "autoDismiss",
+              "type": "boolean",
+              "required": false,
+              "description": {
+                "ru": "Enable timers.",
+                "en": "Enable timers."
+              }
+            },
+            {
+              "name": "pauseOnHover",
+              "type": "boolean",
+              "required": false,
+              "description": {
+                "ru": "Reserved hover pause flag.",
+                "en": "Reserved hover pause flag."
+              }
+            },
+            {
+              "name": "parts",
+              "type": "Record<string, NovaUiPartStyle>",
+              "required": false,
+              "description": {
+                "ru": "Part overrides.",
+                "en": "Part overrides."
+              }
+            },
+            {
+              "name": "onDismiss",
+              "type": "(item: ToastItem, event?: Event) => void",
+              "required": false,
+              "description": {
+                "ru": "Dismiss callback.",
+                "en": "Dismiss callback."
+              }
+            },
+            {
+              "name": "onAction",
+              "type": "(item: ToastItem, event?: Event) => void",
+              "required": false,
+              "description": {
+                "ru": "Action callback.",
+                "en": "Action callback."
+              }
+            }
+          ],
+          "slots": []
         },
         {
           "name": "Panel",
@@ -15935,621 +18953,6 @@
           ]
         },
         {
-          "name": "Dialog",
-          "title": "Dialog",
-          "description": {
-            "ru": "Dialog advanced Nova UI Kit DSL node. Shares the advanced component prop contract with item, value, overlay and anima...",
-            "en": "Dialog advanced Nova UI Kit DSL node. Shares the advanced component prop contract with item, value, overlay and animation controls."
-          },
-          "source": "packages/@endge-nova-ui-kit/src/components/Dialog/Dialog.ts",
-          "snippet": "<Dialog>\n  $END$\n</Dialog>",
-          "props": [
-            {
-              "name": "id",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Стабильный идентификатор компонента.",
-                "en": "Stable component id. Nova runtime uses it for component lookup, refs and diagnostics."
-              }
-            },
-            {
-              "name": "key",
-              "type": "string | number",
-              "required": false,
-              "description": {
-                "ru": "Ключ для reconcile списка.",
-                "en": "Stable key for Nova template reconciliation."
-              }
-            },
-            {
-              "name": "ref",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Имя template ref.",
-                "en": "Template ref name exposed through Nova scope refs."
-              }
-            },
-            {
-              "name": "ref-key",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Dynamic ref bucket key for repeated Nova template nodes.",
-                "en": "Dynamic ref bucket key for repeated Nova template nodes."
-              }
-            },
-            {
-              "name": "context",
-              "type": "Record<string, unknown>",
-              "required": false,
-              "description": {
-                "ru": "Explicit Nova context object forwarded to this node subtree.",
-                "en": "Explicit Nova context object forwarded to this node subtree."
-              }
-            },
-            {
-              "name": "layout",
-              "type": "FlexChildLayout | GridChildLayout | Record<string, unknown>",
-              "required": false,
-              "description": {
-                "ru": "Layout-настройки внутри родителя.",
-                "en": "Parent layout intent for Flex/Grid containers: size, span, margins, order, alignment and flex behavior."
-              }
-            },
-            {
-              "name": "if",
-              "type": "unknown",
-              "required": false,
-              "description": {
-                "ru": "Nova compiler conditional render expression. Use instead of Vue v-if inside NovaCanvas DSL.",
-                "en": "Nova compiler conditional render expression. Use instead of Vue v-if inside NovaCanvas DSL."
-              }
-            },
-            {
-              "name": "else-if",
-              "type": "unknown",
-              "required": false,
-              "description": {
-                "ru": "Nova compiler else-if condition for the previous conditional DSL node.",
-                "en": "Nova compiler else-if condition for the previous conditional DSL node."
-              }
-            },
-            {
-              "name": "else",
-              "type": "boolean | \"\"",
-              "required": false,
-              "description": {
-                "ru": "Nova compiler fallback branch marker for the previous conditional DSL node.",
-                "en": "Nova compiler fallback branch marker for the previous conditional DSL node."
-              }
-            },
-            {
-              "name": "for",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Nova compiler repeat expression, for example `item in items`. Use instead of Vue v-for inside NovaCanvas DSL.",
-                "en": "Nova compiler repeat expression, for example `item in items`. Use instead of Vue v-for inside NovaCanvas DSL."
-              }
-            },
-            {
-              "name": "class",
-              "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
-              "required": false,
-              "description": {
-                "ru": "NovaCSS class компонента.",
-                "en": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`."
-              }
-            },
-            {
-              "name": "attrs",
-              "type": "Record<string, unknown>",
-              "required": false,
-              "description": {
-                "ru": "Raw style-engine attributes. Scoped Nova styles also write their scope marker here.",
-                "en": "Raw style-engine attributes. Scoped Nova styles also write their scope marker here."
-              }
-            },
-            {
-              "name": "x",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Координата X.",
-                "en": "Local X coordinate in canvas pixels."
-              }
-            },
-            {
-              "name": "y",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Координата Y.",
-                "en": "Local Y coordinate in canvas pixels."
-              }
-            },
-            {
-              "name": "width",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Ширина компонента.",
-                "en": "Node width in canvas pixels."
-              }
-            },
-            {
-              "name": "height",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Высота компонента.",
-                "en": "Node height in canvas pixels."
-              }
-            },
-            {
-              "name": "style",
-              "type": "NovaUiInheritedTextStyle",
-              "required": false,
-              "description": {
-                "ru": "Inherited text style object propagated through UI Kit nodes.",
-                "en": "Inherited text style object propagated through UI Kit nodes."
-              }
-            },
-            {
-              "name": "color",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Цвет текста или элемента.",
-                "en": "Foreground/text color."
-              }
-            },
-            {
-              "name": "fontFamily",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Text font family.",
-                "en": "Text font family."
-              }
-            },
-            {
-              "name": "fontSize",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Text font size in canvas pixels.",
-                "en": "Text font size in canvas pixels."
-              }
-            },
-            {
-              "name": "fontWeight",
-              "type": "NovaUiFontWeight",
-              "required": false,
-              "description": {
-                "ru": "Text font weight.",
-                "en": "Text font weight."
-              }
-            },
-            {
-              "name": "fontStyle",
-              "type": "NovaUiFontStyle",
-              "required": false,
-              "description": {
-                "ru": "Text font style.",
-                "en": "Text font style."
-              }
-            },
-            {
-              "name": "lineHeight",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Text line height in canvas pixels.",
-                "en": "Text line height in canvas pixels."
-              }
-            },
-            {
-              "name": "background",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Фон компонента.",
-                "en": "Background fill color."
-              }
-            },
-            {
-              "name": "opacity",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Node opacity from 0 to 1.",
-                "en": "Node opacity from 0 to 1."
-              }
-            },
-            {
-              "name": "border",
-              "type": "NovaUiBorder",
-              "required": false,
-              "description": {
-                "ru": "Описание обводки.",
-                "en": "Border declaration: width, color and radius."
-              }
-            },
-            {
-              "name": "clip",
-              "type": "boolean",
-              "required": false,
-              "description": {
-                "ru": "Clip children to component bounds.",
-                "en": "Clip children to component bounds."
-              }
-            },
-            {
-              "name": "display",
-              "type": "\"normal\" | \"none\"",
-              "required": false,
-              "description": {
-                "ru": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying t...",
-                "en": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it."
-              }
-            },
-            {
-              "name": "padding",
-              "type": "NovaUiSpacing",
-              "required": false,
-              "description": {
-                "ru": "Inner spacing. Supports number or side/horizontal/vertical object.",
-                "en": "Inner spacing. Supports number or side/horizontal/vertical object."
-              }
-            },
-            {
-              "name": "accentColor",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Primary accent color for active indicators and controls.",
-                "en": "Primary accent color for active indicators and controls."
-              }
-            },
-            {
-              "name": "trackColor",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Track color for sliders, toggles, progress and scrollbars.",
-                "en": "Track color for sliders, toggles, progress and scrollbars."
-              }
-            },
-            {
-              "name": "thumbColor",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Thumb/handle color for sliders, toggles and scrollbars.",
-                "en": "Thumb/handle color for sliders, toggles and scrollbars."
-              }
-            },
-            {
-              "name": "hoverBackground",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Background used in hover state.",
-                "en": "Background used in hover state."
-              }
-            },
-            {
-              "name": "pressedBackground",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Background used in pressed state.",
-                "en": "Background used in pressed state."
-              }
-            },
-            {
-              "name": "activeBackground",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Background used in active/selected state.",
-                "en": "Background used in active/selected state."
-              }
-            },
-            {
-              "name": "disabled",
-              "type": "boolean",
-              "required": false,
-              "description": {
-                "ru": "Disables pointer interaction and state changes.",
-                "en": "Disables pointer interaction and state changes."
-              }
-            },
-            {
-              "name": "disabledOpacity",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Opacity applied when disabled.",
-                "en": "Opacity applied when disabled."
-              }
-            },
-            {
-              "name": "sound",
-              "type": "NovaUiSoundMap",
-              "required": false,
-              "description": {
-                "ru": "Optional sound cue map for hover, press, change and disabledPress.",
-                "en": "Optional sound cue map for hover, press, change and disabledPress."
-              }
-            },
-            {
-              "name": "cursor",
-              "type": "NovaCursorDeclaration",
-              "required": false,
-              "description": {
-                "ru": "Cursor declaration for hover, pressed, dragging and disabled states.",
-                "en": "Cursor declaration for hover, pressed, dragging and disabled states."
-              }
-            },
-            {
-              "name": "cursorContext",
-              "type": "NovaCursorContext",
-              "required": false,
-              "description": {
-                "ru": "Additional cursor metadata propagated to Nova input runtime.",
-                "en": "Additional cursor metadata propagated to Nova input runtime."
-              }
-            },
-            {
-              "name": "motion",
-              "type": "NovaUiMotionDeclaration",
-              "required": false,
-              "description": {
-                "ru": "UI Kit motion preset or preset sequence. Supports fadeIn, shimmer, bounce, spin and other presets.",
-                "en": "UI Kit motion preset or preset sequence. Supports fadeIn, shimmer, bounce, spin and other presets."
-              }
-            },
-            {
-              "name": "className",
-              "type": "string | Array<string>",
-              "required": false,
-              "description": {
-                "ru": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
-                "en": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid."
-              }
-            },
-            {
-              "name": "title",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Primary title text for advanced UI primitives.",
-                "en": "Primary title text for advanced UI primitives."
-              }
-            },
-            {
-              "name": "subtitle",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Secondary subtitle text.",
-                "en": "Secondary subtitle text."
-              }
-            },
-            {
-              "name": "text",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Текст для отображения.",
-                "en": "Inline label or body text."
-              }
-            },
-            {
-              "name": "value",
-              "type": "number | string | boolean",
-              "required": false,
-              "description": {
-                "ru": "Current value for input, progress and selection primitives.",
-                "en": "Current value for input, progress and selection primitives."
-              }
-            },
-            {
-              "name": "max",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Maximum value for progress, rating and meter controls.",
-                "en": "Maximum value for progress, rating and meter controls."
-              }
-            },
-            {
-              "name": "min",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Minimum value for value-based controls.",
-                "en": "Minimum value for value-based controls."
-              }
-            },
-            {
-              "name": "items",
-              "type": "Array<AdvancedItem>",
-              "required": false,
-              "description": {
-                "ru": "Item list for menus, galleries, select buttons, tabs and steppers.",
-                "en": "Item list for menus, galleries, select buttons, tabs and steppers."
-              }
-            },
-            {
-              "name": "activeIndex",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Active item index.",
-                "en": "Active item index."
-              }
-            },
-            {
-              "name": "open",
-              "type": "boolean",
-              "required": false,
-              "description": {
-                "ru": "Open state for overlays and disclosure components.",
-                "en": "Open state for overlays and disclosure components."
-              }
-            },
-            {
-              "name": "checked",
-              "type": "boolean",
-              "required": false,
-              "description": {
-                "ru": "Checked state for boolean controls.",
-                "en": "Checked state for boolean controls."
-              }
-            },
-            {
-              "name": "expanded",
-              "type": "boolean",
-              "required": false,
-              "description": {
-                "ru": "Expanded state for disclosure components.",
-                "en": "Expanded state for disclosure components."
-              }
-            },
-            {
-              "name": "blocked",
-              "type": "boolean",
-              "required": false,
-              "description": {
-                "ru": "Blocks the content layer for BlockUI-like components.",
-                "en": "Blocks the content layer for BlockUI-like components."
-              }
-            },
-            {
-              "name": "severity",
-              "type": "'neutral' | 'info' | 'success' | 'warning' | 'danger'",
-              "required": false,
-              "description": {
-                "ru": "Semantic severity tone.",
-                "en": "Semantic severity tone."
-              }
-            },
-            {
-              "name": "orientation",
-              "type": "'horizontal' | 'vertical'",
-              "required": false,
-              "description": {
-                "ru": "Primary orientation.",
-                "en": "Primary orientation."
-              }
-            },
-            {
-              "name": "direction",
-              "type": "'up' | 'down' | 'left' | 'right' | 'up-left' | 'up-right' | 'down-left' | 'down-right'",
-              "required": false,
-              "description": {
-                "ru": "Expansion, movement or popover direction.",
-                "en": "Expansion, movement or popover direction."
-              }
-            },
-            {
-              "name": "mode",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Component-specific visual mode.",
-                "en": "Component-specific visual mode."
-              }
-            },
-            {
-              "name": "image",
-              "type": "NovaUiIconSource",
-              "required": false,
-              "description": {
-                "ru": "Primary image or icon source.",
-                "en": "Primary image or icon source."
-              }
-            },
-            {
-              "name": "compareImage",
-              "type": "NovaUiIconSource",
-              "required": false,
-              "description": {
-                "ru": "Secondary image source for image comparison.",
-                "en": "Secondary image source for image comparison."
-              }
-            },
-            {
-              "name": "rating",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Rating value.",
-                "en": "Rating value."
-              }
-            },
-            {
-              "name": "autoPlay",
-              "type": "boolean",
-              "required": false,
-              "description": {
-                "ru": "Enable automatic carousel/gallery playback.",
-                "en": "Enable automatic carousel/gallery playback."
-              }
-            },
-            {
-              "name": "animation",
-              "type": "false | 'fade' | 'slide' | 'scale' | 'radial' | 'shimmer' | 'spring' | 'meterSweep' | 'activeIndicator' | 'maskFade' | 'stepAdvance'",
-              "required": false,
-              "description": {
-                "ru": "Animation preset for advanced component transitions.",
-                "en": "Animation preset for advanced component transitions."
-              }
-            },
-            {
-              "name": "parts",
-              "type": "Record<string, NovaUiPartStyle>",
-              "required": false,
-              "description": {
-                "ru": "Part-level style overrides for internal regions.",
-                "en": "Part-level style overrides for internal regions."
-              }
-            },
-            {
-              "name": "onChange",
-              "type": "(value: number | string | boolean, event?: Event) => void",
-              "required": false,
-              "description": {
-                "ru": "Value change handler. Equivalent to `@change` in Nova templates.",
-                "en": "Value change handler. Equivalent to `@change` in Nova templates."
-              }
-            },
-            {
-              "name": "onPress",
-              "type": "(item: AdvancedItem, index: number, event?: Event) => void",
-              "required": false,
-              "description": {
-                "ru": "Item press handler. Equivalent to `@press` in Nova templates.",
-                "en": "Item press handler. Equivalent to `@press` in Nova templates."
-              }
-            }
-          ],
-          "slots": [
-            {
-              "name": "default",
-              "description": {
-                "ru": "Nova DSL children compiled into this component.",
-                "en": "Nova DSL children compiled into this component."
-              }
-            }
-          ]
-        },
-        {
           "name": "Drawer",
           "title": "Drawer",
           "description": {
@@ -16558,1236 +18961,6 @@
           },
           "source": "packages/@endge-nova-ui-kit/src/components/Drawer/Drawer.ts",
           "snippet": "<Drawer>\n  $END$\n</Drawer>",
-          "props": [
-            {
-              "name": "id",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Стабильный идентификатор компонента.",
-                "en": "Stable component id. Nova runtime uses it for component lookup, refs and diagnostics."
-              }
-            },
-            {
-              "name": "key",
-              "type": "string | number",
-              "required": false,
-              "description": {
-                "ru": "Ключ для reconcile списка.",
-                "en": "Stable key for Nova template reconciliation."
-              }
-            },
-            {
-              "name": "ref",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Имя template ref.",
-                "en": "Template ref name exposed through Nova scope refs."
-              }
-            },
-            {
-              "name": "ref-key",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Dynamic ref bucket key for repeated Nova template nodes.",
-                "en": "Dynamic ref bucket key for repeated Nova template nodes."
-              }
-            },
-            {
-              "name": "context",
-              "type": "Record<string, unknown>",
-              "required": false,
-              "description": {
-                "ru": "Explicit Nova context object forwarded to this node subtree.",
-                "en": "Explicit Nova context object forwarded to this node subtree."
-              }
-            },
-            {
-              "name": "layout",
-              "type": "FlexChildLayout | GridChildLayout | Record<string, unknown>",
-              "required": false,
-              "description": {
-                "ru": "Layout-настройки внутри родителя.",
-                "en": "Parent layout intent for Flex/Grid containers: size, span, margins, order, alignment and flex behavior."
-              }
-            },
-            {
-              "name": "if",
-              "type": "unknown",
-              "required": false,
-              "description": {
-                "ru": "Nova compiler conditional render expression. Use instead of Vue v-if inside NovaCanvas DSL.",
-                "en": "Nova compiler conditional render expression. Use instead of Vue v-if inside NovaCanvas DSL."
-              }
-            },
-            {
-              "name": "else-if",
-              "type": "unknown",
-              "required": false,
-              "description": {
-                "ru": "Nova compiler else-if condition for the previous conditional DSL node.",
-                "en": "Nova compiler else-if condition for the previous conditional DSL node."
-              }
-            },
-            {
-              "name": "else",
-              "type": "boolean | \"\"",
-              "required": false,
-              "description": {
-                "ru": "Nova compiler fallback branch marker for the previous conditional DSL node.",
-                "en": "Nova compiler fallback branch marker for the previous conditional DSL node."
-              }
-            },
-            {
-              "name": "for",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Nova compiler repeat expression, for example `item in items`. Use instead of Vue v-for inside NovaCanvas DSL.",
-                "en": "Nova compiler repeat expression, for example `item in items`. Use instead of Vue v-for inside NovaCanvas DSL."
-              }
-            },
-            {
-              "name": "class",
-              "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
-              "required": false,
-              "description": {
-                "ru": "NovaCSS class компонента.",
-                "en": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`."
-              }
-            },
-            {
-              "name": "attrs",
-              "type": "Record<string, unknown>",
-              "required": false,
-              "description": {
-                "ru": "Raw style-engine attributes. Scoped Nova styles also write their scope marker here.",
-                "en": "Raw style-engine attributes. Scoped Nova styles also write their scope marker here."
-              }
-            },
-            {
-              "name": "x",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Координата X.",
-                "en": "Local X coordinate in canvas pixels."
-              }
-            },
-            {
-              "name": "y",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Координата Y.",
-                "en": "Local Y coordinate in canvas pixels."
-              }
-            },
-            {
-              "name": "width",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Ширина компонента.",
-                "en": "Node width in canvas pixels."
-              }
-            },
-            {
-              "name": "height",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Высота компонента.",
-                "en": "Node height in canvas pixels."
-              }
-            },
-            {
-              "name": "style",
-              "type": "NovaUiInheritedTextStyle",
-              "required": false,
-              "description": {
-                "ru": "Inherited text style object propagated through UI Kit nodes.",
-                "en": "Inherited text style object propagated through UI Kit nodes."
-              }
-            },
-            {
-              "name": "color",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Цвет текста или элемента.",
-                "en": "Foreground/text color."
-              }
-            },
-            {
-              "name": "fontFamily",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Text font family.",
-                "en": "Text font family."
-              }
-            },
-            {
-              "name": "fontSize",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Text font size in canvas pixels.",
-                "en": "Text font size in canvas pixels."
-              }
-            },
-            {
-              "name": "fontWeight",
-              "type": "NovaUiFontWeight",
-              "required": false,
-              "description": {
-                "ru": "Text font weight.",
-                "en": "Text font weight."
-              }
-            },
-            {
-              "name": "fontStyle",
-              "type": "NovaUiFontStyle",
-              "required": false,
-              "description": {
-                "ru": "Text font style.",
-                "en": "Text font style."
-              }
-            },
-            {
-              "name": "lineHeight",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Text line height in canvas pixels.",
-                "en": "Text line height in canvas pixels."
-              }
-            },
-            {
-              "name": "background",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Фон компонента.",
-                "en": "Background fill color."
-              }
-            },
-            {
-              "name": "opacity",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Node opacity from 0 to 1.",
-                "en": "Node opacity from 0 to 1."
-              }
-            },
-            {
-              "name": "border",
-              "type": "NovaUiBorder",
-              "required": false,
-              "description": {
-                "ru": "Описание обводки.",
-                "en": "Border declaration: width, color and radius."
-              }
-            },
-            {
-              "name": "clip",
-              "type": "boolean",
-              "required": false,
-              "description": {
-                "ru": "Clip children to component bounds.",
-                "en": "Clip children to component bounds."
-              }
-            },
-            {
-              "name": "display",
-              "type": "\"normal\" | \"none\"",
-              "required": false,
-              "description": {
-                "ru": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying t...",
-                "en": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it."
-              }
-            },
-            {
-              "name": "padding",
-              "type": "NovaUiSpacing",
-              "required": false,
-              "description": {
-                "ru": "Inner spacing. Supports number or side/horizontal/vertical object.",
-                "en": "Inner spacing. Supports number or side/horizontal/vertical object."
-              }
-            },
-            {
-              "name": "accentColor",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Primary accent color for active indicators and controls.",
-                "en": "Primary accent color for active indicators and controls."
-              }
-            },
-            {
-              "name": "trackColor",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Track color for sliders, toggles, progress and scrollbars.",
-                "en": "Track color for sliders, toggles, progress and scrollbars."
-              }
-            },
-            {
-              "name": "thumbColor",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Thumb/handle color for sliders, toggles and scrollbars.",
-                "en": "Thumb/handle color for sliders, toggles and scrollbars."
-              }
-            },
-            {
-              "name": "hoverBackground",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Background used in hover state.",
-                "en": "Background used in hover state."
-              }
-            },
-            {
-              "name": "pressedBackground",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Background used in pressed state.",
-                "en": "Background used in pressed state."
-              }
-            },
-            {
-              "name": "activeBackground",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Background used in active/selected state.",
-                "en": "Background used in active/selected state."
-              }
-            },
-            {
-              "name": "disabled",
-              "type": "boolean",
-              "required": false,
-              "description": {
-                "ru": "Disables pointer interaction and state changes.",
-                "en": "Disables pointer interaction and state changes."
-              }
-            },
-            {
-              "name": "disabledOpacity",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Opacity applied when disabled.",
-                "en": "Opacity applied when disabled."
-              }
-            },
-            {
-              "name": "sound",
-              "type": "NovaUiSoundMap",
-              "required": false,
-              "description": {
-                "ru": "Optional sound cue map for hover, press, change and disabledPress.",
-                "en": "Optional sound cue map for hover, press, change and disabledPress."
-              }
-            },
-            {
-              "name": "cursor",
-              "type": "NovaCursorDeclaration",
-              "required": false,
-              "description": {
-                "ru": "Cursor declaration for hover, pressed, dragging and disabled states.",
-                "en": "Cursor declaration for hover, pressed, dragging and disabled states."
-              }
-            },
-            {
-              "name": "cursorContext",
-              "type": "NovaCursorContext",
-              "required": false,
-              "description": {
-                "ru": "Additional cursor metadata propagated to Nova input runtime.",
-                "en": "Additional cursor metadata propagated to Nova input runtime."
-              }
-            },
-            {
-              "name": "motion",
-              "type": "NovaUiMotionDeclaration",
-              "required": false,
-              "description": {
-                "ru": "UI Kit motion preset or preset sequence. Supports fadeIn, shimmer, bounce, spin and other presets.",
-                "en": "UI Kit motion preset or preset sequence. Supports fadeIn, shimmer, bounce, spin and other presets."
-              }
-            },
-            {
-              "name": "className",
-              "type": "string | Array<string>",
-              "required": false,
-              "description": {
-                "ru": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
-                "en": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid."
-              }
-            },
-            {
-              "name": "title",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Primary title text for advanced UI primitives.",
-                "en": "Primary title text for advanced UI primitives."
-              }
-            },
-            {
-              "name": "subtitle",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Secondary subtitle text.",
-                "en": "Secondary subtitle text."
-              }
-            },
-            {
-              "name": "text",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Текст для отображения.",
-                "en": "Inline label or body text."
-              }
-            },
-            {
-              "name": "value",
-              "type": "number | string | boolean",
-              "required": false,
-              "description": {
-                "ru": "Current value for input, progress and selection primitives.",
-                "en": "Current value for input, progress and selection primitives."
-              }
-            },
-            {
-              "name": "max",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Maximum value for progress, rating and meter controls.",
-                "en": "Maximum value for progress, rating and meter controls."
-              }
-            },
-            {
-              "name": "min",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Minimum value for value-based controls.",
-                "en": "Minimum value for value-based controls."
-              }
-            },
-            {
-              "name": "items",
-              "type": "Array<AdvancedItem>",
-              "required": false,
-              "description": {
-                "ru": "Item list for menus, galleries, select buttons, tabs and steppers.",
-                "en": "Item list for menus, galleries, select buttons, tabs and steppers."
-              }
-            },
-            {
-              "name": "activeIndex",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Active item index.",
-                "en": "Active item index."
-              }
-            },
-            {
-              "name": "open",
-              "type": "boolean",
-              "required": false,
-              "description": {
-                "ru": "Open state for overlays and disclosure components.",
-                "en": "Open state for overlays and disclosure components."
-              }
-            },
-            {
-              "name": "checked",
-              "type": "boolean",
-              "required": false,
-              "description": {
-                "ru": "Checked state for boolean controls.",
-                "en": "Checked state for boolean controls."
-              }
-            },
-            {
-              "name": "expanded",
-              "type": "boolean",
-              "required": false,
-              "description": {
-                "ru": "Expanded state for disclosure components.",
-                "en": "Expanded state for disclosure components."
-              }
-            },
-            {
-              "name": "blocked",
-              "type": "boolean",
-              "required": false,
-              "description": {
-                "ru": "Blocks the content layer for BlockUI-like components.",
-                "en": "Blocks the content layer for BlockUI-like components."
-              }
-            },
-            {
-              "name": "severity",
-              "type": "'neutral' | 'info' | 'success' | 'warning' | 'danger'",
-              "required": false,
-              "description": {
-                "ru": "Semantic severity tone.",
-                "en": "Semantic severity tone."
-              }
-            },
-            {
-              "name": "orientation",
-              "type": "'horizontal' | 'vertical'",
-              "required": false,
-              "description": {
-                "ru": "Primary orientation.",
-                "en": "Primary orientation."
-              }
-            },
-            {
-              "name": "direction",
-              "type": "'up' | 'down' | 'left' | 'right' | 'up-left' | 'up-right' | 'down-left' | 'down-right'",
-              "required": false,
-              "description": {
-                "ru": "Expansion, movement or popover direction.",
-                "en": "Expansion, movement or popover direction."
-              }
-            },
-            {
-              "name": "mode",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Component-specific visual mode.",
-                "en": "Component-specific visual mode."
-              }
-            },
-            {
-              "name": "image",
-              "type": "NovaUiIconSource",
-              "required": false,
-              "description": {
-                "ru": "Primary image or icon source.",
-                "en": "Primary image or icon source."
-              }
-            },
-            {
-              "name": "compareImage",
-              "type": "NovaUiIconSource",
-              "required": false,
-              "description": {
-                "ru": "Secondary image source for image comparison.",
-                "en": "Secondary image source for image comparison."
-              }
-            },
-            {
-              "name": "rating",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Rating value.",
-                "en": "Rating value."
-              }
-            },
-            {
-              "name": "autoPlay",
-              "type": "boolean",
-              "required": false,
-              "description": {
-                "ru": "Enable automatic carousel/gallery playback.",
-                "en": "Enable automatic carousel/gallery playback."
-              }
-            },
-            {
-              "name": "animation",
-              "type": "false | 'fade' | 'slide' | 'scale' | 'radial' | 'shimmer' | 'spring' | 'meterSweep' | 'activeIndicator' | 'maskFade' | 'stepAdvance'",
-              "required": false,
-              "description": {
-                "ru": "Animation preset for advanced component transitions.",
-                "en": "Animation preset for advanced component transitions."
-              }
-            },
-            {
-              "name": "parts",
-              "type": "Record<string, NovaUiPartStyle>",
-              "required": false,
-              "description": {
-                "ru": "Part-level style overrides for internal regions.",
-                "en": "Part-level style overrides for internal regions."
-              }
-            },
-            {
-              "name": "onChange",
-              "type": "(value: number | string | boolean, event?: Event) => void",
-              "required": false,
-              "description": {
-                "ru": "Value change handler. Equivalent to `@change` in Nova templates.",
-                "en": "Value change handler. Equivalent to `@change` in Nova templates."
-              }
-            },
-            {
-              "name": "onPress",
-              "type": "(item: AdvancedItem, index: number, event?: Event) => void",
-              "required": false,
-              "description": {
-                "ru": "Item press handler. Equivalent to `@press` in Nova templates.",
-                "en": "Item press handler. Equivalent to `@press` in Nova templates."
-              }
-            }
-          ],
-          "slots": [
-            {
-              "name": "default",
-              "description": {
-                "ru": "Nova DSL children compiled into this component.",
-                "en": "Nova DSL children compiled into this component."
-              }
-            }
-          ]
-        },
-        {
-          "name": "Popover",
-          "title": "Popover",
-          "description": {
-            "ru": "Popover advanced Nova UI Kit DSL node. Shares the advanced component prop contract with item, value, overlay and anim...",
-            "en": "Popover advanced Nova UI Kit DSL node. Shares the advanced component prop contract with item, value, overlay and animation controls."
-          },
-          "source": "packages/@endge-nova-ui-kit/src/components/Popover/Popover.ts",
-          "snippet": "<Popover>\n  $END$\n</Popover>",
-          "props": [
-            {
-              "name": "id",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Стабильный идентификатор компонента.",
-                "en": "Stable component id. Nova runtime uses it for component lookup, refs and diagnostics."
-              }
-            },
-            {
-              "name": "key",
-              "type": "string | number",
-              "required": false,
-              "description": {
-                "ru": "Ключ для reconcile списка.",
-                "en": "Stable key for Nova template reconciliation."
-              }
-            },
-            {
-              "name": "ref",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Имя template ref.",
-                "en": "Template ref name exposed through Nova scope refs."
-              }
-            },
-            {
-              "name": "ref-key",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Dynamic ref bucket key for repeated Nova template nodes.",
-                "en": "Dynamic ref bucket key for repeated Nova template nodes."
-              }
-            },
-            {
-              "name": "context",
-              "type": "Record<string, unknown>",
-              "required": false,
-              "description": {
-                "ru": "Explicit Nova context object forwarded to this node subtree.",
-                "en": "Explicit Nova context object forwarded to this node subtree."
-              }
-            },
-            {
-              "name": "layout",
-              "type": "FlexChildLayout | GridChildLayout | Record<string, unknown>",
-              "required": false,
-              "description": {
-                "ru": "Layout-настройки внутри родителя.",
-                "en": "Parent layout intent for Flex/Grid containers: size, span, margins, order, alignment and flex behavior."
-              }
-            },
-            {
-              "name": "if",
-              "type": "unknown",
-              "required": false,
-              "description": {
-                "ru": "Nova compiler conditional render expression. Use instead of Vue v-if inside NovaCanvas DSL.",
-                "en": "Nova compiler conditional render expression. Use instead of Vue v-if inside NovaCanvas DSL."
-              }
-            },
-            {
-              "name": "else-if",
-              "type": "unknown",
-              "required": false,
-              "description": {
-                "ru": "Nova compiler else-if condition for the previous conditional DSL node.",
-                "en": "Nova compiler else-if condition for the previous conditional DSL node."
-              }
-            },
-            {
-              "name": "else",
-              "type": "boolean | \"\"",
-              "required": false,
-              "description": {
-                "ru": "Nova compiler fallback branch marker for the previous conditional DSL node.",
-                "en": "Nova compiler fallback branch marker for the previous conditional DSL node."
-              }
-            },
-            {
-              "name": "for",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Nova compiler repeat expression, for example `item in items`. Use instead of Vue v-for inside NovaCanvas DSL.",
-                "en": "Nova compiler repeat expression, for example `item in items`. Use instead of Vue v-for inside NovaCanvas DSL."
-              }
-            },
-            {
-              "name": "class",
-              "type": "string | Array<string | Record<string, boolean>> | Record<string, boolean>",
-              "required": false,
-              "description": {
-                "ru": "NovaCSS class компонента.",
-                "en": "Nova style class mapped to the runtime `className` prop. Supports built-in utilities `hidden`/`shown` and responsive prefixes `sm:`, `md:`, `lg:` for any class, for example `hidden md:shown md:box`."
-              }
-            },
-            {
-              "name": "attrs",
-              "type": "Record<string, unknown>",
-              "required": false,
-              "description": {
-                "ru": "Raw style-engine attributes. Scoped Nova styles also write their scope marker here.",
-                "en": "Raw style-engine attributes. Scoped Nova styles also write their scope marker here."
-              }
-            },
-            {
-              "name": "x",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Координата X.",
-                "en": "Local X coordinate in canvas pixels."
-              }
-            },
-            {
-              "name": "y",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Координата Y.",
-                "en": "Local Y coordinate in canvas pixels."
-              }
-            },
-            {
-              "name": "width",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Ширина компонента.",
-                "en": "Node width in canvas pixels."
-              }
-            },
-            {
-              "name": "height",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Высота компонента.",
-                "en": "Node height in canvas pixels."
-              }
-            },
-            {
-              "name": "style",
-              "type": "NovaUiInheritedTextStyle",
-              "required": false,
-              "description": {
-                "ru": "Inherited text style object propagated through UI Kit nodes.",
-                "en": "Inherited text style object propagated through UI Kit nodes."
-              }
-            },
-            {
-              "name": "color",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Цвет текста или элемента.",
-                "en": "Foreground/text color."
-              }
-            },
-            {
-              "name": "fontFamily",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Text font family.",
-                "en": "Text font family."
-              }
-            },
-            {
-              "name": "fontSize",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Text font size in canvas pixels.",
-                "en": "Text font size in canvas pixels."
-              }
-            },
-            {
-              "name": "fontWeight",
-              "type": "NovaUiFontWeight",
-              "required": false,
-              "description": {
-                "ru": "Text font weight.",
-                "en": "Text font weight."
-              }
-            },
-            {
-              "name": "fontStyle",
-              "type": "NovaUiFontStyle",
-              "required": false,
-              "description": {
-                "ru": "Text font style.",
-                "en": "Text font style."
-              }
-            },
-            {
-              "name": "lineHeight",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Text line height in canvas pixels.",
-                "en": "Text line height in canvas pixels."
-              }
-            },
-            {
-              "name": "background",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Фон компонента.",
-                "en": "Background fill color."
-              }
-            },
-            {
-              "name": "opacity",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Node opacity from 0 to 1.",
-                "en": "Node opacity from 0 to 1."
-              }
-            },
-            {
-              "name": "border",
-              "type": "NovaUiBorder",
-              "required": false,
-              "description": {
-                "ru": "Описание обводки.",
-                "en": "Border declaration: width, color and radius."
-              }
-            },
-            {
-              "name": "clip",
-              "type": "boolean",
-              "required": false,
-              "description": {
-                "ru": "Clip children to component bounds.",
-                "en": "Clip children to component bounds."
-              }
-            },
-            {
-              "name": "display",
-              "type": "\"normal\" | \"none\"",
-              "required": false,
-              "description": {
-                "ru": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying t...",
-                "en": "UI Kit display mode. `none` hides the node, disables hit-test and excludes it from UI Kit layout without destroying the instance; `normal` restores it."
-              }
-            },
-            {
-              "name": "padding",
-              "type": "NovaUiSpacing",
-              "required": false,
-              "description": {
-                "ru": "Inner spacing. Supports number or side/horizontal/vertical object.",
-                "en": "Inner spacing. Supports number or side/horizontal/vertical object."
-              }
-            },
-            {
-              "name": "accentColor",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Primary accent color for active indicators and controls.",
-                "en": "Primary accent color for active indicators and controls."
-              }
-            },
-            {
-              "name": "trackColor",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Track color for sliders, toggles, progress and scrollbars.",
-                "en": "Track color for sliders, toggles, progress and scrollbars."
-              }
-            },
-            {
-              "name": "thumbColor",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Thumb/handle color for sliders, toggles and scrollbars.",
-                "en": "Thumb/handle color for sliders, toggles and scrollbars."
-              }
-            },
-            {
-              "name": "hoverBackground",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Background used in hover state.",
-                "en": "Background used in hover state."
-              }
-            },
-            {
-              "name": "pressedBackground",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Background used in pressed state.",
-                "en": "Background used in pressed state."
-              }
-            },
-            {
-              "name": "activeBackground",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Background used in active/selected state.",
-                "en": "Background used in active/selected state."
-              }
-            },
-            {
-              "name": "disabled",
-              "type": "boolean",
-              "required": false,
-              "description": {
-                "ru": "Disables pointer interaction and state changes.",
-                "en": "Disables pointer interaction and state changes."
-              }
-            },
-            {
-              "name": "disabledOpacity",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Opacity applied when disabled.",
-                "en": "Opacity applied when disabled."
-              }
-            },
-            {
-              "name": "sound",
-              "type": "NovaUiSoundMap",
-              "required": false,
-              "description": {
-                "ru": "Optional sound cue map for hover, press, change and disabledPress.",
-                "en": "Optional sound cue map for hover, press, change and disabledPress."
-              }
-            },
-            {
-              "name": "cursor",
-              "type": "NovaCursorDeclaration",
-              "required": false,
-              "description": {
-                "ru": "Cursor declaration for hover, pressed, dragging and disabled states.",
-                "en": "Cursor declaration for hover, pressed, dragging and disabled states."
-              }
-            },
-            {
-              "name": "cursorContext",
-              "type": "NovaCursorContext",
-              "required": false,
-              "description": {
-                "ru": "Additional cursor metadata propagated to Nova input runtime.",
-                "en": "Additional cursor metadata propagated to Nova input runtime."
-              }
-            },
-            {
-              "name": "motion",
-              "type": "NovaUiMotionDeclaration",
-              "required": false,
-              "description": {
-                "ru": "UI Kit motion preset or preset sequence. Supports fadeIn, shimmer, bounce, spin and other presets.",
-                "en": "UI Kit motion preset or preset sequence. Supports fadeIn, shimmer, bounce, spin and other presets."
-              }
-            },
-            {
-              "name": "className",
-              "type": "string | Array<string>",
-              "required": false,
-              "description": {
-                "ru": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid.",
-                "en": "Runtime style class name. In templates prefer `class`; responsive class tokens such as `md:box` are valid."
-              }
-            },
-            {
-              "name": "title",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Primary title text for advanced UI primitives.",
-                "en": "Primary title text for advanced UI primitives."
-              }
-            },
-            {
-              "name": "subtitle",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Secondary subtitle text.",
-                "en": "Secondary subtitle text."
-              }
-            },
-            {
-              "name": "text",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Текст для отображения.",
-                "en": "Inline label or body text."
-              }
-            },
-            {
-              "name": "value",
-              "type": "number | string | boolean",
-              "required": false,
-              "description": {
-                "ru": "Current value for input, progress and selection primitives.",
-                "en": "Current value for input, progress and selection primitives."
-              }
-            },
-            {
-              "name": "max",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Maximum value for progress, rating and meter controls.",
-                "en": "Maximum value for progress, rating and meter controls."
-              }
-            },
-            {
-              "name": "min",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Minimum value for value-based controls.",
-                "en": "Minimum value for value-based controls."
-              }
-            },
-            {
-              "name": "items",
-              "type": "Array<AdvancedItem>",
-              "required": false,
-              "description": {
-                "ru": "Item list for menus, galleries, select buttons, tabs and steppers.",
-                "en": "Item list for menus, galleries, select buttons, tabs and steppers."
-              }
-            },
-            {
-              "name": "activeIndex",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Active item index.",
-                "en": "Active item index."
-              }
-            },
-            {
-              "name": "open",
-              "type": "boolean",
-              "required": false,
-              "description": {
-                "ru": "Open state for overlays and disclosure components.",
-                "en": "Open state for overlays and disclosure components."
-              }
-            },
-            {
-              "name": "checked",
-              "type": "boolean",
-              "required": false,
-              "description": {
-                "ru": "Checked state for boolean controls.",
-                "en": "Checked state for boolean controls."
-              }
-            },
-            {
-              "name": "expanded",
-              "type": "boolean",
-              "required": false,
-              "description": {
-                "ru": "Expanded state for disclosure components.",
-                "en": "Expanded state for disclosure components."
-              }
-            },
-            {
-              "name": "blocked",
-              "type": "boolean",
-              "required": false,
-              "description": {
-                "ru": "Blocks the content layer for BlockUI-like components.",
-                "en": "Blocks the content layer for BlockUI-like components."
-              }
-            },
-            {
-              "name": "severity",
-              "type": "'neutral' | 'info' | 'success' | 'warning' | 'danger'",
-              "required": false,
-              "description": {
-                "ru": "Semantic severity tone.",
-                "en": "Semantic severity tone."
-              }
-            },
-            {
-              "name": "orientation",
-              "type": "'horizontal' | 'vertical'",
-              "required": false,
-              "description": {
-                "ru": "Primary orientation.",
-                "en": "Primary orientation."
-              }
-            },
-            {
-              "name": "direction",
-              "type": "'up' | 'down' | 'left' | 'right' | 'up-left' | 'up-right' | 'down-left' | 'down-right'",
-              "required": false,
-              "description": {
-                "ru": "Expansion, movement or popover direction.",
-                "en": "Expansion, movement or popover direction."
-              }
-            },
-            {
-              "name": "mode",
-              "type": "string",
-              "required": false,
-              "description": {
-                "ru": "Component-specific visual mode.",
-                "en": "Component-specific visual mode."
-              }
-            },
-            {
-              "name": "image",
-              "type": "NovaUiIconSource",
-              "required": false,
-              "description": {
-                "ru": "Primary image or icon source.",
-                "en": "Primary image or icon source."
-              }
-            },
-            {
-              "name": "compareImage",
-              "type": "NovaUiIconSource",
-              "required": false,
-              "description": {
-                "ru": "Secondary image source for image comparison.",
-                "en": "Secondary image source for image comparison."
-              }
-            },
-            {
-              "name": "rating",
-              "type": "number",
-              "required": false,
-              "description": {
-                "ru": "Rating value.",
-                "en": "Rating value."
-              }
-            },
-            {
-              "name": "autoPlay",
-              "type": "boolean",
-              "required": false,
-              "description": {
-                "ru": "Enable automatic carousel/gallery playback.",
-                "en": "Enable automatic carousel/gallery playback."
-              }
-            },
-            {
-              "name": "animation",
-              "type": "false | 'fade' | 'slide' | 'scale' | 'radial' | 'shimmer' | 'spring' | 'meterSweep' | 'activeIndicator' | 'maskFade' | 'stepAdvance'",
-              "required": false,
-              "description": {
-                "ru": "Animation preset for advanced component transitions.",
-                "en": "Animation preset for advanced component transitions."
-              }
-            },
-            {
-              "name": "parts",
-              "type": "Record<string, NovaUiPartStyle>",
-              "required": false,
-              "description": {
-                "ru": "Part-level style overrides for internal regions.",
-                "en": "Part-level style overrides for internal regions."
-              }
-            },
-            {
-              "name": "onChange",
-              "type": "(value: number | string | boolean, event?: Event) => void",
-              "required": false,
-              "description": {
-                "ru": "Value change handler. Equivalent to `@change` in Nova templates.",
-                "en": "Value change handler. Equivalent to `@change` in Nova templates."
-              }
-            },
-            {
-              "name": "onPress",
-              "type": "(item: AdvancedItem, index: number, event?: Event) => void",
-              "required": false,
-              "description": {
-                "ru": "Item press handler. Equivalent to `@press` in Nova templates.",
-                "en": "Item press handler. Equivalent to `@press` in Nova templates."
-              }
-            }
-          ],
-          "slots": [
-            {
-              "name": "default",
-              "description": {
-                "ru": "Nova DSL children compiled into this component.",
-                "en": "Nova DSL children compiled into this component."
-              }
-            }
-          ]
-        },
-        {
-          "name": "Toast",
-          "title": "Toast",
-          "description": {
-            "ru": "Toast advanced Nova UI Kit DSL node. Shares the advanced component prop contract with item, value, overlay and animat...",
-            "en": "Toast advanced Nova UI Kit DSL node. Shares the advanced component prop contract with item, value, overlay and animation controls."
-          },
-          "source": "packages/@endge-nova-ui-kit/src/components/Toast/Toast.ts",
-          "snippet": "<Toast>\n  $END$\n</Toast>",
           "props": [
             {
               "name": "id",
