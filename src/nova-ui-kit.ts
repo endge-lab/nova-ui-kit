@@ -40,6 +40,7 @@ import {
   TEXT_INPUT_SCHEMA_TYPE,
 } from '@/components/Input/input.types'
 import { PANEL_SCHEMA_TYPE } from '@/components/Panel/panel.types'
+import { createProgressRingSchema } from '@/components/ProgressRing/progress-ring.schema'
 import { ROOT_SCHEMA_TYPE } from '@/components/Root/root.types'
 import { SCROLL_AREA_SCHEMA_TYPE } from '@/components/ScrollArea/scroll-area.types'
 import { SCROLLBAR_SCHEMA_TYPE } from '@/components/Scrollbar/scrollbar.types'
@@ -78,6 +79,7 @@ export const NovaUIKit = {
   Toggle: TOGGLE_SCHEMA_TYPE,
   Tooltip: TOOLTIP_SCHEMA_TYPE,
   tooltipSchema: createTooltipSchema,
+  progressRingSchema: createProgressRingSchema,
   SegmentedControl: SEGMENTED_CONTROL_SCHEMA_TYPE,
   Panel: PANEL_SCHEMA_TYPE,
   SpeedDial: SPEED_DIAL_SCHEMA_TYPE,
