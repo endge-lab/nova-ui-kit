@@ -750,6 +750,7 @@ function applyParsedDeclaration(
     || key === 'pressedBackground'
     || key === 'activeBackground'
     || key === 'disabledOpacity'
+    || key === 'placeholderColor'
   ) {
     target.visual = { ...target.visual, [key]: value as never }
     return
@@ -1013,6 +1014,7 @@ const STRING_KEYS = new Set([
   'hoverBackground',
   'pressedBackground',
   'activeBackground',
+  'placeholderColor',
 ])
 
 const NUMERIC_KEYS = new Set([

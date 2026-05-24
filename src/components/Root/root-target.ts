@@ -6,6 +6,7 @@ export const NOVA_UI_ROOT_TARGET = Symbol.for('@endge/nova-ui-kit.root-target')
 /** Контракт Root, который нужен потомкам для проверки корректного дерева. */
 export interface NovaUiRootTarget {
   readonly [NOVA_UI_ROOT_TARGET]: true
+  refreshStyleCascade: () => void
 }
 
 /** Проверяет, является ли node корнем Nova UI Kit дерева. */

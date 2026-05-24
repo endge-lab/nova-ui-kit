@@ -112,6 +112,7 @@ export interface NovaUiStyleDeclarations {
     pressedBackground?: string
     activeBackground?: string
     disabledOpacity?: number
+    placeholderColor?: string
   }
   cursor?: NovaCursorDeclaration
   mask: NovaUiStyleMask

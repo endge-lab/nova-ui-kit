@@ -201,6 +201,11 @@ export class Root<E extends EventList = Record<string, any>>
     this.applyCascade()
   }
 
+  /** Пере-применяет selector cascade после изменения вложенного template дерева. */
+  refreshStyleCascade(): void {
+    this.applyCascade()
+  }
+
   /** Задает resolver theme/CSS tokens для Nova stylesheet. */
   setStyleTokenResolver(resolver: NovaUiStyleTokenResolver | null): void {
     this.tokenResolver = resolver
@@ -517,6 +522,7 @@ export class Root<E extends EventList = Record<string, any>>
         'pressedBackground',
         'activeBackground',
         'disabledOpacity',
+        'placeholderColor',
       ] as const) {
         const value = declarations.visual[key]
         if (value === undefined) continue
@@ -737,6 +743,7 @@ function fallbackCascadeValue(key: string, value: unknown): unknown {
     || key === 'hoverBackground'
     || key === 'pressedBackground'
     || key === 'activeBackground'
+    || key === 'placeholderColor'
   ) return ''
   return value
 }

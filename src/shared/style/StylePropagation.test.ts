@@ -12,6 +12,8 @@ import { BUTTON_SCHEMA_TYPE } from '@/components/Button/button.types'
 import { FLEX_SCHEMA_TYPE } from '@/components/Flex/flex.types'
 import { GRID_SCHEMA_TYPE } from '@/components/Grid/grid.types'
 import type { Flex } from '@/components/Flex/Flex'
+import type { InputApi } from '@/components/Input/input.types'
+import { SEARCH_INPUT_SCHEMA_TYPE } from '@/components/Input/input.types'
 import type { Root } from '@/components/Root/Root'
 import { ROOT_SCHEMA_TYPE } from '@/components/Root/root.types'
 import { SURFACE_SCHEMA_TYPE } from '@/components/Surface/surface.types'
@@ -103,6 +105,10 @@ function buttonApi(app: NovaApp<TestEvents>, id: string): ButtonApi {
   return app.components.requireApi<ButtonApi>(id)
 }
 
+function inputApi(app: NovaApp<TestEvents>, id: string): InputApi {
+  return app.components.requireApi<InputApi>(id)
+}
+
 describe('Nova UI style propagation', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
@@ -192,6 +198,36 @@ describe('Nova UI style propagation', () => {
 
     expect(textApi(app, 'target').getProps().color).toBe('#333333')
     expect(textApi(app, 'target').getProps().fontSize).toBe(18)
+
+    app.destroy()
+  })
+
+  it('applies placeholderColor through stylesheet visual declarations', () => {
+    const app = createApp()
+    const surface = app.createSurface('style')
+
+    app.schema.createNode(surface, {
+      type: ROOT_SCHEMA_TYPE,
+      id: 'root',
+      props: {
+        styleSheet: `
+          #search {
+            placeholderColor: #41516a;
+          }
+        `,
+      },
+      children: [
+        {
+          type: SEARCH_INPUT_SCHEMA_TYPE,
+          id: 'search',
+          props: {
+            placeholder: 'Search',
+          },
+        },
+      ],
+    })
+
+    expect(inputApi(app, 'search').getProps().placeholderColor).toBe('#41516a')
 
     app.destroy()
   })

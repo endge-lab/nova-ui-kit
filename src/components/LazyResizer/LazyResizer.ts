@@ -87,16 +87,16 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
 
     switch (this._direction) {
       case 'top':
-        this.setLocalRenderBounds({ x: 0, y: 0, width: this.width, height: size })
+        this.setLocalRenderBounds({ x: 0, y: -size, width: this.width, height: size * 2 })
         break
       case 'bottom':
-        this.setLocalRenderBounds({ x: 0, y: Math.max(0, this.height - size), width: this.width, height: size })
+        this.setLocalRenderBounds({ x: 0, y: this.height - size, width: this.width, height: size * 2 })
         break
       case 'left':
-        this.setLocalRenderBounds({ x: 0, y: 0, width: size, height: this.height })
+        this.setLocalRenderBounds({ x: -size, y: 0, width: size * 2, height: this.height })
         break
       case 'right':
-        this.setLocalRenderBounds({ x: Math.max(0, this.width - size), y: 0, width: size, height: this.height })
+        this.setLocalRenderBounds({ x: this.width - size, y: 0, width: size * 2, height: this.height })
         break
     }
   }
@@ -376,7 +376,6 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
   render(): void {
     const t = this._lineWidthHover
     const lineWidth = this._motionLineWidth ?? (this._isHover ? this._lineWidthHover : this._lineWidth)
-    const halfWidth = lineWidth / 2
 
     const styles = {
       color: this._motionColor ?? this._color,
@@ -388,18 +387,18 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
         case 'left':
           return {
             type: 'line',
-            x1: halfWidth,
+            x1: 0,
             y1: 0,
-            x2: halfWidth,
+            x2: 0,
             y2: this.height,
             styles,
           }
         case 'right':
           return {
             type: 'line',
-            x1: this.width - halfWidth,
+            x1: this.width,
             y1: 0,
-            x2: this.width - halfWidth,
+            x2: this.width,
             y2: this.height,
             styles,
           }
@@ -407,18 +406,18 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
           return {
             type: 'line',
             x1: 0,
-            y1: halfWidth,
+            y1: 0,
             x2: this.width,
-            y2: halfWidth,
+            y2: 0,
             styles,
           }
         case 'bottom':
           return {
             type: 'line',
             x1: 0,
-            y1: this.height - halfWidth,
+            y1: this.height,
             x2: this.width,
-            y2: this.height - halfWidth,
+            y2: this.height,
             styles,
           }
       }
