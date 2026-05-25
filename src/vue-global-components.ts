@@ -21,7 +21,7 @@ import type { SurfaceProps } from '@/components/Surface/surface.types'
 import type { TagProps } from '@/components/Tag/tag.types'
 import type { TextBlockProps } from '@/components/TextBlock/text-block.types'
 import type { ToggleProps } from '@/components/Toggle/toggle.types'
-import type { TooltipProps } from '@/components/Tooltip/tooltip.types'
+import type { TooltipProps, TooltipsProps } from '@/components/Tooltip/tooltip.types'
 import type { PopoverProps } from '@/components/Popover/popover.types'
 import type { ToastProps, ToastRegionProps } from '@/components/Toast/toast.types'
 
@@ -85,6 +85,7 @@ declare module 'vue' {
     SegmentedControl: NovaDslComponent<SegmentedControlProps>
     SplitPane: NovaDslComponent<SplitPaneProps>
     Tooltip: NovaDslComponent<TooltipProps>
+    Tooltips: NovaDslComponent<TooltipsProps>
     Popover: NovaDslComponent<PopoverProps>
     ActionList: NovaDslComponent<ActionListProps>
     Panel: NovaDslComponent<PanelProps>

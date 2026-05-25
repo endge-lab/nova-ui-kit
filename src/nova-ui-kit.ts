@@ -55,7 +55,7 @@ import { TAG_SCHEMA_TYPE } from '@/components/Tag/tag.types'
 import { TEXT_BLOCK_SCHEMA_TYPE } from '@/components/TextBlock/text-block.types'
 import { TOGGLE_SCHEMA_TYPE } from '@/components/Toggle/toggle.types'
 import { createTooltipSchema } from '@/components/Tooltip/tooltip.config'
-import { TOOLTIP_SCHEMA_TYPE } from '@/components/Tooltip/tooltip.types'
+import { TOOLTIP_SCHEMA_TYPE, TOOLTIPS_SCHEMA_TYPE } from '@/components/Tooltip/tooltip.types'
 import { TOAST_REGION_SCHEMA_TYPE, TOAST_SCHEMA_TYPE } from '@/components/Toast/toast.types'
 
 /** Группировка schema type для более читаемого UI Kit DSL. */
@@ -85,6 +85,7 @@ export const NovaUIKit = {
   Checkbox: CHECKBOX_SCHEMA_TYPE,
   Toggle: TOGGLE_SCHEMA_TYPE,
   Tooltip: TOOLTIP_SCHEMA_TYPE,
+  Tooltips: TOOLTIPS_SCHEMA_TYPE,
   Popover: POPOVER_SCHEMA_TYPE,
   ActionList: ACTION_LIST_SCHEMA_TYPE,
   tooltipSchema: createTooltipSchema,

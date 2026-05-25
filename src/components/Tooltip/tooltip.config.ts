@@ -33,7 +33,9 @@ export type TooltipNodeFactory = <E extends EventList>(
 
 export const TOOLTIP_FIELD_DEFINITIONS = {
   ...NOVA_UI_COMMON_FIELD_DEFINITIONS,
+  type: { type: 'string' },
   content: { type: 'record' },
+  contentMode: { type: 'string' },
   placement: { type: 'string' },
   delay: { type: 'number' },
   hideDelay: { type: 'number' },
@@ -82,7 +84,9 @@ export function normalizeTooltipProps(props: TooltipProps = {}): TooltipResolved
       placement: props.placement ?? 'top',
       contentType: resolveTooltipContentType(props.content),
     },
+    type: props.type ?? 'default',
     content: normalizeTooltipContent(props.content),
+    contentMode: props.contentMode,
     placement: props.placement ?? 'top',
     open: props.open ?? false,
     delay: Math.max(0, finiteNumber(props.delay, 300)),
@@ -120,7 +124,7 @@ export function createTooltipDescriptor(createNode?: TooltipNodeFactory): Toolti
     dirtyPolicy: {
       matrix: NOVA_UI_COMMON_DIRTY_POLICY.matrix,
       update: [...NOVA_UI_COMMON_DIRTY_POLICY.update, 'content', 'placement', 'followCursor'],
-      render: [
+    render: [
         ...NOVA_UI_COMMON_DIRTY_POLICY.render,
         'delay',
         'hideDelay',
@@ -133,6 +137,8 @@ export function createTooltipDescriptor(createNode?: TooltipNodeFactory): Toolti
         'onOpenChange',
         'onShow',
         'onHide',
+        'type',
+        'contentMode',
       ],
     },
     fields: TOOLTIP_FIELD_DEFINITIONS,

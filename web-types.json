@@ -4342,6 +4342,35 @@
           ]
         },
         {
+          "name": "Tooltips",
+          "description": "Root-level tooltip registry. Children Tooltip nodes define typed templates.",
+          "source": {
+            "module": "@endge/nova-ui-kit",
+            "symbol": "TooltipsProps"
+          },
+          "props": [
+            {
+              "name": "id",
+              "description": "Stable component id. Nova runtime uses it for component lookup, refs and diagnostics.",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "definitions",
+              "description": "Tooltip type definitions registered on the nearest Root.",
+              "type": "Array<TooltipDefinition>",
+              "required": false
+            }
+          ],
+          "events": [],
+          "slots": [
+            {
+              "name": "default",
+              "description": "Tooltip template definitions."
+            }
+          ]
+        },
+        {
           "name": "ActionList",
           "description": "ActionList composable action/menu/listbox primitive for Popover recipes.",
           "source": {

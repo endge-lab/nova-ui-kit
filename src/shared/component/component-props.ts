@@ -42,6 +42,7 @@ import {
   type NovaUiStyleTarget,
 } from '@/shared/style'
 import { requireNovaUiRoot } from '@/components/Root/root-target'
+import type { TooltipInput } from '@/components/Tooltip/tooltip.types'
 
 export type NovaUiComponentSize = 'sm' | 'md' | 'lg'
 export type NovaUiOrientation = 'horizontal' | 'vertical'
@@ -78,6 +79,7 @@ export interface NovaUiCommonProps extends NovaUiMotionOptions, NovaUiStyleIdent
   sound?: NovaUiSoundMap
   cursor?: NovaCursorDeclaration
   cursorContext?: NovaCursorContext
+  tooltip?: TooltipInput
 }
 
 export interface NovaUiCommonResolvedProps extends NovaUiStyleIdentityProps {
@@ -110,6 +112,7 @@ export interface NovaUiCommonResolvedProps extends NovaUiStyleIdentityProps {
   sound?: NovaUiSoundMap
   cursor?: NovaCursorDeclaration
   cursorContext?: NovaCursorContext
+  tooltip?: TooltipInput
 }
 
 export interface NovaUiInteractionState {
@@ -165,6 +168,7 @@ export const NOVA_UI_COMMON_FIELD_DEFINITIONS = {
   sound: { type: 'record' },
   cursor: { type: 'cursor' },
   cursorContext: { type: 'record' },
+  tooltip: { type: 'record' },
   motion: { type: 'motion' },
   className: { type: 'string' },
   attrs: { type: 'record' },
@@ -197,6 +201,7 @@ export const NOVA_UI_COMMON_DIRTY_POLICY = {
     'sound',
     'cursor',
     'cursorContext',
+    'tooltip',
     'motion',
     'className',
     'attrs',
@@ -237,6 +242,7 @@ export function normalizeCommonProps<TProps extends NovaUiCommonProps>(
     sound: props.sound ?? defaults.sound,
     cursor: props.cursor ?? defaults.cursor,
     cursorContext: props.cursorContext ?? defaults.cursorContext,
+    tooltip: props.tooltip ?? defaults.tooltip,
     className: props.className ?? defaults.className,
     attrs: props.attrs ?? defaults.attrs,
   }

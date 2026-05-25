@@ -5,9 +5,11 @@ import {
   createEmptyStyleSheet,
   createNovaUiStyleIdentityRegistry,
   createNovaUiStyleSheetGraph,
+  createNovaUiStyleSheetDataPath,
   createNovaUiStyleTokenDataPath,
   planNovaUiMediaInvalidation,
   planNovaUiStyleSheetInvalidation,
+  resolveNovaUiVirtualStyleDeclarations,
   validateNovaUiStyleSheetSource,
   type NovaUiStyleComponentName,
 } from '@/shared/style'
@@ -103,6 +105,22 @@ describe('NovaCSS style subscriptions graph', () => {
     expect(plan.changedMediaAtoms).toEqual(new Set(['min-width:900']))
     expect(plan.candidates).toEqual(new Set([target]))
   })
+
+  it('matches single-part selectors against virtual primitives without registering nodes', () => {
+    const styleSheet = validateNovaUiStyleSheetSource(`
+      Rect.test-bg { background: #ff0000; opacity: 0.75; }
+      .unused { background: #00ff00; }
+      Flex .test-bg { background: #0000ff; }
+    `).styleSheet!
+
+    const declarations = resolveNovaUiVirtualStyleDeclarations({
+      type: 'Rect',
+      className: 'test-bg',
+    }, styleSheet, { width: 1024, height: 768 })
+
+    expect(declarations.box?.background).toBe('#ff0000')
+    expect(declarations.box?.opacity).toBe(0.75)
+  })
 })
 
 describe('NovaCSS Raph dependency tracker', () => {
@@ -132,5 +150,12 @@ describe('NovaCSS Raph dependency tracker', () => {
 
     expect(disposed).toEqual([tokenPath])
     expect(tracker.subscriptionCount()).toBe(0)
+  })
+
+  it('creates app-local stylesheet atoms for virtual primitive owners', () => {
+    const app = { raph: { kernel: { get: () => 0, set: () => {} } } } as unknown as NovaApp
+
+    expect(createNovaUiStyleSheetDataPath(app)).toMatch(/^nova\.ui\.styles\.apps\.a_[a-z0-9]+\.sheet\.version$/)
+    expect(createNovaUiStyleSheetDataPath(app, 'global')).toBe('nova.ui.styles.global.sheet.version')
   })
 })

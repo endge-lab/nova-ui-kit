@@ -72,6 +72,12 @@ const COMPONENT_NAMES: Array<NovaUiStyleComponentName> = [
   'Tabs',
   'Stepper',
   'TimelineChart',
+  'Rect',
+  'Line',
+  'Circle',
+  'Icon',
+  'Text',
+  'ProgressRing',
 ]
 const COMPONENT_NAME_MAP = new Map(COMPONENT_NAMES.map(name => [name.toLowerCase(), name]))
 

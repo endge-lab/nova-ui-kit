@@ -24,6 +24,12 @@ import type {
   RootProps,
   RootResolvedProps,
 } from '@/components/Root/root.types'
+import { RootTooltipControllerNode } from '@/components/Tooltip/RootTooltipControllerNode'
+import type {
+  NovaTooltipTargetResolver,
+  TooltipDefinition,
+  TooltipInput,
+} from '@/components/Tooltip/tooltip.types'
 import {
   NOVA_UI_LAYOUT_TARGET,
   applyNodeLayoutRect,
@@ -40,6 +46,7 @@ import {
   EMPTY_STYLE_CONTEXT,
   NovaUiStyleMask,
   borderRadiusToRendererValue,
+  bumpNovaUiStyleSheetVersion,
   bumpNovaUiStyleTokenVersions,
   createEmptyStyleSheet,
   createEmptyStyleSheetValidationResult,
@@ -103,6 +110,7 @@ export class Root<E extends EventList = Record<string, any>>
   private readonly styleCandidateFallbackThreshold = 2_048
   private mediaSignature = ''
   private mediaContext: NovaUiStyleMediaContext = { width: 0, height: 0 }
+  private tooltipController: RootTooltipControllerNode<E> | null = null
   private readonly disposeGlobalStylesSubscription: () => void
 
   /**
@@ -130,9 +138,13 @@ export class Root<E extends EventList = Record<string, any>>
       getValidation: () => this.validation,
       getDiagnostics: () => this.validation.diagnostics,
       getStyleSheetSource: () => this.getStyleSheetSource(),
+      getCompiledStyleSheet: () => this.styleSheet,
+      getStyleMediaContext: () => this.getMediaContext(),
       inspectStyleNode: node => this.inspectStyleNode(node),
       relayout: () => this.relayout(),
       getChildRect: () => this.childRect,
+      registerTooltipDefinitions: (sourceId, definitions) => this.registerTooltipDefinitions(sourceId, definitions),
+      unregisterTooltipDefinitions: sourceId => this.unregisterTooltipDefinitions(sourceId),
     }
     this.tokenResolver = app.theme.createTokenResolver()
     this.addDisposer(app.theme.observe(this, { phase: 'update' }))
@@ -151,6 +163,14 @@ export class Root<E extends EventList = Record<string, any>>
     })
     this.effectiveStyleContext = mergeStyleContext(EMPTY_STYLE_CONTEXT, resolvedProps.style)
     this.setStyleSheetSource(resolvedProps.styleSheet)
+    const handleTooltipPointerMove = (event: MouseEvent) => this.handleTooltipPointerMove(event)
+    const handleTooltipPointerLeave = () => this.tooltipController?.handlePointerLeave()
+    this.nova.canvas.element.addEventListener('mousemove', handleTooltipPointerMove)
+    this.nova.canvas.element.addEventListener('mouseleave', handleTooltipPointerLeave)
+    this.addDisposer(() => {
+      this.nova.canvas.element.removeEventListener('mousemove', handleTooltipPointerMove)
+      this.nova.canvas.element.removeEventListener('mouseleave', handleTooltipPointerLeave)
+    })
     this.setChildren(options.children ?? [])
   }
 
@@ -212,6 +232,7 @@ export class Root<E extends EventList = Record<string, any>>
     const changedTokens = this.collectChangedResolvedTokens()
     this.styleSheet = this.resolveStyleSheetTokens(this.rawStyleSheet)
     if (changedTokens.length > 0) bumpNovaUiStyleTokenVersions(this.nova, changedTokens)
+    if (changedTokens.length > 0) bumpNovaUiStyleSheetVersion(this.nova)
     this.applyPlannedCascade()
   }
 
@@ -284,6 +305,22 @@ export class Root<E extends EventList = Record<string, any>>
     this.dirty({ update: true, render: true })
   }
 
+  /** Регистрирует tooltip definitions из дочернего Tooltips source. */
+  registerTooltipDefinitions(sourceId: string, definitions: Array<TooltipDefinition>): void {
+    this.ensureTooltipController().registerDefinitions(sourceId, definitions)
+  }
+
+  /** Удаляет tooltip definitions дочернего Tooltips source. */
+  unregisterTooltipDefinitions(sourceId: string): void {
+    this.tooltipController?.unregisterDefinitions(sourceId)
+  }
+
+  /** Делегирует pointer tracking controller-у, создавая его только для tooltip targets. */
+  handleTooltipPointerMove(event: MouseEvent): void {
+    if (!this.tooltipController && !this.hasTooltipTargetAt(event)) return
+    this.ensureTooltipController().handlePointerMove(event)
+  }
+
   /**
    * Обновляет runtime-состояние Root.
    */
@@ -309,6 +346,7 @@ export class Root<E extends EventList = Record<string, any>>
       }
     }
 
+    this.tooltipController?.syncRootRect(this.width, this.height)
     this.layoutDirty = false
   }
 
@@ -396,9 +434,48 @@ export class Root<E extends EventList = Record<string, any>>
       cursor: this.props.cursor ?? null,
       cursorContext: this.props.cursorContext ?? null,
     })
+    this.tooltipController?.syncRootRect(rect.width, rect.height)
     this.layoutDirty = true
     this.dirty({ update: true, matrix: true, render: true })
     return true
+  }
+
+  /** Создает единственный controller tooltip-ов для текущего Root. */
+  private ensureTooltipController(): RootTooltipControllerNode<E> {
+    if (!this.tooltipController) {
+      this.tooltipController = new RootTooltipControllerNode(this.nova, this.surface)
+      this.addChild(this.tooltipController)
+      this.tooltipController.syncRootRect(this.width, this.height)
+    }
+    return this.tooltipController
+  }
+
+  /** Проверяет наличие tooltip target до создания overlay controller. */
+  private hasTooltipTargetAt(event: MouseEvent): boolean {
+    const { x, y } = this.nova.events.getCanvasMousePosition(event)
+    const target = this.nova.events.hitTest(x, y)
+    if (!target || target === this || target === this.tooltipController) return false
+    if (!this.containsNode(target)) return false
+
+    const resolver = target as NovaNode<E> & Partial<NovaTooltipTargetResolver>
+    if (resolver.resolveNovaTooltipTarget?.({ x, y, event })?.tooltip) return true
+
+    const api = (target as unknown as { getProps?: () => Record<string, unknown> }).getProps
+    const tooltip = typeof api === 'function'
+      ? api.call(target).tooltip as TooltipInput
+      : null
+
+    return !!tooltip && typeof tooltip !== 'boolean'
+  }
+
+  /** Проверяет, принадлежит ли target этому Root tree. */
+  private containsNode(target: NovaNode<E>): boolean {
+    let current: NovaNode<E> | undefined = target
+    while (current) {
+      if (current === this) return true
+      current = current.parent as NovaNode<E> | undefined
+    }
+    return false
   }
 
   /**
@@ -420,6 +497,7 @@ export class Root<E extends EventList = Record<string, any>>
     ].filter(Boolean).join('\n'))
     this.collectChangedResolvedTokens()
     this.styleSheet = this.resolveStyleSheetTokens(this.rawStyleSheet)
+    bumpNovaUiStyleSheetVersion(this.nova)
     this.applyPlannedCascade()
   }
 
@@ -636,6 +714,7 @@ export class Root<E extends EventList = Record<string, any>>
     const nextSignature = getNovaUiStyleMediaSignature(this.styleSheet, nextContext)
     if (nextSignature === this.mediaSignature) return
 
+    bumpNovaUiStyleSheetVersion(this.nova)
     const registry = createNovaUiStyleIdentityRegistry(this)
     const graph = this.styleSheetGraph ?? createNovaUiStyleSheetGraph(this.styleSheet)
     this.styleSheetGraph = graph

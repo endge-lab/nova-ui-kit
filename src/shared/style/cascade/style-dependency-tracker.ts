@@ -159,6 +159,25 @@ export function createNovaUiStyleTokenDataPath(
   return `nova.ui.styles.apps.${getNovaUiAppStyleScopeId(app)}.tokens.${tokenId}.version`
 }
 
+/** Путь app-local/global stylesheet atom для virtual primitive selectors. */
+export function createNovaUiStyleSheetDataPath(
+  app: NovaApp<any>,
+  scope: NovaUiStyleTokenScope = 'local',
+): string {
+  if (scope === 'global') return 'nova.ui.styles.global.sheet.version'
+  return `nova.ui.styles.apps.${getNovaUiAppStyleScopeId(app)}.sheet.version`
+}
+
+/** Увеличивает stylesheet atom, чтобы virtual primitive owners пересчитали schema/batches. */
+export function bumpNovaUiStyleSheetVersion(
+  app: NovaApp<any>,
+  scope: NovaUiStyleTokenScope = 'local',
+): void {
+  const path = createNovaUiStyleSheetDataPath(app, scope)
+  const previous = app.raph.kernel.get(path)
+  app.raph.kernel.set(path, typeof previous === 'number' ? previous + 1 : 1)
+}
+
 /** Увеличивает версии token atoms, чтобы Raph доставил dirty только подписанным owners. */
 export function bumpNovaUiStyleTokenVersions(
   app: NovaApp<any>,

@@ -21,7 +21,7 @@ import {
   sizeTokenPadding,
 } from '@/shared/component'
 import { createLayoutRect } from '@/shared/layout'
-import type { NovaUiOverlayPlacement, NovaUiOverlayRect } from '@/shared/overlay'
+import type { NovaUiOverlayRect } from '@/shared/overlay'
 
 /**
  * Отображает компактный счетчик, статус или точечный индикатор поверх canvas UI.
@@ -165,13 +165,13 @@ export class Badge<E extends EventList = Record<string, any>>
     }
   }
 
-  private resolveHorizontalAnchor(anchor: NovaUiOverlayRect, width: number, align: NovaUiOverlayPlacement): number {
+  private resolveHorizontalAnchor(anchor: NovaUiOverlayRect, width: number, align: string): number {
     if (align === 'start') return anchor.x
     if (align === 'end') return anchor.x + anchor.width - width
     return anchor.x + (anchor.width - width) / 2
   }
 
-  private resolveVerticalAnchor(anchor: NovaUiOverlayRect, height: number, align: NovaUiOverlayPlacement): number {
+  private resolveVerticalAnchor(anchor: NovaUiOverlayRect, height: number, align: string): number {
     if (align === 'start') return anchor.y
     if (align === 'end') return anchor.y + anchor.height - height
     return anchor.y + (anchor.height - height) / 2

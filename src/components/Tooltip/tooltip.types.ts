@@ -1,7 +1,9 @@
-import type { NovaComponentSchema, NovaSchema } from '@endge/nova'
+import type { NovaComponentSchema, NovaElementSchema, NovaNode, NovaSchema } from '@endge/nova'
 import type { NovaUiCommonProps, NovaUiCommonResolvedProps } from '@/shared/component'
+import type { NovaUiLayoutRect } from '@/shared/layout'
 
 export const TOOLTIP_SCHEMA_TYPE = 'nova-ui.tooltip'
+export const TOOLTIPS_SCHEMA_TYPE = 'nova-ui.tooltips'
 
 export type TooltipPlacement = 'top' | 'right' | 'bottom' | 'left' | 'cursor'
 export type TooltipPointerTrigger = 'hover' | 'click' | false
@@ -26,6 +28,19 @@ export type TooltipContent =
   | { markdown: string }
   | { schema: NovaSchema | (() => NovaSchema) }
 
+export type TooltipContentMode = 'text' | 'markdown' | 'schema'
+
+export type TooltipInput =
+  | string
+  | boolean
+  | false
+  | null
+  | undefined
+  | ({
+      type?: string
+      value?: unknown
+    } & object)
+
 export interface TooltipCollisionOptions {
   boundary?: 'canvas' | 'parent'
   padding?: number
@@ -40,7 +55,9 @@ export interface TooltipAnimationOptions {
 }
 
 export interface TooltipProps extends NovaUiCommonProps {
+  type?: string
   content?: TooltipContent | null
+  contentMode?: TooltipContentMode
   placement?: TooltipPlacement
   open?: boolean
   delay?: number
@@ -57,7 +74,9 @@ export interface TooltipProps extends NovaUiCommonProps {
 }
 
 export interface TooltipResolvedProps extends NovaUiCommonResolvedProps {
+  type: string
   content: TooltipContent | null
+  contentMode?: TooltipContentMode
   placement: TooltipPlacement
   open: boolean
   delay: number
@@ -76,6 +95,65 @@ export interface TooltipResolvedProps extends NovaUiCommonResolvedProps {
 export interface TooltipSchema extends NovaComponentSchema<TooltipProps> {
   trigger?: NovaComponentSchema
   children?: Array<NovaComponentSchema>
+}
+
+export interface TooltipSlotContext extends Record<string, unknown> {
+  type: string
+  value?: unknown
+  target: {
+    id: string
+    type: string
+    rect: NovaUiLayoutRect
+    props?: Record<string, unknown>
+    node?: NovaNode<any>
+  }
+  pointer: {
+    x: number
+    y: number
+  }
+}
+
+export type TooltipTemplateFactory = (slot: TooltipSlotContext) => Array<NovaElementSchema<any>>
+
+export interface TooltipDefinition {
+  type: string
+  props?: TooltipProps
+  slot?: TooltipTemplateFactory
+}
+
+export interface TooltipsProps extends NovaUiCommonProps {
+  definitions?: Array<TooltipDefinition>
+}
+
+export interface TooltipsResolvedProps extends NovaUiCommonResolvedProps {
+  definitions: Array<TooltipDefinition>
+}
+
+export interface TooltipsSchema extends NovaComponentSchema<TooltipsProps> {
+  children?: Array<TooltipSchema>
+}
+
+export interface TooltipsApi {
+  setDefinitions: (definitions: Array<TooltipDefinition>) => void
+  getDefinitions: () => ReadonlyArray<TooltipDefinition>
+}
+
+export interface TooltipTargetResolution {
+  tooltip: TooltipInput
+  rect?: NovaUiLayoutRect
+  targetId?: string
+  targetType?: string
+  targetProps?: Record<string, unknown>
+}
+
+export interface TooltipTargetResolverInput {
+  x: number
+  y: number
+  event?: MouseEvent
+}
+
+export interface NovaTooltipTargetResolver {
+  resolveNovaTooltipTarget: (input: TooltipTargetResolverInput) => TooltipTargetResolution | null | undefined
 }
 
 export interface TooltipApi {

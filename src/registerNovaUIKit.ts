@@ -23,6 +23,7 @@ import { TEXT_BLOCK_DESCRIPTOR } from '@/components/TextBlock/text-block.registr
 import { POPOVER_DESCRIPTOR } from '@/components/Popover/popover.registry'
 import { TOGGLE_DESCRIPTOR } from '@/components/Toggle/toggle.registry'
 import { TOOLTIP_DESCRIPTOR } from '@/components/Tooltip/tooltip.registry'
+import { TOOLTIPS_DESCRIPTOR } from '@/components/Tooltip/tooltips.registry'
 import { TOAST_DESCRIPTOR, TOAST_REGION_DESCRIPTOR } from '@/components/Toast/toast.registry'
 
 const NOVA_UI_KIT_DESCRIPTORS: Array<NovaComponentDescriptor<any, any, any, any>> = [
@@ -45,6 +46,7 @@ const NOVA_UI_KIT_DESCRIPTORS: Array<NovaComponentDescriptor<any, any, any, any>
   SEGMENTED_CONTROL_DESCRIPTOR,
   SPLIT_PANE_DESCRIPTOR,
   TOOLTIP_DESCRIPTOR,
+  TOOLTIPS_DESCRIPTOR,
   POPOVER_DESCRIPTOR,
   ACTION_LIST_DESCRIPTOR,
   DIALOG_DESCRIPTOR,

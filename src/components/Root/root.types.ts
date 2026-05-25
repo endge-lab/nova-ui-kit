@@ -9,12 +9,15 @@ import type {
   NovaUiStyleDiagnostic,
   NovaUiStyleDisplay,
   NovaUiStyleInspectionDebug,
+  NovaUiCompiledStyleSheet,
+  NovaUiStyleMediaContext,
   NovaUiStyleSheetAsset,
   NovaUiStyleTokenResolver,
   NovaUiStyleIdentityProps,
   NovaUiStyleValidationResult,
   NovaUiStylableNode,
 } from '@/shared/style'
+import type { TooltipDefinition } from '@/components/Tooltip/tooltip.types'
 
 /** Schema type корневого компонента Nova UI Kit. */
 export const ROOT_SCHEMA_TYPE = 'nova-ui.root'
@@ -73,7 +76,11 @@ export interface RootApi {
   getValidation: () => NovaUiStyleValidationResult
   getDiagnostics: () => ReadonlyArray<NovaUiStyleDiagnostic>
   getStyleSheetSource: () => string
+  getCompiledStyleSheet: () => NovaUiCompiledStyleSheet
+  getStyleMediaContext: () => NovaUiStyleMediaContext
   inspectStyleNode: (node: string | NovaUiStylableNode) => NovaUiStyleInspectionDebug | null
   relayout: () => void
   getChildRect: () => Readonly<NovaUiLayoutRect>
+  registerTooltipDefinitions: (sourceId: string, definitions: Array<TooltipDefinition>) => void
+  unregisterTooltipDefinitions: (sourceId: string) => void
 }

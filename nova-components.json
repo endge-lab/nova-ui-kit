@@ -6266,6 +6266,45 @@
           ]
         },
         {
+          "name": "Tooltips",
+          "title": "Tooltips",
+          "description": {
+            "ru": "Root-level tooltip registry. Children Tooltip nodes define typed templates.",
+            "en": "Root-level tooltip registry. Children Tooltip nodes define typed templates."
+          },
+          "source": "packages/@endge-nova-ui-kit/src/components/Tooltip/Tooltips.ts",
+          "snippet": "<Tooltips>\n  $END$\n</Tooltips>",
+          "props": [
+            {
+              "name": "id",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Стабильный идентификатор компонента.",
+                "en": "Stable component id. Nova runtime uses it for component lookup, refs and diagnostics."
+              }
+            },
+            {
+              "name": "definitions",
+              "type": "Array<TooltipDefinition>",
+              "required": false,
+              "description": {
+                "ru": "Tooltip type definitions registered on the nearest Root.",
+                "en": "Tooltip type definitions registered on the nearest Root."
+              }
+            }
+          ],
+          "slots": [
+            {
+              "name": "default",
+              "description": {
+                "ru": "Tooltip template definitions.",
+                "en": "Tooltip template definitions."
+              }
+            }
+          ]
+        },
+        {
           "name": "ActionList",
           "title": "ActionList",
           "description": {

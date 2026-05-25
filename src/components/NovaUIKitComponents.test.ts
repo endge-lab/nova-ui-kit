@@ -52,6 +52,7 @@ import { normalizeSurfaceProps } from '@/components/Surface/surface.config'
 import { normalizeTagProps } from '@/components/Tag/tag.config'
 import { normalizeToggleProps } from '@/components/Toggle/toggle.config'
 import { normalizeTooltipProps } from '@/components/Tooltip/tooltip.config'
+import { RootTooltipControllerNode } from '@/components/Tooltip/RootTooltipControllerNode'
 import { RowResizer } from '@/components/RowResizer/RowResizer'
 import { ColResizer } from '@/components/ColResizer/ColResizer'
 
@@ -525,6 +526,240 @@ describe('Nova UI Kit components', () => {
 
     expect(api.getScrollbarState().opacity).toBe(0)
     expect((app.components.require('custom-scrollbar-y') as any).getProps().opacity).toBe(0)
+
+    app.destroy()
+    vi.useRealTimers()
+  })
+
+  it('opens a default tooltip from common tooltip props without a Tooltips registry', () => {
+    vi.useFakeTimers()
+    const app = createApp()
+    const surface = app.createSurface('tooltip-default-registry')
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'tooltip-default-root',
+      children: [
+        {
+          type: NovaUIKit.Button,
+          id: 'tooltip-default-target',
+          props: { text: 'Hover', tooltip: 'Default text', width: 120, height: 32 },
+        },
+      ],
+    })
+    app.raph.run()
+    app.raph.run()
+
+    const root = app.components.require('tooltip-default-root') as unknown as NovaNode<TestEvents>
+    const initialRootChildCount = root.children.length
+    const initialInteractiveCount = app.events.interactiveNodes.size
+    expect(root.children.filter(child => child instanceof RootTooltipControllerNode)).toHaveLength(0)
+
+    dispatchMouse(app.canvas.element, 'mousemove', 10, 10)
+    vi.advanceTimersByTime(310)
+    app.raph.run()
+    app.raph.run()
+
+    const controllers = root.children.filter(child => child instanceof RootTooltipControllerNode)
+    expect(controllers).toHaveLength(1)
+    expect(root.children).toHaveLength(initialRootChildCount + 1)
+    expect(app.events.interactiveNodes.size).toBe(initialInteractiveCount)
+
+    dispatchMouse(app.canvas.element, 'mousemove', 200, 200)
+    vi.advanceTimersByTime(90)
+    app.raph.run()
+    app.raph.run()
+
+    expect(root.children.filter(child => child instanceof RootTooltipControllerNode)).toHaveLength(1)
+    expect(app.events.interactiveNodes.size).toBe(initialInteractiveCount)
+
+    app.destroy()
+    vi.useRealTimers()
+  })
+
+  it('resolves custom tooltip definitions, payload and local overrides through slot context', () => {
+    vi.useFakeTimers()
+    const app = createApp()
+    const surface = app.createSurface('tooltip-custom-registry')
+    const contexts: Array<Record<string, any>> = []
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'tooltip-custom-root',
+      children: [
+        {
+          type: NovaUIKit.Tooltips,
+          id: 'tooltip-custom-registry-node',
+          props: {
+            definitions: [
+              {
+                type: 'task',
+                props: {
+                  width: 260,
+                  height: 72,
+                  background: '#fff7ed',
+                  border: { color: '#fed7aa', width: 1, radius: 8 },
+                  delay: 0,
+                },
+                slot: slot => {
+                  contexts.push(slot as Record<string, any>)
+                  return [
+                    {
+                      type: NovaUIKit.TextBlock,
+                      id: 'tooltip-custom-title',
+                      props: {
+                        text: `${slot.title}: ${slot.value}`,
+                        color: '#9a3412',
+                      },
+                    },
+                  ]
+                },
+              },
+            ],
+          },
+        },
+        {
+          type: NovaUIKit.Button,
+          id: 'tooltip-custom-target',
+          props: {
+            text: 'Task',
+            width: 120,
+            height: 32,
+            tooltip: {
+              type: 'task',
+              value: 'T-42',
+              title: 'Blocked',
+              placement: 'bottom',
+              width: 280,
+            },
+          },
+        },
+      ],
+    })
+    app.raph.run()
+    app.raph.run()
+
+    const root = app.components.require('tooltip-custom-root') as unknown as NovaNode<TestEvents>
+    const initialRootChildCount = root.children.length
+    const initialInteractiveCount = app.events.interactiveNodes.size
+
+    const targetNode = app.components.require('tooltip-custom-target') as unknown as NovaNode<TestEvents>
+    const targetBounds = targetNode.getWorldBounds()
+    expect(app.events.hitTest(targetBounds.x + 12, targetBounds.y + 12)?.id).toBe(targetNode.id)
+    dispatchMouse(app.canvas.element, 'mousemove', targetBounds.x + 12, targetBounds.y + 12)
+    vi.advanceTimersByTime(1)
+    app.raph.run()
+    app.raph.run()
+
+    expect(contexts).toHaveLength(1)
+    expect(contexts[0]).toMatchObject({
+      type: 'task',
+      value: 'T-42',
+      title: 'Blocked',
+      placement: 'bottom',
+      width: 280,
+      target: {
+        id: 'tooltip-custom-target',
+        type: 'Button',
+      },
+      pointer: { x: targetBounds.x + 12, y: targetBounds.y + 12 },
+    })
+    expect(app.components.requireApi<TextBlockApi>('tooltip-custom-title').getProps().text).toBe('Blocked: T-42')
+    expect(root.children.filter(child => child instanceof RootTooltipControllerNode)).toHaveLength(1)
+    expect(root.children).toHaveLength(initialRootChildCount)
+    expect(app.events.interactiveNodes.size).toBe(initialInteractiveCount)
+
+    app.destroy()
+    vi.useRealTimers()
+  })
+
+  it('supports markdown tooltip shortcut and keeps legacy Tooltip wrapper API intact', () => {
+    const markdown = normalizeTooltipProps({
+      contentMode: 'markdown',
+      content: { markdown: '**Ready**' },
+      type: 'markdown',
+    })
+    expect(markdown.type).toBe('markdown')
+    expect(markdown.contentMode).toBe('markdown')
+    expect(markdown.content).toEqual({ markdown: '**Ready**' })
+
+    const app = createApp()
+    const surface = app.createSurface('tooltip-wrapper-compat')
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'tooltip-wrapper-root',
+      children: [
+        {
+          type: NovaUIKit.Tooltip,
+          id: 'tooltip-wrapper',
+          props: { content: 'Wrapper', open: true },
+          trigger: { type: NovaUIKit.Button, id: 'tooltip-wrapper-trigger', props: { text: '?' } },
+        },
+      ],
+    })
+
+    expect(app.components.requireApi<TooltipApi>('tooltip-wrapper').getProps().open).toBe(true)
+    app.components.requireApi<TooltipApi>('tooltip-wrapper').close()
+    expect(app.components.requireApi<TooltipApi>('tooltip-wrapper').getProps().open).toBe(false)
+
+    app.destroy()
+  })
+
+  it('keeps tooltip controller single and stable across 10k pointer moves', () => {
+    vi.useFakeTimers()
+    const app = createApp()
+    const surface = app.createSurface('tooltip-pointer-bench')
+    const children = Array.from({ length: 1_000 }, (_item, index) => ({
+      type: NovaUIKit.Button,
+      id: `tooltip-bench-target-${index}`,
+      props: {
+        x: (index % 50) * 18,
+        y: Math.floor(index / 50) * 18,
+        width: 16,
+        height: 16,
+        text: '',
+        delay: 0,
+        tooltip: {
+          value: `Target ${index}`,
+          width: 120,
+          height: 28,
+          delay: 10_000,
+        },
+      },
+    }))
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'tooltip-bench-root',
+      children,
+    })
+    app.raph.run()
+    app.raph.run()
+
+    const root = app.components.require('tooltip-bench-root') as unknown as NovaNode<TestEvents>
+    app.components.requireApi<RootApi>('tooltip-bench-root').registerTooltipDefinitions('__bench__', [])
+    const controller = root.children.find(child => child instanceof RootTooltipControllerNode) as RootTooltipControllerNode<TestEvents>
+    const initialRootChildCount = root.children.length
+    const initialInteractiveCount = app.events.interactiveNodes.size
+    const startedAt = realNow()
+
+    for (let index = 0; index < 10_000; index += 1) {
+      const x = ((index % 50) * 18) + 4
+      const y = (Math.floor((index % 1_000) / 50) * 18) + 4
+      controller.handlePointerMove({ clientX: x, clientY: y } as MouseEvent)
+    }
+    app.raph.run()
+    app.raph.run()
+
+    const elapsed = realNow() - startedAt
+    const controllers = root.children.filter(child => child instanceof RootTooltipControllerNode)
+
+    expect(controllers).toHaveLength(1)
+    expect(root.children).toHaveLength(initialRootChildCount)
+    expect(app.events.interactiveNodes.size).toBe(initialInteractiveCount)
+    expect(elapsed).toBeLessThan(400)
+    console.info(`[bench] ui-kit:tooltip-registry-10k-pointer-moves elapsed=${elapsed.toFixed(2)}ms budget=400ms controllerCount=${controllers.length} interactiveGrowth=${app.events.interactiveNodes.size - initialInteractiveCount}`)
 
     app.destroy()
     vi.useRealTimers()
@@ -1764,4 +1999,13 @@ describe('Nova UI Kit components', () => {
 
 function realNow(): number {
   return Number(process.hrtime.bigint()) / 1_000_000
+}
+
+function dispatchMouse(canvas: HTMLCanvasElement, type: string, x: number, y: number): void {
+  canvas.dispatchEvent(new MouseEvent(type, {
+    clientX: x,
+    clientY: y,
+    button: 0,
+    bubbles: true,
+  }))
 }
