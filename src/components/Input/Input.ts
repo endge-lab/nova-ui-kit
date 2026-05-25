@@ -520,6 +520,12 @@ export class Input<E extends EventList = Record<string, any>>
     this.caret.reset()
     this.validator.markDirty()
     this.runValidationIfNeeded('onChange', event)
+    ;(globalThis as unknown as { __novaInputDebug?: unknown }).__novaInputDebug = {
+      reason,
+      hasValueChange: typeof this.props.onValueChange === 'function',
+      value: this.readParsedValue(),
+      component: this.kindName,
+    }
     this.props.onValueChange?.(this.readParsedValue(), this.context(reason, event))
     this.dirty({ render: true })
   }

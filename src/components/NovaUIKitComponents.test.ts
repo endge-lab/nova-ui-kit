@@ -20,6 +20,7 @@ import {
   type FlexApi,
   type GridApi,
   type ImageApi,
+  type InputApi,
   type PanelApi,
   type RootApi,
   type ScrollAreaApi,
@@ -787,6 +788,94 @@ describe('Nova UI Kit components', () => {
     expect(resizeStart).toHaveBeenCalledWith(expect.objectContaining({ delta: 0, event: expect.any(MouseEvent) }))
     expect(resize).toHaveBeenCalledWith(expect.objectContaining({ delta: 20, rect: expect.any(Object), event: expect.any(MouseEvent) }))
     expect(resizeEnd).toHaveBeenCalledWith(expect.objectContaining({ delta: 0, event: expect.any(MouseEvent) }))
+
+    app.destroy()
+  })
+
+  it('routes SearchInput canvas keyboard input through DOM focus and callbacks', () => {
+    const app = createApp()
+    const surface = app.createSurface('search-input-events')
+    const valueChange = vi.fn()
+    const search = vi.fn()
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'search-input-root',
+      children: [
+        {
+          type: NovaUIKit.SearchInput,
+          id: 'search-input',
+          props: {
+            x: 10,
+            y: 10,
+            width: 260,
+            height: 36,
+            inputEngine: 'canvas',
+            onValueChange: valueChange,
+            onSearch: search,
+          },
+        },
+      ],
+    })
+    app.raph.run()
+    app.raph.run()
+
+    app.canvas.element.dispatchEvent(new MouseEvent('mousedown', { clientX: 20, clientY: 20, button: 0, bubbles: true }))
+
+    expect(document.activeElement).toBe(app.canvas.element)
+
+    for (const key of ['m', 'a', 'y']) {
+      document.activeElement?.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
+    }
+    document.activeElement?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }))
+
+    expect(valueChange).toHaveBeenCalledWith('m', expect.objectContaining({ component: 'search', reason: 'keyboard' }))
+    expect(valueChange).toHaveBeenCalledWith('ma', expect.objectContaining({ component: 'search', reason: 'keyboard' }))
+    expect(valueChange).toHaveBeenCalledWith('may', expect.objectContaining({ component: 'search', reason: 'keyboard' }))
+    expect(search).toHaveBeenCalledWith('may', expect.objectContaining({ component: 'search', reason: 'search' }))
+    expect(app.components.requireApi<InputApi>('search-input').getState().draft).toBe('may')
+
+    app.destroy()
+  })
+
+  it('keeps SearchInput proxy input callbacks on textarea events', () => {
+    const app = createApp()
+    const surface = app.createSurface('search-input-proxy-events')
+    const valueChange = vi.fn()
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'search-input-proxy-root',
+      children: [
+        {
+          type: NovaUIKit.SearchInput,
+          id: 'search-input-proxy',
+          props: {
+            x: 10,
+            y: 10,
+            width: 260,
+            height: 36,
+            inputEngine: 'proxy',
+            onValueChange: valueChange,
+          },
+        },
+      ],
+    })
+    app.raph.run()
+    app.raph.run()
+
+    app.canvas.element.dispatchEvent(new MouseEvent('mousedown', { clientX: 20, clientY: 20, button: 0, bubbles: true }))
+
+    const textarea = document.querySelector('textarea')
+
+    expect(textarea).not.toBeNull()
+    expect(document.activeElement).toBe(textarea)
+
+    textarea!.value = 'proxy'
+    textarea!.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: 'proxy' }))
+
+    expect(valueChange).toHaveBeenCalledWith('proxy', expect.objectContaining({ component: 'search', reason: 'proxy' }))
+    expect(app.components.requireApi<InputApi>('search-input-proxy').getState().draft).toBe('proxy')
 
     app.destroy()
   })
