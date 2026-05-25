@@ -12,6 +12,8 @@ import { FLEX_DESCRIPTOR } from '@/components/Flex/flex.registry'
 import { GRID_DESCRIPTOR } from '@/components/Grid/grid.registry'
 import { IMAGE_DESCRIPTOR } from '@/components/Image/image.registry'
 import { INPUT_DESCRIPTORS } from '@/components/Input/input.registry'
+import { OVERLAY_DESCRIPTOR } from '@/components/Overlay/overlay.registry'
+import { OVERLAYS_DESCRIPTOR } from '@/components/Overlay/overlays.registry'
 import { PANEL_DESCRIPTOR } from '@/components/Panel/panel.registry'
 import { ROOT_DESCRIPTOR } from '@/components/Root/root.registry'
 import { SCROLL_AREA_DESCRIPTOR } from '@/components/ScrollArea/scroll-area.registry'
@@ -52,6 +54,8 @@ const NOVA_UI_KIT_DESCRIPTORS: Array<NovaComponentDescriptor<any, any, any, any>
   TOOLTIPS_DESCRIPTOR,
   POPOVER_DESCRIPTOR,
   ACTION_LIST_DESCRIPTOR,
+  OVERLAY_DESCRIPTOR,
+  OVERLAYS_DESCRIPTOR,
   DIALOG_DESCRIPTOR,
   DIALOGS_DESCRIPTOR,
   TOAST_DESCRIPTOR,

@@ -42,6 +42,7 @@ import {
   TEXT_INPUT_SCHEMA_TYPE,
 } from '@/components/Input/input.types'
 import { IMAGE_SCHEMA_TYPE } from '@/components/Image/image.types'
+import { OVERLAY_SCHEMA_TYPE, OVERLAYS_SCHEMA_TYPE } from '@/components/Overlay/overlay.types'
 import { PANEL_SCHEMA_TYPE } from '@/components/Panel/panel.types'
 import { POPOVER_SCHEMA_TYPE } from '@/components/Popover/popover.types'
 import { createProgressRingSchema } from '@/components/ProgressRing/progress-ring.schema'
@@ -90,6 +91,8 @@ export const NovaUIKit = {
   Tooltips: TOOLTIPS_SCHEMA_TYPE,
   Popover: POPOVER_SCHEMA_TYPE,
   ActionList: ACTION_LIST_SCHEMA_TYPE,
+  Overlay: OVERLAY_SCHEMA_TYPE,
+  Overlays: OVERLAYS_SCHEMA_TYPE,
   tooltipSchema: createTooltipSchema,
   progressRingSchema: createProgressRingSchema,
   SegmentedControl: SEGMENTED_CONTROL_SCHEMA_TYPE,

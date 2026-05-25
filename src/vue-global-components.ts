@@ -11,6 +11,7 @@ import type { FlexChildLayout, FlexProps } from '@/components/Flex/flex.types'
 import type { GridChildLayout, GridProps } from '@/components/Grid/grid.types'
 import type { ImageProps } from '@/components/Image/image.types'
 import type { InputProps } from '@/components/Input/input.types'
+import type { OverlayProps, OverlaysProps } from '@/components/Overlay/overlay.types'
 import type { PanelProps } from '@/components/Panel/panel.types'
 import type { RootProps } from '@/components/Root/root.types'
 import type { ScrollAreaProps } from '@/components/ScrollArea/scroll-area.types'
@@ -90,6 +91,8 @@ declare module 'vue' {
     Tooltips: NovaDslComponent<TooltipsProps>
     Popover: NovaDslComponent<PopoverProps>
     ActionList: NovaDslComponent<ActionListProps>
+    Overlay: NovaDslComponent<OverlayProps>
+    Overlays: NovaDslComponent<OverlaysProps>
     Panel: NovaDslComponent<PanelProps>
     SpeedDial: NovaDslComponent<AdvancedComponentProps>
     Dock: NovaDslComponent<AdvancedComponentProps>

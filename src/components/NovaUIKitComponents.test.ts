@@ -23,6 +23,8 @@ import {
   type GridApi,
   type ImageApi,
   type InputApi,
+  type OverlayApi,
+  type OverlaysApi,
   type PanelApi,
   type RootApi,
   type ScrollAreaApi,
@@ -57,6 +59,7 @@ import { normalizeToggleProps } from '@/components/Toggle/toggle.config'
 import { normalizeTooltipProps } from '@/components/Tooltip/tooltip.config'
 import { RootTooltipControllerNode } from '@/components/Tooltip/RootTooltipControllerNode'
 import { RootDialogControllerNode } from '@/components/Dialog/RootDialogControllerNode'
+import { resolveNovaUiOverlayPosition } from '@/shared/overlay/overlay-position'
 import { RowResizer } from '@/components/RowResizer/RowResizer'
 import { ColResizer } from '@/components/ColResizer/ColResizer'
 
@@ -163,7 +166,7 @@ describe('Nova UI Kit components', () => {
       id: 'root',
       props: {
         styleSheet: `
-          Surface, Divider, Panel, Button, Tag, Chip, Checkbox, Toggle, Slider, Scrollbar, ScrollArea, SplitPane, Tooltip, Tooltips, Popover, ActionList, Dialog, Dialogs, Toast, ToastRegion, SegmentedControl {
+          Surface, Divider, Panel, Button, Tag, Chip, Checkbox, Toggle, Slider, Scrollbar, ScrollArea, SplitPane, Tooltip, Tooltips, Popover, ActionList, Overlay, Overlays, Dialog, Dialogs, Toast, ToastRegion, SegmentedControl {
             color: #123456;
             borderWidth: 2;
             accentColor: #2563eb;
@@ -247,6 +250,17 @@ describe('Nova UI Kit components', () => {
           },
         },
         {
+          type: NovaUIKit.Overlay,
+          id: 'overlay',
+          props: { open: true, anchor: { kind: 'pointer', x: 24, y: 160 }, width: 180, height: 76 },
+          children: [{ type: NovaUIKit.TextBlock, id: 'overlay-text', props: { text: 'Overlay' } }],
+        },
+        {
+          type: NovaUIKit.Overlays,
+          id: 'overlays',
+          props: { definitions: [{ type: 'default' }] },
+        },
+        {
           type: NovaUIKit.Dialog,
           id: 'dialog',
           props: { open: true, title: 'Dialog', draggable: true, resizable: true },
@@ -280,6 +294,8 @@ describe('Nova UI Kit components', () => {
     app.components.requireApi<TooltipApi>('tooltip').close()
     app.components.requireApi<PopoverApi>('popover').close()
     app.components.requireApi<ActionListApi>('action-list').focusNext()
+    app.components.requireApi<OverlayApi>('overlay').close()
+    expect(app.components.requireApi<OverlaysApi>('overlays').getDefinitions()).toHaveLength(1)
     app.components.requireApi<DialogApi>('dialog').resizeTo(440, 280)
     expect(app.components.requireApi<DialogsApi>('dialogs').getDefinitions()).toHaveLength(1)
     app.components.requireApi<ToastRegionApi>('toast-region').push({ id: 'queued', title: 'Queued' })
@@ -301,6 +317,7 @@ describe('Nova UI Kit components', () => {
     expect(app.components.requireApi<TooltipApi>('tooltip').getProps().open).toBe(false)
     expect(app.components.requireApi<PopoverApi>('popover').getProps().open).toBe(false)
     expect(app.components.requireApi<ActionListApi>('action-list').getProps().activeIndex).toBe(2)
+    expect(app.components.requireApi<OverlayApi>('overlay').getProps().open).toBe(false)
     expect(app.components.requireApi<DialogApi>('dialog').getProps().open).toBe(true)
     expect(app.components.requireApi<ToastRegionApi>('toast-region').getProps().items).toHaveLength(2)
     expect(app.components.requireApi<SegmentedControlApi>('segmented').getProps().value).toBe('b')
@@ -381,6 +398,144 @@ describe('Nova UI Kit components', () => {
     expect(app.events.hitTest(8, 8)?.id).toBe(button.id)
 
     app.destroy()
+  })
+
+  it('manages registry overlays through Root API', () => {
+    const app = createApp()
+    const surface = app.createSurface('overlay-registry')
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'overlay-root',
+      props: { width: 400, height: 260 },
+      children: [
+        {
+          type: NovaUIKit.Overlays,
+          id: 'overlay-source-a',
+          props: {
+            definitions: [
+              {
+                type: 'menu',
+                props: { width: 180, height: 88, anchor: { kind: 'pointer', x: 24, y: 24 } },
+              },
+            ],
+          },
+        },
+        {
+          type: NovaUIKit.Overlays,
+          id: 'overlay-source-b',
+          props: {
+            definitions: [
+              {
+                type: 'menu',
+                props: { width: 240, height: 96, placement: 'bottom-start' },
+                slot: slot => [
+                  {
+                    type: NovaUIKit.TextBlock,
+                    id: `overlay-body-${slot.id}`,
+                    props: { text: String(slot.value) },
+                    layout: { width: '100%', height: '100%' },
+                  },
+                ],
+              },
+            ],
+          },
+        },
+      ],
+    })
+    app.raph.run()
+
+    const root = app.components.requireApi<RootApi>('overlay-root')
+    const id = root.openOverlay('menu', {
+      id: 'main-menu',
+      value: 'Opened',
+      height: 104,
+      anchor: { kind: 'pointer', x: 120, y: 80 },
+    })
+    app.raph.run()
+    app.raph.run()
+
+    expect(id).toBe('main-menu')
+    expect(root.getOpenOverlayIds()).toEqual(['main-menu'])
+    const overlay = app.components.requireApi<OverlayApi>('nova-root-overlay-main-menu')
+    expect(overlay.getProps().width).toBe(240)
+    expect(overlay.getProps().height).toBe(104)
+    expect(overlay.getProps().anchor).toMatchObject({ kind: 'pointer', x: 120, y: 80 })
+
+    root.updateOverlay('main-menu', { width: 260, anchor: { kind: 'rect', x: 20, y: 30, width: 80, height: 24 } })
+    app.raph.run()
+    expect(overlay.getProps().width).toBe(260)
+    expect(overlay.getProps().anchor).toMatchObject({ kind: 'rect', x: 20, y: 30, width: 80, height: 24 })
+
+    root.closeOverlay('main-menu')
+    app.raph.run()
+    expect(root.getOpenOverlayIds()).toEqual([])
+
+    app.destroy()
+  })
+
+  it('dismisses registry overlays by outside click and escape', () => {
+    const app = createApp()
+    const surface = app.createSurface('overlay-dismiss')
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'overlay-dismiss-root',
+      props: { width: 400, height: 260 },
+      children: [
+        {
+          type: NovaUIKit.Overlays,
+          id: 'overlay-dismiss-registry',
+          props: {
+            definitions: [
+              {
+                type: 'menu',
+                props: {
+                  width: 160,
+                  height: 80,
+                  anchor: { kind: 'rect', x: 100, y: 80, width: 32, height: 24 },
+                },
+              },
+            ],
+          },
+        },
+      ],
+    })
+    app.raph.run()
+
+    const root = app.components.requireApi<RootApi>('overlay-dismiss-root')
+    root.openOverlay('menu', { id: 'outside-menu' })
+    app.raph.run()
+    app.handleEvent('mousedown', new MouseEvent('mousedown', { clientX: 8, clientY: 8, button: 0 }))
+    expect(root.getOpenOverlayIds()).toEqual([])
+
+    root.openOverlay('menu', { id: 'escape-menu' })
+    app.raph.run()
+    const overlay = app.components.require('nova-root-overlay-escape-menu') as unknown as NovaNode<TestEvents>
+    overlay.eventHandlers.keydown?.(new KeyboardEvent('keydown', { key: 'Escape' }))
+    expect(root.getOpenOverlayIds()).toEqual([])
+
+    app.destroy()
+  })
+
+  it('resolves overlay pointer and rect anchor positions', () => {
+    expect(resolveNovaUiOverlayPosition({
+      root: { x: 0, y: 0, width: 320, height: 240 },
+      anchor: { kind: 'pointer', x: 120, y: 80 },
+      overlay: { width: 100, height: 60 },
+      placement: 'bottom-start',
+      offset: 8,
+      collision: { mode: 'none' },
+    })).toMatchObject({ x: 120, y: 88 })
+
+    expect(resolveNovaUiOverlayPosition({
+      root: { x: 0, y: 0, width: 320, height: 240 },
+      anchor: { kind: 'rect', x: 260, y: 220, width: 40, height: 20 },
+      overlay: { width: 100, height: 60 },
+      placement: 'bottom-start',
+      offset: 8,
+      collision: { mode: 'shift', padding: 8 },
+    })).toMatchObject({ x: 212, y: 172 })
   })
 
   it('opens a default dialog through Root dialog API without a Dialogs registry', () => {

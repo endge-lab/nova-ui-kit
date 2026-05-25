@@ -19,6 +19,7 @@ import type {
 } from '@/shared/style'
 import type { TooltipDefinition } from '@/components/Tooltip/tooltip.types'
 import type { DialogDefinition, DialogInput, DialogProps } from '@/components/Dialog/dialog.types'
+import type { OverlayDefinition, OverlayInput, OverlayProps } from '@/components/Overlay/overlay.types'
 
 /** Schema type корневого компонента Nova UI Kit. */
 export const ROOT_SCHEMA_TYPE = 'nova-ui.root'
@@ -92,4 +93,11 @@ export interface RootApi {
   closeDialogs: (event?: Event) => void
   updateDialog: (id: string, patch: DialogProps & Record<string, unknown>) => void
   getOpenDialogIds: () => Array<string>
+  registerOverlayDefinitions: (sourceId: string, definitions: Array<OverlayDefinition>) => void
+  unregisterOverlayDefinitions: (sourceId: string) => void
+  openOverlay: (input: OverlayInput, payload?: Record<string, unknown>) => string
+  closeOverlay: (id?: string, event?: Event) => void
+  closeOverlays: (event?: Event) => void
+  updateOverlay: (id: string, patch: OverlayProps & Record<string, unknown>) => void
+  getOpenOverlayIds: () => Array<string>
 }

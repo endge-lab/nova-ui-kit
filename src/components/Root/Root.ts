@@ -30,6 +30,12 @@ import type {
   DialogInput,
   DialogProps,
 } from '@/components/Dialog/dialog.types'
+import { RootOverlayControllerNode } from '@/components/Overlay/RootOverlayControllerNode'
+import type {
+  OverlayDefinition,
+  OverlayInput,
+  OverlayProps,
+} from '@/components/Overlay/overlay.types'
 import { RootTooltipControllerNode } from '@/components/Tooltip/RootTooltipControllerNode'
 import type {
   NovaTooltipTargetResolver,
@@ -123,6 +129,7 @@ export class Root<E extends EventList = Record<string, any>>
   private mediaContext: NovaUiStyleMediaContext = { width: 0, height: 0 }
   private tooltipController: RootTooltipControllerNode<E> | null = null
   private dialogController: RootDialogControllerNode<E> | null = null
+  private overlayController: RootOverlayControllerNode<E> | null = null
   private readonly disposeGlobalStylesSubscription: () => void
 
   /**
@@ -165,6 +172,13 @@ export class Root<E extends EventList = Record<string, any>>
       closeDialogs: event => this.closeDialogs(event),
       updateDialog: (id, patch) => this.updateDialog(id, patch),
       getOpenDialogIds: () => this.getOpenDialogIds(),
+      registerOverlayDefinitions: (sourceId, definitions) => this.registerOverlayDefinitions(sourceId, definitions),
+      unregisterOverlayDefinitions: sourceId => this.unregisterOverlayDefinitions(sourceId),
+      openOverlay: (input, payload) => this.openOverlay(input, payload),
+      closeOverlay: (id, event) => this.closeOverlay(id, event),
+      closeOverlays: event => this.closeOverlays(event),
+      updateOverlay: (id, patch) => this.updateOverlay(id, patch),
+      getOpenOverlayIds: () => this.getOpenOverlayIds(),
     }
     this.tokenResolver = app.theme.createTokenResolver()
     this.addDisposer(app.theme.observe(this, { phase: 'update' }))
@@ -380,6 +394,41 @@ export class Root<E extends EventList = Record<string, any>>
     return this.dialogController?.getOpenDialogIds() ?? []
   }
 
+  /** Регистрирует overlay definitions из дочернего Overlays source. */
+  registerOverlayDefinitions(sourceId: string, definitions: Array<OverlayDefinition>): void {
+    this.ensureOverlayController().registerDefinitions(sourceId, definitions)
+  }
+
+  /** Удаляет overlay definitions дочернего Overlays source. */
+  unregisterOverlayDefinitions(sourceId: string): void {
+    this.overlayController?.unregisterDefinitions(sourceId)
+  }
+
+  /** Открывает registry overlay через единый overlay-controller. */
+  openOverlay(input: OverlayInput, payload?: Record<string, unknown>): string {
+    return this.ensureOverlayController().openOverlay(input, payload)
+  }
+
+  /** Закрывает registry overlay по id или верхний overlay. */
+  closeOverlay(id?: string, event?: Event): void {
+    this.overlayController?.closeOverlay(id, event)
+  }
+
+  /** Закрывает все registry overlays текущего Root. */
+  closeOverlays(event?: Event): void {
+    this.overlayController?.closeOverlays(event)
+  }
+
+  /** Обновляет открытый registry overlay без пересоздания controller. */
+  updateOverlay(id: string, patch: OverlayProps & Record<string, unknown>): void {
+    this.overlayController?.updateOverlay(id, patch)
+  }
+
+  /** Возвращает ids открытых registry overlays. */
+  getOpenOverlayIds(): Array<string> {
+    return this.overlayController?.getOpenOverlayIds() ?? []
+  }
+
   /** Делегирует pointer tracking controller-у, создавая его только для tooltip targets. */
   handleTooltipPointerMove(event: MouseEvent): void {
     if (!this.tooltipController && !this.hasTooltipTargetAt(event)) return
@@ -504,6 +553,7 @@ export class Root<E extends EventList = Record<string, any>>
       cursorContext: this.props.cursorContext ?? null,
     })
     this.tooltipController?.syncRootRect(rect.width, rect.height)
+    this.overlayController?.syncRootRect(rect.width, rect.height)
     this.dialogController?.syncRootRect(rect.width, rect.height)
     this.layoutDirty = true
     this.dirty({ update: true, matrix: true, render: true })
@@ -528,6 +578,16 @@ export class Root<E extends EventList = Record<string, any>>
       this.dialogController.syncRootRect(this.width, this.height)
     }
     return this.dialogController
+  }
+
+  /** Создает единственный controller overlays для текущего Root. */
+  private ensureOverlayController(): RootOverlayControllerNode<E> {
+    if (!this.overlayController) {
+      this.overlayController = new RootOverlayControllerNode(this.nova, this.surface)
+      this.addChild(this.overlayController)
+      this.overlayController.syncRootRect(this.width, this.height)
+    }
+    return this.overlayController
   }
 
   /** Проверяет наличие tooltip target до создания overlay controller. */
