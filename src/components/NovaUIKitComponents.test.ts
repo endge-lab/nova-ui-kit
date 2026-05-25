@@ -292,6 +292,70 @@ describe('Nova UI Kit components', () => {
     app.destroy()
   })
 
+  it('keeps closed popovers out of hit-test and hides their action children', () => {
+    const app = createApp()
+    const surface = app.createSurface('popover-hit-test')
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'popover-hit-root',
+      props: { width: 300, height: 120 },
+      children: [
+        {
+          type: NovaUIKit.Button,
+          id: 'popover-hit-button',
+          props: { text: 'Saved views', width: 120, height: 32 },
+        },
+        {
+          type: NovaUIKit.Popover,
+          id: 'popover-hit-popover',
+          props: {
+            open: false,
+            width: 300,
+            height: 120,
+            anchor: { kind: 'rect', x: 0, y: 34, width: 120, height: 32 },
+            placement: 'bottom-start',
+          },
+          children: [
+            {
+              type: NovaUIKit.ActionList,
+              id: 'popover-hit-list',
+              props: {
+                items: [
+                  { id: 'data-1', label: 'Данные 1' },
+                  { id: 'data-2', label: 'Данные 2' },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+    })
+    app.raph.run()
+    app.raph.run()
+
+    const button = app.components.require('popover-hit-button') as unknown as NovaNode<TestEvents>
+    const popover = app.components.require('popover-hit-popover') as unknown as NovaNode<TestEvents>
+    const list = app.components.require('popover-hit-list') as unknown as NovaNode<TestEvents>
+
+    expect(popover.active).toBe(false)
+    expect(popover.visible).toBe(false)
+    expect(list.active).toBe(false)
+    expect(list.visible).toBe(false)
+    expect(app.events.hitTest(8, 8)).toBe(button)
+
+    app.components.requireApi<PopoverApi>('popover-hit-popover').open()
+    app.raph.run()
+    app.raph.run()
+
+    expect(popover.active).toBe(true)
+    expect(popover.visible).toBe(true)
+    expect(list.active).toBe(true)
+    expect(list.visible).toBe(true)
+
+    app.destroy()
+  })
+
   it('accepts mixed constructor and string children inside Root, Panel and SplitPane containers', () => {
     const app = createApp()
     const surface = app.createSurface('mixed-children')

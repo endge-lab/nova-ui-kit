@@ -15,7 +15,7 @@ export class Popover<E extends EventList = Record<string, any>> extends NovaUiCo
     super(app, surface, descriptor, normalizePopoverProps(props), options)
     this.api = { open: event => this.setOpen(true, event), close: event => this.setOpen(false, event), toggle: event => this.setOpen(!this.props.open, event), setProps: patch => this.setProps(patch), getProps: () => this.props }
     reconcileNovaTemplateChildren(this, this.childNodes, options.children ?? []).nodes.forEach(node => this.childNodes.push(node))
-    this.options({ interactive: true })
+    this.syncOpenState()
     this.setupEvents()
   }
 
@@ -38,9 +38,16 @@ export class Popover<E extends EventList = Record<string, any>> extends NovaUiCo
     this.renderer.schema(schema)
   }
 
-  protected override onPropsChanged(changedKeys: Array<keyof PopoverResolvedProps>): void { this.props = normalizePopoverProps(this.props); this.applyCommonPropsChanged(changedKeys) }
+  protected override onPropsChanged(changedKeys: Array<keyof PopoverResolvedProps>): void { this.props = normalizePopoverProps(this.props); this.applyCommonPropsChanged(changedKeys); this.syncOpenState() }
+
+  protected override applyCommonDisplayState(): void {
+    const displayed = this.props.display !== 'none' && this.props.open
+    this.visible = displayed
+    this.active = displayed
+  }
 
   private setOpen(open: boolean, event?: Event): void { if (open !== this.props.open) { this.setProps({ open }); this.props.onOpenChange?.(open, event) } }
+  private syncOpenState(): void { this.options({ interactive: this.props.open && !this.props.disabled && this.props.display !== 'none' }) }
   private setupEvents(): void {
     this.on('click', event => { if (!this.props.open || !this.props.dismiss.outside) return; const { x, y } = this.events.getCanvasMousePosition(event); const [localX, localY] = this.toLocal(x, y); if (localX < this.surfaceRect.x || localX > this.surfaceRect.x + this.surfaceRect.width || localY < this.surfaceRect.y || localY > this.surfaceRect.y + this.surfaceRect.height) this.setOpen(false, event); return false })
     this.on('keydown', event => { if (this.props.open && this.props.dismiss.escape && event.key === 'Escape') this.setOpen(false, event) })
