@@ -536,6 +536,15 @@ describe('Nova UI Kit components', () => {
       offset: 8,
       collision: { mode: 'shift', padding: 8 },
     })).toMatchObject({ x: 212, y: 172 })
+
+    expect(resolveNovaUiOverlayPosition({
+      root: { x: 0, y: 0, width: 320, height: 240 },
+      anchor: { kind: 'rect', x: 120, y: 190, width: 80, height: 30 },
+      overlay: { width: 120, height: 80 },
+      placement: 'bottom-start',
+      offset: 8,
+      collision: { mode: 'flip', padding: 8 },
+    })).toMatchObject({ x: 120, y: 102 })
   })
 
   it('opens a default dialog through Root dialog API without a Dialogs registry', () => {
