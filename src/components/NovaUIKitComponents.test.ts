@@ -352,6 +352,16 @@ describe('Nova UI Kit components', () => {
     expect(popover.visible).toBe(true)
     expect(list.active).toBe(true)
     expect(list.visible).toBe(true)
+    expect(app.events.hitTest(8, 8)).toBe(popover)
+
+    popover.eventHandlers.mousedown?.(new MouseEvent('mousedown', { clientX: 8, clientY: 8 }))
+    expect(app.components.requireApi<PopoverApi>('popover-hit-popover').getProps().open).toBe(false)
+    app.raph.run()
+    app.raph.run()
+
+    expect(popover.active).toBe(false)
+    expect(popover.visible).toBe(false)
+    expect(app.events.hitTest(8, 8)).toBe(button)
 
     app.destroy()
   })

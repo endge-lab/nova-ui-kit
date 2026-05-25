@@ -49,8 +49,14 @@ export class Popover<E extends EventList = Record<string, any>> extends NovaUiCo
   private setOpen(open: boolean, event?: Event): void { if (open !== this.props.open) { this.setProps({ open }); this.props.onOpenChange?.(open, event) } }
   private syncOpenState(): void { this.options({ interactive: this.props.open && !this.props.disabled && this.props.display !== 'none' }) }
   private setupEvents(): void {
-    this.on('click', event => { if (!this.props.open || !this.props.dismiss.outside) return; const { x, y } = this.events.getCanvasMousePosition(event); const [localX, localY] = this.toLocal(x, y); if (localX < this.surfaceRect.x || localX > this.surfaceRect.x + this.surfaceRect.width || localY < this.surfaceRect.y || localY > this.surfaceRect.y + this.surfaceRect.height) this.setOpen(false, event); return false })
+    this.on('mousedown', event => { if (!this.props.open || !this.props.dismiss.outside) return; if (!this.isInsideSurface(event)) { this.setOpen(false, event); return false } })
+    this.on('click', event => { if (!this.props.open || !this.props.dismiss.outside) return; if (!this.isInsideSurface(event)) { this.setOpen(false, event); return false } })
     this.on('keydown', event => { if (this.props.open && this.props.dismiss.escape && event.key === 'Escape') this.setOpen(false, event) })
+  }
+  private isInsideSurface(event: MouseEvent): boolean {
+    const { x, y } = this.events.getCanvasMousePosition(event)
+    const [localX, localY] = this.toLocal(x, y)
+    return localX >= this.surfaceRect.x && localX <= this.surfaceRect.x + this.surfaceRect.width && localY >= this.surfaceRect.y && localY <= this.surfaceRect.y + this.surfaceRect.height
   }
   private resolveRect(): void {
     const pos = resolveNovaUiOverlayPosition({ root: { x: 0, y: 0, width: this.width, height: this.height }, anchor: this.props.anchor, overlay: { width: this.props.width, height: this.props.height }, placement: this.props.placement, offset: this.props.offset, collision: this.props.collision })
