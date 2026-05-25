@@ -12,6 +12,7 @@ export class Dialog<E extends EventList = Record<string, any>> extends NovaUiCom
   private readonly bodyRect = createLayoutRect()
   private dragging = false
   private resizing = false
+  private bodyLayoutReady = false
   private readonly api: DialogApi
 
   constructor(app: NovaApp<E>, surface: NovaSurface<E>, props: DialogProps = {}, options: { componentId?: string; children?: DialogSchema['children'] } = {}, descriptor: DialogDescriptor = DIALOG_NODE_DESCRIPTOR) {
@@ -27,10 +28,16 @@ export class Dialog<E extends EventList = Record<string, any>> extends NovaUiCom
   override getApi(): DialogApi { return this.api }
 
   update(): void {
-    this.applyBodyOpenState()
-    if (!this.props.open) return
+    if (!this.props.open) {
+      this.bodyLayoutReady = false
+      this.applyBodyOpenState()
+      return
+    }
+
     this.resolveRects()
     for (const child of this.bodyNodes) applyNodeLayoutRect(child as NovaNode<any>, this.bodyRect)
+    this.bodyLayoutReady = true
+    this.applyBodyOpenState()
   }
 
   render(): void {
@@ -50,7 +57,7 @@ export class Dialog<E extends EventList = Record<string, any>> extends NovaUiCom
     this.renderer.schema(schema)
   }
 
-  protected override onPropsChanged(changedKeys: Array<keyof DialogResolvedProps>): void { this.props = normalizeDialogProps(this.props); this.applyCommonPropsChanged(changedKeys); if (changedKeys.includes('open') || changedKeys.includes('display')) { this.applyOpenState(); this.applyBodyOpenState() } }
+  protected override onPropsChanged(changedKeys: Array<keyof DialogResolvedProps>): void { this.props = normalizeDialogProps(this.props); this.applyCommonPropsChanged(changedKeys); if (changedKeys.includes('open') || changedKeys.includes('display')) { if (!this.props.open || this.props.display === 'none') this.bodyLayoutReady = false; this.applyOpenState(); this.applyBodyOpenState() } }
 
   private setOpen(open: boolean, event?: Event): void { if (open !== this.props.open) { this.setProps({ open }); this.props.onOpenChange?.(open, event) } }
   private moveTo(x: number, y: number, event?: Event): void { const next = { x: clamp(x, 0, Math.max(0, this.width - this.props.width)), y: clamp(y, 0, Math.max(0, this.height - this.props.height)) }; this.setProps({ position: next }); this.props.onMove?.(next, event) }
@@ -68,7 +75,7 @@ export class Dialog<E extends EventList = Record<string, any>> extends NovaUiCom
     this.options({ interactive: displayed })
   }
   private applyBodyOpenState(): void {
-    const displayed = this.props.display !== 'none' && this.props.open
+    const displayed = this.props.display !== 'none' && this.props.open && this.bodyLayoutReady
     for (const node of this.bodyNodes) {
       node.visible = displayed
       node.active = displayed
