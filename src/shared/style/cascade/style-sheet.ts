@@ -1,5 +1,5 @@
 import type { NovaComponentNode, NovaCursorDeclaration } from '@endge/nova'
-import type { NovaUiSpacing } from '@/shared/layout'
+import type { NovaUiLayoutValue, NovaUiSpacing } from '@/shared/layout'
 import type {
   NovaUiBorder,
   NovaUiInheritedTextStyle,
@@ -12,6 +12,7 @@ export type NovaUiStyleComponentName =
   | 'Grid'
   | 'TextBlock'
   | 'Surface'
+  | 'Divider'
   | 'Button'
   | 'ActionList'
   | 'Badge'
@@ -109,9 +110,22 @@ export interface NovaUiStyleDeclarations {
   }
   spacing?: {
     padding?: NovaUiSpacing
+    margin?: NovaUiSpacing
   }
   layout?: {
     display?: NovaUiStyleDisplay
+    width?: NovaUiLayoutValue
+    height?: NovaUiLayoutValue
+    minWidth?: number
+    maxWidth?: number
+    minHeight?: number
+    maxHeight?: number
+    flexGrow?: number
+    flexShrink?: number
+    flexBasis?: NovaUiLayoutValue
+    margin?: NovaUiSpacing
+    alignSelf?: string
+    order?: number
     gap?: number
     rowGap?: number
     columnGap?: number

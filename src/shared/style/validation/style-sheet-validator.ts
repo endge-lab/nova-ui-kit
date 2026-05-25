@@ -29,6 +29,7 @@ const COMPONENT_NAMES: Array<NovaUiStyleComponentName> = [
   'Grid',
   'TextBlock',
   'Surface',
+  'Divider',
   'Button',
   'ActionList',
   'Badge',
@@ -652,9 +653,10 @@ function parseDeclarationValue(
   if (key === 'clip') return parseBoolean(value, diagnostics, source, offset)
   if (key === 'cursor') return parseCursor(value, diagnostics, source, offset)
   if (key === 'display') return parseDisplay(value, diagnostics, source, offset)
+  if (key === 'width' || key === 'height' || key === 'flexBasis') return parseLayoutValue(value, diagnostics, source, offset)
   if (value.startsWith('var(') && NUMERIC_KEYS.has(key)) return value
   if (NUMERIC_KEYS.has(key)) return parseFiniteNumber(value, diagnostics, source, offset)
-  if (key === 'padding') return parseSpacing(value, diagnostics, source, offset)
+  if (key === 'padding' || key === 'margin') return parseSpacing(value, diagnostics, source, offset)
   if (STRING_KEYS.has(key)) return stripQuotes(value)
 
   diagnostics.push(createDiagnostic('warning', 'unknown-declaration', `Неизвестная декларация "${displayKey}" проигнорирована.`, source, offset))
@@ -746,11 +748,30 @@ function applyParsedDeclaration(
     target.spacing = { ...target.spacing, padding: value as NovaUiSpacing }
     return
   }
+  if (key === 'margin') {
+    target.spacing = { ...target.spacing, margin: value as NovaUiSpacing }
+    return
+  }
   if (key === 'display') {
     target.layout = { ...target.layout, display: value as NovaUiStyleDisplay }
     return
   }
-  if (key === 'gap' || key === 'rowGap' || key === 'columnGap') {
+  if (
+    key === 'width'
+    || key === 'height'
+    || key === 'minWidth'
+    || key === 'maxWidth'
+    || key === 'minHeight'
+    || key === 'maxHeight'
+    || key === 'flexGrow'
+    || key === 'flexShrink'
+    || key === 'flexBasis'
+    || key === 'alignSelf'
+    || key === 'order'
+    || key === 'gap'
+    || key === 'rowGap'
+    || key === 'columnGap'
+  ) {
     target.layout = { ...target.layout, [key]: value as number }
     return
   }
@@ -806,6 +827,24 @@ function parseSpacing(
     bottom: numbers[2],
     left: numbers[3],
   }
+}
+
+function parseLayoutValue(
+  value: string,
+  diagnostics: Array<NovaUiStyleDiagnostic>,
+  source: string,
+  offset: number,
+): number | string | null {
+  if (value === 'auto' || value === 'fill') return value
+  if (/^-?\d+(?:\.\d+)?%$/.test(value)) return value
+
+  const numberValue = parseNumberToken(value)
+  if (numberValue === null) {
+    diagnostics.push(createDiagnostic('error', 'invalid-layout-value', `Невалидное layout-значение "${value}".`, source, offset))
+    return null
+  }
+
+  return numberValue
 }
 
 function parseFiniteNumber(
@@ -1027,6 +1066,7 @@ const STRING_KEYS = new Set([
   'pressedBackground',
   'activeBackground',
   'placeholderColor',
+  'alignSelf',
 ])
 
 const NUMERIC_KEYS = new Set([
@@ -1035,6 +1075,13 @@ const NUMERIC_KEYS = new Set([
   'opacity',
   'borderWidth',
   'borderRadius',
+  'minWidth',
+  'maxWidth',
+  'minHeight',
+  'maxHeight',
+  'flexGrow',
+  'flexShrink',
+  'order',
   'gap',
   'rowGap',
   'columnGap',

@@ -26,6 +26,8 @@ export interface FlexProps extends NovaUiMotionOptions, NovaUiStyleIdentityProps
   y?: number
   width?: number
   height?: number
+  row?: boolean
+  col?: boolean
   direction?: FlexDirection
   wrap?: FlexWrap
   gap?: number
@@ -47,6 +49,8 @@ export interface FlexResolvedProps {
   y: number
   width: number
   height: number
+  row: boolean
+  col: boolean
   direction: FlexDirection
   wrap: FlexWrap
   gap: number

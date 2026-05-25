@@ -373,8 +373,8 @@ describe('Nova UI style propagation', () => {
       type: ROOT_SCHEMA_TYPE,
       id: 'root',
       props: {
-        width: 700,
-        height: 200,
+        width: 300,
+        height: 100,
       },
       children: [
         {
@@ -428,6 +428,68 @@ describe('Nova UI style propagation', () => {
     expect(hidden.visible).toBe(true)
     expect(hidden.active).toBe(true)
     expect(shown.x).toBe(100)
+
+    app.destroy()
+  })
+
+  it('resolves utility classes and NovaCSS layout intent for Flex children', () => {
+    const app = createApp()
+    const surface = app.createSurface('style')
+    const root = app.schema.createNode(surface, {
+      type: ROOT_SCHEMA_TYPE,
+      id: 'root',
+      props: {
+        width: 300,
+        height: 100,
+        styleSheet: `
+          .bar {
+            flex-shrink: 0;
+          }
+
+          .content {
+            flex-grow: 1;
+            min-height: 0;
+          }
+        `,
+      },
+      children: [
+        {
+          type: FLEX_SCHEMA_TYPE,
+          id: 'column',
+          props: {
+            width: 300,
+            height: 100,
+            direction: 'column',
+          },
+          children: [
+            {
+              type: SURFACE_SCHEMA_TYPE,
+              id: 'bar',
+              props: {
+                className: 'bar h-44',
+              },
+            },
+            {
+              type: SURFACE_SCHEMA_TYPE,
+              id: 'content',
+              props: {
+                className: 'content w-full',
+              },
+            },
+          ],
+        },
+      ],
+    }) as Root<TestEvents>
+    const column = app.components.require<Flex<TestEvents>>('column')
+    const bar = app.components.require<any>('bar')
+    const content = app.components.require<any>('content')
+
+    root.update()
+    column.update()
+
+    expect(bar.height).toBe(44)
+    expect(content.y).toBe(44)
+    expect(content.height).toBeCloseTo(56)
 
     app.destroy()
   })

@@ -18,6 +18,7 @@ import {
   type ChipApi,
   type DialogApi,
   type DialogsApi,
+  type DividerApi,
   type FlexApi,
   type GridApi,
   type ImageApi,
@@ -42,6 +43,7 @@ import { registerNovaUIKit } from '@/registerNovaUIKit'
 import { normalizeBadgeProps } from '@/components/Badge/badge.config'
 import { normalizeButtonProps } from '@/components/Button/button.config'
 import { normalizeCheckboxProps } from '@/components/Checkbox/checkbox.config'
+import { normalizeDividerProps } from '@/components/Divider/divider.config'
 import { normalizeImageProps } from '@/components/Image/image.config'
 import { normalizePanelProps } from '@/components/Panel/panel.config'
 import { normalizeScrollAreaProps } from '@/components/ScrollArea/scroll-area.config'
@@ -161,8 +163,9 @@ describe('Nova UI Kit components', () => {
       id: 'root',
       props: {
         styleSheet: `
-          Surface, Panel, Button, Tag, Chip, Checkbox, Toggle, Slider, Scrollbar, ScrollArea, SplitPane, Tooltip, Tooltips, Popover, ActionList, Dialog, Dialogs, Toast, ToastRegion, SegmentedControl {
+          Surface, Divider, Panel, Button, Tag, Chip, Checkbox, Toggle, Slider, Scrollbar, ScrollArea, SplitPane, Tooltip, Tooltips, Popover, ActionList, Dialog, Dialogs, Toast, ToastRegion, SegmentedControl {
             color: #123456;
+            borderWidth: 2;
             accentColor: #2563eb;
             trackColor: #dbe4ef;
             thumbColor: #ffffff;
@@ -175,6 +178,7 @@ describe('Nova UI Kit components', () => {
       },
       children: [
         { type: NovaUIKit.Surface, id: 'surface', props: { width: 160, height: 80 } },
+        { type: NovaUIKit.Divider, id: 'divider', props: { width: 160, lineStyle: 'dashed', border: { width: 2 }, padding: { horizontal: 8 }, margin: { vertical: 4 } } },
         { type: NovaUIKit.Button, id: 'button', props: { text: 'Run' } },
         { type: NovaUIKit.Badge, id: 'badge', props: { value: 3 } },
         { type: NovaUIKit.Image, id: 'image', props: { src: createCanvasDrawable(), radius: 8 } },
@@ -262,6 +266,7 @@ describe('Nova UI Kit components', () => {
     })
 
     app.components.requireApi<ButtonApi>('button').setSelected(true)
+    app.components.requireApi<DividerApi>('divider').setLineStyle('dotted')
     app.components.requireApi<BadgeApi>('badge').setValue(4)
     app.components.requireApi<ImageApi>('image').setSrc(createCanvasDrawable())
     app.components.requireApi<TagApi>('tag').setTone('success')
@@ -282,6 +287,8 @@ describe('Nova UI Kit components', () => {
     app.components.requireApi<PanelApi>('panel').setTitle('Updated')
 
     expect(app.components.requireApi<ButtonApi>('button').getProps().selected).toBe(true)
+    expect(app.components.requireApi<DividerApi>('divider').getProps().lineStyle).toBe('dotted')
+    expect(app.components.requireApi<DividerApi>('divider').getProps().border?.width).toBe(2)
     expect(app.components.requireApi<BadgeApi>('badge').getProps().value).toBe(4)
     expect(app.components.requireApi<ImageApi>('image').getProps().radius).toBe(8)
     expect(app.components.requireApi<TagApi>('tag').getProps().tone).toBe('success')
@@ -2057,6 +2064,7 @@ describe('Nova UI Kit components', () => {
     const normalizers = [
       normalizeSurfaceProps,
       normalizeButtonProps,
+      normalizeDividerProps,
       normalizeBadgeProps,
       normalizeImageProps,
       normalizeTagProps,
@@ -2095,6 +2103,7 @@ describe('Nova UI Kit components', () => {
         pressedBackground: #e2e8f0;
         activeBackground: #eff6ff;
         disabledOpacity: 0.35;
+        margin: 4 8;
       }
     `)
     expect(validation.ok).toBe(true)

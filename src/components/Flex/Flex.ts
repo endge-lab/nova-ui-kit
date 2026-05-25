@@ -30,7 +30,10 @@ import {
   applyNodeLayoutRect,
   copyRect,
   createLayoutRect,
+  getNovaUiNodeLayoutIntent,
   isNovaUiLayoutDisplayed,
+  mergeNovaUiLayoutIntents,
+  readNovaUiNodeProps,
   rectEquals,
   relayoutNovaUiLayoutAncestors,
   type NovaUiLayoutRect,
@@ -49,6 +52,7 @@ import {
   type NovaUiStyleContext,
   type NovaUiStyleReceiveResult,
   type NovaUiStyleTarget,
+  resolveNovaUiClassLayoutIntent,
 } from '@/shared/style'
 import { resolveNovaUiMotionOptions } from '@/shared/motion'
 
@@ -199,6 +203,10 @@ export class Flex<E extends EventList = Record<string, any>>
     if (!this.layoutDirty) return
 
     const layoutEntries = this.childEntries.filter(entry => isNovaUiLayoutDisplayed(entry.node))
+    for (const entry of layoutEntries) {
+      entry.compiledLayout = compileFlexChildLayout(resolveFlexChildLayout(entry.node, entry.rawLayout))
+    }
+
     this.engine.compute({
       props: this.props,
       width: this.width,
@@ -269,6 +277,7 @@ export class Flex<E extends EventList = Record<string, any>>
       const node = reconciled.nodes[index]
       const id = child.id ?? (node as NovaNode<E> & { componentId?: string }).componentId ?? node.id
       const entry = createFlexChildEntry(id, node, child.layout)
+      entry.compiledLayout = compileFlexChildLayout(resolveFlexChildLayout(node, child.layout))
       this.childEntries.push(entry)
       this.childEntriesById.set(id, entry)
     })
@@ -401,10 +410,21 @@ function hasFlexGeometryChanges(keys: Array<keyof FlexResolvedProps>): boolean {
   return keys.includes('x') || keys.includes('y') || keys.includes('width') || keys.includes('height')
 }
 
+function resolveFlexChildLayout(node: unknown, explicitLayout: FlexChildLayout = {}): FlexChildLayout {
+  const props = readNovaUiNodeProps(node)
+  return mergeNovaUiLayoutIntents<FlexChildLayout>(
+    resolveNovaUiClassLayoutIntent(props.className),
+    getNovaUiNodeLayoutIntent(node),
+    explicitLayout,
+  )
+}
+
 function hasFlexLayoutChanges(keys: Array<keyof FlexResolvedProps>): boolean {
   return (
     keys.includes('width')
     || keys.includes('height')
+    || keys.includes('row')
+    || keys.includes('col')
     || keys.includes('direction')
     || keys.includes('wrap')
     || keys.includes('gap')

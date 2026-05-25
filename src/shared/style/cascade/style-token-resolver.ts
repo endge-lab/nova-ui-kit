@@ -16,11 +16,20 @@ const NUMERIC_TOKEN_KEYS = new Set([
   'opacity',
   'borderWidth',
   'borderRadius',
+  'width',
+  'height',
+  'minWidth',
+  'maxWidth',
+  'minHeight',
+  'maxHeight',
+  'flexGrow',
+  'flexShrink',
+  'flexBasis',
+  'order',
   'gap',
   'rowGap',
   'columnGap',
   'disabledOpacity',
-  'width',
 ])
 
 /** Проверяет precompiled stylesheet asset. */

@@ -21,6 +21,7 @@ import {
   pushText,
   sizeTokenPadding,
 } from '@/shared/component/component-render'
+import { findNovaUiRoot } from '@/components/Root/root-target'
 
 /**
  * Описывает ответственность Button в архитектуре проекта.
@@ -76,6 +77,7 @@ export class Button<E extends EventList = Record<string, any>>
       return
     }
     this.playUiSound('press')
+    findNovaUiRoot(this)?.getApi().closeTooltip({ suppressMs: 250 })
     this.props.onPress?.(event)
   }
 

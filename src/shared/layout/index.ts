@@ -1,4 +1,5 @@
 export * from '@/shared/layout/flex-layout-engine'
+export * from '@/shared/layout/layout-intent'
 export * from '@/shared/layout/layout-rect'
 export * from '@/shared/layout/layout-target'
 export * from '@/shared/layout/layout-value'

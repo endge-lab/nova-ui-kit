@@ -41,10 +41,12 @@ import {
   applyNodeLayoutRect,
   copyRect,
   createLayoutRect,
+  readNovaUiNodeProps,
   isNovaUiLayoutDisplayed,
   rectEquals,
   relayoutNovaUiLayoutAncestors,
   resolveSpacing,
+  setNovaUiNodeLayoutIntent,
   type NovaUiLayoutRect,
   type NovaUiLayoutTarget,
 } from '@/shared/layout'
@@ -66,6 +68,7 @@ import {
   matchStyleRules,
   mergeNovaUiStyleSheets,
   mergeStyleContext,
+  resolveNovaUiClassUtilities,
   resolveNovaUiStyleSheetTokens,
   planNovaUiMediaInvalidation,
   planNovaUiStyleSheetInvalidation,
@@ -154,6 +157,7 @@ export class Root<E extends EventList = Record<string, any>>
       getChildRect: () => this.childRect,
       registerTooltipDefinitions: (sourceId, definitions) => this.registerTooltipDefinitions(sourceId, definitions),
       unregisterTooltipDefinitions: sourceId => this.unregisterTooltipDefinitions(sourceId),
+      closeTooltip: options => this.closeTooltip(options),
       registerDialogDefinitions: (sourceId, definitions) => this.registerDialogDefinitions(sourceId, definitions),
       unregisterDialogDefinitions: sourceId => this.unregisterDialogDefinitions(sourceId),
       openDialog: (input, payload) => this.openDialog(input, payload),
@@ -298,7 +302,10 @@ export class Root<E extends EventList = Record<string, any>>
         order: rule.order,
         declarations: rule.declarations,
       })),
-      mergedDeclarations: mergeRuleDeclarations(rules),
+      mergedDeclarations: mergeStyleDeclarations(
+        resolveNovaUiClassUtilities(readNovaUiNodeProps(target).className),
+        mergeRuleDeclarations(rules),
+      ),
       baselineProps: { ...state.baseline },
       currentProps: { ...target.getProps() },
       appliedKeys: [...state.keys],
@@ -331,6 +338,11 @@ export class Root<E extends EventList = Record<string, any>>
   /** Удаляет tooltip definitions дочернего Tooltips source. */
   unregisterTooltipDefinitions(sourceId: string): void {
     this.tooltipController?.unregisterDefinitions(sourceId)
+  }
+
+  /** Закрывает активный tooltip без ожидания pointer leave. */
+  closeTooltip(options: { suppressMs?: number } = {}): void {
+    this.tooltipController?.closeNow(options)
   }
 
   /** Регистрирует dialog definitions из дочернего Dialogs source. */
@@ -660,8 +672,11 @@ export class Root<E extends EventList = Record<string, any>>
    */
   private applyCascadeToNode(node: NovaUiStylableNode): void {
     const rules = matchStyleRules(node, this.styleSheet, this.getMediaContext())
-    const declarations = mergeRuleDeclarations(rules)
+    const utilityDeclarations = resolveNovaUiClassUtilities(readNovaUiNodeProps(node).className)
+    const declarations = mergeStyleDeclarations(utilityDeclarations, mergeRuleDeclarations(rules))
     const patch = this.createCascadePatch(node, declarations)
+    setNovaUiNodeLayoutIntent(node, declarations.layout)
+    if (declarations.layout) this.markLayoutAncestorsDirty(node)
     if (!patch) return
 
     node.setProps(patch)
@@ -708,6 +723,10 @@ export class Root<E extends EventList = Record<string, any>>
     if (declarations.spacing?.padding !== undefined) {
       nextKeys.add('padding')
       patch.padding = declarations.spacing.padding
+    }
+    if (declarations.spacing?.margin !== undefined) {
+      nextKeys.add('margin')
+      patch.margin = declarations.spacing.margin
     }
     if (declarations.layout?.display !== undefined) {
       nextKeys.add('display')
@@ -768,6 +787,7 @@ export class Root<E extends EventList = Record<string, any>>
         border: props.border,
         clip: props.clip,
         padding: props.padding,
+        margin: props.margin,
         display: props.display,
         gap: props.gap,
         rowGap: props.rowGap,
@@ -934,6 +954,38 @@ function mergeRuleDeclarations(rules: ReturnType<typeof matchStyleRules>): NovaU
   }, { mask: NovaUiStyleMask.None })
 }
 
+function mergeStyleDeclarations(...items: Array<NovaUiStyleDeclarations>): NovaUiStyleDeclarations {
+  return items.reduce<NovaUiStyleDeclarations>((target, source) => {
+    target.inheritedText = {
+      ...target.inheritedText,
+      ...source.inheritedText,
+    }
+    target.box = {
+      ...target.box,
+      ...source.box,
+      border: {
+        ...target.box?.border,
+        ...source.box?.border,
+      },
+    }
+    target.spacing = {
+      ...target.spacing,
+      ...source.spacing,
+    }
+    target.layout = {
+      ...target.layout,
+      ...source.layout,
+    }
+    target.visual = {
+      ...target.visual,
+      ...source.visual,
+    }
+    if (source.cursor !== undefined) target.cursor = source.cursor
+    target.mask |= source.mask
+    return target
+  }, { mask: NovaUiStyleMask.None })
+}
+
 function mergeCursorDeclaration(
   target: NovaCursorDeclaration | undefined,
   source: NovaCursorDeclaration,
@@ -976,6 +1028,7 @@ function fallbackCascadeValue(key: string, value: unknown): unknown {
   if (key === 'border') return { width: 0 }
   if (key === 'clip') return false
   if (key === 'padding') return 0
+  if (key === 'margin') return 0
   if (key === 'display') return 'normal'
   if (key === 'gap' || key === 'rowGap' || key === 'columnGap') return 0
   if (key === 'disabledOpacity') return 0.45

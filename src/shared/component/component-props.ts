@@ -69,6 +69,7 @@ export interface NovaUiCommonProps extends NovaUiMotionOptions, NovaUiStyleIdent
   clip?: boolean
   display?: NovaUiStyleDisplay
   padding?: NovaUiSpacing
+  margin?: NovaUiSpacing
   accentColor?: string
   trackColor?: string
   thumbColor?: string
@@ -102,6 +103,7 @@ export interface NovaUiCommonResolvedProps extends NovaUiStyleIdentityProps {
   clip: boolean
   display: NovaUiStyleDisplay
   padding: NovaUiSpacing
+  margin: NovaUiSpacing
   accentColor?: string
   trackColor?: string
   thumbColor?: string
@@ -158,6 +160,7 @@ export const NOVA_UI_COMMON_FIELD_DEFINITIONS = {
   clip: { type: 'boolean' },
   display: { type: 'string' },
   padding: { type: 'spacing' },
+  margin: { type: 'spacing' },
   accentColor: { type: 'string' },
   trackColor: { type: 'string' },
   thumbColor: { type: 'string' },
@@ -177,7 +180,7 @@ export const NOVA_UI_COMMON_FIELD_DEFINITIONS = {
 
 export const NOVA_UI_COMMON_DIRTY_POLICY = {
   matrix: ['x', 'y'] as const,
-  update: ['width', 'height', 'padding'] as const,
+  update: ['width', 'height', 'padding', 'margin'] as const,
   render: [
     'style',
     'color',
@@ -232,6 +235,7 @@ export function normalizeCommonProps<TProps extends NovaUiCommonProps>(
     clip: props.clip ?? defaults.clip ?? false,
     display: props.display ?? defaults.display ?? 'normal',
     padding: props.padding ?? defaults.padding ?? 0,
+    margin: props.margin ?? defaults.margin ?? 0,
     accentColor: props.accentColor ?? defaults.accentColor,
     trackColor: props.trackColor ?? defaults.trackColor,
     thumbColor: props.thumbColor ?? defaults.thumbColor,

@@ -5,6 +5,7 @@ import {
   compileLayoutValue,
   copyRect,
   createLayoutRect,
+  readNovaUiNodeProps,
   rectEquals,
   resolveLayoutValue,
   resolveSpacing,
@@ -51,5 +52,32 @@ describe('Nova UI layout primitives', () => {
 
     expect(applyNodeLayoutRect(node, { x: 1, y: 2, width: 5, height: 4 })).toBe(true)
     expect(options).toHaveBeenCalledWith({ x: 1, y: 2, width: 5, height: 4 })
+  })
+
+  it('uses setProps for generated component nodes before falling back to options', () => {
+    const setProps = vi.fn()
+    const options = vi.fn()
+    const node = {
+      x: 0,
+      y: 0,
+      width: 10,
+      height: 10,
+      setProps,
+      options,
+    } as unknown as NovaNode<any>
+
+    expect(applyNodeLayoutRect(node, { x: 4, y: 8, width: 120, height: 48 })).toBe(true)
+    expect(setProps).toHaveBeenCalledWith({ x: 4, y: 8, width: 120, height: 48 })
+    expect(options).not.toHaveBeenCalled()
+  })
+
+  it('reads generated Nova SFC props when getProps is unavailable', () => {
+    const node = {
+      props: {
+        className: 'h-48 shrink-0',
+      },
+    }
+
+    expect(readNovaUiNodeProps(node)).toEqual({ className: 'h-48 shrink-0' })
   })
 })

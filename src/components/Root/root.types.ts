@@ -84,6 +84,7 @@ export interface RootApi {
   getChildRect: () => Readonly<NovaUiLayoutRect>
   registerTooltipDefinitions: (sourceId: string, definitions: Array<TooltipDefinition>) => void
   unregisterTooltipDefinitions: (sourceId: string) => void
+  closeTooltip: (options?: { suppressMs?: number }) => void
   registerDialogDefinitions: (sourceId: string, definitions: Array<DialogDefinition>) => void
   unregisterDialogDefinitions: (sourceId: string) => void
   openDialog: (input: DialogInput, payload?: Record<string, unknown>) => string

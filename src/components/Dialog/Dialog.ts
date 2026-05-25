@@ -18,7 +18,8 @@ export class Dialog<E extends EventList = Record<string, any>> extends NovaUiCom
     super(app, surface, descriptor, normalizeDialogProps(props), options)
     this.api = { open: event => this.setOpen(true, event), close: event => this.setOpen(false, event), toggle: event => this.setOpen(!this.props.open, event), moveTo: (x, y, event) => this.moveTo(x, y, event), resizeTo: (width, height, event) => this.resizeTo(width, height, event), setProps: patch => this.setProps(patch), getProps: () => this.props }
     reconcileNovaTemplateChildren(this, this.bodyNodes, options.children ?? []).nodes.forEach(node => this.bodyNodes.push(node))
-    this.options({ interactive: true })
+    this.applyOpenState()
+    this.applyBodyOpenState()
     this.setupEvents()
   }
 
@@ -26,6 +27,8 @@ export class Dialog<E extends EventList = Record<string, any>> extends NovaUiCom
   override getApi(): DialogApi { return this.api }
 
   update(): void {
+    this.applyBodyOpenState()
+    if (!this.props.open) return
     this.resolveRects()
     for (const child of this.bodyNodes) applyNodeLayoutRect(child as NovaNode<any>, this.bodyRect)
   }
@@ -47,7 +50,7 @@ export class Dialog<E extends EventList = Record<string, any>> extends NovaUiCom
     this.renderer.schema(schema)
   }
 
-  protected override onPropsChanged(changedKeys: Array<keyof DialogResolvedProps>): void { this.props = normalizeDialogProps(this.props); this.applyCommonPropsChanged(changedKeys) }
+  protected override onPropsChanged(changedKeys: Array<keyof DialogResolvedProps>): void { this.props = normalizeDialogProps(this.props); this.applyCommonPropsChanged(changedKeys); if (changedKeys.includes('open') || changedKeys.includes('display')) { this.applyOpenState(); this.applyBodyOpenState() } }
 
   private setOpen(open: boolean, event?: Event): void { if (open !== this.props.open) { this.setProps({ open }); this.props.onOpenChange?.(open, event) } }
   private moveTo(x: number, y: number, event?: Event): void { const next = { x: clamp(x, 0, Math.max(0, this.width - this.props.width)), y: clamp(y, 0, Math.max(0, this.height - this.props.height)) }; this.setProps({ position: next }); this.props.onMove?.(next, event) }
@@ -57,6 +60,20 @@ export class Dialog<E extends EventList = Record<string, any>> extends NovaUiCom
     this.on('dragmove', (event, dx, dy) => { if (this.dragging) { this.moveTo(this.surfaceRect.x + dx, this.surfaceRect.y + dy, event); return false } if (this.resizing) { this.resizeTo(this.props.width + dx, this.props.height + dy, event); return false } })
     this.on('dragend', () => { this.dragging = false; this.resizing = false; return false })
     this.on('keydown', event => { if (this.props.open && this.props.dismiss.escape && event.key === 'Escape') this.setOpen(false, event) })
+  }
+  private applyOpenState(): void {
+    const displayed = this.props.display !== 'none' && this.props.open
+    this.visible = displayed
+    this.active = displayed
+    this.options({ interactive: displayed })
+  }
+  private applyBodyOpenState(): void {
+    const displayed = this.props.display !== 'none' && this.props.open
+    for (const node of this.bodyNodes) {
+      node.visible = displayed
+      node.active = displayed
+      node.dirty({ update: true, render: true })
+    }
   }
   private resolveRects(): void {
     const width = this.props.width * this.props.scale

@@ -1,9 +1,18 @@
 import type { EventList } from '@endge/utils'
-import type { NovaApp, NovaSchema, NovaSurface } from '@endge/nova'
+import { NovaAssets, type NovaApp, type NovaSchema, type NovaSurface } from '@endge/nova'
 import { ACTION_LIST_NODE_DESCRIPTOR, normalizeActionListProps, type ActionListDescriptor } from '@/components/ActionList/action-list.config'
 import type { ActionListApi, ActionListItem, ActionListProps, ActionListResolvedProps } from '@/components/ActionList/action-list.types'
 import { NovaUiComponentNode, buildBoxSchema, resolveComponentTextStyle , pushIcon, pushText } from '@/shared/component'
 import { resolveSpacing } from '@/shared/layout'
+import checkIconSource from '@/assets/icons/check.svg?raw'
+
+const ACTION_LIST_ASSETS = NovaAssets.define('nova-ui-kit-action-list', {
+  icons: {
+    check: NovaAssets.svg(checkIconSource, { width: 24, height: 24, color: '#2563eb' }),
+  },
+})
+
+NovaAssets.global.use(ACTION_LIST_ASSETS)
 
 export class ActionList<E extends EventList = Record<string, any>> extends NovaUiComponentNode<ActionListResolvedProps, ActionListApi, ActionListProps, E> {
   private hoveredIndex = -1
@@ -26,7 +35,7 @@ export class ActionList<E extends EventList = Record<string, any>> extends NovaU
       if (item.type === 'separator') { schema.push({ type: 'rect', x: padding.left + 8, y: y + 6, width: width - 16, height: 1, styles: { background: 'var(--nova-action-list-separator-color, #e2e8f0)' } }); y += 12; return }
       if (item.type === 'group') { pushText(schema, item.label, padding.left + 10, y, width - 20, 22, { ...textStyle, color: 'var(--nova-action-list-group-color, #64748b)', fontSize: 11, fontWeight: '700', lineHeight: 16 }); y += 24; return }
       const active = index === this.hoveredIndex || index === this.props.activeIndex || item.selected || this.itemValue(item) === this.props.value
-      if (active) schema.push({ type: 'rect', x: padding.left, y, width, height: this.props.itemHeight, styles: { background: 'var(--nova-action-list-item-active-background, #eff6ff)', border: { color: 'rgba(0,0,0,0)', width: 0, radius: 6 } } })
+      if (active) schema.push({ type: 'rect', x: padding.left, y, width, height: this.props.itemHeight, styles: { background: this.props.activeBackground ?? '#eff6ff', border: { color: 'rgba(0,0,0,0)', width: 0, radius: 6 } } })
       pushIcon(schema, item.icon, padding.left + 10, y + (this.props.itemHeight - 16) / 2, 16, item.disabled ? 0.45 : 1)
       const textX = padding.left + (item.icon ? 34 : 10)
       const labelY = item.description ? y + 2 : y
@@ -34,7 +43,7 @@ export class ActionList<E extends EventList = Record<string, any>> extends NovaU
       pushText(schema, item.label, textX, labelY, width - 82, labelHeight, { ...textStyle, color: item.disabled ? 'var(--nova-action-list-disabled-color, #94a3b8)' : item.tone === 'danger' ? 'var(--nova-action-list-danger-color, #dc2626)' : textStyle.color, fontWeight: item.selected ? '700' : textStyle.fontWeight })
       if (item.description) pushText(schema, item.description, textX, y + 20, width - 82, 16, { ...textStyle, color: 'var(--nova-action-list-description-color, #64748b)', fontSize: 11, lineHeight: 14 })
       pushText(schema, item.shortcut, padding.left + width - 56, y, 46, this.props.itemHeight, { ...textStyle, color: 'var(--nova-action-list-shortcut-color, #94a3b8)', fontSize: 11, lineHeight: 16 }, { align: 'right' })
-      if (item.checked || this.itemValue(item) === this.props.value) pushText(schema, '✓', padding.left + width - 21, y, 16, this.props.itemHeight, { ...textStyle, color: 'var(--nova-action-list-checkmark-color, #2563eb)', fontWeight: '800' }, { align: 'center' })
+      if (item.checked || this.itemValue(item) === this.props.value) pushIcon(schema, ACTION_LIST_ASSETS.icons.check, padding.left + width - 25, y + (this.props.itemHeight - 18) / 2, 18)
       else if (item.type === 'submenu' || item.items?.length) pushText(schema, '›', padding.left + width - 20, y, 16, this.props.itemHeight, { ...textStyle, color: 'var(--nova-action-list-submenu-color, #64748b)', fontWeight: '800' }, { align: 'center' })
       y += this.props.itemHeight
     })
@@ -49,7 +58,16 @@ export class ActionList<E extends EventList = Record<string, any>> extends NovaU
   private setValue(value: string | number | boolean | undefined, event?: Event): void { const item = this.props.items[this.props.activeIndex]; this.setProps({ value }); if (item) this.props.onValueChange?.(value, item, event) }
   private moveFocus(delta: number, _event?: Event): void { const indexes = this.props.items.map((item, index) => ({ item, index })).filter(({ item }) => item.type !== 'separator' && item.type !== 'group' && !item.disabled).map(({ index }) => index); if (!indexes.length) return; const current = Math.max(0, indexes.indexOf(this.props.activeIndex)); this.setProps({ activeIndex: indexes[this.props.loop ? (current + delta + indexes.length) % indexes.length : Math.max(0, Math.min(indexes.length - 1, current + delta))] }) }
   private activateFocused(event?: Event): void { this.activate(this.props.activeIndex, event) }
-  private activate(index: number, event?: Event): void { const item = this.props.items[index]; if (!item || item.disabled || item.type === 'separator' || item.type === 'group') return; this.setProps({ activeIndex: index }); if (this.props.selectable) this.setValue(this.itemValue(item), event); this.props.onAction?.(item, index, event) }
+  private activate(index: number, event?: Event): void { const item = this.props.items[index]; if (!item || item.disabled || item.type === 'separator' || item.type === 'group') return; this.setProps({ activeIndex: index }); this.applyLocalChoiceState(item, index); if (this.props.selectable) this.setValue(this.itemValue(item), event); this.props.onAction?.(item, index, event) }
+  private applyLocalChoiceState(item: ActionListItem, index: number): void {
+    if (item.type === 'checkbox') {
+      this.setProps({ items: this.props.items.map((candidate, candidateIndex) => candidateIndex === index ? { ...candidate, checked: !candidate.checked } : candidate) })
+      return
+    }
+    if (item.type === 'radio') {
+      this.setProps({ items: this.props.items.map((candidate, candidateIndex) => candidate.type === 'radio' ? { ...candidate, checked: candidateIndex === index } : candidate) })
+    }
+  }
   private itemValue(item: ActionListItem): string | number | boolean | undefined { return item.value ?? item.id ?? item.label }
   private indexFromEvent(event: MouseEvent): number { const { x, y } = this.events.getCanvasMousePosition(event); const [, localY] = this.toLocal(x, y); const padding = resolveSpacing(this.props.padding); let rowY = padding.top; for (let index = 0; index < this.props.items.length; index += 1) { const item = this.props.items[index]; const height = item.type === 'separator' ? 12 : item.type === 'group' ? 24 : this.props.itemHeight; if (localY >= rowY && localY <= rowY + height) return item.disabled || item.type === 'separator' || item.type === 'group' ? -1 : index; rowY += height } return -1 }
 }

@@ -5,6 +5,7 @@ import { BADGE_DESCRIPTOR } from '@/components/Badge/badge.registry'
 import { BUTTON_DESCRIPTOR } from '@/components/Button/button.registry'
 import { CHECKBOX_DESCRIPTOR } from '@/components/Checkbox/checkbox.registry'
 import { CHIP_DESCRIPTOR } from '@/components/Chip/chip.registry'
+import { DIVIDER_DESCRIPTOR } from '@/components/Divider/divider.registry'
 import { DIALOG_DESCRIPTOR } from '@/components/Dialog/dialog.registry'
 import { DIALOGS_DESCRIPTOR } from '@/components/Dialog/dialogs.registry'
 import { FLEX_DESCRIPTOR } from '@/components/Flex/flex.registry'
@@ -33,6 +34,7 @@ const NOVA_UI_KIT_DESCRIPTORS: Array<NovaComponentDescriptor<any, any, any, any>
   GRID_DESCRIPTOR,
   TEXT_BLOCK_DESCRIPTOR,
   SURFACE_DESCRIPTOR,
+  DIVIDER_DESCRIPTOR,
   BUTTON_DESCRIPTOR,
   BADGE_DESCRIPTOR,
   ...INPUT_DESCRIPTORS,

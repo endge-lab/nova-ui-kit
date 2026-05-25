@@ -3,6 +3,7 @@ import { BADGE_SCHEMA_TYPE } from '@/components/Badge/badge.types'
 import { BUTTON_SCHEMA_TYPE } from '@/components/Button/button.types'
 import { CHECKBOX_SCHEMA_TYPE } from '@/components/Checkbox/checkbox.types'
 import { CHIP_SCHEMA_TYPE } from '@/components/Chip/chip.types'
+import { DIVIDER_SCHEMA_TYPE } from '@/components/Divider/divider.types'
 import { DIALOG_SCHEMA_TYPE, DIALOGS_SCHEMA_TYPE } from '@/components/Dialog/dialog.types'
 import {
   ACCORDION_SCHEMA_TYPE,
@@ -65,6 +66,7 @@ export const NovaUIKit = {
   Grid: GRID_SCHEMA_TYPE,
   TextBlock: TEXT_BLOCK_SCHEMA_TYPE,
   Surface: SURFACE_SCHEMA_TYPE,
+  Divider: DIVIDER_SCHEMA_TYPE,
   Button: BUTTON_SCHEMA_TYPE,
   Badge: BADGE_SCHEMA_TYPE,
   Input: INPUT_SCHEMA_TYPE,

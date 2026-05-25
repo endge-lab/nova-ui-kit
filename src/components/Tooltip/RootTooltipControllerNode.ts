@@ -72,6 +72,7 @@ export class RootTooltipControllerNode<E extends EventList = Record<string, any>
   private activeTargetKey = ''
   private openTimer = 0
   private hideTimer = 0
+  private mutedUntil = 0
 
   /** Создает controller-node и размещает его поверх Root. */
   constructor(app: NovaApp<E>, surface: NovaSurface<E>) {
@@ -105,6 +106,11 @@ export class RootTooltipControllerNode<E extends EventList = Record<string, any>
 
   /** Обрабатывает pointer move на уровне Root capture path. */
   handlePointerMove(event: MouseEvent): void {
+    if (Date.now() < this.mutedUntil) {
+      this.closeNow()
+      return
+    }
+
     const { x, y } = this.nova.events.getCanvasMousePosition(event)
     const target = this.nova.events.hitTest(x, y)
     const resolution = this.resolveTargetTooltip(target, x, y, event)
@@ -178,6 +184,20 @@ export class RootTooltipControllerNode<E extends EventList = Record<string, any>
   /** Закрывает tooltip при уходе pointer с canvas. */
   handlePointerLeave(): void {
     this.scheduleClose()
+  }
+
+  /** Закрывает активный tooltip без задержки. */
+  closeNow(options: { suppressMs?: number } = {}): void {
+    if (options.suppressMs && options.suppressMs > 0) {
+      this.mutedUntil = Math.max(this.mutedUntil, Date.now() + options.suppressMs)
+    }
+    window.clearTimeout(this.openTimer)
+    window.clearTimeout(this.hideTimer)
+    if (!this.activeTooltip && !this.activeTargetKey) return
+    this.activeTooltip = null
+    this.activeTargetKey = ''
+    this.reconcileChildren([])
+    this.dirty({ update: true, render: true })
   }
 
   /** Обновляет custom slot child tree. */

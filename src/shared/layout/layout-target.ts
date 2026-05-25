@@ -61,6 +61,16 @@ export function applyNodeLayoutRect(node: NovaNode<any>, rect: NovaUiLayoutRect)
     return false
   }
 
+  if ('setProps' in node && typeof (node as { setProps?: unknown }).setProps === 'function') {
+    ;(node as unknown as { setProps: (patch: NovaUiLayoutRect) => void }).setProps({
+      x: rect.x,
+      y: rect.y,
+      width: rect.width,
+      height: rect.height,
+    })
+    return true
+  }
+
   node.options({
     x: rect.x,
     y: rect.y,
