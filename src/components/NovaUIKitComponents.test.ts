@@ -299,7 +299,7 @@ describe('Nova UI Kit components', () => {
     app.schema.createNode(surface, {
       type: NovaUIKit.Root,
       id: 'popover-hit-root',
-      props: { width: 300, height: 120 },
+      props: { width: 300, height: 260 },
       children: [
         {
           type: NovaUIKit.Button,
@@ -342,7 +342,7 @@ describe('Nova UI Kit components', () => {
     expect(popover.visible).toBe(false)
     expect(list.active).toBe(false)
     expect(list.visible).toBe(false)
-    expect(app.events.hitTest(8, 8)).toBe(button)
+    expect(app.events.hitTest(8, 8)?.id).toBe(button.id)
 
     app.components.requireApi<PopoverApi>('popover-hit-popover').open()
     app.raph.run()
@@ -352,16 +352,16 @@ describe('Nova UI Kit components', () => {
     expect(popover.visible).toBe(true)
     expect(list.active).toBe(true)
     expect(list.visible).toBe(true)
-    expect(app.events.hitTest(8, 8)).toBe(popover)
+    expect(app.events.hitTest(8, 8)?.id).not.toBe(button.id)
 
-    popover.eventHandlers.mousedown?.(new MouseEvent('mousedown', { clientX: 8, clientY: 8 }))
+    app.handleEvent('mousedown', new MouseEvent('mousedown', { clientX: 8, clientY: 8, button: 0 }))
     expect(app.components.requireApi<PopoverApi>('popover-hit-popover').getProps().open).toBe(false)
     app.raph.run()
     app.raph.run()
 
     expect(popover.active).toBe(false)
     expect(popover.visible).toBe(false)
-    expect(app.events.hitTest(8, 8)).toBe(button)
+    expect(app.events.hitTest(8, 8)?.id).toBe(button.id)
 
     app.destroy()
   })

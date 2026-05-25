@@ -29,11 +29,13 @@ export class ActionList<E extends EventList = Record<string, any>> extends NovaU
       if (active) schema.push({ type: 'rect', x: padding.left, y, width, height: this.props.itemHeight, styles: { background: 'var(--nova-action-list-item-active-background, #eff6ff)', border: { color: 'rgba(0,0,0,0)', width: 0, radius: 6 } } })
       pushIcon(schema, item.icon, padding.left + 10, y + (this.props.itemHeight - 16) / 2, 16, item.disabled ? 0.45 : 1)
       const textX = padding.left + (item.icon ? 34 : 10)
-      pushText(schema, item.label, textX, y + 2, width - 82, 20, { ...textStyle, color: item.disabled ? 'var(--nova-action-list-disabled-color, #94a3b8)' : item.tone === 'danger' ? 'var(--nova-action-list-danger-color, #dc2626)' : textStyle.color, fontWeight: item.selected ? '700' : textStyle.fontWeight })
+      const labelY = item.description ? y + 2 : y
+      const labelHeight = item.description ? 20 : this.props.itemHeight
+      pushText(schema, item.label, textX, labelY, width - 82, labelHeight, { ...textStyle, color: item.disabled ? 'var(--nova-action-list-disabled-color, #94a3b8)' : item.tone === 'danger' ? 'var(--nova-action-list-danger-color, #dc2626)' : textStyle.color, fontWeight: item.selected ? '700' : textStyle.fontWeight })
       if (item.description) pushText(schema, item.description, textX, y + 20, width - 82, 16, { ...textStyle, color: 'var(--nova-action-list-description-color, #64748b)', fontSize: 11, lineHeight: 14 })
-      pushText(schema, item.shortcut, padding.left + width - 56, y + 2, 46, 20, { ...textStyle, color: 'var(--nova-action-list-shortcut-color, #94a3b8)', fontSize: 11, lineHeight: 16 }, { align: 'right' })
-      if (item.checked || this.itemValue(item) === this.props.value) pushText(schema, '✓', padding.left + width - 21, y + 2, 16, 20, { ...textStyle, color: 'var(--nova-action-list-checkmark-color, #2563eb)', fontWeight: '800' }, { align: 'center' })
-      else if (item.type === 'submenu' || item.items?.length) pushText(schema, '›', padding.left + width - 20, y + 2, 16, 20, { ...textStyle, color: 'var(--nova-action-list-submenu-color, #64748b)', fontWeight: '800' }, { align: 'center' })
+      pushText(schema, item.shortcut, padding.left + width - 56, y, 46, this.props.itemHeight, { ...textStyle, color: 'var(--nova-action-list-shortcut-color, #94a3b8)', fontSize: 11, lineHeight: 16 }, { align: 'right' })
+      if (item.checked || this.itemValue(item) === this.props.value) pushText(schema, '✓', padding.left + width - 21, y, 16, this.props.itemHeight, { ...textStyle, color: 'var(--nova-action-list-checkmark-color, #2563eb)', fontWeight: '800' }, { align: 'center' })
+      else if (item.type === 'submenu' || item.items?.length) pushText(schema, '›', padding.left + width - 20, y, 16, this.props.itemHeight, { ...textStyle, color: 'var(--nova-action-list-submenu-color, #64748b)', fontWeight: '800' }, { align: 'center' })
       y += this.props.itemHeight
     })
     this.renderer.schema(schema)

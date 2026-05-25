@@ -41,6 +41,10 @@ export const BADGE_FIELD_DEFINITIONS = {
   icon: { type: 'icon' },
   tone: { type: 'string' },
   size: { type: 'string' },
+  anchor: { type: 'record' },
+  placement: { type: 'string' },
+  offsetX: { type: 'number' },
+  offsetY: { type: 'number' },
 } as const
 
 export function normalizeBadgeProps(props: BadgeProps = {}): BadgeResolvedProps {
@@ -57,6 +61,10 @@ export function normalizeBadgeProps(props: BadgeProps = {}): BadgeResolvedProps 
     icon: props.icon,
     tone,
     size,
+    anchor: props.anchor,
+    placement: props.placement ?? 'top-end',
+    offsetX: finiteNumber(props.offsetX, 0),
+    offsetY: finiteNumber(props.offsetY, 0),
   }
 }
 
@@ -69,7 +77,7 @@ export function createBadgeDescriptor(createNode?: BadgeNodeFactory): BadgeDescr
     kind: 'node-component',
     dirtyPolicy: {
       matrix: NOVA_UI_COMMON_DIRTY_POLICY.matrix,
-      update: [...NOVA_UI_COMMON_DIRTY_POLICY.update, 'text', 'value', 'max', 'dot', 'icon', 'size'],
+      update: [...NOVA_UI_COMMON_DIRTY_POLICY.update, 'text', 'value', 'max', 'dot', 'icon', 'size', 'anchor', 'placement', 'offsetX', 'offsetY'],
       render: [...NOVA_UI_COMMON_DIRTY_POLICY.render, 'tone'],
     },
     fields: BADGE_FIELD_DEFINITIONS,
@@ -110,4 +118,3 @@ function badgePalette(tone: BadgeTone): { background: string; border: string; co
 function finiteNumber(value: unknown, fallback: number): number {
   return typeof value === 'number' && Number.isFinite(value) ? value : fallback
 }
-

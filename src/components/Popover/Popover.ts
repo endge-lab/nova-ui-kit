@@ -49,9 +49,17 @@ export class Popover<E extends EventList = Record<string, any>> extends NovaUiCo
   private setOpen(open: boolean, event?: Event): void { if (open !== this.props.open) { this.setProps({ open }); this.props.onOpenChange?.(open, event) } }
   private syncOpenState(): void { this.options({ interactive: this.props.open && !this.props.disabled && this.props.display !== 'none' }) }
   private setupEvents(): void {
-    this.on('mousedown', event => { if (!this.props.open || !this.props.dismiss.outside) return; if (!this.isInsideSurface(event)) { this.setOpen(false, event); return false } })
-    this.on('click', event => { if (!this.props.open || !this.props.dismiss.outside) return; if (!this.isInsideSurface(event)) { this.setOpen(false, event); return false } })
+    this.onCapture('mousedown', event => this.dismissOutside(event))
+    this.on('mousedown', event => this.dismissOutside(event))
+    this.on('click', event => this.dismissOutside(event))
     this.on('keydown', event => { if (this.props.open && this.props.dismiss.escape && event.key === 'Escape') this.setOpen(false, event) })
+  }
+  private dismissOutside(event: MouseEvent): boolean | undefined {
+    if (!this.props.open || !this.props.dismiss.outside) return undefined
+    if (this.isInsideSurface(event)) return undefined
+    this.setOpen(false, event)
+    event.stopPropagation()
+    return false
   }
   private isInsideSurface(event: MouseEvent): boolean {
     const { x, y } = this.events.getCanvasMousePosition(event)

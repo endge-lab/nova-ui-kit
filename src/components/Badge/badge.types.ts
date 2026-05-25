@@ -5,6 +5,7 @@ import type {
   NovaUiComponentSize,
   NovaUiIconSource,
 } from '@/shared/component'
+import type { NovaUiOverlayAnchor, NovaUiOverlayPlacement } from '@/shared/overlay'
 
 export const BADGE_SCHEMA_TYPE = 'nova-ui.badge'
 
@@ -18,6 +19,10 @@ export interface BadgeProps extends NovaUiCommonProps {
   icon?: NovaUiIconSource
   tone?: BadgeTone
   size?: NovaUiComponentSize
+  anchor?: NovaUiOverlayAnchor
+  placement?: NovaUiOverlayPlacement
+  offsetX?: number
+  offsetY?: number
 }
 
 export interface BadgeResolvedProps extends NovaUiCommonResolvedProps {
@@ -28,6 +33,10 @@ export interface BadgeResolvedProps extends NovaUiCommonResolvedProps {
   icon?: NovaUiIconSource
   tone: BadgeTone
   size: NovaUiComponentSize
+  anchor?: NovaUiOverlayAnchor
+  placement: NovaUiOverlayPlacement
+  offsetX: number
+  offsetY: number
 }
 
 export type BadgeSchema = NovaComponentSchema<BadgeProps>
@@ -39,4 +48,3 @@ export interface BadgeApi {
   setProps: (patch: BadgeProps) => void
   getProps: () => Readonly<BadgeResolvedProps>
 }
-
