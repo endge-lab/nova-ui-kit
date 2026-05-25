@@ -1,9 +1,18 @@
-import type { NovaComponentSchema } from '@endge/nova'
+import type { NovaComponentSchema, NovaElementSchema } from '@endge/nova'
 import type { NovaUiCommonProps, NovaUiCommonResolvedProps } from '@/shared/component'
 import type { NovaUiPartStyleOptions } from '@/domain/domain.types'
 import type { NovaUiOverlayDismissMode, NovaUiOverlayPlacement } from '@/shared/overlay/overlay.types'
 
 export const DIALOG_SCHEMA_TYPE = 'nova-ui.dialog'
+export const DIALOGS_SCHEMA_TYPE = 'nova-ui.dialogs'
+
+export type DialogInput =
+  | string
+  | ({
+      type?: string
+      id?: string
+      value?: unknown
+    } & Record<string, unknown>)
 
 export interface DialogProps extends NovaUiCommonProps, NovaUiPartStyleOptions {
   open?: boolean
@@ -55,6 +64,51 @@ export interface DialogResolvedProps extends NovaUiCommonResolvedProps, NovaUiPa
 
 export interface DialogSchema extends NovaComponentSchema<DialogProps> {
   children?: Array<NovaComponentSchema>
+}
+
+export interface DialogSlotContext extends Record<string, unknown> {
+  id: string
+  type: string
+  value?: unknown
+  props: DialogResolvedProps
+  dialog: {
+    id: string
+    type: string
+    index: number
+  }
+  close: (event?: Event) => void
+  update: (patch: DialogProps) => void
+}
+
+export type DialogTemplateFactory = (slot: DialogSlotContext) => Array<NovaElementSchema<any>>
+
+export interface DialogDefinition {
+  type: string
+  props?: DialogProps
+  slot?: DialogTemplateFactory
+}
+
+export interface DialogsProps extends NovaUiCommonProps {
+  definitions?: Array<DialogDefinition>
+}
+
+export interface DialogsResolvedProps extends NovaUiCommonResolvedProps {
+  definitions: Array<DialogDefinition>
+}
+
+export interface DialogsSchema extends NovaComponentSchema<DialogsProps> {
+  children?: Array<DialogSchema>
+}
+
+export interface DialogsApi {
+  setDefinitions: (definitions: Array<DialogDefinition>) => void
+  getDefinitions: () => ReadonlyArray<DialogDefinition>
+}
+
+export interface DialogOpenOptions extends Record<string, unknown> {
+  type?: string
+  id?: string
+  value?: unknown
 }
 
 export interface DialogApi {

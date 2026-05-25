@@ -5778,6 +5778,35 @@
           ]
         },
         {
+          "name": "Dialogs",
+          "description": "Root-level dialog registry. Children Dialog nodes define typed templates opened through RootApi.openDialog.",
+          "source": {
+            "module": "@endge/nova-ui-kit",
+            "symbol": "DialogsProps"
+          },
+          "props": [
+            {
+              "name": "id",
+              "description": "Stable component id. Nova runtime uses it for component lookup, refs and diagnostics.",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "definitions",
+              "description": "Dialog type definitions registered on the nearest Root.",
+              "type": "Array<DialogDefinition>",
+              "required": false
+            }
+          ],
+          "events": [],
+          "slots": [
+            {
+              "name": "default",
+              "description": "Dialog template definitions."
+            }
+          ]
+        },
+        {
           "name": "Toast",
           "description": "Single notification item for manual composition or ToastRegion children.",
           "source": {

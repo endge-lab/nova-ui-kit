@@ -6,6 +6,7 @@ import { BUTTON_DESCRIPTOR } from '@/components/Button/button.registry'
 import { CHECKBOX_DESCRIPTOR } from '@/components/Checkbox/checkbox.registry'
 import { CHIP_DESCRIPTOR } from '@/components/Chip/chip.registry'
 import { DIALOG_DESCRIPTOR } from '@/components/Dialog/dialog.registry'
+import { DIALOGS_DESCRIPTOR } from '@/components/Dialog/dialogs.registry'
 import { FLEX_DESCRIPTOR } from '@/components/Flex/flex.registry'
 import { GRID_DESCRIPTOR } from '@/components/Grid/grid.registry'
 import { IMAGE_DESCRIPTOR } from '@/components/Image/image.registry'
@@ -50,6 +51,7 @@ const NOVA_UI_KIT_DESCRIPTORS: Array<NovaComponentDescriptor<any, any, any, any>
   POPOVER_DESCRIPTOR,
   ACTION_LIST_DESCRIPTOR,
   DIALOG_DESCRIPTOR,
+  DIALOGS_DESCRIPTOR,
   TOAST_DESCRIPTOR,
   TOAST_REGION_DESCRIPTOR,
   PANEL_DESCRIPTOR,

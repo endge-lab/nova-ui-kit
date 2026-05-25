@@ -5,7 +5,7 @@ import type { BadgeProps } from '@/components/Badge/badge.types'
 import type { ButtonProps } from '@/components/Button/button.types'
 import type { CheckboxProps } from '@/components/Checkbox/checkbox.types'
 import type { ChipProps } from '@/components/Chip/chip.types'
-import type { DialogProps } from '@/components/Dialog/dialog.types'
+import type { DialogProps, DialogsProps } from '@/components/Dialog/dialog.types'
 import type { FlexChildLayout, FlexProps } from '@/components/Flex/flex.types'
 import type { GridChildLayout, GridProps } from '@/components/Grid/grid.types'
 import type { ImageProps } from '@/components/Image/image.types'
@@ -105,6 +105,7 @@ declare module 'vue' {
     Rating: NovaDslComponent<AdvancedComponentProps>
     SelectButton: NovaDslComponent<AdvancedComponentProps>
     Dialog: NovaDslComponent<DialogProps>
+    Dialogs: NovaDslComponent<DialogsProps>
     Drawer: NovaDslComponent<AdvancedComponentProps>
     Toast: NovaDslComponent<ToastProps>
     ToastRegion: NovaDslComponent<ToastRegionProps>

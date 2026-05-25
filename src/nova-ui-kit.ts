@@ -3,7 +3,7 @@ import { BADGE_SCHEMA_TYPE } from '@/components/Badge/badge.types'
 import { BUTTON_SCHEMA_TYPE } from '@/components/Button/button.types'
 import { CHECKBOX_SCHEMA_TYPE } from '@/components/Checkbox/checkbox.types'
 import { CHIP_SCHEMA_TYPE } from '@/components/Chip/chip.types'
-import { DIALOG_SCHEMA_TYPE } from '@/components/Dialog/dialog.types'
+import { DIALOG_SCHEMA_TYPE, DIALOGS_SCHEMA_TYPE } from '@/components/Dialog/dialog.types'
 import {
   ACCORDION_SCHEMA_TYPE,
   BLOCK_UI_SCHEMA_TYPE,
@@ -108,6 +108,7 @@ export const NovaUIKit = {
   Rating: RATING_SCHEMA_TYPE,
   SelectButton: SELECT_BUTTON_SCHEMA_TYPE,
   Dialog: DIALOG_SCHEMA_TYPE,
+  Dialogs: DIALOGS_SCHEMA_TYPE,
   Drawer: DRAWER_SCHEMA_TYPE,
   Toast: TOAST_SCHEMA_TYPE,
   ToastRegion: TOAST_REGION_SCHEMA_TYPE,

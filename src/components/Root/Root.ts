@@ -24,6 +24,12 @@ import type {
   RootProps,
   RootResolvedProps,
 } from '@/components/Root/root.types'
+import { RootDialogControllerNode } from '@/components/Dialog/RootDialogControllerNode'
+import type {
+  DialogDefinition,
+  DialogInput,
+  DialogProps,
+} from '@/components/Dialog/dialog.types'
 import { RootTooltipControllerNode } from '@/components/Tooltip/RootTooltipControllerNode'
 import type {
   NovaTooltipTargetResolver,
@@ -113,6 +119,7 @@ export class Root<E extends EventList = Record<string, any>>
   private mediaSignature = ''
   private mediaContext: NovaUiStyleMediaContext = { width: 0, height: 0 }
   private tooltipController: RootTooltipControllerNode<E> | null = null
+  private dialogController: RootDialogControllerNode<E> | null = null
   private readonly disposeGlobalStylesSubscription: () => void
 
   /**
@@ -147,6 +154,13 @@ export class Root<E extends EventList = Record<string, any>>
       getChildRect: () => this.childRect,
       registerTooltipDefinitions: (sourceId, definitions) => this.registerTooltipDefinitions(sourceId, definitions),
       unregisterTooltipDefinitions: sourceId => this.unregisterTooltipDefinitions(sourceId),
+      registerDialogDefinitions: (sourceId, definitions) => this.registerDialogDefinitions(sourceId, definitions),
+      unregisterDialogDefinitions: sourceId => this.unregisterDialogDefinitions(sourceId),
+      openDialog: (input, payload) => this.openDialog(input, payload),
+      closeDialog: (id, event) => this.closeDialog(id, event),
+      closeDialogs: event => this.closeDialogs(event),
+      updateDialog: (id, patch) => this.updateDialog(id, patch),
+      getOpenDialogIds: () => this.getOpenDialogIds(),
     }
     this.tokenResolver = app.theme.createTokenResolver()
     this.addDisposer(app.theme.observe(this, { phase: 'update' }))
@@ -319,6 +333,41 @@ export class Root<E extends EventList = Record<string, any>>
     this.tooltipController?.unregisterDefinitions(sourceId)
   }
 
+  /** Регистрирует dialog definitions из дочернего Dialogs source. */
+  registerDialogDefinitions(sourceId: string, definitions: Array<DialogDefinition>): void {
+    this.ensureDialogController().registerDefinitions(sourceId, definitions)
+  }
+
+  /** Удаляет dialog definitions дочернего Dialogs source. */
+  unregisterDialogDefinitions(sourceId: string): void {
+    this.dialogController?.unregisterDefinitions(sourceId)
+  }
+
+  /** Открывает registry dialog через единый overlay-controller. */
+  openDialog(input: DialogInput, payload?: Record<string, unknown>): string {
+    return this.ensureDialogController().openDialog(input, payload)
+  }
+
+  /** Закрывает registry dialog по id или верхний dialog. */
+  closeDialog(id?: string, event?: Event): void {
+    this.dialogController?.closeDialog(id, event)
+  }
+
+  /** Закрывает все registry dialogs текущего Root. */
+  closeDialogs(event?: Event): void {
+    this.dialogController?.closeDialogs(event)
+  }
+
+  /** Обновляет открытый registry dialog без пересоздания controller. */
+  updateDialog(id: string, patch: DialogProps & Record<string, unknown>): void {
+    this.dialogController?.updateDialog(id, patch)
+  }
+
+  /** Возвращает ids открытых registry dialogs. */
+  getOpenDialogIds(): Array<string> {
+    return this.dialogController?.getOpenDialogIds() ?? []
+  }
+
   /** Делегирует pointer tracking controller-у, создавая его только для tooltip targets. */
   handleTooltipPointerMove(event: MouseEvent): void {
     if (!this.tooltipController && !this.hasTooltipTargetAt(event)) return
@@ -351,6 +400,7 @@ export class Root<E extends EventList = Record<string, any>>
     }
 
     this.tooltipController?.syncRootRect(this.width, this.height)
+    this.dialogController?.syncRootRect(this.width, this.height)
     this.layoutDirty = false
   }
 
@@ -442,6 +492,7 @@ export class Root<E extends EventList = Record<string, any>>
       cursorContext: this.props.cursorContext ?? null,
     })
     this.tooltipController?.syncRootRect(rect.width, rect.height)
+    this.dialogController?.syncRootRect(rect.width, rect.height)
     this.layoutDirty = true
     this.dirty({ update: true, matrix: true, render: true })
     return true
@@ -455,6 +506,16 @@ export class Root<E extends EventList = Record<string, any>>
       this.tooltipController.syncRootRect(this.width, this.height)
     }
     return this.tooltipController
+  }
+
+  /** Создает единственный controller диалогов для текущего Root. */
+  private ensureDialogController(): RootDialogControllerNode<E> {
+    if (!this.dialogController) {
+      this.dialogController = new RootDialogControllerNode(this.nova, this.surface)
+      this.addChild(this.dialogController)
+      this.dialogController.syncRootRect(this.width, this.height)
+    }
+    return this.dialogController
   }
 
   /** Проверяет наличие tooltip target до создания overlay controller. */

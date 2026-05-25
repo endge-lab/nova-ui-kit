@@ -8361,6 +8361,45 @@
           ]
         },
         {
+          "name": "Dialogs",
+          "title": "Dialogs",
+          "description": {
+            "ru": "Root-level dialog registry. Children Dialog nodes define typed templates opened through RootApi.openDialog.",
+            "en": "Root-level dialog registry. Children Dialog nodes define typed templates opened through RootApi.openDialog."
+          },
+          "source": "packages/@endge-nova-ui-kit/src/components/Dialog/Dialogs.ts",
+          "snippet": "<Dialogs>\n  $END$\n</Dialogs>",
+          "props": [
+            {
+              "name": "id",
+              "type": "string",
+              "required": false,
+              "description": {
+                "ru": "Стабильный идентификатор компонента.",
+                "en": "Stable component id. Nova runtime uses it for component lookup, refs and diagnostics."
+              }
+            },
+            {
+              "name": "definitions",
+              "type": "Array<DialogDefinition>",
+              "required": false,
+              "description": {
+                "ru": "Dialog type definitions registered on the nearest Root.",
+                "en": "Dialog type definitions registered on the nearest Root."
+              }
+            }
+          ],
+          "slots": [
+            {
+              "name": "default",
+              "description": {
+                "ru": "Dialog template definitions.",
+                "en": "Dialog template definitions."
+              }
+            }
+          ]
+        },
+        {
           "name": "Toast",
           "title": "Toast",
           "description": {

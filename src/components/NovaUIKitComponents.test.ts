@@ -17,6 +17,7 @@ import {
   type CheckboxApi,
   type ChipApi,
   type DialogApi,
+  type DialogsApi,
   type FlexApi,
   type GridApi,
   type ImageApi,
@@ -53,6 +54,7 @@ import { normalizeTagProps } from '@/components/Tag/tag.config'
 import { normalizeToggleProps } from '@/components/Toggle/toggle.config'
 import { normalizeTooltipProps } from '@/components/Tooltip/tooltip.config'
 import { RootTooltipControllerNode } from '@/components/Tooltip/RootTooltipControllerNode'
+import { RootDialogControllerNode } from '@/components/Dialog/RootDialogControllerNode'
 import { RowResizer } from '@/components/RowResizer/RowResizer'
 import { ColResizer } from '@/components/ColResizer/ColResizer'
 
@@ -159,7 +161,7 @@ describe('Nova UI Kit components', () => {
       id: 'root',
       props: {
         styleSheet: `
-          Surface, Panel, Button, Tag, Chip, Checkbox, Toggle, Slider, Scrollbar, ScrollArea, SplitPane, Tooltip, Popover, ActionList, Dialog, Toast, ToastRegion, SegmentedControl {
+          Surface, Panel, Button, Tag, Chip, Checkbox, Toggle, Slider, Scrollbar, ScrollArea, SplitPane, Tooltip, Tooltips, Popover, ActionList, Dialog, Dialogs, Toast, ToastRegion, SegmentedControl {
             color: #123456;
             accentColor: #2563eb;
             trackColor: #dbe4ef;
@@ -247,6 +249,11 @@ describe('Nova UI Kit components', () => {
           children: [{ type: NovaUIKit.TextBlock, id: 'dialog-body', props: { text: 'Body' } }],
         },
         {
+          type: NovaUIKit.Dialogs,
+          id: 'dialogs',
+          props: { definitions: [{ type: 'default' }] },
+        },
+        {
           type: NovaUIKit.ToastRegion,
           id: 'toast-region',
           props: { autoDismiss: false, items: [{ id: 'saved', title: 'Saved', message: 'Done', tone: 'success' }] },
@@ -269,6 +276,7 @@ describe('Nova UI Kit components', () => {
     app.components.requireApi<PopoverApi>('popover').close()
     app.components.requireApi<ActionListApi>('action-list').focusNext()
     app.components.requireApi<DialogApi>('dialog').resizeTo(440, 280)
+    expect(app.components.requireApi<DialogsApi>('dialogs').getDefinitions()).toHaveLength(1)
     app.components.requireApi<ToastRegionApi>('toast-region').push({ id: 'queued', title: 'Queued' })
     app.components.requireApi<SegmentedControlApi>('segmented').setValue('b')
     app.components.requireApi<PanelApi>('panel').setTitle('Updated')
@@ -364,6 +372,216 @@ describe('Nova UI Kit components', () => {
     expect(popover.active).toBe(false)
     expect(popover.visible).toBe(false)
     expect(app.events.hitTest(8, 8)?.id).toBe(button.id)
+
+    app.destroy()
+  })
+
+  it('opens a default dialog through Root dialog API without a Dialogs registry', () => {
+    const app = createApp()
+    const surface = app.createSurface('dialog-default-registry')
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'dialog-default-root',
+      props: { width: 900, height: 560 },
+      children: [
+        { type: NovaUIKit.Button, id: 'dialog-default-trigger', props: { text: 'Open' } },
+      ],
+    })
+    app.raph.run()
+    app.raph.run()
+
+    const root = app.components.require('dialog-default-root') as unknown as NovaNode<TestEvents>
+    const initialRootChildCount = root.children.length
+    const initialInteractiveCount = app.events.interactiveNodes.size
+    const rootApi = app.components.requireApi<RootApi>('dialog-default-root')
+
+    expect(root.children.filter(child => child instanceof RootDialogControllerNode)).toHaveLength(0)
+    const id = rootApi.openDialog({
+      title: 'Default dialog',
+      value: 'Default body',
+      width: 360,
+      height: 220,
+      resizable: true,
+    })
+    app.raph.run()
+    app.raph.run()
+
+    const controllers = root.children.filter(child => child instanceof RootDialogControllerNode)
+    expect(controllers).toHaveLength(1)
+    expect(rootApi.getOpenDialogIds()).toEqual([id])
+    expect(app.components.requireApi<DialogApi>(`nova-root-dialog-${id}`).getProps()).toMatchObject({
+      open: true,
+      title: 'Default dialog',
+      width: 360,
+      height: 220,
+      resizable: true,
+      className: 'default',
+      attrs: { type: 'default' },
+    })
+    expect(app.components.requireApi<TextBlockApi>(`nova-root-dialog-${id}-value`).getProps().text).toBe('Default body')
+    expect(root.children).toHaveLength(initialRootChildCount + 1)
+    expect(app.events.interactiveNodes.size).toBeGreaterThanOrEqual(initialInteractiveCount)
+
+    rootApi.closeDialog(id)
+    app.raph.run()
+    app.raph.run()
+    expect(rootApi.getOpenDialogIds()).toEqual([])
+    expect(root.children.filter(child => child instanceof RootDialogControllerNode)).toHaveLength(1)
+
+    app.destroy()
+  })
+
+  it('resolves custom dialog definitions, payload and local overrides through slot context', () => {
+    const app = createApp()
+    const surface = app.createSurface('dialog-custom-registry')
+    const contexts: Array<Record<string, any>> = []
+    const openChanges: Array<boolean> = []
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'dialog-custom-root',
+      props: { width: 900, height: 560 },
+      children: [
+        {
+          type: NovaUIKit.Dialogs,
+          id: 'dialog-custom-registry-node',
+          props: {
+            definitions: [
+              {
+                type: 'confirm',
+                props: {
+                  title: 'Confirm',
+                  width: 420,
+                  height: 240,
+                  placement: 'top',
+                  draggable: true,
+                  background: '#f8fafc',
+                  border: { color: '#94a3b8', width: 1, radius: 10 },
+                },
+                slot: slot => {
+                  contexts.push(slot as Record<string, any>)
+                  return [
+                    {
+                      type: NovaUIKit.TextBlock,
+                      id: 'dialog-custom-body',
+                      props: {
+                        text: `${slot.title}: ${slot.value}`,
+                        color: '#0f172a',
+                      },
+                    },
+                  ]
+                },
+              },
+            ],
+          },
+        },
+      ],
+    })
+    app.raph.run()
+    app.raph.run()
+
+    const root = app.components.require('dialog-custom-root') as unknown as NovaNode<TestEvents>
+    const rootApi = app.components.requireApi<RootApi>('dialog-custom-root')
+    const initialRootChildCount = root.children.length
+    const initialInteractiveCount = app.events.interactiveNodes.size
+    const id = rootApi.openDialog('confirm', {
+      id: 'remove-task',
+      title: 'Remove task',
+      value: 'T-42',
+      width: 480,
+      placement: 'bottom',
+      onOpenChange: open => openChanges.push(open),
+    })
+    app.raph.run()
+    app.raph.run()
+
+    expect(id).toBe('remove-task')
+    expect(contexts).toHaveLength(1)
+    expect(contexts[0]).toMatchObject({
+      id: 'remove-task',
+      type: 'confirm',
+      title: 'Remove task',
+      value: 'T-42',
+      dialog: { id: 'remove-task', type: 'confirm', index: 0 },
+    })
+    expect(contexts[0].props).toMatchObject({
+      width: 480,
+      placement: 'bottom',
+      draggable: true,
+      background: '#f8fafc',
+      className: 'confirm',
+      attrs: { type: 'confirm' },
+    })
+    expect(app.components.requireApi<TextBlockApi>('dialog-custom-body').getProps().text).toBe('Remove task: T-42')
+    expect(root.children.filter(child => child instanceof RootDialogControllerNode)).toHaveLength(1)
+    expect(root.children).toHaveLength(initialRootChildCount)
+    expect(app.events.interactiveNodes.size).toBeGreaterThanOrEqual(initialInteractiveCount)
+
+    rootApi.updateDialog(id, { value: 'T-43', title: 'Remove updated' })
+    app.raph.run()
+    app.raph.run()
+    expect(rootApi.getOpenDialogIds()).toEqual(['remove-task'])
+
+    rootApi.closeDialogs()
+    app.raph.run()
+    app.raph.run()
+    expect(rootApi.getOpenDialogIds()).toEqual([])
+    expect(openChanges).toEqual([false])
+
+    app.destroy()
+  })
+
+  it('keeps dialog controller single and stable across 1k open-close operations', () => {
+    const app = createApp()
+    const surface = app.createSurface('dialog-open-close-bench')
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'dialog-bench-root',
+      props: { width: 900, height: 560 },
+      children: [
+        {
+          type: NovaUIKit.Dialogs,
+          id: 'dialog-bench-registry',
+          props: {
+            definitions: [
+              {
+                type: 'bench',
+                props: { width: 320, height: 180, title: 'Bench', backdrop: false, modal: false },
+              },
+            ],
+          },
+        },
+      ],
+    })
+    app.raph.run()
+    app.raph.run()
+
+    const root = app.components.require('dialog-bench-root') as unknown as NovaNode<TestEvents>
+    const rootApi = app.components.requireApi<RootApi>('dialog-bench-root')
+    const initialRootChildCount = root.children.length
+    const initialInteractiveCount = app.events.interactiveNodes.size
+    const startedAt = realNow()
+
+    for (let index = 0; index < 1_000; index += 1) {
+      const id = rootApi.openDialog('bench', {
+        id: `bench-${index}`,
+        value: index,
+      })
+      rootApi.closeDialog(id)
+    }
+    app.raph.run()
+    app.raph.run()
+
+    const elapsed = realNow() - startedAt
+    const controllers = root.children.filter(child => child instanceof RootDialogControllerNode)
+    expect(controllers).toHaveLength(1)
+    expect(root.children).toHaveLength(initialRootChildCount)
+    expect(app.events.interactiveNodes.size).toBe(initialInteractiveCount)
+    expect(rootApi.getOpenDialogIds()).toEqual([])
+    expect(elapsed).toBeLessThan(800)
+    console.info(`[bench] ui-kit:dialog-registry-1k-open-close elapsed=${elapsed.toFixed(2)}ms budget=800ms controllerCount=${controllers.length} interactiveGrowth=${app.events.interactiveNodes.size - initialInteractiveCount}`)
 
     app.destroy()
   })

@@ -18,6 +18,7 @@ import type {
   NovaUiStylableNode,
 } from '@/shared/style'
 import type { TooltipDefinition } from '@/components/Tooltip/tooltip.types'
+import type { DialogDefinition, DialogInput, DialogProps } from '@/components/Dialog/dialog.types'
 
 /** Schema type корневого компонента Nova UI Kit. */
 export const ROOT_SCHEMA_TYPE = 'nova-ui.root'
@@ -83,4 +84,11 @@ export interface RootApi {
   getChildRect: () => Readonly<NovaUiLayoutRect>
   registerTooltipDefinitions: (sourceId: string, definitions: Array<TooltipDefinition>) => void
   unregisterTooltipDefinitions: (sourceId: string) => void
+  registerDialogDefinitions: (sourceId: string, definitions: Array<DialogDefinition>) => void
+  unregisterDialogDefinitions: (sourceId: string) => void
+  openDialog: (input: DialogInput, payload?: Record<string, unknown>) => string
+  closeDialog: (id?: string, event?: Event) => void
+  closeDialogs: (event?: Event) => void
+  updateDialog: (id: string, patch: DialogProps & Record<string, unknown>) => void
+  getOpenDialogIds: () => Array<string>
 }
