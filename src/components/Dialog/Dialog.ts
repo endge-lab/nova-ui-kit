@@ -34,16 +34,16 @@ export class Dialog<E extends EventList = Record<string, any>> extends NovaUiCom
     if (!this.props.open) { this.renderer.schema([]); return }
     this.resolveRects()
     const schema: NovaSchema = []
-    if (this.props.modal || this.props.backdrop) schema.push({ type: 'rect', x: 0, y: 0, width: this.width, height: this.height, styles: { background: 'var(--nova-dialog-backdrop-background, rgba(15,23,42,0.38))' } })
+    if (this.props.modal || this.props.backdrop) schema.push({ type: 'rect', x: 0, y: 0, width: this.width, height: this.height, styles: { background: 'rgba(15,23,42,0.38)' } })
     const surface = buildBoxSchema(this.props, this.surfaceRect.width, this.surfaceRect.height)
     for (const item of surface) { const shape = item as Record<string, any>; shape.x = (shape.x ?? 0) + this.surfaceRect.x; shape.y = (shape.y ?? 0) + this.surfaceRect.y; schema.push(item) }
     const padding = resolveSpacing(this.props.padding)
     const textStyle = resolveComponentTextStyle(this.props, this.inheritedStyleContext)
     pushText(schema, this.props.title, this.surfaceRect.x + padding.left, this.surfaceRect.y + padding.top, this.surfaceRect.width - padding.left - padding.right - 32, 24, { ...textStyle, fontSize: 17, fontWeight: '800', lineHeight: 22 })
-    pushText(schema, this.props.description, this.surfaceRect.x + padding.left, this.surfaceRect.y + padding.top + 24, this.surfaceRect.width - padding.left - padding.right - 32, 20, { ...textStyle, color: 'var(--nova-dialog-description-color, #64748b)', fontSize: 12, lineHeight: 17 })
+    pushText(schema, this.props.description, this.surfaceRect.x + padding.left, this.surfaceRect.y + padding.top + 24, this.surfaceRect.width - padding.left - padding.right - 32, 20, { ...textStyle, color: '#64748b', fontSize: 12, lineHeight: 17 })
     if (this.props.closeButton) pushText(schema, '×', this.surfaceRect.x + this.surfaceRect.width - padding.right - 24, this.surfaceRect.y + padding.top, 24, 24, { ...textStyle, fontSize: 20, fontWeight: '700' }, { align: 'center' })
-    if (this.props.draggable) schema.push({ type: 'rect', x: this.surfaceRect.x + 12, y: this.surfaceRect.y + 6, width: this.surfaceRect.width - 24, height: 4, styles: { background: 'var(--nova-dialog-drag-handle-background, rgba(148,163,184,0.42))', border: { color: 'rgba(0,0,0,0)', width: 0, radius: 999 } } })
-    if (this.props.resizable) schema.push({ type: 'rect', x: this.surfaceRect.x + this.surfaceRect.width - 18, y: this.surfaceRect.y + this.surfaceRect.height - 18, width: 12, height: 12, styles: { background: 'var(--nova-dialog-resize-handle-background, rgba(100,116,139,0.45))' } })
+    if (this.props.draggable) schema.push({ type: 'rect', x: this.surfaceRect.x + 12, y: this.surfaceRect.y + 6, width: this.surfaceRect.width - 24, height: 4, styles: { background: 'rgba(148,163,184,0.42)', border: { color: 'rgba(0,0,0,0)', width: 0, radius: 999 } } })
+    if (this.props.resizable) schema.push({ type: 'rect', x: this.surfaceRect.x + this.surfaceRect.width - 18, y: this.surfaceRect.y + this.surfaceRect.height - 18, width: 12, height: 12, styles: { background: 'rgba(100,116,139,0.45)' } })
     this.renderer.schema(schema)
   }
 

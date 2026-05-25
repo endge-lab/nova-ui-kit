@@ -11,7 +11,7 @@ export const DIALOG_FIELD_DEFINITIONS = { ...NOVA_UI_COMMON_FIELD_DEFINITIONS, o
 export function normalizeDialogProps(props: DialogProps = {}): DialogResolvedProps {
   const dismiss = typeof props.dismiss === 'object' ? { outside: props.dismiss.outside ?? true, escape: props.dismiss.escape ?? true } : { outside: props.dismiss ?? true, escape: props.dismiss ?? true }
   return {
-    ...normalizeCommonProps(props, { width: 420, height: 260, background: 'var(--nova-dialog-background, #ffffff)', color: 'var(--nova-dialog-color, #172033)', border: { color: 'var(--nova-dialog-border-color, #cbd5e1)', width: 1, radius: 12 }, padding: { horizontal: 18, vertical: 16 } }),
+    ...normalizeCommonProps(props, { width: 420, height: 260, background: '#ffffff', color: '#172033', border: { color: '#cbd5e1', width: 1, radius: 12 }, padding: { horizontal: 18, vertical: 16 } }),
     open: props.open ?? false,
     modal: props.modal ?? true,
     backdrop: props.backdrop ?? true,

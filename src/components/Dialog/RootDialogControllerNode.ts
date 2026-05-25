@@ -17,6 +17,7 @@ import type {
   DialogSlotContext,
 } from '@/components/Dialog/dialog.types'
 import { TEXT_BLOCK_SCHEMA_TYPE } from '@/components/TextBlock/text-block.types'
+import { applyNodeLayoutRect } from '@/shared/layout'
 
 interface RegisteredDialogSource {
   sourceId: string
@@ -39,10 +40,10 @@ const DEFAULT_DIALOG_PROPS: DialogProps = {
   closeButton: true,
   draggable: false,
   resizable: false,
-  background: 'var(--nova-dialog-background, #ffffff)',
-  color: 'var(--nova-dialog-color, #172033)',
+  background: '#ffffff',
+  color: '#172033',
   border: {
-    color: 'var(--nova-dialog-border-color, #cbd5e1)',
+    color: '#cbd5e1',
     width: 1,
     radius: 12,
   },
@@ -50,7 +51,7 @@ const DEFAULT_DIALOG_PROPS: DialogProps = {
     horizontal: 18,
     vertical: 16,
   },
-  fontFamily: 'var(--nova-dialog-font-family, Inter, Arial, sans-serif)',
+  fontFamily: 'Inter, Arial, sans-serif',
   fontSize: 13,
   lineHeight: 18,
 }
@@ -154,6 +155,14 @@ export class RootDialogControllerNode<E extends EventList = Record<string, any>>
     const reconciled = reconcileNovaTemplateChildren(this, this.managedChildren, children)
     this.managedChildren.length = 0
     this.managedChildren.push(...reconciled.nodes)
+    for (const child of this.managedChildren) {
+      applyNodeLayoutRect(child, {
+        x: 0,
+        y: 0,
+        width: this.width,
+        height: this.height,
+      })
+    }
   }
 
   /** Controller ничего не рисует напрямую. */
@@ -294,7 +303,7 @@ function createDefaultDialogBody(slot: DialogSlotContext): Array<NovaElementSche
         y: 0,
         width: Math.max(0, slot.props.width - 36),
         height: Math.max(24, slot.props.height - 92),
-        color: 'var(--nova-dialog-body-color, #334155)',
+        color: '#334155',
         fontSize: 13,
         lineHeight: 18,
       },
