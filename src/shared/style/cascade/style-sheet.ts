@@ -133,6 +133,7 @@ export interface NovaUiCompiledStyleRule {
   rightMostId?: string
   rightMostClasses: Array<string>
   rightMostType?: NovaUiStyleComponentName
+  rightMostAttrs?: Record<string, string | true>
 }
 
 /** Готовый к hot path stylesheet с индексами по правой части selector. */
@@ -141,6 +142,7 @@ export interface NovaUiCompiledStyleSheet {
   byId: Map<string, Array<NovaUiCompiledStyleRule>>
   byClass: Map<string, Array<NovaUiCompiledStyleRule>>
   byType: Map<NovaUiStyleComponentName, Array<NovaUiCompiledStyleRule>>
+  byAttr: Map<string, Array<NovaUiCompiledStyleRule>>
   universal: Array<NovaUiCompiledStyleRule>
   version: number
   source?: string

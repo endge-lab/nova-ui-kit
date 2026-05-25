@@ -40,8 +40,11 @@ import {
   EMPTY_STYLE_CONTEXT,
   NovaUiStyleMask,
   borderRadiusToRendererValue,
+  bumpNovaUiStyleTokenVersions,
   createEmptyStyleSheet,
   createEmptyStyleSheetValidationResult,
+  createNovaUiStyleIdentityRegistry,
+  createNovaUiStyleSheetGraph,
   getNovaUiBuiltInUtilityStyleSheet,
   getNovaUiGlobalStyleSheet,
   getNovaUiStyleMediaSignature,
@@ -51,12 +54,17 @@ import {
   mergeNovaUiStyleSheets,
   mergeStyleContext,
   resolveNovaUiStyleSheetTokens,
+  planNovaUiMediaInvalidation,
+  planNovaUiStyleSheetInvalidation,
   styleContextChangedMask,
   subscribeNovaUiGlobalStyleSheets,
   validateNovaUiStyleSheetSource,
   type NovaUiCompiledStyleSheet,
+  type NovaUiStyleInvalidationPlan,
   type NovaUiStyleDeclarations,
   type NovaUiStyleInspectionDebug,
+  type NovaUiStyleMediaContext,
+  type NovaUiStyleSheetGraph,
   type NovaUiStyleSheetAsset,
   type NovaUiStyleTokenResolver,
   type NovaUiStyleReceiveResult,
@@ -84,13 +92,17 @@ export class Root<E extends EventList = Record<string, any>>
   private layoutDirty = true
   private externalLayout = false
   private styleSheet: NovaUiCompiledStyleSheet = createEmptyStyleSheet()
+  private styleSheetGraph: NovaUiStyleSheetGraph | null = null
   private localRawStyleSheet: NovaUiCompiledStyleSheet = createEmptyStyleSheet()
   private rawStyleSheet: NovaUiCompiledStyleSheet = createEmptyStyleSheet()
   private validation: NovaUiStyleValidationResult = createEmptyStyleSheetValidationResult()
   private effectiveStyleContext = EMPTY_STYLE_CONTEXT
   private tokenResolver: NovaUiStyleTokenResolver | null = null
   private resolvedTokenVersion: number | null = null
+  private readonly resolvedTokenValues = new Map<string, string>()
+  private readonly styleCandidateFallbackThreshold = 2_048
   private mediaSignature = ''
+  private mediaContext: NovaUiStyleMediaContext = { width: 0, height: 0 }
   private readonly disposeGlobalStylesSubscription: () => void
 
   /**
@@ -197,8 +209,10 @@ export class Root<E extends EventList = Record<string, any>>
 
   /** Обновляет token-resolved stylesheet после смены темы или token context. */
   refreshStyleTokens(): void {
+    const changedTokens = this.collectChangedResolvedTokens()
     this.styleSheet = this.resolveStyleSheetTokens(this.rawStyleSheet)
-    this.applyCascade()
+    if (changedTokens.length > 0) bumpNovaUiStyleTokenVersions(this.nova, changedTokens)
+    this.applyPlannedCascade()
   }
 
   /** Пере-применяет selector cascade после изменения вложенного template дерева. */
@@ -404,9 +418,9 @@ export class Root<E extends EventList = Record<string, any>>
       globalAsset.source,
       this.localRawStyleSheet.source,
     ].filter(Boolean).join('\n'))
+    this.collectChangedResolvedTokens()
     this.styleSheet = this.resolveStyleSheetTokens(this.rawStyleSheet)
-    this.mediaSignature = ''
-    this.applyCascade()
+    this.applyPlannedCascade()
   }
 
   /**
@@ -432,6 +446,7 @@ export class Root<E extends EventList = Record<string, any>>
    */
   private applyCascade(): void {
     this.mediaSignature = getNovaUiStyleMediaSignature(this.styleSheet, this.getMediaContext())
+    this.mediaContext = this.getMediaContext()
     this.traverseAll(node => {
       if (isStylableNode(node)) this.applyCascadeToNode(node)
     })
@@ -441,6 +456,43 @@ export class Root<E extends EventList = Record<string, any>>
     this.propagateStyleContext(styleContextChangedMask(previous, this.effectiveStyleContext) || NovaUiStyleMask.AllText)
     this.layoutDirty = true
     this.dirty({ update: true, render: true })
+  }
+
+  /**
+   * Применяет selector cascade через indexed invalidation plan.
+   */
+  private applyPlannedCascade(): void {
+    const registry = createNovaUiStyleIdentityRegistry(this)
+    const nextGraph = createNovaUiStyleSheetGraph(this.styleSheet)
+    const plan = planNovaUiStyleSheetInvalidation(this.styleSheetGraph, nextGraph, registry, {
+      candidateFallbackThreshold: this.styleCandidateFallbackThreshold,
+    })
+    this.styleSheetGraph = nextGraph
+    this.applyCascadePlan(plan)
+  }
+
+  /**
+   * Применяет selector cascade только для candidates или включает safe full fallback.
+   */
+  private applyCascadePlan(plan: NovaUiStyleInvalidationPlan): void {
+    if (plan.fallback) {
+      this.applyCascade()
+      return
+    }
+
+    this.mediaSignature = getNovaUiStyleMediaSignature(this.styleSheet, this.getMediaContext())
+    this.mediaContext = this.getMediaContext()
+    for (const node of plan.candidates) {
+      this.applyCascadeToNode(node)
+    }
+
+    const previous = this.effectiveStyleContext
+    this.effectiveStyleContext = mergeStyleContext(EMPTY_STYLE_CONTEXT, this.props.style)
+    this.propagateStyleContext(styleContextChangedMask(previous, this.effectiveStyleContext))
+    this.layoutDirty = true
+    if (plan.candidates.size > 0 || plan.changedTokens.size > 0 || plan.changedRuleCount > 0 || plan.changedMediaAtoms.size > 0) {
+      this.dirty({ update: true, render: true })
+    }
   }
 
   /**
@@ -580,10 +632,16 @@ export class Root<E extends EventList = Record<string, any>>
    * Синхронизирует актуальное состояние Root.
    */
   private refreshMediaCascadeIfNeeded(): void {
-    const nextSignature = getNovaUiStyleMediaSignature(this.styleSheet, this.getMediaContext())
+    const nextContext = this.getMediaContext()
+    const nextSignature = getNovaUiStyleMediaSignature(this.styleSheet, nextContext)
     if (nextSignature === this.mediaSignature) return
 
-    this.applyCascade()
+    const registry = createNovaUiStyleIdentityRegistry(this)
+    const graph = this.styleSheetGraph ?? createNovaUiStyleSheetGraph(this.styleSheet)
+    this.styleSheetGraph = graph
+    this.applyCascadePlan(planNovaUiMediaInvalidation(graph, registry, this.mediaContext, nextContext, {
+      candidateFallbackThreshold: this.styleCandidateFallbackThreshold,
+    }))
   }
 
   /**
@@ -594,6 +652,32 @@ export class Root<E extends EventList = Record<string, any>>
       width: this.width,
       height: this.height,
     }
+  }
+
+  /**
+   * Сравнивает resolved CSS token values и возвращает только реально изменившиеся atoms.
+   */
+  private collectChangedResolvedTokens(): Array<string> {
+    const dependencies = this.rawStyleSheet.tokenDependencies ?? []
+    if (!this.tokenResolver || dependencies.length === 0) {
+      this.resolvedTokenValues.clear()
+      return []
+    }
+
+    const changed: Array<string> = []
+    const nextTokens = new Set(dependencies)
+    for (const token of dependencies) {
+      const nextValue = this.tokenResolver.resolve(token, '') ?? ''
+      if (this.resolvedTokenValues.has(token) && this.resolvedTokenValues.get(token) !== nextValue) {
+        changed.push(token)
+      }
+      this.resolvedTokenValues.set(token, nextValue)
+    }
+
+    for (const token of [...this.resolvedTokenValues.keys()]) {
+      if (!nextTokens.has(token)) this.resolvedTokenValues.delete(token)
+    }
+    return changed
   }
 
   /**

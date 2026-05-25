@@ -34,6 +34,7 @@ export function createEmptyStyleSheet(source = ''): NovaUiCompiledStyleSheet {
     byId: new Map(),
     byClass: new Map(),
     byType: new Map(),
+    byAttr: new Map(),
     universal: [],
     version: 0,
     source,
@@ -51,6 +52,7 @@ export function compileStyleSheetIndexes(
     byId: new Map(),
     byClass: new Map(),
     byType: new Map(),
+    byAttr: new Map(),
     universal: [],
     version: Date.now(),
     source,
@@ -62,6 +64,7 @@ export function compileStyleSheetIndexes(
     rule.rightMostId = rightMost.id
     rule.rightMostClasses = rightMost.classes
     rule.rightMostType = rightMost.type
+    rule.rightMostAttrs = rightMost.attrs
 
     if (rightMost.id) {
       appendIndexedRule(sheet.byId, rightMost.id, rule)
@@ -77,6 +80,14 @@ export function compileStyleSheetIndexes(
 
     if (rightMost.type) {
       appendIndexedRule(sheet.byType, rightMost.type, rule)
+      continue
+    }
+
+    const rightMostAttrs = Object.keys(rightMost.attrs)
+    if (rightMostAttrs.length > 0) {
+      for (const attrName of rightMostAttrs) {
+        appendIndexedRule(sheet.byAttr, attrName, rule)
+      }
       continue
     }
 
@@ -103,6 +114,9 @@ export function matchStyleRules(
   collectCandidates(candidates, seen, styleSheet.byId.get(identity.id))
   for (const className of identity.classes) {
     collectCandidates(candidates, seen, styleSheet.byClass.get(className))
+  }
+  for (const attrName of Object.keys(identity.attrs)) {
+    collectCandidates(candidates, seen, styleSheet.byAttr.get(attrName))
   }
 
   const matched: Array<{ rule: NovaUiCompiledStyleRule; variantRank: number }> = []
