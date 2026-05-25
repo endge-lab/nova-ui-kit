@@ -96,6 +96,7 @@ export class Button<E extends EventList = Record<string, any>>
     const padding = sizeTokenPadding(this.props.size)
     const iconSize = padding.icon
     const hasIcon = !!this.props.icon
+    const hasTrailingIcon = !!this.props.trailingIcon && this.props.iconPlacement !== 'only'
     const hasText = !!this.props.text && this.props.iconPlacement !== 'only'
     const contentWidth = Math.max(0, this.width - padding.horizontal * 2)
     const contentHeight = Math.max(0, this.height - padding.vertical * 2)
@@ -115,8 +116,10 @@ export class Button<E extends EventList = Record<string, any>>
     } else {
       const iconX = padding.horizontal
       const textX = hasIcon ? iconX + iconSize + padding.gap : padding.horizontal
+      const trailingWidth = hasTrailingIcon ? iconSize + padding.gap : 0
       pushIcon(schema, this.props.icon, iconX, (this.height - iconSize) / 2, iconSize, iconOpacity)
-      pushText(schema, this.props.text, textX, padding.vertical, Math.max(0, contentWidth - (hasIcon ? iconSize + padding.gap : 0)), contentHeight, textStyle, { align: hasText ? 'center' : 'left' })
+      pushText(schema, this.props.text, textX, padding.vertical, Math.max(0, contentWidth - (hasIcon ? iconSize + padding.gap : 0) - trailingWidth), contentHeight, textStyle, { align: hasText ? 'center' : 'left' })
+      pushIcon(schema, this.props.trailingIcon, this.width - padding.horizontal - iconSize, (this.height - iconSize) / 2, iconSize, iconOpacity)
     }
 
     this.renderer.schema(schema)

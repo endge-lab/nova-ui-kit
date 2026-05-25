@@ -14,6 +14,7 @@ export type ButtonIconPlacement = 'left' | 'right' | 'top' | 'bottom' | 'only'
 export interface ButtonProps extends NovaUiCommonProps {
   text?: string
   icon?: NovaUiIconSource
+  trailingIcon?: NovaUiIconSource
   iconPlacement?: ButtonIconPlacement
   variant?: ButtonVariant
   size?: NovaUiComponentSize
@@ -25,6 +26,7 @@ export interface ButtonProps extends NovaUiCommonProps {
 export interface ButtonResolvedProps extends NovaUiCommonResolvedProps {
   text: string
   icon?: NovaUiIconSource
+  trailingIcon?: NovaUiIconSource
   iconPlacement: ButtonIconPlacement
   variant: ButtonVariant
   size: NovaUiComponentSize

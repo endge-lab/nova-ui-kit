@@ -35,6 +35,7 @@ export const BUTTON_FIELD_DEFINITIONS = {
   ...NOVA_UI_COMMON_FIELD_DEFINITIONS,
   text: { type: 'string' },
   icon: { type: 'icon' },
+  trailingIcon: { type: 'icon' },
   iconPlacement: { type: 'string' },
   variant: { type: 'string' },
   size: { type: 'string' },
@@ -53,6 +54,7 @@ export function normalizeButtonProps(props: ButtonProps = {}): ButtonResolvedPro
     ...common,
     text: props.text ?? '',
     icon: props.icon,
+    trailingIcon: props.trailingIcon,
     iconPlacement: props.iconPlacement ?? (props.icon && !props.text ? 'only' : 'left'),
     variant,
     size,
@@ -71,9 +73,10 @@ export function createButtonDescriptor(createNode?: ButtonNodeFactory): ButtonDe
     kind: 'node-component',
     dirtyPolicy: {
       matrix: NOVA_UI_COMMON_DIRTY_POLICY.matrix,
-      update: [...NOVA_UI_COMMON_DIRTY_POLICY.update, 'text', 'icon', 'iconPlacement', 'size'],
+      update: [...NOVA_UI_COMMON_DIRTY_POLICY.update, 'text', 'icon', 'trailingIcon', 'iconPlacement', 'size'],
       render: [
         ...NOVA_UI_COMMON_DIRTY_POLICY.render,
+        'trailingIcon',
         'variant',
         'loading',
         'selected',
