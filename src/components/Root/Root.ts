@@ -100,6 +100,7 @@ export class Root<E extends EventList = Record<string, any>>
   private externalLayout = false
   private styleSheet: NovaUiCompiledStyleSheet = createEmptyStyleSheet()
   private styleSheetGraph: NovaUiStyleSheetGraph | null = null
+  private localStyleSheetAsset: NovaUiStyleSheetAsset | null = null
   private localRawStyleSheet: NovaUiCompiledStyleSheet = createEmptyStyleSheet()
   private rawStyleSheet: NovaUiCompiledStyleSheet = createEmptyStyleSheet()
   private validation: NovaUiStyleValidationResult = createEmptyStyleSheetValidationResult()
@@ -108,6 +109,7 @@ export class Root<E extends EventList = Record<string, any>>
   private resolvedTokenVersion: number | null = null
   private readonly resolvedTokenValues = new Map<string, string>()
   private readonly styleCandidateFallbackThreshold = 2_048
+  private activeThemeId: string | null = null
   private mediaSignature = ''
   private mediaContext: NovaUiStyleMediaContext = { width: 0, height: 0 }
   private tooltipController: RootTooltipControllerNode<E> | null = null
@@ -209,6 +211,7 @@ export class Root<E extends EventList = Record<string, any>>
     this.localRawStyleSheet = validation.ok && validation.styleSheet
       ? validation.styleSheet
       : createEmptyStyleSheet(source)
+    this.localStyleSheetAsset = null
     this.props.styleSheet = source
     this.refreshCombinedStyleSheet()
   }
@@ -223,6 +226,7 @@ export class Root<E extends EventList = Record<string, any>>
     this.localRawStyleSheet = asset.ok && asset.styleSheet
       ? asset.styleSheet
       : createEmptyStyleSheet(asset.source)
+    this.localStyleSheetAsset = asset
     this.props.styleSheet = asset
     this.refreshCombinedStyleSheet()
   }
@@ -406,6 +410,9 @@ export class Root<E extends EventList = Record<string, any>>
     if (changedKeys.includes('styleSheet')) {
       this.setStyleSheetSource(this.props.styleSheet)
     }
+    if (changedKeys.includes('className') || changedKeys.includes('attrs') || changedKeys.includes('display')) {
+      bumpNovaUiStyleSheetVersion(this.nova)
+    }
     if (changedKeys.includes('style')) {
       const previous = this.effectiveStyleContext
       this.effectiveStyleContext = mergeStyleContext(EMPTY_STYLE_CONTEXT, this.props.style)
@@ -484,17 +491,25 @@ export class Root<E extends EventList = Record<string, any>>
   private refreshCombinedStyleSheet(): void {
     const globalAsset = getNovaUiGlobalStyleSheet(this.nova)
     const builtInStyleSheet = getNovaUiBuiltInUtilityStyleSheet()
+    const activeThemeId = this.nova.theme.active()
+    const globalThemeStyleSheet = resolveActiveNovaUiThemeStyleSheet(globalAsset, activeThemeId)
+    const localThemeStyleSheet = resolveActiveNovaUiThemeStyleSheet(this.localStyleSheetAsset, activeThemeId)
     const styleSheets = [
       builtInStyleSheet,
       globalAsset.styleSheet,
+      globalThemeStyleSheet,
       this.localRawStyleSheet,
+      localThemeStyleSheet,
     ].filter((sheet): sheet is NovaUiCompiledStyleSheet => !!sheet)
 
     this.rawStyleSheet = mergeNovaUiStyleSheets(styleSheets, [
       builtInStyleSheet.source,
       globalAsset.source,
+      globalThemeStyleSheet?.source,
       this.localRawStyleSheet.source,
+      localThemeStyleSheet?.source,
     ].filter(Boolean).join('\n'))
+    this.activeThemeId = activeThemeId
     this.collectChangedResolvedTokens()
     this.styleSheet = this.resolveStyleSheetTokens(this.rawStyleSheet)
     bumpNovaUiStyleSheetVersion(this.nova)
@@ -506,6 +521,12 @@ export class Root<E extends EventList = Record<string, any>>
    */
   private refreshStyleTokensIfNeeded(): void {
     const version = this.tokenResolver?.version ?? null
+    const activeThemeId = this.nova.theme.active()
+    if (activeThemeId !== this.activeThemeId) {
+      this.refreshCombinedStyleSheet()
+      return
+    }
+
     if (version === this.resolvedTokenVersion) return
 
     this.refreshStyleTokens()
@@ -929,4 +950,19 @@ function hasRootGeometryChanges(keys: Array<keyof RootResolvedProps>): boolean {
 
 function hasRootLayoutChanges(keys: Array<keyof RootResolvedProps>): boolean {
   return keys.includes('width') || keys.includes('height') || keys.includes('padding') || keys.includes('display')
+}
+
+function resolveActiveNovaUiThemeStyleSheet(
+  asset: NovaUiStyleSheetAsset | null,
+  activeThemeId: string | null,
+): NovaUiCompiledStyleSheet | null {
+  if (!asset || !activeThemeId) return null
+  const styleSheets = (asset.themes ?? [])
+    .filter(theme => theme.id === activeThemeId)
+    .map(theme => theme.styleSheet)
+    .filter((sheet): sheet is NovaUiCompiledStyleSheet => !!sheet)
+  if (styleSheets.length === 0) return null
+  if (styleSheets.length === 1) return styleSheets[0] ?? null
+
+  return mergeNovaUiStyleSheets(styleSheets, styleSheets.map(sheet => sheet.source).filter(Boolean).join('\n'))
 }

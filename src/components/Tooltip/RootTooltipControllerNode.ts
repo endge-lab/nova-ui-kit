@@ -135,7 +135,15 @@ export class RootTooltipControllerNode<E extends EventList = Record<string, any>
       open: true,
       content: resolveTooltipContent(type, normalized, definition),
     })
-    const targetKey = `${nodeTargetId(target)}:${resolution.targetId ?? nodeTargetId(target) ?? 'target'}:${type}:${String(normalized.value ?? '')}`
+    const targetKey = [
+      nodeTargetId(target),
+      resolution.targetId ?? nodeTargetId(target) ?? 'target',
+      type,
+      props.placement,
+      props.width,
+      props.height,
+      String(normalized.value ?? ''),
+    ].join(':')
     const slotContext = createSlotContext(type, normalized, target, resolution, anchor, x, y)
 
     if (this.activeTargetKey === targetKey && this.activeTooltip) {

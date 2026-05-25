@@ -121,6 +121,25 @@ describe('NovaCSS style subscriptions graph', () => {
     expect(declarations.box?.background).toBe('#ff0000')
     expect(declarations.box?.opacity).toBe(0.75)
   })
+
+  it('matches descendant and child selectors for virtual primitives through the owner chain', () => {
+    const root = new TestStyleNode('root', 'Root', { className: 'dark' })
+    const timeline = root.append(new TestStyleNode('timeline', 'TimelineChart'))
+    const internalLayer = { parent: timeline }
+    const styleSheet = validateNovaUiStyleSheetSource(`
+      .test-bg { background: #111111; }
+      .dark .test-bg { background: #ff0000; }
+      TimelineChart > Rect.test-bg { opacity: 0.5; }
+    `).styleSheet!
+
+    const declarations = resolveNovaUiVirtualStyleDeclarations({
+      type: 'Rect',
+      className: 'test-bg',
+    }, styleSheet, { width: 1024, height: 768 }, { owner: internalLayer as unknown as NovaNode<any> })
+
+    expect(declarations.box?.background).toBe('#ff0000')
+    expect(declarations.box?.opacity).toBe(0.5)
+  })
 })
 
 describe('NovaCSS Raph dependency tracker', () => {

@@ -30,6 +30,7 @@ import {
   NOVA_UI_STYLE_TARGET,
   NovaUiStyleMask,
   borderRadiusToRendererValue,
+  bumpNovaUiStyleSheetVersion,
   mergeStyleContext,
   type NovaUiBorder,
   type NovaUiFontStyle,
@@ -513,6 +514,9 @@ export abstract class NovaUiComponentNode<
     })
     this.applyCommonDisplayState()
     if (changedKeys.includes('display')) this.markLayoutAncestorsDirty()
+    if (changedKeys.includes('className') || changedKeys.includes('attrs') || changedKeys.includes('display')) {
+      bumpNovaUiStyleSheetVersion(this.nova)
+    }
 
     if (!this.externalLayout && hasGeometryChanges(changedKeys)) {
       this.applyResolvedRect({

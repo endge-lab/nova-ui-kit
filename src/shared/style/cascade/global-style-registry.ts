@@ -5,6 +5,7 @@ import type {
   NovaUiCompiledStyleSheet,
   NovaUiStyleDiagnostic,
   NovaUiStyleSheetAsset,
+  NovaUiStyleThemeDefinition,
 } from '@/shared/style/cascade/style-sheet'
 
 interface NovaUiGlobalStyleState {
@@ -53,12 +54,14 @@ export function getNovaUiGlobalStyleSheet(app: NovaApp<any>): NovaUiStyleSheetAs
   const source = assets.map(asset => asset.source).filter(Boolean).join('\n')
   const diagnostics = assets.flatMap(asset => asset.diagnostics)
   const tokenDependencies = [...new Set(assets.flatMap(asset => asset.tokenDependencies))]
+  const themes = mergeNovaUiStyleThemes(assets.flatMap(asset => asset.themes ?? []))
   const ok = assets.every(asset => asset.ok)
 
   state.cached = {
     ok,
     source,
     styleSheet: mergeNovaUiStyleSheets(styleSheets, source),
+    themes,
     diagnostics,
     tokenDependencies,
   }
@@ -90,6 +93,37 @@ export function mergeNovaUiStyleSheets(
   const merged = compileStyleSheetIndexes(rules, source)
   merged.tokenDependencies = [...tokenDependencies]
   return merged
+}
+
+/** Объединяет theme stylesheet layers с тем же порядком cascade, что и обычные assets. */
+export function mergeNovaUiStyleThemes(
+  themes: ReadonlyArray<NovaUiStyleThemeDefinition>,
+): Array<NovaUiStyleThemeDefinition> {
+  const grouped = new Map<string, Array<NovaUiStyleThemeDefinition>>()
+  for (const theme of themes) {
+    const list = grouped.get(theme.id)
+    if (list) list.push(theme)
+    else grouped.set(theme.id, [theme])
+  }
+
+  return [...grouped.entries()].map(([id, entries]) => {
+    const styleSheets = entries
+      .map(entry => entry.styleSheet)
+      .filter((sheet): sheet is NovaUiCompiledStyleSheet => !!sheet)
+    const source = entries
+      .map(entry => entry.styleSheet?.source)
+      .filter(Boolean)
+      .join('\n')
+
+    return {
+      id,
+      tokens: entries.reduce<NovaUiStyleThemeDefinition['tokens']>((target, entry) => ({
+        ...target,
+        ...entry.tokens,
+      }), {}),
+      styleSheet: styleSheets.length > 0 ? mergeNovaUiStyleSheets(styleSheets, source) : null,
+    }
+  })
 }
 
 /** Создает empty asset для мест, где нужен стабильный stylesheet object. */

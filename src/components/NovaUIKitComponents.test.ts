@@ -586,6 +586,7 @@ describe('Nova UI Kit components', () => {
     app.schema.createNode(surface, {
       type: NovaUIKit.Root,
       id: 'tooltip-custom-root',
+      props: { width: 900, height: 560 },
       children: [
         {
           type: NovaUIKit.Tooltips,
@@ -597,6 +598,7 @@ describe('Nova UI Kit components', () => {
                 props: {
                   width: 260,
                   height: 72,
+                  placement: 'bottom',
                   background: '#fff7ed',
                   border: { color: '#fed7aa', width: 1, radius: 8 },
                   delay: 0,
@@ -629,7 +631,7 @@ describe('Nova UI Kit components', () => {
               type: 'task',
               value: 'T-42',
               title: 'Blocked',
-              placement: 'bottom',
+              placement: 'right',
               width: 280,
             },
           },
@@ -656,7 +658,7 @@ describe('Nova UI Kit components', () => {
       type: 'task',
       value: 'T-42',
       title: 'Blocked',
-      placement: 'bottom',
+      placement: 'right',
       width: 280,
       target: {
         id: 'tooltip-custom-target',
@@ -665,6 +667,9 @@ describe('Nova UI Kit components', () => {
       pointer: { x: targetBounds.x + 12, y: targetBounds.y + 12 },
     })
     expect(app.components.requireApi<TextBlockApi>('tooltip-custom-title').getProps().text).toBe('Blocked: T-42')
+    expect((app.components.require('nova-root-tooltip-surface') as any).getProps().x).toBeGreaterThan(
+      targetBounds.x + (targetBounds.width - 280) / 2,
+    )
     expect(root.children.filter(child => child instanceof RootTooltipControllerNode)).toHaveLength(1)
     expect(root.children).toHaveLength(initialRootChildCount)
     expect(app.events.interactiveNodes.size).toBe(initialInteractiveCount)
@@ -1743,6 +1748,72 @@ describe('Nova UI Kit components', () => {
     expect(app.components.requireApi<TextBlockApi>('theme-label').getProps().fontSize).toBe(16)
     expect(app.components.requireApi<ButtonApi>('theme-button').getProps().accentColor).toBe('#9b7cff')
     expect(app.components.requireApi<RootApi>('theme-root').getDiagnostics()).toHaveLength(0)
+
+    app.destroy()
+  })
+
+  it('applies active @theme stylesheet rules without requiring theme classes', () => {
+    const app = createApp()
+    app.theme.registerMany([
+      { id: 'light', tokens: {} },
+      { id: 'dark', tokens: {} },
+    ], { active: 'light' })
+    const base = validateNovaUiStyleSheetSource(`
+      Button.test-bg {
+        background: #111827;
+      }
+    `)
+    const dark = validateNovaUiStyleSheetSource(`
+      Button.test-bg {
+        background: #ff0000;
+      }
+    `)
+    const surface = app.createSurface('theme-rule-styles')
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'theme-rule-root',
+      props: {
+        styleSheet: {
+          ok: base.ok && dark.ok,
+          source: base.styleSheet?.source ?? '',
+          styleSheet: base.styleSheet,
+          themes: [
+            {
+              id: 'dark',
+              tokens: {},
+              styleSheet: null,
+            },
+            {
+              id: 'dark',
+              tokens: {},
+              styleSheet: dark.styleSheet,
+            },
+          ],
+          diagnostics: [...base.diagnostics, ...dark.diagnostics],
+          tokenDependencies: [],
+        },
+      },
+      children: [
+        { type: NovaUIKit.Button, id: 'theme-rule-button', props: { className: 'test-bg', text: 'Theme rule' } },
+      ],
+    })
+    app.raph.run()
+    app.raph.run()
+
+    expect(app.components.requireApi<ButtonApi>('theme-rule-button').getProps().background).toBe('#111827')
+
+    app.theme.use('dark')
+    app.raph.run()
+    app.raph.run()
+
+    expect(app.components.requireApi<ButtonApi>('theme-rule-button').getProps().background).toBe('#ff0000')
+
+    app.theme.use('light')
+    app.raph.run()
+    app.raph.run()
+
+    expect(app.components.requireApi<ButtonApi>('theme-rule-button').getProps().background).toBe('#111827')
 
     app.destroy()
   })
