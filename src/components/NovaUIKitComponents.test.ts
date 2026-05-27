@@ -1573,6 +1573,225 @@ describe('Nova UI Kit components', () => {
     app.destroy()
   })
 
+  it('uses the full rect without resizer when SplitPane has one pane', () => {
+    const app = createApp()
+    const surface = app.createSurface('split-pane-single-pane')
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'split-single-pane-root',
+      props: { width: 300, height: 120 },
+      children: [
+        {
+          type: NovaUIKit.SplitPane,
+          id: 'split-single-pane',
+          props: {
+            direction: 'vertical',
+            width: 300,
+            height: 120,
+            sizes: [40, 80],
+            minSizes: [40, 40],
+            resizer: { hitSize: 10 },
+          },
+          children: [
+            { type: NovaUIKit.Surface, id: 'split-single-pane-content' },
+          ],
+        },
+      ],
+    })
+    app.raph.run()
+    app.raph.run()
+
+    const split = app.components.require('split-single-pane') as unknown as NovaNode<TestEvents>
+    const content = app.components.require('split-single-pane-content')
+
+    expect(content.width).toBe(300)
+    expect(content.height).toBe(120)
+    expect(split.children.some(child => child.__type === 'RowResizer' || child.__type === 'ColResizer')).toBe(false)
+
+    app.destroy()
+  })
+
+  it('reflows the first pane to the full rect when the second SplitPane child is removed', () => {
+    const app = createApp()
+    const surface = app.createSurface('split-pane-dynamic-single-pane')
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'split-dynamic-single-pane-root',
+      props: { width: 300, height: 120 },
+      children: [
+        {
+          type: NovaUIKit.SplitPane,
+          id: 'split-dynamic-single-pane',
+          props: {
+            direction: 'vertical',
+            width: 300,
+            height: 120,
+            sizes: [40, 80],
+            minSizes: [40, 40],
+            resizer: { hitSize: 10 },
+          },
+          children: [
+            { type: NovaUIKit.Surface, id: 'split-dynamic-main' },
+            { type: NovaUIKit.Surface, id: 'split-dynamic-mini' },
+          ],
+        },
+      ],
+    })
+    app.raph.run()
+    app.raph.run()
+
+    const split = app.components.require('split-dynamic-single-pane') as unknown as NovaNode<TestEvents> & {
+      setChildren: (children: Array<Record<string, unknown>>) => void
+    }
+    expect(split.children.some(child => child.__type === 'RowResizer')).toBe(true)
+
+    split.setChildren([
+      { type: NovaUIKit.Surface, id: 'split-dynamic-main' },
+    ])
+    app.raph.run()
+    app.raph.run()
+
+    const main = app.components.require('split-dynamic-main')
+    expect(main.width).toBe(300)
+    expect(main.height).toBe(120)
+    expect(split.children.some(child => child.__type === 'RowResizer' || child.__type === 'ColResizer')).toBe(false)
+
+    app.destroy()
+  })
+
+  it('treats SplitPane children with display none as inactive panes without unmounting them', () => {
+    const app = createApp()
+    const surface = app.createSurface('split-pane-hidden-pane')
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'split-hidden-pane-root',
+      props: { width: 300, height: 120 },
+      children: [
+        {
+          type: NovaUIKit.SplitPane,
+          id: 'split-hidden-pane',
+          props: {
+            direction: 'vertical',
+            width: 300,
+            height: 120,
+            sizes: [40, 80],
+            minSizes: [40, 40],
+            resizer: { hitSize: 10 },
+          },
+          children: [
+            { type: NovaUIKit.Surface, id: 'split-hidden-main' },
+            { type: NovaUIKit.Surface, id: 'split-hidden-mini' },
+          ],
+        },
+      ],
+    })
+    app.raph.run()
+    app.raph.run()
+
+    const split = app.components.require('split-hidden-pane') as unknown as NovaNode<TestEvents>
+    const main = app.components.require('split-hidden-main')
+    const mini = app.components.require<any>('split-hidden-mini')
+
+    expect(main.height).toBe(40)
+    expect(mini.height).toBe(70)
+    expect(split.children.some(child => child.__type === 'RowResizer')).toBe(true)
+
+    mini.setProps({ display: 'none' })
+    app.raph.run()
+    app.raph.run()
+
+    expect(app.components.require('split-hidden-mini')).toBe(mini)
+    expect(main.width).toBe(300)
+    expect(main.height).toBe(120)
+    expect(mini.visible).toBe(false)
+    expect(mini.active).toBe(false)
+    expect(mini.width).toBe(0)
+    expect(mini.height).toBe(0)
+    expect(split.children.some(child => child.__type === 'RowResizer' || child.__type === 'ColResizer')).toBe(false)
+
+    mini.setProps({ display: 'normal' })
+    app.raph.run()
+    app.raph.run()
+
+    expect(app.components.require('split-hidden-mini')).toBe(mini)
+    expect(main.height).toBe(40)
+    expect(mini.height).toBe(70)
+    expect(mini.visible).toBe(true)
+    expect(mini.active).toBe(true)
+    expect(split.children.some(child => child.__type === 'RowResizer')).toBe(true)
+
+    app.destroy()
+  })
+
+  it('collapses inactive SplitPane children even when child does not implement common display props', () => {
+    const app = createApp()
+    const surface = app.createSurface('split-pane-custom-hidden-pane')
+    Nova.registerComponents(app.schema, InspectorCardNode)
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'split-custom-hidden-root',
+      props: { width: 300, height: 120 },
+      children: [
+        {
+          type: NovaUIKit.SplitPane,
+          id: 'split-custom-hidden',
+          props: {
+            direction: 'vertical',
+            width: 300,
+            height: 120,
+            sizes: [40, 80],
+            minSizes: [40, 40],
+            resizer: { hitSize: 10 },
+          },
+          children: [
+            { type: 'InspectorCard', id: 'split-custom-main' },
+            { type: 'InspectorCard', id: 'split-custom-mini' },
+          ],
+        },
+      ],
+    })
+    app.raph.run()
+    app.raph.run()
+
+    const split = app.components.require('split-custom-hidden') as unknown as NovaNode<TestEvents>
+    const main = app.components.require<any>('split-custom-main')
+    const mini = app.components.require<any>('split-custom-mini')
+
+    expect(main.height).toBe(40)
+    expect(mini.height).toBe(70)
+    expect(split.children.some(child => child.__type === 'RowResizer')).toBe(true)
+
+    mini.setProps({ display: 'none' })
+    app.components.requireApi<SplitPaneApi>('split-custom-hidden').relayout()
+    app.raph.run()
+    app.raph.run()
+
+    expect(main.width).toBe(300)
+    expect(main.height).toBe(120)
+    expect(mini.visible).toBe(false)
+    expect(mini.active).toBe(false)
+    expect(mini.width).toBe(0)
+    expect(mini.height).toBe(0)
+    expect(split.children.some(child => child.__type === 'RowResizer' || child.__type === 'ColResizer')).toBe(false)
+
+    mini.setProps({ display: 'normal' })
+    app.components.requireApi<SplitPaneApi>('split-custom-hidden').relayout()
+    app.raph.run()
+    app.raph.run()
+
+    expect(main.height).toBe(40)
+    expect(mini.height).toBe(70)
+    expect(mini.visible).toBe(true)
+    expect(mini.active).toBe(true)
+    expect(split.children.some(child => child.__type === 'RowResizer')).toBe(true)
+
+    app.destroy()
+  })
+
   it('resizes SplitPane panes on drag without requiring onResize callback', () => {
     const app = createApp()
     const surface = app.createSurface('split-pane-drag-default')
@@ -1611,6 +1830,63 @@ describe('Nova UI Kit components', () => {
 
     expect(app.components.require('split-drag-left').width).toBe(150)
     expect(app.components.require('split-drag-right').width).toBe(140)
+
+    app.destroy()
+  })
+
+  it('previews SplitPane resizer position and commits pane sizes at drag end in lazy mode', () => {
+    const app = createApp()
+    const surface = app.createSurface('split-pane-lazy-drag')
+    const onResize = vi.fn()
+    const onResizeEnd = vi.fn()
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'split-lazy-root',
+      props: { width: 300, height: 120 },
+      children: [
+        {
+          type: NovaUIKit.SplitPane,
+          id: 'split-lazy',
+          props: {
+            width: 300,
+            height: 120,
+            sizes: [120, 180],
+            resizeMode: 'lazy',
+            resizer: { hitSize: 10 },
+            onResize,
+            onResizeEnd,
+          },
+          children: [
+            { type: NovaUIKit.Surface, id: 'split-lazy-left' },
+            { type: NovaUIKit.Surface, id: 'split-lazy-right' },
+          ],
+        },
+      ],
+    })
+    app.raph.run()
+    app.raph.run()
+
+    const split = app.components.require('split-lazy') as unknown as NovaNode<TestEvents>
+    const resizer = split.children.find(child => child.__type === 'ColResizer') as NovaNode<TestEvents>
+
+    resizer.eventHandlers.dragstart?.(new MouseEvent('mousedown', { clientX: 120, clientY: 10 }), { startX: 120, startY: 10 })
+    resizer.eventHandlers.dragmove?.(new MouseEvent('mousemove', { clientX: 150, clientY: 10 }), 30, 0, { totalDx: 30, totalDy: 0, startX: 120, startY: 10 })
+    app.raph.run()
+    app.raph.run()
+
+    expect(app.components.require('split-lazy-left').width).toBe(120)
+    expect(app.components.require('split-lazy-right').width).toBe(170)
+    expect(resizer.x).toBe(150)
+    expect(onResize).toHaveBeenCalledWith(expect.objectContaining({ delta: 30, rect: expect.objectContaining({ x: 150 }) }))
+
+    resizer.eventHandlers.dragend?.(new MouseEvent('mouseup', { clientX: 150, clientY: 10 }), { totalDx: 30, totalDy: 0, startX: 120, startY: 10 })
+    app.raph.run()
+    app.raph.run()
+
+    expect(app.components.require('split-lazy-left').width).toBe(150)
+    expect(app.components.require('split-lazy-right').width).toBe(140)
+    expect(onResizeEnd).toHaveBeenCalledWith(expect.objectContaining({ delta: 30, rect: expect.objectContaining({ x: 150 }) }))
 
     app.destroy()
   })

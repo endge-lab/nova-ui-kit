@@ -1,4 +1,5 @@
 import type { NovaNode } from '@endge/nova'
+import { readNovaUiNodeProps } from '@/shared/layout/layout-intent'
 import type { NovaUiLayoutRect } from '@/shared/layout/layout-rect'
 
 /** Символ помечает компонент, который принимает rect от layout-родителя. */
@@ -32,10 +33,7 @@ export function isNovaUiLayoutTarget(node: unknown): node is NovaNode<any> & Nov
 
 /** UI Kit-level display:none исключает node из layout без удаления instance. */
 export function isNovaUiLayoutDisplayed(node: unknown): boolean {
-  if (!node || typeof node !== 'object' || !('getProps' in node)) return true
-
-  const props = (node as { getProps: () => Record<string, unknown> }).getProps()
-  return props.display !== 'none'
+  return readNovaUiNodeProps(node).display !== 'none'
 }
 
 /** Помечает layout-предков грязными, когда display меняет участие node в layout. */
@@ -52,23 +50,33 @@ export function relayoutNovaUiLayoutAncestors(node: { parent?: unknown }): void 
 export function applyNodeLayoutRect(node: NovaNode<any>, rect: NovaUiLayoutRect): boolean {
   if (isNovaUiLayoutTarget(node)) return node.applyLayoutRect(rect)
 
+  let changed = false
+
+  if ('setProps' in node && typeof (node as { setProps?: unknown }).setProps === 'function') {
+    const props = readNovaUiNodeProps(node)
+    const propsChanged = props.x !== rect.x
+      || props.y !== rect.y
+      || props.width !== rect.width
+      || props.height !== rect.height
+
+    if (propsChanged) {
+      ;(node as unknown as { setProps: (patch: NovaUiLayoutRect) => void }).setProps({
+        x: rect.x,
+        y: rect.y,
+        width: rect.width,
+        height: rect.height,
+      })
+      changed = true
+    }
+  }
+
   if (
     node.x === rect.x
     && node.y === rect.y
     && node.width === rect.width
     && node.height === rect.height
   ) {
-    return false
-  }
-
-  if ('setProps' in node && typeof (node as { setProps?: unknown }).setProps === 'function') {
-    ;(node as unknown as { setProps: (patch: NovaUiLayoutRect) => void }).setProps({
-      x: rect.x,
-      y: rect.y,
-      width: rect.width,
-      height: rect.height,
-    })
-    return true
+    return changed
   }
 
   node.options({

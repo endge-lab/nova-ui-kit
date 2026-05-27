@@ -4028,6 +4028,12 @@
               "required": false
             },
             {
+              "name": "resizeMode",
+              "description": "Resize strategy: live updates panes during drag, lazy commits panes on drag end.",
+              "type": "'live' | 'lazy'",
+              "required": false
+            },
+            {
               "name": "resizer",
               "description": "Resizer colors, hit size and overlay configuration.",
               "type": "SplitPaneResizerProps",

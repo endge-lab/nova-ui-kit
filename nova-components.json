@@ -5802,6 +5802,15 @@
               }
             },
             {
+              "name": "resizeMode",
+              "type": "'live' | 'lazy'",
+              "required": false,
+              "description": {
+                "ru": "Resize strategy: live updates panes during drag, lazy commits panes on drag end.",
+                "en": "Resize strategy: live updates panes during drag, lazy commits panes on drag end."
+              }
+            },
+            {
               "name": "resizer",
               "type": "SplitPaneResizerProps",
               "required": false,

@@ -5,6 +5,7 @@ export const SPLIT_PANE_SCHEMA_TYPE = 'nova-ui.split-pane'
 
 export type SplitPaneDirection = 'horizontal' | 'vertical'
 export type SplitPaneCollapsedPane = 'first' | 'second' | null
+export type SplitPaneResizeMode = 'live' | 'lazy'
 
 export interface SplitPaneResizerProps {
   color?: string
@@ -26,6 +27,7 @@ export interface SplitPaneProps extends NovaUiCommonProps {
   sizes?: [number, number]
   minSizes?: [number, number]
   maxSizes?: [number, number]
+  resizeMode?: SplitPaneResizeMode
   resizer?: SplitPaneResizerProps
   collapsedPane?: SplitPaneCollapsedPane
   onResizeStart?: (payload: SplitPaneResizePayload) => void
@@ -38,6 +40,7 @@ export interface SplitPaneResolvedProps extends NovaUiCommonResolvedProps {
   sizes: [number, number]
   minSizes: [number, number]
   maxSizes: [number, number]
+  resizeMode: SplitPaneResizeMode
   resizer: Required<SplitPaneResizerProps>
   collapsedPane: SplitPaneCollapsedPane
   onResizeStart?: (payload: SplitPaneResizePayload) => void
@@ -56,5 +59,6 @@ export interface SplitPaneApi {
   collapse: (pane: Exclude<SplitPaneCollapsedPane, null>) => void
   expand: () => void
   setProps: (patch: SplitPaneProps) => void
+  relayout: () => void
   getProps: () => Readonly<SplitPaneResolvedProps>
 }

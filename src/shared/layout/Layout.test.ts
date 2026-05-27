@@ -54,7 +54,7 @@ describe('Nova UI layout primitives', () => {
     expect(options).toHaveBeenCalledWith({ x: 1, y: 2, width: 5, height: 4 })
   })
 
-  it('uses setProps for generated component nodes before falling back to options', () => {
+  it('syncs generated component props and node geometry for layout rects', () => {
     const setProps = vi.fn()
     const options = vi.fn()
     const node = {
@@ -68,7 +68,7 @@ describe('Nova UI layout primitives', () => {
 
     expect(applyNodeLayoutRect(node, { x: 4, y: 8, width: 120, height: 48 })).toBe(true)
     expect(setProps).toHaveBeenCalledWith({ x: 4, y: 8, width: 120, height: 48 })
-    expect(options).not.toHaveBeenCalled()
+    expect(options).toHaveBeenCalledWith({ x: 4, y: 8, width: 120, height: 48 })
   })
 
   it('reads generated Nova SFC props when getProps is unavailable', () => {

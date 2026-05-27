@@ -27,6 +27,7 @@ export const SPLIT_PANE_FIELD_DEFINITIONS = {
   sizes: { type: 'tuple' },
   minSizes: { type: 'tuple' },
   maxSizes: { type: 'tuple' },
+  resizeMode: { type: 'string' },
   resizer: { type: 'record' },
   collapsedPane: { type: 'string' },
   onResizeStart: { type: 'function' },
@@ -47,6 +48,7 @@ export function normalizeSplitPaneProps(props: SplitPaneProps = {}): SplitPaneRe
     sizes: normalizePair(props.sizes, [0.5, 0.5]),
     minSizes: normalizePair(props.minSizes, [80, 80]),
     maxSizes: normalizePair(props.maxSizes, [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY]),
+    resizeMode: props.resizeMode === 'lazy' ? 'lazy' : 'live',
     resizer: {
       color: props.resizer?.color ?? '#94a3b8',
       lineWidth: finiteNumber(props.resizer?.lineWidth, 1),
@@ -69,7 +71,7 @@ export function createSplitPaneDescriptor(createNode?: SplitPaneNodeFactory): Sp
     kind: 'node-component',
     dirtyPolicy: {
       matrix: NOVA_UI_COMMON_DIRTY_POLICY.matrix,
-      update: [...NOVA_UI_COMMON_DIRTY_POLICY.update, 'direction', 'sizes', 'minSizes', 'maxSizes', 'resizer', 'collapsedPane'],
+      update: [...NOVA_UI_COMMON_DIRTY_POLICY.update, 'direction', 'sizes', 'minSizes', 'maxSizes', 'resizeMode', 'resizer', 'collapsedPane'],
       render: [...NOVA_UI_COMMON_DIRTY_POLICY.render, 'onResizeStart', 'onResize', 'onResizeEnd'],
     },
     fields: SPLIT_PANE_FIELD_DEFINITIONS,
