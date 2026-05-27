@@ -19,6 +19,10 @@ export interface SplitPaneResizePayload {
   height?: number
   delta: number
   rect: { x: number; y: number; width: number; height: number }
+  panes?: {
+    first: { x: number; y: number; width: number; height: number }
+    second: { x: number; y: number; width: number; height: number }
+  }
   event: MouseEvent
 }
 

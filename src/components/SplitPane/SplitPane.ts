@@ -273,12 +273,13 @@ export class SplitPane<E extends EventList = Record<string, any>>
    * Создает runtime-сущность SplitPane.
    */
   private createResizePayload(delta: number, event: MouseEvent, firstSize?: number): SplitPaneResizePayload {
-    const { resizer } = this.resolveRects(firstSize)
+    const { first, second, resizer } = this.resolveRects(firstSize)
     return {
       width: this.props.direction === 'horizontal' ? resizer.x : this.width,
       height: this.props.direction === 'vertical' ? resizer.y : this.height,
       delta,
       rect: resizer,
+      panes: { first, second },
       event,
     }
   }

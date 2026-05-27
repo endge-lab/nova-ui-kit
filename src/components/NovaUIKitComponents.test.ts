@@ -32,6 +32,7 @@ import {
   type SegmentedControlApi,
   type SliderApi,
   type SplitPaneApi,
+  type SplitPaneResizePayload,
   type TagApi,
   type TextBlockApi,
   type ToggleApi,
@@ -1830,6 +1831,51 @@ describe('Nova UI Kit components', () => {
 
     expect(app.components.require('split-drag-left').width).toBe(150)
     expect(app.components.require('split-drag-right').width).toBe(140)
+
+    app.destroy()
+  })
+
+  it('reports current pane rects while SplitPane is resized', () => {
+    const app = createApp()
+    const surface = app.createSurface('split-pane-resize-payload')
+    const payloads: Array<SplitPaneResizePayload> = []
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'split-payload-root',
+      props: { width: 300, height: 180 },
+      children: [
+        {
+          type: NovaUIKit.SplitPane,
+          id: 'split-payload',
+          props: {
+            width: 300,
+            height: 180,
+            direction: 'vertical',
+            sizes: [100, 80],
+            minSizes: [40, 40],
+            resizer: { hitSize: 12 },
+            onResize: payload => payloads.push(payload),
+          },
+          children: [
+            { type: NovaUIKit.Surface, id: 'split-payload-first' },
+            { type: NovaUIKit.Surface, id: 'split-payload-second' },
+          ],
+        },
+      ],
+    })
+    app.raph.run()
+    app.raph.run()
+
+    const split = app.components.require('split-payload') as unknown as NovaNode<TestEvents>
+    const resizer = split.children.find(child => child.__type === 'RowResizer') as NovaNode<TestEvents>
+
+    resizer.eventHandlers.dragstart?.(new MouseEvent('mousedown', { clientX: 10, clientY: 100 }), { startX: 10, startY: 100 })
+    resizer.eventHandlers.dragmove?.(new MouseEvent('mousemove', { clientX: 10, clientY: 120 }), 0, 20, { totalDx: 0, totalDy: 20, startX: 10, startY: 100 })
+    app.raph.run()
+
+    expect(payloads.at(-1)?.panes?.first).toMatchObject({ x: 0, y: 0, width: 300, height: 120 })
+    expect(payloads.at(-1)?.panes?.second).toMatchObject({ x: 0, y: 132, width: 300, height: 48 })
 
     app.destroy()
   })
