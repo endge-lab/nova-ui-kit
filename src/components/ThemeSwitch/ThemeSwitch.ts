@@ -1,5 +1,7 @@
 import { NovaComponentNode, type NovaApp, type NovaSchema, type NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
+import { normalizeButtonProps } from '@/components/Button/button.config'
+import { buildButtonSchema } from '@/components/Button/button-render'
 import {
   THEME_SWITCH_NODE_DESCRIPTOR,
   normalizeThemeSwitchProps,
@@ -9,6 +11,7 @@ import {
   resolveNovaUiPositionedRect,
   type NovaUiLayoutRect,
 } from '@/shared/layout'
+import { NovaUiStyleMask } from '@/shared/style'
 import { THEME_SWITCH_ASSETS } from '@/components/ThemeSwitch/theme-switch-assets'
 import type {
   ThemeSwitchApi,
@@ -21,6 +24,7 @@ import type {
 export class ThemeSwitch<E extends EventList = Record<string, any>>
   extends NovaComponentNode<ThemeSwitchResolvedProps, ThemeSwitchApi, Record<string, never>, ThemeSwitchProps, E> {
   private readonly api: ThemeSwitchApi
+  private hovered = false
   private pressed = false
   private assetsRegistered = false
 
@@ -63,47 +67,23 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
     }
 
     const theme = this.currentTheme()
-    const background = theme?.background ?? (this.pressed ? 'rgba(241,245,249,0.98)' : 'rgba(255,255,255,0.94)')
-    const schema: NovaSchema = []
-    schema.push({
-      type: 'rect',
-      x: 0,
-      y: 0,
+    const buttonProps = normalizeButtonProps({
       width: this.props.width,
       height: this.props.height,
-      styles: {
-        background,
-        border: { color: '#cbd5e1', width: 1, radius: 8 },
-      },
+      size: 'md',
+      icon: theme?.icon,
+      text: theme?.icon ? '' : theme?.label?.slice(0, 2).toUpperCase() ?? 'T',
+      iconPlacement: 'only',
+      background: theme?.background,
     })
-
-    if (theme?.icon) {
-      schema.push({
-        type: 'icon',
-        icon: theme.icon,
-        x: (this.props.width - 18) / 2,
-        y: (this.props.height - 18) / 2,
-        width: 18,
-        height: 18,
-        styles: { quality: 'crisp' },
-      })
-    } else if (!theme?.icon) {
-      schema.push({
-        type: 'text',
-        text: theme?.label?.slice(0, 2).toUpperCase() ?? 'T',
-        x: 0,
-        y: 0,
-        width: this.props.width,
-        height: this.props.height,
-        styles: {
-          color: '#111827',
-          font: { family: 'Inter, Arial, sans-serif', size: 11, weight: '900' },
-          align: { horizontal: 'center', vertical: 'middle' },
-        },
-      })
-    }
-
-    this.renderer.schema(schema)
+    this.renderer.schema(buildButtonSchema(buttonProps, this.props.width, this.props.height, {
+      values: {},
+      mask: NovaUiStyleMask.None,
+      version: 0,
+    }, {
+      hovered: this.hovered,
+      pressed: this.pressed,
+    }))
   }
 
   protected override onPropsChanged(): void {
@@ -131,6 +111,11 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
   }
 
   private setupEvents(): void {
+    this.on('mouseenter', () => {
+      if (!this.props.visible) return
+      this.hovered = true
+      this.dirty({ render: true })
+    })
     this.on('mousedown', () => {
       if (!this.props.visible) return false
       this.pressed = true
@@ -145,6 +130,7 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
       return false
     })
     this.on('mouseleave', () => {
+      this.hovered = false
       if (!this.pressed) return
       this.pressed = false
       this.dirty({ render: true })

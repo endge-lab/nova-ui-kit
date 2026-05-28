@@ -47,6 +47,7 @@ const COMPONENT_NAMES: Array<NovaUiStyleComponentName> = [
   'Toggle',
   'Tooltip',
   'SegmentedControl',
+  'ZoomControls',
   'Panel',
   'SpeedDial',
   'Dock',

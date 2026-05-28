@@ -26,6 +26,7 @@ import { SURFACE_DESCRIPTOR } from '@/components/Surface/surface.registry'
 import { TAG_DESCRIPTOR } from '@/components/Tag/tag.registry'
 import { TEXT_BLOCK_DESCRIPTOR } from '@/components/TextBlock/text-block.registry'
 import { THEME_SWITCH_DESCRIPTOR } from '@/components/ThemeSwitch/theme-switch.registry'
+import { ZOOM_CONTROLS_DESCRIPTOR } from '@/components/ZoomControls/zoom-controls.registry'
 import { POPOVER_DESCRIPTOR } from '@/components/Popover/popover.registry'
 import { TOGGLE_DESCRIPTOR } from '@/components/Toggle/toggle.registry'
 import { TOOLTIP_DESCRIPTOR } from '@/components/Tooltip/tooltip.registry'
@@ -47,6 +48,7 @@ const NOVA_UI_KIT_DESCRIPTORS: Array<NovaComponentDescriptor<any, any, any, any>
   TAG_DESCRIPTOR,
   CHIP_DESCRIPTOR,
   THEME_SWITCH_DESCRIPTOR,
+  ZOOM_CONTROLS_DESCRIPTOR,
   SCROLLBAR_DESCRIPTOR,
   SCROLL_AREA_DESCRIPTOR,
   SLIDER_DESCRIPTOR,

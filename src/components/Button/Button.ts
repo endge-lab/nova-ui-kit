@@ -1,5 +1,5 @@
 import type { EventList } from '@endge/utils'
-import type { NovaApp, NovaSchema, NovaSurface } from '@endge/nova'
+import type { NovaApp, NovaSurface } from '@endge/nova'
 import {
   BUTTON_NODE_DESCRIPTOR,
   normalizeButtonProps,
@@ -12,16 +12,9 @@ import type {
 } from '@/components/Button/button.types'
 import {
   NovaUiComponentNode,
-  buildBoxSchema,
-  resolveComponentTextStyle,
-  resolveInteractionBackground,
 } from '@/shared/component/component-props'
-import {
-  pushIcon,
-  pushText,
-  sizeTokenPadding,
-} from '@/shared/component/component-render'
 import { findNovaUiRoot } from '@/components/Root/root-target'
+import { buildButtonSchema } from '@/components/Button/button-render'
 
 /**
  * Описывает ответственность Button в архитектуре проекта.
@@ -85,44 +78,11 @@ export class Button<E extends EventList = Record<string, any>>
    * Выполняет отрисовку Button.
    */
   render(): void {
-    const schema: NovaSchema = buildBoxSchema(this.props, this.width, this.height, {
-      background: resolveInteractionBackground(this.props, {
-        hovered: this.hovered,
-        pressed: this.pressed,
-        active: this.props.selected,
-      }),
-    })
-    const textStyle = resolveComponentTextStyle(this.props, this.inheritedStyleContext)
-    const padding = sizeTokenPadding(this.props.size)
-    const iconSize = padding.icon
-    const hasIcon = !!this.props.icon
-    const hasTrailingIcon = !!this.props.trailingIcon && this.props.iconPlacement !== 'only'
-    const hasText = !!this.props.text && this.props.iconPlacement !== 'only'
-    const contentWidth = Math.max(0, this.width - padding.horizontal * 2)
-    const contentHeight = Math.max(0, this.height - padding.vertical * 2)
-    const iconOpacity = this.props.loading ? 0.45 : 1
-
-    if (this.props.iconPlacement === 'only') {
-      pushIcon(schema, this.props.icon, (this.width - iconSize) / 2, (this.height - iconSize) / 2, iconSize, iconOpacity)
-    } else if (this.props.iconPlacement === 'right') {
-      const iconX = this.width - padding.horizontal - iconSize
-      pushText(schema, this.props.text, padding.horizontal, padding.vertical, Math.max(0, contentWidth - (hasIcon ? iconSize + padding.gap : 0)), contentHeight, textStyle, { align: 'center' })
-      pushIcon(schema, this.props.icon, iconX, (this.height - iconSize) / 2, iconSize, iconOpacity)
-    } else if (this.props.iconPlacement === 'top' || this.props.iconPlacement === 'bottom') {
-      const iconY = this.props.iconPlacement === 'top' ? padding.vertical : this.height - padding.vertical - iconSize
-      const textY = this.props.iconPlacement === 'top' ? iconY + iconSize + padding.gap : padding.vertical
-      pushIcon(schema, this.props.icon, (this.width - iconSize) / 2, iconY, iconSize, iconOpacity)
-      pushText(schema, this.props.text, padding.horizontal, textY, contentWidth, Math.max(0, contentHeight - (hasIcon ? iconSize + padding.gap : 0)), textStyle, { align: 'center' })
-    } else {
-      const iconX = padding.horizontal
-      const textX = hasIcon ? iconX + iconSize + padding.gap : padding.horizontal
-      const trailingWidth = hasTrailingIcon ? iconSize + padding.gap : 0
-      pushIcon(schema, this.props.icon, iconX, (this.height - iconSize) / 2, iconSize, iconOpacity)
-      pushText(schema, this.props.text, textX, padding.vertical, Math.max(0, contentWidth - (hasIcon ? iconSize + padding.gap : 0) - trailingWidth), contentHeight, textStyle, { align: hasText ? 'center' : 'left' })
-      pushIcon(schema, this.props.trailingIcon, this.width - padding.horizontal - iconSize, (this.height - iconSize) / 2, iconSize, iconOpacity)
-    }
-
-    this.renderer.schema(schema)
+    this.renderer.schema(buildButtonSchema(this.props, this.width, this.height, this.inheritedStyleContext, {
+      hovered: this.hovered,
+      pressed: this.pressed,
+      active: this.props.selected,
+    }))
   }
 
   /**

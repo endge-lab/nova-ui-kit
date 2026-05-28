@@ -95,7 +95,7 @@ export function createButtonDescriptor(createNode?: ButtonNodeFactory): ButtonDe
 export const BUTTON_NODE_DESCRIPTOR = createButtonDescriptor()
 
 function resolveButtonDefaults(variant: ButtonResolvedProps['variant'], size: ButtonResolvedProps['size']) {
-  const baseHeight = sizeTokenHeight(size, 32)
+  const baseHeight = sizeTokenHeight(size, 36)
   if (variant === 'primary') {
     return {
       width: 128,

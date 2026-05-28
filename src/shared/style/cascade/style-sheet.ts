@@ -1,5 +1,8 @@
-import type { NovaComponentNode, NovaCursorDeclaration } from '@endge/nova'
-import type { NovaMotionEasingName } from '@endge/nova'
+import type {
+  NovaComponentNode,
+  NovaCursorDeclaration,
+  NovaMotionEasingName,
+} from '@endge/nova'
 import type { NovaUiLayoutValue, NovaUiSpacing } from '@/shared/layout'
 import type {
   NovaUiBorder,
@@ -29,6 +32,7 @@ export type NovaUiStyleComponentName =
   | 'Toggle'
   | 'Tooltip'
   | 'SegmentedControl'
+  | 'ZoomControls'
   | 'Panel'
   | 'SpeedDial'
   | 'Dock'

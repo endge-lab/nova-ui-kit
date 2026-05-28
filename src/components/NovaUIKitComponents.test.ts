@@ -44,6 +44,7 @@ import {
   type ToggleApi,
   type ToastRegionApi,
   type TooltipApi,
+  type ZoomControlsApi,
   type PopoverApi,
   registerNovaUiGlobalStyleSheet,
   validateNovaUiStyleSheetSource,
@@ -220,7 +221,7 @@ describe('Nova UI Kit components', () => {
       id: 'root',
       props: {
         styleSheet: `
-          Surface, Divider, Panel, Button, Tag, Chip, Checkbox, Toggle, Slider, Scrollbar, ScrollArea, SplitPane, Tooltip, Tooltips, Popover, ActionList, Overlay, Overlays, Dialog, Dialogs, Toast, ToastRegion, SegmentedControl {
+          Surface, Divider, Panel, Button, Tag, Chip, Checkbox, Toggle, Slider, Scrollbar, ScrollArea, SplitPane, Tooltip, Tooltips, Popover, ActionList, Overlay, Overlays, Dialog, Dialogs, Toast, ToastRegion, SegmentedControl, ZoomControls {
             color: #123456;
             borderWidth: 2;
             accentColor: #2563eb;
@@ -239,6 +240,7 @@ describe('Nova UI Kit components', () => {
         { type: NovaUIKit.Button, id: 'button', props: { text: 'Run' } },
         { type: NovaUIKit.FpsMeter, id: 'fps-meter', props: { placement: 'top-right', margin: 8 } },
         { type: 'NovaUIKit.ThemeSwitch', id: 'theme-switch', props: { themes: [{ id: 'light', label: 'Light' }, { id: 'dark', label: 'Dark' }] } },
+        { type: NovaUIKit.ZoomControls, id: 'zoom-controls', props: { value: 1, step: 0.25, minZoom: 0.5, maxZoom: 2 } },
         { type: NovaUIKit.Badge, id: 'badge', props: { value: 3 } },
         { type: NovaUIKit.Image, id: 'image', props: { src: createCanvasDrawable(), radius: 8 } },
         { type: NovaUIKit.Tag, id: 'tag', props: { text: 'Ready' } },
@@ -338,6 +340,7 @@ describe('Nova UI Kit components', () => {
     app.components.requireApi<ButtonApi>('button').setSelected(true)
     app.components.requireApi<FpsMeterApi>('fps-meter').setVisible(false)
     app.components.requireApi<ThemeSwitchApi>('theme-switch').next()
+    app.components.requireApi<ZoomControlsApi>('zoom-controls').zoomIn()
     app.components.requireApi<DividerApi>('divider').setLineStyle('dotted')
     app.components.requireApi<BadgeApi>('badge').setValue(4)
     app.components.requireApi<ImageApi>('image').setSrc(createCanvasDrawable())
@@ -364,6 +367,7 @@ describe('Nova UI Kit components', () => {
     expect(app.components.requireApi<FpsMeterApi>('fps-meter').getProps().visible).toBe(false)
     expect(app.components.requireApi<ThemeSwitchApi>('theme-switch').getProps().themes).toHaveLength(2)
     expect(app.components.requireApi<ThemeSwitchApi>('theme-switch').getProps().themes.every(theme => theme.icon)).toBe(true)
+    expect(app.components.requireApi<ZoomControlsApi>('zoom-controls').getProps().value).toBe(1.25)
     expect(app.components.requireApi<DividerApi>('divider').getProps().lineStyle).toBe('dotted')
     expect(app.components.requireApi<DividerApi>('divider').getProps().border?.width).toBe(2)
     expect(app.components.requireApi<BadgeApi>('badge').getProps().value).toBe(4)

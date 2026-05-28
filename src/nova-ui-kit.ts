@@ -57,6 +57,7 @@ import { SURFACE_SCHEMA_TYPE } from '@/components/Surface/surface.types'
 import { TAG_SCHEMA_TYPE } from '@/components/Tag/tag.types'
 import { TEXT_BLOCK_SCHEMA_TYPE } from '@/components/TextBlock/text-block.types'
 import { THEME_SWITCH_SCHEMA_TYPE } from '@/components/ThemeSwitch/theme-switch.types'
+import { ZOOM_CONTROLS_SCHEMA_TYPE } from '@/components/ZoomControls/zoom-controls.types'
 import { TOGGLE_SCHEMA_TYPE } from '@/components/Toggle/toggle.types'
 import { createTooltipSchema } from '@/components/Tooltip/tooltip.config'
 import { TOOLTIP_SCHEMA_TYPE, TOOLTIPS_SCHEMA_TYPE } from '@/components/Tooltip/tooltip.types'
@@ -99,6 +100,7 @@ export const NovaUIKit = {
   progressRingSchema: createProgressRingSchema,
   FpsMeter: FPS_METER_SCHEMA_TYPE,
   ThemeSwitch: THEME_SWITCH_SCHEMA_TYPE,
+  ZoomControls: ZOOM_CONTROLS_SCHEMA_TYPE,
   SegmentedControl: SEGMENTED_CONTROL_SCHEMA_TYPE,
   Panel: PANEL_SCHEMA_TYPE,
   SpeedDial: SPEED_DIAL_SCHEMA_TYPE,
