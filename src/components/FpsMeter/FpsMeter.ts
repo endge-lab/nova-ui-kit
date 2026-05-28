@@ -14,6 +14,10 @@ import type {
   FpsMeterProps,
   FpsMeterResolvedProps,
 } from '@/components/FpsMeter/fps-meter.types'
+import {
+  ensureNovaUIKitThemes,
+  resolveNovaUiThemeValue,
+} from '@/shared/style/nova-ui-kit-theme'
 
 /** Универсальный overlay-счетчик FPS для Nova-canvas. */
 export class FpsMeter<E extends EventList = Record<string, any>>
@@ -28,7 +32,9 @@ export class FpsMeter<E extends EventList = Record<string, any>>
     options: { componentId?: string } = {},
     descriptor: FpsMeterDescriptor = FPS_METER_NODE_DESCRIPTOR,
   ) {
+    ensureNovaUIKitThemes(app)
     super(app, surface, descriptor, normalizeFpsMeterProps(props), options)
+    this.addDisposer(app.theme.observe(this, { phase: 'render' }))
     this.api = {
       setVisible: visible => this.setProps({ visible }),
       setProps: patch => this.setProps(patch),
@@ -65,8 +71,8 @@ export class FpsMeter<E extends EventList = Record<string, any>>
       width: this.props.width,
       height: this.props.height,
       styles: {
-        background: minimal ? 'rgba(17,24,39,0.66)' : 'rgba(17,24,39,0.82)',
-        border: { color: 'rgba(255,255,255,0.14)', width: 1, radius: 8 },
+        background: resolveNovaUiThemeValue(this.nova, minimal ? 'var(--nova-fps-meter-minimal-background, rgba(17,24,39,0.66))' : 'var(--nova-fps-meter-background, rgba(17,24,39,0.82))'),
+        border: { color: resolveNovaUiThemeValue(this.nova, 'var(--nova-fps-meter-border-color, rgba(255,255,255,0.14))'), width: 1, radius: 8 },
       },
     })
     schema.push({
@@ -77,7 +83,7 @@ export class FpsMeter<E extends EventList = Record<string, any>>
       width: Math.max(0, this.props.width - 16),
       height: this.props.height,
       styles: {
-        color: '#ffffff',
+        color: resolveNovaUiThemeValue(this.nova, 'var(--nova-fps-meter-color, #ffffff)'),
         font: { family: 'Inter, Arial, sans-serif', size: 11, weight: '900' },
         align: { horizontal: 'center', vertical: 'middle' },
       },

@@ -56,9 +56,9 @@ export function normalizeOverlayProps(props: OverlayProps = {}): OverlayResolved
     ...normalizeCommonProps(props, {
       width: 240,
       height: 160,
-      background: '#ffffff',
-      color: '#172033',
-      border: { color: '#cbd5e1', width: 1, radius: 8 },
+      background: 'var(--nova-overlay-background, #ffffff)',
+      color: 'var(--nova-overlay-color, #172033)',
+      border: { color: 'var(--nova-overlay-border-color, #cbd5e1)', width: 1, radius: 8 },
       padding: { horizontal: 8, vertical: 8 },
     }),
     open: props.open ?? false,

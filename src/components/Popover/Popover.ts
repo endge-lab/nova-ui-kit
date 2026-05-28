@@ -31,10 +31,10 @@ export class Popover<E extends EventList = Record<string, any>> extends NovaUiCo
     if (!this.props.open) { this.renderer.schema([]); return }
     this.resolveRect()
     const schema: NovaSchema = []
-    if (this.props.backdrop) schema.push({ type: 'rect', x: 0, y: 0, width: this.width, height: this.height, styles: { background: 'var(--nova-popover-backdrop-background, rgba(15,23,42,0.18))' } })
-    const surface = buildBoxSchema({ ...this.props, ...(this.props.surface ?? {}) }, this.props.width, this.props.height)
+    if (this.props.backdrop) schema.push({ type: 'rect', x: 0, y: 0, width: this.width, height: this.height, styles: { background: this.resolveThemeValue('var(--nova-popover-backdrop-background, rgba(15,23,42,0.18))') } })
+    const surface = buildBoxSchema({ ...this.props, ...(this.props.surface ?? {}) }, this.props.width, this.props.height, { resolveThemeValue: value => this.resolveThemeValue(value) })
     for (const item of surface) { const shape = item as Record<string, any>; shape.x = (shape.x ?? 0) + this.surfaceRect.x; shape.y = (shape.y ?? 0) + this.surfaceRect.y; schema.push(item) }
-    if (this.props.arrow) schema.push({ type: 'rect', x: this.surfaceRect.x + 20, y: this.surfaceRect.y - 5, width: 10, height: 10, styles: { background: 'var(--nova-popover-arrow-background, #ffffff)', border: { color: 'rgba(0,0,0,0)', width: 0, radius: 2 } } })
+    if (this.props.arrow) schema.push({ type: 'rect', x: this.surfaceRect.x + 20, y: this.surfaceRect.y - 5, width: 10, height: 10, styles: { background: this.resolveThemeValue('var(--nova-popover-arrow-background, #ffffff)'), border: { color: 'rgba(0,0,0,0)', width: 0, radius: 2 } } })
     this.renderer.schema(schema)
   }
 

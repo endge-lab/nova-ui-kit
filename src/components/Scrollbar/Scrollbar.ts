@@ -110,9 +110,9 @@ export class Scrollbar<E extends EventList = Record<string, any>>
         thickness: this.props.thickness,
         minThumbSize: this.props.minThumbSize,
         radius: this.props.radius,
-        trackColor: this.props.trackColor ?? undefined,
-        thumbColor: this.props.thumbColor ?? undefined,
-        thumbHoverColor: this.props.hoverBackground ?? this.props.thumbColor ?? undefined,
+        trackColor: this.resolveThemeValue(this.props.trackColor) ?? undefined,
+        thumbColor: this.resolveThemeValue(this.props.thumbColor) ?? undefined,
+        thumbHoverColor: this.resolveThemeValue(this.props.hoverBackground ?? this.props.thumbColor) ?? undefined,
       },
     })
     const schema: NovaSchema = createNovaScrollbarSchema(geometry, {

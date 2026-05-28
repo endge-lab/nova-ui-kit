@@ -82,7 +82,7 @@ export class Button<E extends EventList = Record<string, any>>
       hovered: this.hovered,
       pressed: this.pressed,
       active: this.props.selected,
-    }))
+    }, value => this.resolveThemeValue(value)))
   }
 
   /**

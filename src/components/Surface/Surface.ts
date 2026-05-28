@@ -160,7 +160,7 @@ export class Surface<E extends EventList = Record<string, any>>
    * Выполняет отрисовку Surface.
    */
   render(): void {
-    const schema = buildBoxSchema(this.props, this.width, this.height)
+    const schema = buildBoxSchema(this.props, this.width, this.height, { resolveThemeValue: value => this.resolveThemeValue(value) })
     if (schema.length > 0) this.renderer.schema(schema)
     if (this.props.clip) this.renderer.clip(0, 0, this.width, this.height)
   }

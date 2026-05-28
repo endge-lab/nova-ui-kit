@@ -44,8 +44,8 @@ export function normalizeImageProps(props: ImageProps = {}): ImageResolvedProps 
     ...normalizeCommonProps(props, {
       width: 40,
       height: 40,
-      background: 'rgba(148, 163, 184, 0.18)',
-      border: { color: 'rgba(15,23,42,0.10)', width: 0, radius: finiteNumber(props.radius, 0) },
+      background: 'var(--nova-image-background, rgba(148, 163, 184, 0.18))',
+      border: { color: 'var(--nova-image-border-color, rgba(15,23,42,0.10))', width: 0, radius: finiteNumber(props.radius, 0) },
       clip: true,
     }),
     src: props.src,
@@ -82,4 +82,3 @@ export const IMAGE_NODE_DESCRIPTOR = createImageDescriptor()
 function finiteNumber(value: unknown, fallback: number): number {
   return typeof value === 'number' && Number.isFinite(value) ? value : fallback
 }
-

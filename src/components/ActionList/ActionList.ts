@@ -26,25 +26,25 @@ export class ActionList<E extends EventList = Record<string, any>> extends NovaU
   override setProps(patch: ActionListProps): this { return super.setProps(patch as Partial<ActionListResolvedProps>) }
   override getApi(): ActionListApi { return this.api }
   render(): void {
-    const schema: NovaSchema = buildBoxSchema(this.props, this.width, this.height)
+    const schema: NovaSchema = buildBoxSchema(this.props, this.width, this.height, { resolveThemeValue: value => this.resolveThemeValue(value) })
     const padding = resolveSpacing(this.props.padding)
-    const textStyle = resolveComponentTextStyle(this.props, this.inheritedStyleContext)
+    const textStyle = resolveComponentTextStyle(this.props, this.inheritedStyleContext, {}, value => this.resolveThemeValue(value))
     let y = padding.top
     const width = Math.max(0, this.width - padding.left - padding.right)
     this.props.items.forEach((item, index) => {
-      if (item.type === 'separator') { schema.push({ type: 'rect', x: padding.left + 8, y: y + 6, width: width - 16, height: 1, styles: { background: 'var(--nova-action-list-separator-color, #e2e8f0)' } }); y += 12; return }
-      if (item.type === 'group') { pushText(schema, item.label, padding.left + 10, y, width - 20, 22, { ...textStyle, color: 'var(--nova-action-list-group-color, #64748b)', fontSize: 11, fontWeight: '700', lineHeight: 16 }); y += 24; return }
+      if (item.type === 'separator') { schema.push({ type: 'rect', x: padding.left + 8, y: y + 6, width: width - 16, height: 1, styles: { background: this.resolveThemeValue('var(--nova-action-list-separator-color, #e2e8f0)') } }); y += 12; return }
+      if (item.type === 'group') { pushText(schema, item.label, padding.left + 10, y, width - 20, 22, { ...textStyle, color: this.resolveThemeValue('var(--nova-action-list-group-color, #64748b)') ?? textStyle.color, fontSize: 11, fontWeight: '700', lineHeight: 16 }); y += 24; return }
       const active = index === this.hoveredIndex || index === this.props.activeIndex || item.selected || this.itemValue(item) === this.props.value
-      if (active) schema.push({ type: 'rect', x: padding.left, y, width, height: this.props.itemHeight, styles: { background: this.props.activeBackground ?? '#eff6ff', border: { color: 'rgba(0,0,0,0)', width: 0, radius: 6 } } })
+      if (active) schema.push({ type: 'rect', x: padding.left, y, width, height: this.props.itemHeight, styles: { background: this.resolveThemeValue(this.props.activeBackground ?? '#eff6ff'), border: { color: 'rgba(0,0,0,0)', width: 0, radius: 6 } } })
       pushIcon(schema, item.icon, padding.left + 10, y + (this.props.itemHeight - 16) / 2, 16, item.disabled ? 0.45 : 1)
       const textX = padding.left + (item.icon ? 34 : 10)
       const labelY = item.description ? y + 2 : y
       const labelHeight = item.description ? 20 : this.props.itemHeight
-      pushText(schema, item.label, textX, labelY, width - 82, labelHeight, { ...textStyle, color: item.disabled ? 'var(--nova-action-list-disabled-color, #94a3b8)' : item.tone === 'danger' ? 'var(--nova-action-list-danger-color, #dc2626)' : textStyle.color, fontWeight: item.selected ? '700' : textStyle.fontWeight })
-      if (item.description) pushText(schema, item.description, textX, y + 20, width - 82, 16, { ...textStyle, color: 'var(--nova-action-list-description-color, #64748b)', fontSize: 11, lineHeight: 14 })
-      pushText(schema, item.shortcut, padding.left + width - 56, y, 46, this.props.itemHeight, { ...textStyle, color: 'var(--nova-action-list-shortcut-color, #94a3b8)', fontSize: 11, lineHeight: 16 }, { align: 'right' })
+      pushText(schema, item.label, textX, labelY, width - 82, labelHeight, { ...textStyle, color: item.disabled ? this.resolveThemeValue('var(--nova-action-list-disabled-color, #94a3b8)') ?? textStyle.color : item.tone === 'danger' ? this.resolveThemeValue('var(--nova-action-list-danger-color, #dc2626)') ?? textStyle.color : textStyle.color, fontWeight: item.selected ? '700' : textStyle.fontWeight })
+      if (item.description) pushText(schema, item.description, textX, y + 20, width - 82, 16, { ...textStyle, color: this.resolveThemeValue('var(--nova-action-list-description-color, #64748b)') ?? textStyle.color, fontSize: 11, lineHeight: 14 })
+      pushText(schema, item.shortcut, padding.left + width - 56, y, 46, this.props.itemHeight, { ...textStyle, color: this.resolveThemeValue('var(--nova-action-list-shortcut-color, #94a3b8)') ?? textStyle.color, fontSize: 11, lineHeight: 16 }, { align: 'right' })
       if (item.checked || this.itemValue(item) === this.props.value) pushIcon(schema, ACTION_LIST_ASSETS.icons.check, padding.left + width - 25, y + (this.props.itemHeight - 18) / 2, 18)
-      else if (item.type === 'submenu' || item.items?.length) pushText(schema, '›', padding.left + width - 20, y, 16, this.props.itemHeight, { ...textStyle, color: 'var(--nova-action-list-submenu-color, #64748b)', fontWeight: '800' }, { align: 'center' })
+      else if (item.type === 'submenu' || item.items?.length) pushText(schema, '›', padding.left + width - 20, y, 16, this.props.itemHeight, { ...textStyle, color: this.resolveThemeValue('var(--nova-action-list-submenu-color, #64748b)') ?? textStyle.color, fontWeight: '800' }, { align: 'center' })
       y += this.props.itemHeight
     })
     this.renderer.schema(schema)

@@ -114,7 +114,7 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
    * Выполняет отрисовку AdvancedComponent.
    */
   render(): void {
-    const schema: NovaSchema = buildBoxSchema(this.props, this.width, this.height)
+    const schema: NovaSchema = buildBoxSchema(this.props, this.width, this.height, { resolveThemeValue: value => this.resolveThemeValue(value) })
 
     switch (this.props.kind) {
       case 'SpeedDial':
@@ -595,7 +595,7 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
    */
   private textStyle(patch: Partial<ReturnType<typeof resolveComponentTextStyle>> = {}): ReturnType<typeof resolveComponentTextStyle> {
     return {
-      ...resolveComponentTextStyle(this.props, this.inheritedStyleContext),
+      ...resolveComponentTextStyle(this.props, this.inheritedStyleContext, {}, value => this.resolveThemeValue(value)),
       ...patch,
     }
   }

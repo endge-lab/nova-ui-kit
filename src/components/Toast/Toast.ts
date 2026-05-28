@@ -16,15 +16,15 @@ export class Toast<E extends EventList = Record<string, any>> extends NovaUiComp
   override setProps(patch: ToastProps): this { return super.setProps(patch as Partial<ToastResolvedProps>) }
   override getApi(): ToastApi { return this.api }
   render(): void {
-    const schema: NovaSchema = buildBoxSchema(this.props, this.width, this.height)
-    const textStyle = resolveComponentTextStyle(this.props, this.inheritedStyleContext)
+    const schema: NovaSchema = buildBoxSchema(this.props, this.width, this.height, { resolveThemeValue: value => this.resolveThemeValue(value) })
+    const textStyle = resolveComponentTextStyle(this.props, this.inheritedStyleContext, {}, value => this.resolveThemeValue(value))
     const left = this.props.icon ? 44 : 14
     pushIcon(schema, this.props.icon, 14, 16, 20)
     pushText(schema, this.props.title, left, 11, this.width - left - 42, 22, { ...textStyle, fontWeight: '800', lineHeight: 20 })
-    pushText(schema, this.props.message, left, 34, this.width - left - 42, 20, { ...textStyle, color: 'var(--nova-toast-message-color, #64748b)', fontSize: 12, lineHeight: 17 })
-    pushText(schema, this.props.actionLabel, left, this.height - 25, 90, 20, { ...textStyle, color: 'var(--nova-toast-action-color, #2563eb)', fontWeight: '700', fontSize: 12 })
+    pushText(schema, this.props.message, left, 34, this.width - left - 42, 20, { ...textStyle, color: this.resolveThemeValue('var(--nova-toast-message-color, #64748b)') ?? textStyle.color, fontSize: 12, lineHeight: 17 })
+    pushText(schema, this.props.actionLabel, left, this.height - 25, 90, 20, { ...textStyle, color: this.resolveThemeValue('var(--nova-toast-action-color, #2563eb)') ?? textStyle.color, fontWeight: '700', fontSize: 12 })
     if (this.props.closeButton) pushText(schema, '×', this.width - 32, 8, 20, 20, { ...textStyle, fontSize: 19, fontWeight: '700' }, { align: 'center' })
-    if (this.props.progress !== undefined) schema.push({ type: 'rect', x: 0, y: this.height - 3, width: this.width * this.props.progress, height: 3, styles: { background: 'var(--nova-toast-progress-background, #2563eb)' } })
+    if (this.props.progress !== undefined) schema.push({ type: 'rect', x: 0, y: this.height - 3, width: this.width * this.props.progress, height: 3, styles: { background: this.resolveThemeValue('var(--nova-toast-progress-background, #2563eb)') } })
     this.renderer.schema(schema)
   }
   protected override onPropsChanged(changedKeys: Array<keyof ToastResolvedProps>): void { this.props = normalizeToastProps(this.props); this.applyCommonPropsChanged(changedKeys) }
@@ -42,7 +42,7 @@ export class ToastRegion<E extends EventList = Record<string, any>> extends Nova
   override setProps(patch: ToastRegionProps): this { return super.setProps(patch as Partial<ToastRegionResolvedProps>) }
   override getApi(): ToastRegionApi { return this.api }
   update(): void { this.visibleItems().forEach((_item, index) => { const node = this.toastNodes[index]; if (node) applyNodeLayoutRect(node as NovaNode<any>, { x: this.resolveX(), y: this.resolveY(index), width: 320, height: 84 }) }) }
-  render(): void { this.renderer.schema(buildBoxSchema(this.props, this.width, this.height)) }
+  render(): void { this.renderer.schema(buildBoxSchema(this.props, this.width, this.height, { resolveThemeValue: value => this.resolveThemeValue(value) })) }
   protected override onPropsChanged(changedKeys: Array<keyof ToastRegionResolvedProps>): void { this.props = normalizeToastRegionProps(this.props); if (changedKeys.includes('items')) this.reconcileToasts(); this.applyCommonPropsChanged(changedKeys) }
   private reconcileToasts(): void {
     const schemas = this.visibleItems().map(item => ({ type: TOAST_SCHEMA_TYPE, id: item.id, props: { title: item.title, message: item.message, icon: item.icon, tone: item.tone, actionLabel: item.actionLabel, onClose: (event?: Event) => this.dismiss(item.id, event), onAction: (event?: Event) => this.props.onAction?.(item, event) } }))

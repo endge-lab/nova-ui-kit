@@ -59,9 +59,10 @@ export class Chip<E extends EventList = Record<string, any>>
         hovered: this.hovered,
         pressed: this.pressed,
         active: this.props.selected,
-      }),
+      }, value => this.resolveThemeValue(value)),
+      resolveThemeValue: value => this.resolveThemeValue(value),
     })
-    const textStyle = resolveComponentTextStyle(this.props, this.inheritedStyleContext)
+    const textStyle = resolveComponentTextStyle(this.props, this.inheritedStyleContext, {}, value => this.resolveThemeValue(value))
     const padding = sizeTokenPadding(this.props.size)
     let x = padding.horizontal
 

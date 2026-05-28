@@ -85,9 +85,9 @@ export class Toggle<E extends EventList = Record<string, any>>
       width: trackWidth,
       height: trackHeight,
       background: this.props.checked ? this.props.accentColor : this.props.trackColor,
-      border: { color: this.props.checked ? this.props.accentColor : '#cbd5e1', width: 1, radius: 999 },
+      border: { color: this.props.checked ? this.props.accentColor : 'var(--nova-ui-border, #cbd5e1)', width: 1, radius: 999 },
     }
-    const trackSchema = buildBoxSchema(trackProps, trackWidth, trackHeight)
+    const trackSchema = buildBoxSchema(trackProps, trackWidth, trackHeight, { resolveThemeValue: value => this.resolveThemeValue(value) })
     for (const item of trackSchema) {
       Object.assign(item, { x: 0, y: trackY })
       schema.push(item)
@@ -98,12 +98,12 @@ export class Toggle<E extends EventList = Record<string, any>>
       y: trackY + trackHeight / 2,
       radius: thumbSize / 2,
       styles: {
-        background: this.props.thumbColor ?? '#ffffff',
+        background: this.resolveThemeValue(this.props.thumbColor ?? '#ffffff'),
         opacity: this.pressed ? 0.86 : 1,
-        border: { color: 'rgba(15,23,42,0.12)', width: 1 },
+        border: { color: this.resolveThemeValue('var(--nova-toggle-thumb-border-color, rgba(15,23,42,0.12))'), width: 1 },
       },
     })
-    pushText(schema, this.props.label, trackWidth + 10, 0, Math.max(0, this.width - trackWidth - 10), this.height, resolveComponentTextStyle(this.props, this.inheritedStyleContext))
+    pushText(schema, this.props.label, trackWidth + 10, 0, Math.max(0, this.width - trackWidth - 10), this.height, resolveComponentTextStyle(this.props, this.inheritedStyleContext, {}, value => this.resolveThemeValue(value)))
     this.renderer.schema(schema)
   }
 

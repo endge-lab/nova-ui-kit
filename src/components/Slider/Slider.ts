@@ -89,7 +89,7 @@ export class Slider<E extends EventList = Record<string, any>>
       y: trackY,
       width: horizontal ? trackLength : trackThickness,
       height: horizontal ? trackThickness : trackLength,
-      styles: { background: this.props.trackColor ?? '#dbe4ef', border: { radius: 999, width: 0 } },
+      styles: { background: this.resolveThemeValue(this.props.trackColor ?? '#dbe4ef'), border: { radius: 999, width: 0 } },
     })
     schema.push({
       type: 'rect',
@@ -97,7 +97,7 @@ export class Slider<E extends EventList = Record<string, any>>
       y: horizontal ? trackY : trackY + trackLength - fillLength,
       width: horizontal ? fillLength : trackThickness,
       height: horizontal ? trackThickness : fillLength,
-      styles: { background: this.props.accentColor ?? '#2563eb', border: { radius: 999, width: 0 } },
+      styles: { background: this.resolveThemeValue(this.props.accentColor ?? '#2563eb'), border: { radius: 999, width: 0 } },
     })
 
     for (const mark of this.props.marks) {
@@ -107,7 +107,7 @@ export class Slider<E extends EventList = Record<string, any>>
         x: horizontal ? trackX + trackLength * markPercent : this.width / 2,
         y: horizontal ? this.height / 2 : trackY + trackLength * (1 - markPercent),
         radius: 2,
-        styles: { background: this.props.accentColor ?? '#2563eb', opacity: 0.55 },
+        styles: { background: this.resolveThemeValue(this.props.accentColor ?? '#2563eb'), opacity: 0.55 },
       })
     }
 
@@ -117,8 +117,8 @@ export class Slider<E extends EventList = Record<string, any>>
       y: horizontal ? this.height / 2 : trackY + trackLength - fillLength,
       radius: thumbRadius,
       styles: {
-        background: this.props.thumbColor ?? '#ffffff',
-        border: { color: this.props.accentColor ?? '#2563eb', width: 2 },
+        background: this.resolveThemeValue(this.props.thumbColor ?? '#ffffff'),
+        border: { color: this.resolveThemeValue(this.props.accentColor ?? '#2563eb'), width: 2 },
         opacity: this.props.disabled ? this.props.disabledOpacity : 1,
       },
     })

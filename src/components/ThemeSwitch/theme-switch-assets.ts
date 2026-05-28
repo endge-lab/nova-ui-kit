@@ -10,6 +10,8 @@ export const THEME_SWITCH_ASSETS = NovaAssets.define('nova-ui-kit-theme-switch',
   },
 })
 
+NovaAssets.global.use(THEME_SWITCH_ASSETS)
+
 export const DEFAULT_THEME_SWITCH_THEMES: ThemeSwitchTheme[] = [
   { id: 'light', label: 'Light', icon: THEME_SWITCH_ASSETS.icons.sun },
   { id: 'dark', label: 'Dark', icon: THEME_SWITCH_ASSETS.icons.moon },

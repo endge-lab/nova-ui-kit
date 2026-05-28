@@ -112,11 +112,11 @@ export function normalizeInputProps(props: InputProps = {}, kind: InputComponent
     icon: props.icon,
     prefix: props.prefix,
     suffix: props.suffix,
-    selectionColor: props.selectionColor ?? 'rgba(37, 99, 235, 0.22)',
-    caretColor: props.caretColor ?? '#2563eb',
-    placeholderColor: props.placeholderColor ?? '#94a3b8',
-    focusBorderColor: props.focusBorderColor ?? '#2563eb',
-    errorColor: props.errorColor ?? '#dc2626',
+    selectionColor: props.selectionColor ?? 'var(--nova-input-selection-color, rgba(37, 99, 235, 0.22))',
+    caretColor: props.caretColor ?? 'var(--nova-input-caret-color, #2563eb)',
+    placeholderColor: props.placeholderColor ?? 'var(--nova-input-placeholder-color, #94a3b8)',
+    focusBorderColor: props.focusBorderColor ?? 'var(--nova-input-focus-border-color, #2563eb)',
+    errorColor: props.errorColor ?? 'var(--nova-input-error-color, #dc2626)',
     revealable: props.revealable ?? kind === 'password',
     onSearch: props.onSearch,
     min: props.min,
@@ -207,43 +207,43 @@ function resolveInputDefaults(variant: InputResolvedProps['variant'], size: Inpu
   const base = {
     width: kind === 'textarea' ? 320 : kind === 'field' ? 320 : 220,
     height,
-    color: '#172033',
+    color: 'var(--nova-input-color, #172033)',
     fontFamily: 'Inter, Arial, sans-serif',
     fontSize: size === 'sm' ? 12 : size === 'lg' ? 15 : 13,
     fontWeight: '500' as const,
     lineHeight: size === 'sm' ? 16 : size === 'lg' ? 22 : 18,
     padding: { horizontal: size === 'lg' ? 14 : 10, vertical: size === 'lg' ? 9 : 7 },
-    accentColor: '#2563eb',
-    hoverBackground: '#f8fafc',
-    pressedBackground: '#eef2ff',
+    accentColor: 'var(--nova-input-accent-color, #2563eb)',
+    hoverBackground: 'var(--nova-input-hover-background, #f8fafc)',
+    pressedBackground: 'var(--nova-input-pressed-background, #eef2ff)',
     cursor: { hover: 'text', pressed: 'text', disabled: 'not-allowed' },
   }
   if (variant === 'filled') {
     return {
       ...base,
-      background: '#f1f5f9',
-      border: { color: '#cbd5e1', width: 1, radius: 8 },
+      background: 'var(--nova-input-filled-background, #f1f5f9)',
+      border: { color: 'var(--nova-input-border-color, #cbd5e1)', width: 1, radius: 8 },
     }
   }
   if (variant === 'ghost') {
     return {
       ...base,
-      background: 'rgba(255,255,255,0)',
-      border: { color: 'rgba(148,163,184,0)', width: 1, radius: 8 },
-      hoverBackground: 'rgba(148,163,184,0.12)',
+      background: 'var(--nova-input-ghost-background, rgba(255,255,255,0))',
+      border: { color: 'var(--nova-input-ghost-border-color, rgba(148,163,184,0))', width: 1, radius: 8 },
+      hoverBackground: 'var(--nova-input-ghost-hover-background, rgba(148,163,184,0.12))',
     }
   }
   if (variant === 'underline') {
     return {
       ...base,
-      background: 'rgba(255,255,255,0)',
-      border: { color: '#cbd5e1', width: 1, radius: 0 },
+      background: 'var(--nova-input-underline-background, rgba(255,255,255,0))',
+      border: { color: 'var(--nova-input-border-color, #cbd5e1)', width: 1, radius: 0 },
     }
   }
   return {
     ...base,
-    background: '#ffffff',
-    border: { color: '#cbd5e1', width: 1, radius: 8 },
+    background: 'var(--nova-input-background, #ffffff)',
+    border: { color: 'var(--nova-input-border-color, #cbd5e1)', width: 1, radius: 8 },
   }
 }
 

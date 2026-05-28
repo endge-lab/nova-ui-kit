@@ -25,7 +25,7 @@ export function normalizeTextBlockProps(props: TextBlockProps = {}): TextBlockRe
     y: finiteNumber(props.y, 0),
     width: Math.max(0, finiteNumber(props.width, DEFAULT_WIDTH)),
     height: Math.max(0, finiteNumber(props.height, DEFAULT_HEIGHT)),
-    color: props.color ?? props.style?.color ?? '#172033',
+    color: props.color ?? props.style?.color ?? 'var(--nova-text-block-color, #172033)',
     opacity: clamp01(props.opacity ?? 1),
     fontFamily: props.fontFamily ?? props.style?.fontFamily ?? 'Inter, Arial, sans-serif',
     fontSize,

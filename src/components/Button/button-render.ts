@@ -22,11 +22,13 @@ export function buildButtonSchema(
   height: number,
   inheritedStyleContext: NovaUiStyleContext,
   state: Partial<NovaUiInteractionState> & { active?: boolean } = {},
+  resolveThemeValue?: (value: string | undefined) => string | undefined,
 ): NovaSchema {
   const schema: NovaSchema = buildBoxSchema(props, width, height, {
-    background: resolveInteractionBackground(props, state),
+    background: resolveInteractionBackground(props, state, resolveThemeValue),
+    resolveThemeValue,
   })
-  const textStyle = resolveComponentTextStyle(props, inheritedStyleContext)
+  const textStyle = resolveComponentTextStyle(props, inheritedStyleContext, {}, resolveThemeValue)
   const padding = sizeTokenPadding(props.size)
   const iconSize = padding.icon
   const hasIcon = !!props.icon

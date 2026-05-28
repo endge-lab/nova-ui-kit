@@ -108,10 +108,10 @@ export class SplitPane<E extends EventList = Record<string, any>>
     this.applyPaneRect(activePanes[1], second)
     this.resizerNode?.options({
       ...resizer,
-      color: this.props.resizer.color,
+      color: this.resolveThemeValue(this.props.resizer.color) ?? this.props.resizer.color,
       lineWidth: this.props.resizer.lineWidth,
       hitSize: this.props.resizer.hitSize,
-      overlayColor: this.props.resizer.overlayColor,
+      overlayColor: this.resolveThemeValue(this.props.resizer.overlayColor) ?? this.props.resizer.overlayColor,
       minSize: 0,
       maxSize: Number.POSITIVE_INFINITY,
     })
@@ -151,7 +151,7 @@ export class SplitPane<E extends EventList = Record<string, any>>
    * Выполняет отрисовку SplitPane.
    */
   render(): void {
-    const schema = buildBoxSchema(this.props, this.width, this.height)
+    const schema = buildBoxSchema(this.props, this.width, this.height, { resolveThemeValue: value => this.resolveThemeValue(value) })
     if (schema.length > 0) this.renderer.schema(schema)
     if (this.props.clip) this.renderer.clip(0, 0, this.width, this.height)
   }
@@ -190,8 +190,8 @@ export class SplitPane<E extends EventList = Record<string, any>>
 
     if (this.resizerNode) return
     this.resizerNode = this.props.direction === 'horizontal'
-      ? new ColResizer<E>(this.nova, this.surface, this.props.resizer.color, this.props.resizer.lineWidth)
-      : new RowResizer<E>(this.nova, this.surface, this.props.resizer.color, this.props.resizer.lineWidth)
+      ? new ColResizer<E>(this.nova, this.surface, this.resolveThemeValue(this.props.resizer.color) ?? this.props.resizer.color, this.props.resizer.lineWidth)
+      : new RowResizer<E>(this.nova, this.surface, this.resolveThemeValue(this.props.resizer.color) ?? this.props.resizer.color, this.props.resizer.lineWidth)
     this.addChild(this.resizerNode)
     this.resizerNode
       .onChangeStart(event => this.startResize(event))

@@ -108,11 +108,11 @@ function resolveBadgeDefaults(tone: BadgeTone, size: BadgeResolvedProps['size'],
 }
 
 function badgePalette(tone: BadgeTone): { background: string; border: string; color: string } {
-  if (tone === 'success') return { background: '#dcfce7', border: '#86efac', color: '#166534' }
-  if (tone === 'warning') return { background: '#fef3c7', border: '#fcd34d', color: '#92400e' }
-  if (tone === 'danger') return { background: '#fee2e2', border: '#fca5a5', color: '#991b1b' }
-  if (tone === 'neutral') return { background: '#f1f5f9', border: '#cbd5e1', color: '#334155' }
-  return { background: '#dbeafe', border: '#93c5fd', color: '#1d4ed8' }
+  if (tone === 'success') return { background: 'var(--nova-badge-success-background, #dcfce7)', border: 'var(--nova-badge-success-border-color, #86efac)', color: 'var(--nova-badge-success-color, #166534)' }
+  if (tone === 'warning') return { background: 'var(--nova-badge-warning-background, #fef3c7)', border: 'var(--nova-badge-warning-border-color, #fcd34d)', color: 'var(--nova-badge-warning-color, #92400e)' }
+  if (tone === 'danger') return { background: 'var(--nova-badge-danger-background, #fee2e2)', border: 'var(--nova-badge-danger-border-color, #fca5a5)', color: 'var(--nova-badge-danger-color, #991b1b)' }
+  if (tone === 'neutral') return { background: 'var(--nova-badge-background, #f1f5f9)', border: 'var(--nova-badge-border-color, #cbd5e1)', color: 'var(--nova-badge-color, #334155)' }
+  return { background: 'var(--nova-badge-info-background, #dbeafe)', border: 'var(--nova-badge-info-border-color, #93c5fd)', color: 'var(--nova-badge-info-color, #1d4ed8)' }
 }
 
 function finiteNumber(value: unknown, fallback: number): number {

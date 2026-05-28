@@ -100,12 +100,12 @@ function resolveButtonDefaults(variant: ButtonResolvedProps['variant'], size: Bu
     return {
       width: 128,
       height: baseHeight,
-      background: '#2563eb',
-      color: '#ffffff',
-      border: { color: '#1d4ed8', width: 1, radius: 7 },
-      hoverBackground: '#1d4ed8',
-      pressedBackground: '#1e40af',
-      activeBackground: '#1d4ed8',
+      background: 'var(--nova-button-primary-background, #2563eb)',
+      color: 'var(--nova-button-primary-color, #ffffff)',
+      border: { color: 'var(--nova-button-primary-border-color, #1d4ed8)', width: 1, radius: 7 },
+      hoverBackground: 'var(--nova-button-primary-hover-background, #1d4ed8)',
+      pressedBackground: 'var(--nova-button-primary-pressed-background, #1e40af)',
+      activeBackground: 'var(--nova-button-primary-active-background, #1d4ed8)',
       cursor: { hover: 'pointer', pressed: 'pointer', disabled: 'not-allowed' },
     }
   }
@@ -113,11 +113,11 @@ function resolveButtonDefaults(variant: ButtonResolvedProps['variant'], size: Bu
     return {
       width: 128,
       height: baseHeight,
-      background: '#dc2626',
-      color: '#ffffff',
-      border: { color: '#b91c1c', width: 1, radius: 7 },
-      hoverBackground: '#b91c1c',
-      pressedBackground: '#991b1b',
+      background: 'var(--nova-button-danger-background, #dc2626)',
+      color: 'var(--nova-button-danger-color, #ffffff)',
+      border: { color: 'var(--nova-button-danger-border-color, #b91c1c)', width: 1, radius: 7 },
+      hoverBackground: 'var(--nova-button-danger-hover-background, #b91c1c)',
+      pressedBackground: 'var(--nova-button-danger-pressed-background, #991b1b)',
       cursor: { hover: 'pointer', pressed: 'pointer', disabled: 'not-allowed' },
     }
   }
@@ -125,12 +125,12 @@ function resolveButtonDefaults(variant: ButtonResolvedProps['variant'], size: Bu
     return {
       width: 112,
       height: baseHeight,
-      background: 'rgba(255,255,255,0)',
-      color: '#334155',
-      border: { color: 'rgba(148,163,184,0)', width: 1, radius: 7 },
-      hoverBackground: 'rgba(148,163,184,0.14)',
-      pressedBackground: 'rgba(148,163,184,0.24)',
-      activeBackground: 'rgba(37,99,235,0.14)',
+      background: 'var(--nova-button-ghost-background, rgba(255,255,255,0))',
+      color: 'var(--nova-button-ghost-color, #334155)',
+      border: { color: 'var(--nova-button-ghost-border-color, rgba(148,163,184,0))', width: 1, radius: 7 },
+      hoverBackground: 'var(--nova-button-ghost-hover-background, rgba(148,163,184,0.14))',
+      pressedBackground: 'var(--nova-button-ghost-pressed-background, rgba(148,163,184,0.24))',
+      activeBackground: 'var(--nova-button-ghost-active-background, rgba(37,99,235,0.14))',
       cursor: { hover: 'pointer', pressed: 'pointer', disabled: 'not-allowed' },
     }
   }
@@ -138,12 +138,12 @@ function resolveButtonDefaults(variant: ButtonResolvedProps['variant'], size: Bu
   return {
     width: 128,
     height: baseHeight,
-    background: '#ffffff',
-    color: '#172033',
-    border: { color: '#cbd5e1', width: 1, radius: 7 },
-    hoverBackground: '#f8fafc',
-    pressedBackground: '#eef2f7',
-    activeBackground: '#eff6ff',
+    background: 'var(--nova-button-background, #ffffff)',
+    color: 'var(--nova-button-color, #172033)',
+    border: { color: 'var(--nova-button-border-color, #cbd5e1)', width: 1, radius: 7 },
+    hoverBackground: 'var(--nova-button-hover-background, #f8fafc)',
+    pressedBackground: 'var(--nova-button-pressed-background, #eef2f7)',
+    activeBackground: 'var(--nova-button-active-background, #eff6ff)',
     cursor: { hover: 'pointer', pressed: 'pointer', disabled: 'not-allowed' },
   }
 }

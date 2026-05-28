@@ -78,10 +78,10 @@ export class Badge<E extends EventList = Record<string, any>>
    */
   render(): void {
     this.resolveVisualRect()
-    const schema: NovaSchema = buildBoxSchema(this.props, this.visualRect.width, this.visualRect.height)
+    const schema: NovaSchema = buildBoxSchema(this.props, this.visualRect.width, this.visualRect.height, { resolveThemeValue: value => this.resolveThemeValue(value) })
 
     if (!this.props.dot) {
-      const textStyle = resolveComponentTextStyle(this.props, this.inheritedStyleContext)
+      const textStyle = resolveComponentTextStyle(this.props, this.inheritedStyleContext, {}, value => this.resolveThemeValue(value))
       const padding = sizeTokenPadding(this.props.size)
       const iconSize = Math.max(10, padding.icon - 2)
       const text = this.displayText()

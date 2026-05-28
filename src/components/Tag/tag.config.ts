@@ -68,18 +68,18 @@ export const TAG_NODE_DESCRIPTOR = createTagDescriptor()
 
 function resolveTagDefaults(tone: TagTone, size: TagResolvedProps['size'], selected: boolean) {
   const tones = {
-    neutral: ['#f8fafc', '#475569', '#cbd5e1'],
-    info: ['#eff6ff', '#1d4ed8', '#bfdbfe'],
-    success: ['#ecfdf5', '#047857', '#a7f3d0'],
-    warning: ['#fffbeb', '#b45309', '#fde68a'],
-    danger: ['#fef2f2', '#b91c1c', '#fecaca'],
+    neutral: ['var(--nova-tag-background, #f8fafc)', 'var(--nova-tag-color, #475569)', 'var(--nova-tag-border-color, #cbd5e1)'],
+    info: ['var(--nova-tag-info-background, #eff6ff)', 'var(--nova-tag-info-color, #1d4ed8)', 'var(--nova-tag-info-border-color, #bfdbfe)'],
+    success: ['var(--nova-tag-success-background, #ecfdf5)', 'var(--nova-tag-success-color, #047857)', 'var(--nova-tag-success-border-color, #a7f3d0)'],
+    warning: ['var(--nova-tag-warning-background, #fffbeb)', 'var(--nova-tag-warning-color, #b45309)', 'var(--nova-tag-warning-border-color, #fde68a)'],
+    danger: ['var(--nova-tag-danger-background, #fef2f2)', 'var(--nova-tag-danger-color, #b91c1c)', 'var(--nova-tag-danger-border-color, #fecaca)'],
   } satisfies Record<TagTone, [string, string, string]>
   const [background, color, border] = tones[tone]
   return {
     width: 92,
     height: sizeTokenHeight(size, 28),
     background: selected ? color : background,
-    color: selected ? '#ffffff' : color,
+    color: selected ? 'var(--nova-tag-selected-color, #ffffff)' : color,
     border: { color: border, width: 1, radius: 999 },
     padding: { horizontal: 10, vertical: 4 },
   }

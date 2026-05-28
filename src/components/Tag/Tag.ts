@@ -56,8 +56,8 @@ export class Tag<E extends EventList = Record<string, any>>
    * Выполняет отрисовку Tag.
    */
   render(): void {
-    const schema: NovaSchema = buildBoxSchema(this.props, this.width, this.height)
-    const textStyle = resolveComponentTextStyle(this.props, this.inheritedStyleContext)
+    const schema: NovaSchema = buildBoxSchema(this.props, this.width, this.height, { resolveThemeValue: value => this.resolveThemeValue(value) })
+    const textStyle = resolveComponentTextStyle(this.props, this.inheritedStyleContext, {}, value => this.resolveThemeValue(value))
     const padding = sizeTokenPadding(this.props.size)
     const iconSize = padding.icon
     const textX = this.props.icon ? padding.horizontal + iconSize + padding.gap : padding.horizontal

@@ -351,7 +351,7 @@ describe('Nova UI style propagation', () => {
     const panel = app.components.require<any>('panel')
     const samePanel = panel
 
-    expect(panel.getProps().background).toBe('#ffffff')
+    expect(panel.getProps().background).toBe('var(--nova-surface-background, #ffffff)')
 
     root.setProps({ width: 800 })
     root.update()

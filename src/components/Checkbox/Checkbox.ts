@@ -83,14 +83,14 @@ export class Checkbox<E extends EventList = Record<string, any>>
     const boxProps = {
       ...this.props,
       background: active
-        ? this.props.accentColor ?? '#2563eb'
-        : resolveInteractionBackground(this.props, { hovered: this.hovered, pressed: this.pressed }),
+        ? this.props.accentColor ?? 'var(--nova-ui-accent, #2563eb)'
+        : resolveInteractionBackground(this.props, { hovered: this.hovered, pressed: this.pressed }, value => this.resolveThemeValue(value)),
       border: active
-        ? { color: this.props.accentColor ?? '#2563eb', width: 1, radius: 4 }
+        ? { color: this.props.accentColor ?? 'var(--nova-ui-accent, #2563eb)', width: 1, radius: 4 }
         : this.props.border,
     }
 
-    schema.push(...buildBoxSchema(boxProps, boxSize, boxSize))
+    schema.push(...buildBoxSchema(boxProps, boxSize, boxSize, { resolveThemeValue: value => this.resolveThemeValue(value) }))
     if (schema[0]) Object.assign(schema[0], { x: 0, y: boxY })
 
     if (this.props.checked) {
@@ -102,7 +102,7 @@ export class Checkbox<E extends EventList = Record<string, any>>
       schema.push({ type: 'line', x1: 4, y1: boxY + boxSize / 2, x2: boxSize - 4, y2: boxY + boxSize / 2, styles: { color: '#ffffff', width: 2 } })
     }
 
-    pushText(schema, this.props.label, boxSize + 8, 0, Math.max(0, this.width - boxSize - 8), this.height, resolveComponentTextStyle(this.props, this.inheritedStyleContext))
+    pushText(schema, this.props.label, boxSize + 8, 0, Math.max(0, this.width - boxSize - 8), this.height, resolveComponentTextStyle(this.props, this.inheritedStyleContext, {}, value => this.resolveThemeValue(value)))
     this.renderer.schema(schema)
   }
 

@@ -195,7 +195,7 @@ export class ScrollArea<E extends EventList = Record<string, any>>
    * Выполняет отрисовку ScrollArea.
    */
   render(): void {
-    const schema = buildBoxSchema(this.props, this.width, this.height)
+    const schema = buildBoxSchema(this.props, this.width, this.height, { resolveThemeValue: value => this.resolveThemeValue(value) })
     if (schema.length > 0) this.renderer.schema(schema)
     this.renderer.clip(0, 0, this.width, this.height)
   }
@@ -366,8 +366,8 @@ export class ScrollArea<E extends EventList = Record<string, any>>
       viewportSize: this.height,
       contentSize: this.props.contentHeight,
       thickness,
-      trackColor: this.props.trackColor,
-      thumbColor: this.props.thumbColor,
+      trackColor: this.resolveThemeValue(this.props.trackColor),
+      thumbColor: this.resolveThemeValue(this.props.thumbColor),
       opacity,
     })
     this.horizontalScrollbarApi()?.setProps({
@@ -377,8 +377,8 @@ export class ScrollArea<E extends EventList = Record<string, any>>
       viewportSize: this.width,
       contentSize: this.props.contentWidth,
       thickness,
-      trackColor: this.props.trackColor,
-      thumbColor: this.props.thumbColor,
+      trackColor: this.resolveThemeValue(this.props.trackColor),
+      thumbColor: this.resolveThemeValue(this.props.thumbColor),
       opacity,
     })
 

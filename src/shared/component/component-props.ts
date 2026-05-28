@@ -45,6 +45,10 @@ import {
   type NovaUiStyleReceiveResult,
   type NovaUiStyleTarget,
 } from '@/shared/style'
+import {
+  ensureNovaUIKitThemes,
+  resolveNovaUiThemeValue,
+} from '@/shared/style/nova-ui-kit-theme'
 import type { TooltipInput } from '@/components/Tooltip/tooltip.types'
 
 export type NovaUiComponentSize = 'sm' | 'md' | 'lg'
@@ -272,12 +276,14 @@ export function resolveComponentTextStyle(
   props: NovaUiCommonResolvedProps,
   context: NovaUiStyleContext,
   defaults: Partial<NovaUiTextStyleDefaults> = {},
+  resolveThemeValue?: (value: string | undefined) => string | undefined,
 ): NovaUiTextStyleDefaults {
   const inherited = mergeStyleContext(context, props.style).values
+  const resolveValue = resolveThemeValue ?? ((value: string | undefined) => value)
 
   return {
-    color: props.color ?? inherited.color ?? defaults.color ?? NOVA_UI_DEFAULT_TEXT_STYLE.color,
-    fontFamily: props.fontFamily ?? inherited.fontFamily ?? defaults.fontFamily ?? NOVA_UI_DEFAULT_TEXT_STYLE.fontFamily,
+    color: resolveValue(props.color ?? inherited.color ?? defaults.color ?? NOVA_UI_DEFAULT_TEXT_STYLE.color) ?? NOVA_UI_DEFAULT_TEXT_STYLE.color,
+    fontFamily: resolveValue(props.fontFamily ?? inherited.fontFamily ?? defaults.fontFamily ?? NOVA_UI_DEFAULT_TEXT_STYLE.fontFamily) ?? NOVA_UI_DEFAULT_TEXT_STYLE.fontFamily,
     fontSize: props.fontSize ?? inherited.fontSize ?? defaults.fontSize ?? NOVA_UI_DEFAULT_TEXT_STYLE.fontSize,
     fontWeight: props.fontWeight ?? inherited.fontWeight ?? defaults.fontWeight ?? NOVA_UI_DEFAULT_TEXT_STYLE.fontWeight,
     fontStyle: props.fontStyle ?? inherited.fontStyle ?? defaults.fontStyle ?? NOVA_UI_DEFAULT_TEXT_STYLE.fontStyle,
@@ -303,12 +309,14 @@ export function createStateAttrs(
 export function resolveInteractionBackground(
   props: NovaUiCommonResolvedProps,
   state: Partial<NovaUiInteractionState> & { active?: boolean } = {},
+  resolveThemeValue?: (value: string | undefined) => string | undefined,
 ): string | undefined {
-  if (props.disabled) return props.background
-  if (state.pressed && props.pressedBackground) return props.pressedBackground
-  if (state.active && props.activeBackground) return props.activeBackground
-  if (state.hovered && props.hoverBackground) return props.hoverBackground
-  return props.background
+  const resolveValue = resolveThemeValue ?? ((value: string | undefined) => value)
+  if (props.disabled) return resolveValue(props.background)
+  if (state.pressed && props.pressedBackground) return resolveValue(props.pressedBackground)
+  if (state.active && props.activeBackground) return resolveValue(props.activeBackground)
+  if (state.hovered && props.hoverBackground) return resolveValue(props.hoverBackground)
+  return resolveValue(props.background)
 }
 
 export function buildBoxSchema(
@@ -320,12 +328,15 @@ export function buildBoxSchema(
     opacity?: number
     border?: NovaUiBorder
     radiusFallback?: number
+    resolveThemeValue?: (value: string | undefined) => string | undefined
   } = {},
 ): NovaSchema {
   const schema: NovaSchema = []
-  const background = options.background ?? props.background
+  const resolveValue = options.resolveThemeValue ?? ((value: string | undefined) => value)
+  const background = resolveValue(options.background ?? props.background)
   const opacity = options.opacity ?? (props.disabled ? props.disabledOpacity : props.opacity)
   const border = options.border ?? props.border
+  const borderColor = resolveValue(border?.color)
 
   if (background) {
     schema.push({
@@ -339,7 +350,7 @@ export function buildBoxSchema(
         opacity,
         border: border?.width
           ? {
-              color: border.color ?? '#d6d9e2',
+              color: borderColor ?? '#d6d9e2',
               width: border.width,
               radius: borderRadiusToRendererValue(border.radius ?? options.radiusFallback ?? 0),
             }
@@ -356,7 +367,7 @@ export function buildBoxSchema(
       width,
       height,
       styles: {
-        color: border.color ?? '#d6d9e2',
+        color: borderColor ?? '#d6d9e2',
         width: border.width,
         radius: borderRadiusToRendererValue(border.radius ?? options.radiusFallback ?? 0),
       },
@@ -414,7 +425,9 @@ export abstract class NovaUiComponentNode<
     props: TProps,
     options: { componentId?: string } = {},
   ) {
+    ensureNovaUIKitThemes(app)
     super(app, surface, descriptor, props, options)
+    this.addDisposer(app.theme.observe(this, { phase: 'render' }))
     this.applyInitialLayoutRect(props)
     this.applyCommonDisplayState()
     this.options({
@@ -512,6 +525,13 @@ export abstract class NovaUiComponentNode<
    */
   protected playUiSound(eventName: NovaUiSoundEventName): void {
     this.nova.sound.playCue(this.props.sound?.[eventName])
+  }
+
+  /**
+   * Резолвит NovaCSS-compatible token string в active Nova theme.
+   */
+  protected resolveThemeValue(value: string | undefined): string | undefined {
+    return resolveNovaUiThemeValue(this.nova, value)
   }
 
   /**

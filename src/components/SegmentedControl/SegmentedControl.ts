@@ -79,10 +79,10 @@ export class SegmentedControl<E extends EventList = Record<string, any>>
    * Выполняет отрисовку SegmentedControl.
    */
   render(): void {
-    const schema: NovaSchema = buildBoxSchema(this.props, this.width, this.height)
+    const schema: NovaSchema = buildBoxSchema(this.props, this.width, this.height, { resolveThemeValue: value => this.resolveThemeValue(value) })
     const count = Math.max(1, this.props.items.length)
     const segmentWidth = this.width / count
-    const textStyle = resolveComponentTextStyle(this.props, this.inheritedStyleContext)
+    const textStyle = resolveComponentTextStyle(this.props, this.inheritedStyleContext, {}, value => this.resolveThemeValue(value))
     const padding = sizeTokenPadding(this.props.size)
 
     this.props.items.forEach((item, index) => {
@@ -91,11 +91,11 @@ export class SegmentedControl<E extends EventList = Record<string, any>>
       const hovered = index === this.hoveredIndex
       const pressed = index === this.pressedIndex
       const background = active
-        ? this.props.activeBackground ?? '#ffffff'
+        ? this.resolveThemeValue(this.props.activeBackground ?? '#ffffff')
         : pressed
-          ? this.props.pressedBackground ?? 'rgba(148,163,184,0.22)'
+          ? this.resolveThemeValue(this.props.pressedBackground ?? 'rgba(148,163,184,0.22)')
           : hovered
-            ? this.props.hoverBackground ?? 'rgba(148,163,184,0.14)'
+            ? this.resolveThemeValue(this.props.hoverBackground ?? 'rgba(148,163,184,0.14)')
             : undefined
 
       if (background) {
@@ -117,7 +117,7 @@ export class SegmentedControl<E extends EventList = Record<string, any>>
       pushIcon(schema, item.icon, iconX, (this.height - iconSize) / 2, iconSize, item.disabled ? 0.35 : 1)
       pushText(schema, item.label, textX, 0, Math.max(0, segmentWidth - (textX - x) - padding.horizontal), this.height, {
         ...textStyle,
-        color: item.disabled ? '#94a3b8' : active ? this.props.accentColor ?? textStyle.color : textStyle.color,
+        color: item.disabled ? this.resolveThemeValue('var(--nova-ui-subtle, #94a3b8)') ?? textStyle.color : active ? this.resolveThemeValue(this.props.accentColor ?? textStyle.color) ?? textStyle.color : textStyle.color,
       }, { align: 'center' })
     })
 

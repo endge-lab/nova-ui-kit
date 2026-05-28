@@ -197,8 +197,9 @@ export class Input<E extends EventList = Record<string, any>>
         hovered: this.hovered,
         pressed: this.pressed,
         active: focused,
-      }),
+      }, value => this.resolveThemeValue(value)),
       border,
+      resolveThemeValue: value => this.resolveThemeValue(value),
     })
 
     if (this.props.variant === 'underline') {
@@ -208,7 +209,7 @@ export class Input<E extends EventList = Record<string, any>>
         y: this.height - 1,
         width: this.width,
         height: focused ? 2 : 1,
-        styles: { background: invalid ? this.props.errorColor : focused ? this.props.focusBorderColor : '#cbd5e1' },
+        styles: { background: this.resolveThemeValue(invalid ? this.props.errorColor : focused ? this.props.focusBorderColor : 'var(--nova-ui-border, #cbd5e1)') },
       })
     }
 
@@ -219,19 +220,19 @@ export class Input<E extends EventList = Record<string, any>>
    * Выполняет расширяемый шаг pushInputContent для Input.
    */
   protected pushInputContent(schema: NovaSchema): void {
-    const textStyle = resolveComponentTextStyle(this.props, this.inheritedStyleContext)
+    const textStyle = resolveComponentTextStyle(this.props, this.inheritedStyleContext, {}, value => this.resolveThemeValue(value))
     const state = this.controller.getState()
     const layout = this.layoutCache ?? this.createTextLayout()
     const visibleText = this.displayText(state.draft)
     const empty = visibleText.length === 0
-    const textColor = empty ? this.props.placeholderColor : textStyle.color
+    const textColor = empty ? this.resolveThemeValue(this.props.placeholderColor) ?? textStyle.color : textStyle.color
     const text = empty ? this.props.placeholder : visibleText
     const iconSize = Math.max(12, Math.min(18, (this.props.fontSize ?? textStyle.fontSize) + 3))
 
     if (this.props.icon) pushIcon(schema, this.props.icon, 10, (this.height - iconSize) / 2, iconSize, this.props.disabled ? 0.5 : 0.85)
     if (this.kindName === 'search' && !this.props.icon) this.pushSearchGlyph(schema, 12, this.height / 2, iconSize)
-    if (this.props.prefix) pushText(schema, this.props.prefix, 10, 0, 36, this.height, { ...textStyle, color: '#64748b' }, { align: 'center' })
-    if (this.props.suffix) pushText(schema, this.props.suffix, this.width - 46, 0, 36, this.height, { ...textStyle, color: '#64748b' }, { align: 'center' })
+    if (this.props.prefix) pushText(schema, this.props.prefix, 10, 0, 36, this.height, { ...textStyle, color: this.resolveThemeValue('var(--nova-input-affix-color, #64748b)') ?? textStyle.color }, { align: 'center' })
+    if (this.props.suffix) pushText(schema, this.props.suffix, this.width - 46, 0, 36, this.height, { ...textStyle, color: this.resolveThemeValue('var(--nova-input-affix-color, #64748b)') ?? textStyle.color }, { align: 'center' })
 
     const contentX = layout.contentX
     const contentY = this.kindName === 'textarea' ? layout.contentY : (this.height - textStyle.lineHeight) / 2
@@ -245,7 +246,7 @@ export class Input<E extends EventList = Record<string, any>>
         y: rect.y,
         width: rect.width,
         height: rect.height,
-        styles: { background: this.props.selectionColor },
+        styles: { background: this.resolveThemeValue(this.props.selectionColor) },
       })
     }
 
@@ -263,7 +264,7 @@ export class Input<E extends EventList = Record<string, any>>
         y: caret.y,
         width: Math.max(1, caret.width),
         height: caret.height,
-        styles: { background: this.props.caretColor },
+        styles: { background: this.resolveThemeValue(this.props.caretColor) },
       })
     }
 
@@ -302,7 +303,7 @@ export class Input<E extends EventList = Record<string, any>>
    * Выполняет расширяемый шаг pushSelectMenu для Input.
    */
   protected pushSelectMenu(schema: NovaSchema): void {
-    const textStyle = resolveComponentTextStyle(this.props, this.inheritedStyleContext)
+    const textStyle = resolveComponentTextStyle(this.props, this.inheritedStyleContext, {}, value => this.resolveThemeValue(value))
     const optionHeight = 28
     const height = Math.min(160, this.props.options.length * optionHeight)
     schema.push({
@@ -312,8 +313,8 @@ export class Input<E extends EventList = Record<string, any>>
       width: this.width,
       height,
       styles: {
-        background: '#ffffff',
-        border: { color: '#cbd5e1', width: 1, radius: 8 },
+        background: this.resolveThemeValue('var(--nova-input-menu-background, #ffffff)'),
+        border: { color: this.resolveThemeValue('var(--nova-input-menu-border-color, #cbd5e1)'), width: 1, radius: 8 },
       },
     })
     this.props.options.slice(0, Math.floor(height / optionHeight)).forEach((option, index) => {
@@ -324,7 +325,7 @@ export class Input<E extends EventList = Record<string, any>>
         y: this.height + 8 + index * optionHeight,
         width: this.width - 8,
         height: optionHeight - 4,
-        styles: { background: active ? '#eff6ff' : 'rgba(255,255,255,0)', border: { width: 0, radius: 6 } },
+        styles: { background: this.resolveThemeValue(active ? 'var(--nova-input-menu-active-background, #eff6ff)' : 'rgba(255,255,255,0)'), border: { width: 0, radius: 6 } },
       })
       pushText(schema, option.label, 12, this.height + 8 + index * optionHeight, this.width - 24, optionHeight - 4, textStyle, { ellipsis: true })
     })
@@ -617,7 +618,7 @@ export class Input<E extends EventList = Record<string, any>>
    * Создает runtime-сущность Input.
    */
   protected createTextLayout(): NovaTextInputLayoutResult {
-    const style = resolveComponentTextStyle(this.props, this.inheritedStyleContext)
+    const style = resolveComponentTextStyle(this.props, this.inheritedStyleContext, {}, value => this.resolveThemeValue(value))
     const leftInset = (this.props.icon || this.kindName === 'search') ? 34 : this.props.prefix ? 44 : 10
     const rightInset = this.props.clearable || this.kindName === 'password' || this.kindName === 'select' ? 34 : this.props.suffix ? 44 : 10
     return layoutEngine.layout({
@@ -807,8 +808,8 @@ export class Input<E extends EventList = Record<string, any>>
    */
   protected pushRevealButton(schema: NovaSchema): void {
     pushText(schema, this.revealed ? 'hide' : 'show', this.width - 42, 0, 38, this.height, {
-      ...resolveComponentTextStyle(this.props, this.inheritedStyleContext),
-      color: '#2563eb',
+      ...resolveComponentTextStyle(this.props, this.inheritedStyleContext, {}, value => this.resolveThemeValue(value)),
+      color: this.resolveThemeValue('var(--nova-ui-accent, #2563eb)') ?? '#2563eb',
       fontSize: 11,
     }, { align: 'center' })
   }
@@ -920,9 +921,9 @@ export class InputField<E extends EventList = Record<string, any>> extends Input
    */
   override render(): void {
     const schema: NovaSchema = []
-    const style = resolveComponentTextStyle(this.props, this.inheritedStyleContext)
+    const style = resolveComponentTextStyle(this.props, this.inheritedStyleContext, {}, value => this.resolveThemeValue(value))
     if (this.props.label) {
-      pushText(schema, `${this.props.label}${this.props.required ? ' *' : ''}`, 0, 0, this.width, 18, { ...style, fontSize: 12, color: '#475569' }, { ellipsis: true })
+      pushText(schema, `${this.props.label}${this.props.required ? ' *' : ''}`, 0, 0, this.width, 18, { ...style, fontSize: 12, color: this.resolveThemeValue('var(--nova-input-label-color, #475569)') ?? style.color }, { ellipsis: true })
     }
     const inputY = this.props.label ? 22 : 0
     const inputHeight = Math.min(36, Math.max(28, this.height - inputY - (this.props.hint || this.isInvalid() ? 20 : 0)))
@@ -942,9 +943,9 @@ export class InputField<E extends EventList = Record<string, any>> extends Input
       width: this.width,
       height: inputHeight,
       styles: {
-        background: this.props.background,
+        background: this.resolveThemeValue(this.props.background),
         border: {
-          color: invalid ? this.props.errorColor : this.controller.getState().focused ? this.props.focusBorderColor : this.props.border?.color ?? '#cbd5e1',
+          color: this.resolveThemeValue(invalid ? this.props.errorColor : this.controller.getState().focused ? this.props.focusBorderColor : this.props.border?.color ?? 'var(--nova-ui-border, #cbd5e1)'),
           width: this.props.border?.width ?? 1,
           radius: this.props.border?.radius ?? 8,
         },
@@ -953,14 +954,14 @@ export class InputField<E extends EventList = Record<string, any>> extends Input
     const text = this.controller.getState().draft || this.props.placeholder
     pushText(schema, text, 10, inputY, this.width - 20, inputHeight, {
       ...style,
-      color: this.controller.getState().draft ? style.color : this.props.placeholderColor,
+      color: this.controller.getState().draft ? style.color : this.resolveThemeValue(this.props.placeholderColor) ?? style.color,
     }, { ellipsis: true })
     const supportText = this.props.error ?? this.validationMessage ?? this.props.hint
     if (supportText) {
       pushText(schema, supportText, 0, inputY + inputHeight + 4, this.width, 18, {
         ...style,
         fontSize: 12,
-        color: this.isInvalid() ? this.props.errorColor : '#64748b',
+        color: this.resolveThemeValue(this.isInvalid() ? this.props.errorColor : 'var(--nova-input-hint-color, #64748b)') ?? style.color,
       }, { ellipsis: true })
     }
     this.renderer.schema(schema)

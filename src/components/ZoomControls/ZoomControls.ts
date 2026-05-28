@@ -59,16 +59,16 @@ export class ZoomControls<E extends EventList = Record<string, any>>
 
   /** Отрисовывает сегменты zoom controls. */
   render(): void {
-    const schema: NovaSchema = buildBoxSchema(this.props, this.width, this.height)
+    const schema: NovaSchema = buildBoxSchema(this.props, this.width, this.height, { resolveThemeValue: value => this.resolveThemeValue(value) })
     const minus = this.minusRect()
     const plus = this.plusRect()
     const label = this.labelRect()
-    const textStyle = resolveComponentTextStyle(this.props, this.inheritedStyleContext, { fontSize: 13, fontWeight: '700' })
+    const textStyle = resolveComponentTextStyle(this.props, this.inheritedStyleContext, { fontSize: 13, fontWeight: '700' }, value => this.resolveThemeValue(value))
     this.pushButtonSegment(schema, minus, this.props.minusLabel, this.segmentState('minus'))
     if (this.props.showValue && label.width > 0) {
       pushText(schema, this.formatValue(), label.x, label.y, label.width, label.height, {
         ...textStyle,
-        color: this.props.color ?? 'var(--nova-zoom-controls-value-color, #344054)',
+        color: this.resolveThemeValue(this.props.color ?? 'var(--nova-zoom-controls-value-color, #344054)') ?? textStyle.color,
         fontSize: 11,
         fontWeight: '700',
       }, { align: 'center' })
@@ -168,10 +168,10 @@ export class ZoomControls<E extends EventList = Record<string, any>>
         ? this.props.hoverBackground
         : undefined
     if (background) {
-      schema.push({ type: 'rect', ...rect, styles: { background } })
+      schema.push({ type: 'rect', ...rect, styles: { background: this.resolveThemeValue(background) } })
     }
     pushText(schema, label, rect.x, rect.y, rect.width, rect.height, {
-      ...resolveComponentTextStyle(this.props, this.inheritedStyleContext, { fontSize: 15, fontWeight: '900' }),
+      ...resolveComponentTextStyle(this.props, this.inheritedStyleContext, { fontSize: 15, fontWeight: '900' }, value => this.resolveThemeValue(value)),
       fontSize: 15,
       fontWeight: '900',
     }, { align: 'center' })

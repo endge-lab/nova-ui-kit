@@ -44,9 +44,9 @@ export function normalizeScrollbarProps(props: ScrollbarProps = {}): ScrollbarRe
     ...normalizeCommonProps(props, {
       width: orientation === 'vertical' ? 12 : 160,
       height: orientation === 'vertical' ? 160 : 12,
-      trackColor: 'rgba(148,163,184,0.24)',
-      thumbColor: 'rgba(71,85,105,0.72)',
-      hoverBackground: 'rgba(71,85,105,0.88)',
+      trackColor: 'var(--nova-scrollbar-track-color, rgba(148,163,184,0.24))',
+      thumbColor: 'var(--nova-scrollbar-thumb-color, rgba(71,85,105,0.72))',
+      hoverBackground: 'var(--nova-scrollbar-thumb-hover-color, rgba(71,85,105,0.88))',
       cursor: { hover: cursor, pressed: cursor, dragging: cursor, disabled: 'not-allowed' },
     }),
     orientation,

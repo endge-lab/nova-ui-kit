@@ -42,8 +42,8 @@ export function normalizeSurfaceProps(props: SurfaceProps = {}): SurfaceResolved
     ...normalizeCommonProps(props, {
       width: 160,
       height: 96,
-      background: '#ffffff',
-      border: { color: '#d6d9e2', width: 1, radius: 8 },
+      background: 'var(--nova-surface-background, #ffffff)',
+      border: { color: 'var(--nova-surface-border-color, #d6d9e2)', width: 1, radius: 8 },
       clip: false,
     }),
     motionOffsetY: finiteNumber(props.motionOffsetY, 0),

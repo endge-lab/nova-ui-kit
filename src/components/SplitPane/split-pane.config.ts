@@ -40,8 +40,8 @@ export function normalizeSplitPaneProps(props: SplitPaneProps = {}): SplitPaneRe
     ...normalizeCommonProps(props, {
       width: 420,
       height: 220,
-      background: '#ffffff',
-      border: { color: '#cbd5e1', width: 1, radius: 8 },
+      background: 'var(--nova-split-pane-background, #ffffff)',
+      border: { color: 'var(--nova-split-pane-border-color, #cbd5e1)', width: 1, radius: 8 },
       clip: true,
     }),
     direction: props.direction ?? 'horizontal',
@@ -50,10 +50,10 @@ export function normalizeSplitPaneProps(props: SplitPaneProps = {}): SplitPaneRe
     maxSizes: normalizePair(props.maxSizes, [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY]),
     resizeMode: props.resizeMode === 'lazy' ? 'lazy' : 'live',
     resizer: {
-      color: props.resizer?.color ?? '#94a3b8',
+      color: props.resizer?.color ?? 'var(--nova-split-pane-resizer-color, #94a3b8)',
       lineWidth: finiteNumber(props.resizer?.lineWidth, 1),
       hitSize: finiteNumber(props.resizer?.hitSize, 8),
-      overlayColor: props.resizer?.overlayColor ?? 'rgba(37,99,235,0.14)',
+      overlayColor: props.resizer?.overlayColor ?? 'var(--nova-split-pane-resizer-overlay-color, rgba(37,99,235,0.14))',
     },
     collapsedPane: props.collapsedPane ?? null,
     onResizeStart: props.onResizeStart,

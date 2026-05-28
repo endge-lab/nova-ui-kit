@@ -101,9 +101,9 @@ export class Panel<E extends EventList = Record<string, any>>
    * Выполняет отрисовку Panel.
    */
   render(): void {
-    const schema: NovaSchema = buildBoxSchema(this.props, this.width, this.height)
+    const schema: NovaSchema = buildBoxSchema(this.props, this.width, this.height, { resolveThemeValue: value => this.resolveThemeValue(value) })
     const padding = resolveSpacing(this.props.padding)
-    const textStyle = resolveComponentTextStyle(this.props, this.inheritedStyleContext)
+    const textStyle = resolveComponentTextStyle(this.props, this.inheritedStyleContext, {}, value => this.resolveThemeValue(value))
     if (this.props.title) {
       pushText(schema, this.props.title, padding.left, padding.top, Math.max(0, this.width - padding.left - padding.right), 24, {
         ...textStyle,
@@ -115,7 +115,7 @@ export class Panel<E extends EventList = Record<string, any>>
     if (this.props.subtitle) {
       pushText(schema, this.props.subtitle, padding.left, padding.top + 25, Math.max(0, this.width - padding.left - padding.right), 20, {
         ...textStyle,
-        color: '#64748b',
+        color: this.resolveThemeValue('var(--nova-panel-subtitle-color, #64748b)') ?? textStyle.color,
         fontSize: Math.max(11, textStyle.fontSize - 1),
         lineHeight: 18,
       })

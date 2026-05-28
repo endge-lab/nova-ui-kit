@@ -46,7 +46,9 @@ import {
   type TooltipApi,
   type ZoomControlsApi,
   type PopoverApi,
+  THEME_SWITCH_ASSETS,
   registerNovaUiGlobalStyleSheet,
+  resolveNovaUiThemeValue,
   validateNovaUiStyleSheetSource,
 } from '@/index'
 import { registerNovaUIKit } from '@/registerNovaUIKit'
@@ -2844,6 +2846,29 @@ describe('Nova UI Kit components', () => {
     const props = app.components.requireApi<ThemeSwitchApi>('theme-switch-defaults').getProps()
     expect(props.themes.map(theme => theme.id)).toEqual(['light', 'dark'])
     expect(props.themes.every(theme => theme.icon)).toBe(true)
+    expect(app.assets.resolveRecord(THEME_SWITCH_ASSETS.icons.sun)).toBeDefined()
+    expect(app.assets.resolveRecord(THEME_SWITCH_ASSETS.icons.moon)).toBeDefined()
+
+    app.destroy()
+  })
+
+  it('registers built-in light and dark NovaUIKit theme tokens on first component use', () => {
+    const app = createApp()
+    const surface = app.createSurface('built-in-theme-tokens')
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'built-in-theme-root',
+      children: [
+        { type: NovaUIKit.Button, id: 'built-in-theme-button', props: { text: 'Theme' } },
+      ],
+    })
+
+    expect(app.theme.active()).toBe('light')
+    expect(resolveNovaUiThemeValue(app, 'var(--nova-button-background, #ffffff)')).toBe('#ffffff')
+
+    app.theme.use('dark')
+    expect(resolveNovaUiThemeValue(app, 'var(--nova-button-background, #ffffff)')).toBe('#172033')
 
     app.destroy()
   })

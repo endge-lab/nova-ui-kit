@@ -8,11 +8,14 @@ import {
   type ThemeSwitchDescriptor,
 } from '@/components/ThemeSwitch/theme-switch.config'
 import {
+  ensureNovaUIKitThemes,
+  resolveNovaUiThemeValue,
+} from '@/shared/style/nova-ui-kit-theme'
+import {
   resolveNovaUiPositionedRect,
   type NovaUiLayoutRect,
 } from '@/shared/layout'
 import { NovaUiStyleMask } from '@/shared/style'
-import { THEME_SWITCH_ASSETS } from '@/components/ThemeSwitch/theme-switch-assets'
 import type {
   ThemeSwitchApi,
   ThemeSwitchProps,
@@ -26,7 +29,6 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
   private readonly api: ThemeSwitchApi
   private hovered = false
   private pressed = false
-  private assetsRegistered = false
 
   constructor(
     app: NovaApp<E>,
@@ -35,7 +37,9 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
     options: { componentId?: string } = {},
     descriptor: ThemeSwitchDescriptor = THEME_SWITCH_NODE_DESCRIPTOR,
   ) {
+    ensureNovaUIKitThemes(app)
     super(app, surface, descriptor, normalizeThemeSwitchProps(props), options)
+    this.addDisposer(app.theme.observe(this, { phase: 'render' }))
     this.api = {
       next: () => this.nextTheme(),
       setValue: value => this.setProps({ value }),
@@ -43,7 +47,6 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
       getProps: () => this.props,
     }
     this.options({ interactive: true, cursor: 'pointer', zIndex: 2001 })
-    this.registerAssets()
     this.setupEvents()
     this.applyPlacement()
   }
@@ -83,31 +86,12 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
     }, {
       hovered: this.hovered,
       pressed: this.pressed,
-    }))
+    }, value => resolveNovaUiThemeValue(this.nova, value)))
   }
 
   protected override onPropsChanged(): void {
     this.props = normalizeThemeSwitchProps(this.props)
     this.applyPlacement()
-  }
-
-  protected override onMount(): void {
-    this.registerAssets()
-    super.onMount()
-  }
-
-  protected override onUnmount(): void {
-    if (this.assetsRegistered) {
-      this.nova.assets.unuse(THEME_SWITCH_ASSETS)
-      this.assetsRegistered = false
-    }
-    super.onUnmount()
-  }
-
-  private registerAssets(): void {
-    if (this.assetsRegistered) return
-    this.nova.assets.use(THEME_SWITCH_ASSETS)
-    this.assetsRegistered = true
   }
 
   private setupEvents(): void {

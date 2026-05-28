@@ -97,6 +97,7 @@ import {
   type NovaUiStyleValidationResult,
   type NovaUiStylableNode,
 } from '@/shared/style'
+import { ensureNovaUIKitThemes } from '@/shared/style/nova-ui-kit-theme'
 
 interface AppliedCascadeState {
   baseline: Record<string, unknown>
@@ -148,6 +149,7 @@ export class Root<E extends EventList = Record<string, any>>
     options: { componentId?: string; children?: Array<RootChildSchema> } = {},
     descriptor: RootDescriptor = ROOT_NODE_DESCRIPTOR,
   ) {
+    ensureNovaUIKitThemes(app)
     const resolvedProps = normalizeRootProps(props)
     super(app, surface, descriptor, resolvedProps, options)
     this.__type = 'Root'

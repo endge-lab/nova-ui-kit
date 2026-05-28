@@ -42,6 +42,10 @@ import {
   type NovaUiStyleReceiveResult,
   type NovaUiStyleTarget,
 } from '@/shared/style'
+import {
+  ensureNovaUIKitThemes,
+  resolveNovaUiThemeValue,
+} from '@/shared/style/nova-ui-kit-theme'
 import { isNovaUiMotionEnabled, resolveNovaUiMotionOptions } from '@/shared/motion'
 
 const TEXT_BLOCK_LAYOUT_STYLE_MASK = (
@@ -82,11 +86,13 @@ export class TextBlock<E extends EventList = Record<string, any>>
     options: { componentId?: string } = {},
     descriptor: TextBlockDescriptor = TEXT_BLOCK_NODE_DESCRIPTOR,
   ) {
+    ensureNovaUIKitThemes(app)
     const resolvedProps = normalizeTextBlockProps(props)
     const initialProps = isNovaUiMotionEnabled(props) && props.motion === 'fadeIn'
       ? { ...resolvedProps, opacity: 0 }
       : resolvedProps
     super(app, surface, descriptor, initialProps, options)
+    this.addDisposer(app.theme.observe(this, { phase: 'render' }))
     this.__type = 'TextBlock'
     this.applyDisplayState()
     this.explicitTopLevelStyleMask = textBlockTopLevelStyleMask(props)
@@ -243,7 +249,7 @@ export class TextBlock<E extends EventList = Record<string, any>>
    * Выполняет отрисовку TextBlock.
    */
   render(): void {
-    this.renderSchema(buildTextBlockSchema(this.resolveCurrentLayoutProps(), this.measureText, 'node'))
+    this.renderSchema(buildTextBlockSchema(this.resolveThemeLayoutProps(this.resolveCurrentLayoutProps()), this.measureText, 'node'))
   }
 
   /**
@@ -352,6 +358,20 @@ export class TextBlock<E extends EventList = Record<string, any>>
       fontWeight: this.effectiveTextStyle.fontWeight ?? this.props.fontWeight,
       fontStyle: this.effectiveTextStyle.fontStyle ?? this.props.fontStyle,
       lineHeight: this.effectiveTextStyle.lineHeight ?? this.props.lineHeight,
+    }
+  }
+
+  private resolveThemeLayoutProps(props: TextBlockResolvedProps): TextBlockResolvedProps {
+    return {
+      ...props,
+      color: resolveNovaUiThemeValue(this.nova, props.color) ?? props.color,
+      background: resolveNovaUiThemeValue(this.nova, props.background),
+      border: props.border
+        ? {
+            ...props.border,
+            color: resolveNovaUiThemeValue(this.nova, props.border.color),
+          }
+        : props.border,
     }
   }
 

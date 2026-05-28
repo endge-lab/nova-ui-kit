@@ -95,11 +95,11 @@ export class Overlay<E extends EventList = Record<string, any>>
         y: 0,
         width: this.width,
         height: this.height,
-        styles: { background: 'rgba(15,23,42,0.18)' },
+        styles: { background: this.resolveThemeValue('var(--nova-overlay-backdrop-background, rgba(15,23,42,0.18))') },
       })
     }
 
-    const surface = buildBoxSchema(this.props, this.surfaceRect.width, this.surfaceRect.height)
+    const surface = buildBoxSchema(this.props, this.surfaceRect.width, this.surfaceRect.height, { resolveThemeValue: value => this.resolveThemeValue(value) })
     for (const item of surface) {
       const shape = item as Record<string, any>
       shape.x = (shape.x ?? 0) + this.surfaceRect.x

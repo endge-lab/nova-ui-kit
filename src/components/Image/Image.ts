@@ -71,7 +71,7 @@ export class Image<E extends EventList = Record<string, any>>
       },
       this.width,
       this.height,
-      { radiusFallback: this.props.radius },
+      { radiusFallback: this.props.radius, resolveThemeValue: value => this.resolveThemeValue(value) },
     )
     schema.push(...backgroundSchema)
 

@@ -71,9 +71,9 @@ export function normalizeTooltipProps(props: TooltipProps = {}): TooltipResolved
     ...normalizeCommonProps(props, {
       width: 120,
       height: 32,
-      background: '#111827',
-      color: '#ffffff',
-      border: { color: 'rgba(255,255,255,0.12)', width: 1, radius: 7 },
+      background: 'var(--nova-tooltip-background, #111827)',
+      color: 'var(--nova-tooltip-color, #ffffff)',
+      border: { color: 'var(--nova-tooltip-border-color, rgba(255,255,255,0.12))', width: 1, radius: 7 },
       padding: { horizontal: 10, vertical: 7 },
       className,
     }),
