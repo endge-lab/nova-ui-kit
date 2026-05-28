@@ -1,4 +1,5 @@
 export * from '@/components/ThemeSwitch/ThemeSwitch'
 export * from '@/components/ThemeSwitch/theme-switch.config'
+export * from '@/components/ThemeSwitch/theme-switch-assets'
 export * from '@/components/ThemeSwitch/theme-switch.registry'
 export * from '@/components/ThemeSwitch/theme-switch.types'

@@ -5,9 +5,11 @@ import {
   compileLayoutValue,
   copyRect,
   createLayoutRect,
+  isNovaUiOutOfFlowPosition,
   readNovaUiNodeProps,
   rectEquals,
   resolveLayoutValue,
+  resolveNovaUiPositionedRect,
   resolveSpacing,
 } from '@/shared/layout'
 
@@ -79,5 +81,40 @@ describe('Nova UI layout primitives', () => {
     }
 
     expect(readNovaUiNodeProps(node)).toEqual({ className: 'h-48 shrink-0' })
+  })
+
+  it('resolves CSS-like positioned rects without affecting flow semantics', () => {
+    const container = { x: 10, y: 20, width: 300, height: 200 }
+    const fallback = { x: 30, y: 40, width: 80, height: 50 }
+
+    expect(resolveNovaUiPositionedRect(container, fallback, { position: 'static' })).toEqual(fallback)
+    expect(resolveNovaUiPositionedRect(container, fallback, { position: 'relative', inset: { left: 6, top: 4 } })).toEqual({
+      x: 36,
+      y: 44,
+      width: 80,
+      height: 50,
+    })
+    expect(resolveNovaUiPositionedRect(container, fallback, {
+      position: 'absolute',
+      inset: { top: 12, right: 16 },
+      width: 90,
+      height: 32,
+    })).toEqual({
+      x: 204,
+      y: 32,
+      width: 90,
+      height: 32,
+    })
+    expect(resolveNovaUiPositionedRect(container, fallback, {
+      position: 'absolute',
+      inset: { left: 12, right: 18, top: 10, bottom: 20 },
+    })).toEqual({
+      x: 22,
+      y: 30,
+      width: 270,
+      height: 170,
+    })
+    expect(isNovaUiOutOfFlowPosition('absolute')).toBe(true)
+    expect(isNovaUiOutOfFlowPosition('relative')).toBe(false)
   })
 })

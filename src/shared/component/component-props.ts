@@ -20,9 +20,12 @@ import {
   createLayoutRect,
   rectEquals,
   relayoutNovaUiLayoutAncestors,
+  resolveNovaUiPosition,
   resolveSpacing,
+  type NovaUiInset,
   type NovaUiLayoutRect,
   type NovaUiLayoutTarget,
+  type NovaUiPosition,
   type NovaUiSpacing,
 } from '@/shared/layout'
 import {
@@ -42,7 +45,6 @@ import {
   type NovaUiStyleReceiveResult,
   type NovaUiStyleTarget,
 } from '@/shared/style'
-import { requireNovaUiRoot } from '@/components/Root/root-target'
 import type { TooltipInput } from '@/components/Tooltip/tooltip.types'
 
 export type NovaUiComponentSize = 'sm' | 'md' | 'lg'
@@ -50,12 +52,16 @@ export type NovaUiOrientation = 'horizontal' | 'vertical'
 export type NovaUiIconSource = CanvasImageSource | string | NovaAssetRef<'icon' | 'image'> | undefined | null
 export type NovaUiSoundEventName = 'hover' | 'press' | 'change' | 'disabledPress'
 export type NovaUiSoundMap = Partial<Record<NovaUiSoundEventName, NovaSoundCueInput>>
+export type NovaUiLegacyPointPosition = { x?: number; y?: number }
 
 export interface NovaUiCommonProps extends NovaUiMotionOptions, NovaUiStyleIdentityProps {
   x?: number
   y?: number
   width?: number
   height?: number
+  position?: NovaUiPosition | NovaUiLegacyPointPosition
+  inset?: NovaUiInset
+  zIndex?: number
   style?: NovaUiInheritedTextStyle
   color?: string
   fontFamily?: string
@@ -89,6 +95,9 @@ export interface NovaUiCommonResolvedProps extends NovaUiStyleIdentityProps {
   y: number
   width: number
   height: number
+  position?: NovaUiPosition | NovaUiLegacyPointPosition
+  inset?: NovaUiInset
+  zIndex?: number
   motion?: NovaUiMotionOptions['motion']
   style?: NovaUiInheritedTextStyle
   color?: string
@@ -147,6 +156,9 @@ export const NOVA_UI_COMMON_FIELD_DEFINITIONS = {
   y: { type: 'number' },
   width: { type: 'number' },
   height: { type: 'number' },
+  position: { type: 'string' },
+  inset: { type: 'spacing' },
+  zIndex: { type: 'number' },
   style: { type: 'style' },
   color: { type: 'string' },
   fontFamily: { type: 'string' },
@@ -179,8 +191,8 @@ export const NOVA_UI_COMMON_FIELD_DEFINITIONS = {
 } as const
 
 export const NOVA_UI_COMMON_DIRTY_POLICY = {
-  matrix: ['x', 'y'] as const,
-  update: ['width', 'height', 'padding', 'margin'] as const,
+  matrix: ['x', 'y', 'zIndex'] as const,
+  update: ['width', 'height', 'padding', 'margin', 'position', 'inset'] as const,
   render: [
     'style',
     'color',
@@ -221,6 +233,9 @@ export function normalizeCommonProps<TProps extends NovaUiCommonProps>(
     y: finiteNumber(props.y, defaults.y ?? 0),
     width: Math.max(0, finiteNumber(props.width, defaults.width ?? 0)),
     height: Math.max(0, finiteNumber(props.height, defaults.height ?? 0)),
+    position: resolveNovaUiPosition(props.position ?? defaults.position),
+    inset: props.inset ?? defaults.inset,
+    zIndex: finiteOptionalNumber(props.zIndex, defaults.zIndex),
     motion: props.motion ?? defaults.motion,
     style: props.style ?? defaults.style,
     color: props.color ?? defaults.color,
@@ -438,11 +453,6 @@ export abstract class NovaUiComponentNode<
   /**
    * Обрабатывает входящее событие NovaUiComponentNode.
    */
-  protected override onMount(): void {
-    requireNovaUiRoot(this)
-    super.onMount()
-  }
-
   /**
    * Возвращает значение состояния NovaUiComponentNode.
    */
@@ -510,6 +520,7 @@ export abstract class NovaUiComponentNode<
   protected applyCommonPropsChanged(changedKeys: Array<keyof TProps>): void {
     this.options({
       opacity: this.props.disabled ? this.props.disabledOpacity : this.props.opacity,
+      zIndex: this.props.zIndex,
       cursor: this.props.cursor ?? null,
       cursorContext: {
         ...(this.props.cursorContext ?? {}),
@@ -518,6 +529,9 @@ export abstract class NovaUiComponentNode<
     })
     this.applyCommonDisplayState()
     if (changedKeys.includes('display')) this.markLayoutAncestorsDirty()
+    if (changedKeys.includes('position') || changedKeys.includes('inset') || changedKeys.includes('zIndex')) {
+      this.markLayoutAncestorsDirty()
+    }
     if (changedKeys.includes('className') || changedKeys.includes('attrs') || changedKeys.includes('display')) {
       bumpNovaUiStyleSheetVersion(this.nova)
     }
@@ -547,6 +561,7 @@ export abstract class NovaUiComponentNode<
       y: props.y,
       width: props.width,
       height: props.height,
+      zIndex: props.zIndex,
       cursor: props.cursor ?? null,
       cursorContext: {
         ...(props.cursorContext ?? {}),
@@ -568,6 +583,7 @@ export abstract class NovaUiComponentNode<
       y: rect.y,
       width: rect.width,
       height: rect.height,
+      zIndex: this.props.zIndex,
     })
     this.dirty({ matrix: true, update: sizeChanged, render: true })
     this.notifySyncPortChanged('x', rect.x)

@@ -24,18 +24,23 @@ import type {
   FlexProps,
   FlexResolvedProps,
 } from '@/components/Flex/flex.types'
-import { requireNovaUiRoot } from '@/components/Root/root-target'
 import {
   NOVA_UI_LAYOUT_TARGET,
   applyNodeLayoutRect,
+  applyNovaUiLayoutZIndex,
   copyRect,
   createLayoutRect,
   getNovaUiNodeLayoutIntent,
+  isNovaUiOutOfFlowPosition,
+  isNovaUiLayoutTarget,
   isNovaUiLayoutDisplayed,
   mergeNovaUiLayoutIntents,
   readNovaUiNodeProps,
   rectEquals,
   relayoutNovaUiLayoutAncestors,
+  resolveNovaUiPositionedLayout,
+  resolveNovaUiPositionedRect,
+  resolveSpacing,
   type NovaUiLayoutRect,
   type NovaUiLayoutTarget,
 } from '@/shared/layout'
@@ -192,6 +197,7 @@ export class Flex<E extends EventList = Record<string, any>>
       y: rect.y,
       width: rect.width,
       height: rect.height,
+      zIndex: this.props.zIndex,
     })
     this.layoutDirty = true
     this.dirty({ update: true, matrix: true, render: true })
@@ -201,26 +207,51 @@ export class Flex<E extends EventList = Record<string, any>>
   /** Пересчитывает layout только если изменились размеры, props или children. */
   update(): void {
     if (!this.layoutDirty) return
+    if (!this.externalLayout) this.applyResolvedRect(this.resolveStandaloneRect())
 
     const layoutEntries = this.childEntries.filter(entry => isNovaUiLayoutDisplayed(entry.node))
+    const flowEntries: Array<FlexChildEntry> = []
+    const positionedEntries: Array<FlexChildEntry> = []
+    const layoutsById = new Map<string, FlexChildLayout>()
+
     for (const entry of layoutEntries) {
-      entry.compiledLayout = compileFlexChildLayout(resolveFlexChildLayout(entry.node, entry.rawLayout))
+      const layout = resolveFlexChildLayout(entry.node, entry.rawLayout)
+      layoutsById.set(entry.id, layout)
+      entry.compiledLayout = compileFlexChildLayout(layout)
+      if (isNovaUiOutOfFlowPosition(layout.position)) positionedEntries.push(entry)
+      else flowEntries.push(entry)
     }
 
     this.engine.compute({
       props: this.props,
       width: this.width,
       height: this.height,
-      entries: layoutEntries,
+      entries: flowEntries,
     })
 
-    for (const entry of layoutEntries) {
-      if (rectEquals(entry.prevRect, entry.nextRect)) continue
+    const containerRect = resolveFlexContentRect(this.props.padding, this.width, this.height)
+    for (const entry of flowEntries) {
+      this.applyChildLayoutRect(entry, resolveNovaUiPositionedRect(
+        containerRect,
+        entry.nextRect,
+        layoutsById.get(entry.id) ?? {},
+        entry.node,
+      ))
+    }
 
-      const changed = applyNodeLayoutRect(entry.node as NovaNode<any>, entry.nextRect)
-      copyRect(entry.prevRect, entry.nextRect)
-      this.rectsById.set(entry.id, entry.prevRect)
-      if (changed) entry.node.dirty({ update: true, render: true })
+    for (const entry of positionedEntries) {
+      const fallback = {
+        x: entry.prevRect.x,
+        y: entry.prevRect.y,
+        width: entry.prevRect.width || entry.node.width,
+        height: entry.prevRect.height || entry.node.height,
+      }
+      this.applyChildLayoutRect(entry, resolveNovaUiPositionedRect(
+        containerRect,
+        fallback,
+        layoutsById.get(entry.id) ?? {},
+        entry.node,
+      ))
     }
 
     this.layoutDirty = false
@@ -315,17 +346,12 @@ export class Flex<E extends EventList = Record<string, any>>
   /**
    * Обрабатывает входящее событие Flex.
    */
-  protected override onMount(): void {
-    requireNovaUiRoot(this)
-  }
-
-  /**
-   * Обрабатывает входящее событие Flex.
-   */
   protected override onPropsChanged(_changedKeys: Array<keyof FlexResolvedProps>): void {
     this.props = normalizeFlexProps(this.props)
     this.applyDisplayState()
+    this.options({ zIndex: this.props.zIndex })
     if (_changedKeys.includes('display')) this.markLayoutAncestorsDirty()
+    if (_changedKeys.includes('position') || _changedKeys.includes('inset') || _changedKeys.includes('zIndex')) this.markLayoutAncestorsDirty()
     if (hasFlexLayoutChanges(_changedKeys)) this.layoutDirty = true
     if (!this.externalLayout && hasFlexGeometryChanges(_changedKeys)) {
       this.applyResolvedRect({
@@ -404,25 +430,110 @@ export class Flex<E extends EventList = Record<string, any>>
   private markLayoutAncestorsDirty(): void {
     relayoutNovaUiLayoutAncestors(this)
   }
+
+  private applyChildLayoutRect(entry: FlexChildEntry, rect: NovaUiLayoutRect): void {
+    const layout = resolveFlexChildLayout(entry.node, entry.rawLayout)
+    if (rectEquals(entry.prevRect, rect)) {
+      applyNovaUiLayoutZIndex(entry.node as NovaNode<any>, layout.zIndex)
+      return
+    }
+
+    const changed = applyNodeLayoutRect(entry.node as NovaNode<any>, rect)
+    applyNovaUiLayoutZIndex(entry.node as NovaNode<any>, layout.zIndex)
+    copyRect(entry.prevRect, rect)
+    this.rectsById.set(entry.id, entry.prevRect)
+    if (changed) entry.node.dirty({ update: true, render: true })
+  }
+
+  private resolveStandaloneRect(): NovaUiLayoutRect {
+    const preferred = this.measurePreferredSize()
+    const fallback = {
+      x: this.props.x,
+      y: this.props.y,
+      width: this.props.width > 0 ? this.props.width : preferred.width,
+      height: this.props.height > 0 ? this.props.height : preferred.height,
+    }
+    if (this.props.position === 'static') return fallback
+    return resolveNovaUiPositionedRect(
+      { x: 0, y: 0, width: this.surface.width, height: this.surface.height },
+      fallback,
+      { position: this.props.position, inset: this.props.inset, zIndex: this.props.zIndex },
+      this,
+    )
+  }
+
+  private measurePreferredSize(): { width: number; height: number } {
+    const entries = this.childEntries.filter(entry => {
+      if (!isNovaUiLayoutDisplayed(entry.node)) return false
+      return !isNovaUiOutOfFlowPosition(resolveFlexChildLayout(entry.node, entry.rawLayout).position)
+    })
+    if (entries.length === 0) return { width: Math.max(0, this.props.width), height: Math.max(0, this.props.height) }
+
+    const padding = resolveSpacing(this.props.padding)
+    const isRow = this.props.direction === 'row'
+    const mainGap = isRow ? this.props.columnGap : this.props.rowGap
+    let main = 0
+    let cross = 0
+
+    entries.forEach((entry, index) => {
+      const layout = resolveFlexChildLayout(entry.node, entry.rawLayout)
+      const size = measureFlexChild(entry, layout)
+      const margin = resolveSpacing(layout.margin)
+      const itemMain = isRow ? size.width + margin.left + margin.right : size.height + margin.top + margin.bottom
+      const itemCross = isRow ? size.height + margin.top + margin.bottom : size.width + margin.left + margin.right
+      main += itemMain + (index > 0 ? mainGap : 0)
+      cross = Math.max(cross, itemCross)
+    })
+
+    return isRow
+      ? { width: main + padding.left + padding.right, height: cross + padding.top + padding.bottom }
+      : { width: cross + padding.left + padding.right, height: main + padding.top + padding.bottom }
+  }
 }
 
 function hasFlexGeometryChanges(keys: Array<keyof FlexResolvedProps>): boolean {
-  return keys.includes('x') || keys.includes('y') || keys.includes('width') || keys.includes('height')
+  return keys.includes('x') || keys.includes('y') || keys.includes('width') || keys.includes('height') || keys.includes('position') || keys.includes('inset')
+}
+
+function measureFlexChild(entry: FlexChildEntry, layout: FlexChildLayout): { width: number; height: number } {
+  const layoutWidth = typeof layout.width === 'number' && Number.isFinite(layout.width) ? layout.width : undefined
+  const layoutHeight = typeof layout.height === 'number' && Number.isFinite(layout.height) ? layout.height : undefined
+  const measured = isNovaUiLayoutTarget(entry.node) && entry.node.measureLayout
+    ? entry.node.measureLayout({ minWidth: 0, maxWidth: Number.MAX_SAFE_INTEGER, minHeight: 0, maxHeight: Number.MAX_SAFE_INTEGER })
+    : undefined
+  return {
+    width: Math.max(0, layoutWidth ?? measured?.width ?? entry.node.width ?? 0),
+    height: Math.max(0, layoutHeight ?? measured?.height ?? entry.node.height ?? 0),
+  }
 }
 
 function resolveFlexChildLayout(node: unknown, explicitLayout: FlexChildLayout = {}): FlexChildLayout {
   const props = readNovaUiNodeProps(node)
+  const propLayout = resolveNovaUiPositionedLayout(node)
   return mergeNovaUiLayoutIntents<FlexChildLayout>(
     resolveNovaUiClassLayoutIntent(props.className),
     getNovaUiNodeLayoutIntent(node),
+    propLayout,
     explicitLayout,
   )
+}
+
+function resolveFlexContentRect(paddingInput: FlexResolvedProps['padding'], width: number, height: number): NovaUiLayoutRect {
+  const padding = resolveSpacing(paddingInput)
+  return {
+    x: padding.left,
+    y: padding.top,
+    width: Math.max(0, width - padding.left - padding.right),
+    height: Math.max(0, height - padding.top - padding.bottom),
+  }
 }
 
 function hasFlexLayoutChanges(keys: Array<keyof FlexResolvedProps>): boolean {
   return (
     keys.includes('width')
     || keys.includes('height')
+    || keys.includes('position')
+    || keys.includes('inset')
     || keys.includes('row')
     || keys.includes('col')
     || keys.includes('direction')

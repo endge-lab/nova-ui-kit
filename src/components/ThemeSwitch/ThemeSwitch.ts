@@ -5,6 +5,11 @@ import {
   normalizeThemeSwitchProps,
   type ThemeSwitchDescriptor,
 } from '@/components/ThemeSwitch/theme-switch.config'
+import {
+  resolveNovaUiPositionedRect,
+  type NovaUiLayoutRect,
+} from '@/shared/layout'
+import { THEME_SWITCH_ASSETS, resolveThemeSwitchDefaultIconKind } from '@/components/ThemeSwitch/theme-switch-assets'
 import type {
   ThemeSwitchApi,
   ThemeSwitchProps,
@@ -32,6 +37,7 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
       setProps: patch => this.setProps(patch),
       getProps: () => this.props,
     }
+    this.nova.assets.use(THEME_SWITCH_ASSETS)
     this.options({ interactive: true, cursor: 'pointer', zIndex: 2001 })
     this.setupEvents()
     this.applyPlacement()
@@ -56,6 +62,7 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
     }
 
     const theme = this.currentTheme()
+    const background = theme?.background ?? (this.pressed ? 'rgba(241,245,249,0.98)' : 'rgba(255,255,255,0.94)')
     const schema: NovaSchema = []
     schema.push({
       type: 'rect',
@@ -64,12 +71,15 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
       width: this.props.width,
       height: this.props.height,
       styles: {
-        background: theme?.background ?? (this.pressed ? 'rgba(241,245,249,0.98)' : 'rgba(255,255,255,0.94)'),
-        border: { color: '#cbd5e1', width: 1, radius: 7 },
+        background,
+        border: { color: '#cbd5e1', width: 1, radius: 8 },
       },
     })
 
-    if (theme?.icon) {
+    const builtinIcon = theme ? resolveThemeSwitchDefaultIconKind(theme.id) : undefined
+    if (builtinIcon) {
+      pushThemeSwitchBuiltinIcon(schema, builtinIcon, this.props.width / 2, this.props.height / 2, 18, builtinIcon === 'moon' ? '#f8fafc' : '#111827', background)
+    } else if (theme?.icon) {
       schema.push({
         type: 'icon',
         icon: theme.icon,
@@ -148,15 +158,57 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
 
   private applyPlacement(): void {
     const rect = resolveOverlayRect(this.surface.width, this.surface.height, this.props)
-    this.options({ x: rect.x, y: rect.y, width: rect.width, height: rect.height, interactive: this.props.visible, zIndex: 2001 })
+    this.options({
+      ...(rect.x !== undefined && rect.y !== undefined ? { x: rect.x, y: rect.y } : {}),
+      width: rect.width,
+      height: rect.height,
+      interactive: this.props.visible,
+      zIndex: this.props.zIndex,
+    })
     this.setLocalRenderBounds({ x: 0, y: 0, width: rect.width, height: rect.height })
   }
 }
 
-function resolveOverlayRect(rootWidth: number, rootHeight: number, props: ThemeSwitchResolvedProps): { x: number; y: number; width: number; height: number } {
+function pushThemeSwitchBuiltinIcon(schema: NovaSchema, kind: 'moon' | 'sun', cx: number, cy: number, size: number, color: string, background: string): void {
+  const strokeWidth = 1.8
+  if (kind === 'moon') {
+    schema.push({ type: 'circle', x: cx - 2, y: cy + 1, radius: size * 0.39, styles: { border: { color, width: strokeWidth } } })
+    schema.push({ type: 'circle', x: cx + 3, y: cy - 4, radius: size * 0.36, styles: { background } })
+    schema.push({ type: 'line', x1: cx + 5.5, y1: cy - 7, x2: cx + 8.5, y2: cy - 7, styles: { color, width: strokeWidth } })
+    schema.push({ type: 'line', x1: cx + 7, y1: cy - 8.5, x2: cx + 7, y2: cy - 5.5, styles: { color, width: strokeWidth } })
+    schema.push({ type: 'line', x1: cx + 8, y1: cy + 4, x2: cx + 12, y2: cy + 4, styles: { color, width: strokeWidth } })
+    schema.push({ type: 'line', x1: cx + 10, y1: cy + 2, x2: cx + 10, y2: cy + 6, styles: { color, width: strokeWidth } })
+    return
+  }
+
+  schema.push({ type: 'circle', x: cx, y: cy, radius: size * 0.24, styles: { border: { color, width: strokeWidth } } })
+  const inner = size * 0.36
+  const outer = size * 0.48
+  for (let index = 0; index < 8; index += 1) {
+    const angle = (Math.PI * 2 * index) / 8
+    schema.push({
+      type: 'line',
+      x1: cx + Math.cos(angle) * inner,
+      y1: cy + Math.sin(angle) * inner,
+      x2: cx + Math.cos(angle) * outer,
+      y2: cy + Math.sin(angle) * outer,
+      styles: { color, width: strokeWidth },
+    })
+  }
+}
+
+function resolveOverlayRect(rootWidth: number, rootHeight: number, props: ThemeSwitchResolvedProps): { x?: number; y?: number; width: number; height: number } {
   const width = props.width
   const height = props.height
   if (typeof props.x === 'number' && typeof props.y === 'number') return { x: props.x, y: props.y, width, height }
+  if (props.position !== 'static') {
+    return resolveNovaUiPositionedRect(
+      { x: 0, y: 0, width: rootWidth, height: rootHeight },
+      { x: 0, y: 0, width, height },
+      props,
+    ) as NovaUiLayoutRect
+  }
+  if (!props.placement) return { width, height }
   const left = props.placement.endsWith('left')
   const top = props.placement.startsWith('top')
   return {

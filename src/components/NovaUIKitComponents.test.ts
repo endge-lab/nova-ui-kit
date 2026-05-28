@@ -157,6 +157,14 @@ function installCanvasMocks(): void {
     value: 1,
     configurable: true,
   })
+  Object.defineProperty(URL, 'createObjectURL', {
+    value: vi.fn(() => 'blob:nova-ui-kit-icon'),
+    configurable: true,
+  })
+  Object.defineProperty(URL, 'revokeObjectURL', {
+    value: vi.fn(),
+    configurable: true,
+  })
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation((type: string) => {
     if (type === RendererType.Web2D) return create2DContextStub()
     return null
@@ -230,7 +238,7 @@ describe('Nova UI Kit components', () => {
         { type: NovaUIKit.Divider, id: 'divider', props: { width: 160, lineStyle: 'dashed', border: { width: 2 }, padding: { horizontal: 8 }, margin: { vertical: 4 } } },
         { type: NovaUIKit.Button, id: 'button', props: { text: 'Run' } },
         { type: NovaUIKit.FpsMeter, id: 'fps-meter', props: { placement: 'top-right', margin: 8 } },
-        { type: NovaUIKit.ThemeSwitch, id: 'theme-switch', props: { themes: [{ id: 'light', label: 'Light' }, { id: 'dark', label: 'Dark' }] } },
+        { type: 'NovaUIKit.ThemeSwitch', id: 'theme-switch', props: { themes: [{ id: 'light', label: 'Light' }, { id: 'dark', label: 'Dark' }] } },
         { type: NovaUIKit.Badge, id: 'badge', props: { value: 3 } },
         { type: NovaUIKit.Image, id: 'image', props: { src: createCanvasDrawable(), radius: 8 } },
         { type: NovaUIKit.Tag, id: 'tag', props: { text: 'Ready' } },
@@ -355,6 +363,7 @@ describe('Nova UI Kit components', () => {
     expect(app.components.requireApi<ButtonApi>('button').getProps().selected).toBe(true)
     expect(app.components.requireApi<FpsMeterApi>('fps-meter').getProps().visible).toBe(false)
     expect(app.components.requireApi<ThemeSwitchApi>('theme-switch').getProps().themes).toHaveLength(2)
+    expect(app.components.requireApi<ThemeSwitchApi>('theme-switch').getProps().themes.every(theme => theme.icon)).toBe(true)
     expect(app.components.requireApi<DividerApi>('divider').getProps().lineStyle).toBe('dotted')
     expect(app.components.requireApi<DividerApi>('divider').getProps().border?.width).toBe(2)
     expect(app.components.requireApi<BadgeApi>('badge').getProps().value).toBe(4)
@@ -2810,6 +2819,82 @@ describe('Nova UI Kit components', () => {
     const flow = app.components.requireApi<FlexApi>('layout-flow')
     expect(flow.getChildRect('layout-card-a')).toEqual({ x: 0, y: 0, width: 100, height: 60 })
     expect(flow.getChildRect('layout-card-b')).toEqual({ x: 110, y: 0, width: 100, height: 60 })
+
+    app.destroy()
+  })
+
+  it('uses built-in light and dark icons for ThemeSwitch defaults', () => {
+    const app = createApp()
+    const surface = app.createSurface('theme-switch-defaults')
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.ThemeSwitch,
+      id: 'theme-switch-defaults',
+      props: {},
+    })
+
+    const props = app.components.requireApi<ThemeSwitchApi>('theme-switch-defaults').getProps()
+    expect(props.themes.map(theme => theme.id)).toEqual(['light', 'dark'])
+    expect(props.themes.every(theme => theme.icon)).toBe(true)
+
+    app.destroy()
+  })
+
+  it('supports CSS-like absolute and flow positioning in UI Kit containers', () => {
+    const app = createApp()
+    const surface = app.createSurface('positioned-layout')
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'positioned-root',
+      props: { width: 420, height: 240, padding: 0 },
+      children: [
+        {
+          type: NovaUIKit.Flex,
+          id: 'positioned-flex',
+          props: { width: 420, height: 240, direction: 'row', gap: 10, padding: 12, alignItems: 'start' },
+          children: [
+            { type: NovaUIKit.Surface, id: 'positioned-flow-a', layout: { width: 80, height: 40, flexShrink: 0 } },
+            { type: NovaUIKit.FpsMeter, id: 'positioned-fps-flow', props: { width: 74, height: 28 }, layout: { flexShrink: 0 } },
+            {
+              type: NovaUIKit.ThemeSwitch,
+              id: 'positioned-theme-absolute',
+              props: { width: 36, height: 36, themes: [{ id: 'light', label: 'Light' }] },
+              layout: { position: 'absolute', inset: { top: 16, right: 18 }, zIndex: 25 },
+            },
+          ],
+        },
+        {
+          type: NovaUIKit.Flex,
+          id: 'positioned-fixed-flex',
+          props: { position: 'fixed', inset: { top: 16, right: 16 }, gap: 8, alignItems: 'center' },
+          children: [
+            { type: NovaUIKit.FpsMeter, id: 'positioned-fixed-fps' },
+            { type: NovaUIKit.ThemeSwitch, id: 'positioned-fixed-theme' },
+          ],
+        },
+      ],
+    })
+    app.raph.run()
+    app.raph.run()
+
+    const flex = app.components.requireApi<FlexApi>('positioned-flex')
+    const fps = app.components.require('positioned-fps-flow')
+    const theme = app.components.require('positioned-theme-absolute')
+
+    expect(flex.getChildRect('positioned-flow-a')).toEqual({ x: 12, y: 12, width: 80, height: 40 })
+    expect(flex.getChildRect('positioned-fps-flow')).toEqual({ x: 102, y: 12, width: 74, height: 28 })
+    expect(fps.x).toBe(102)
+    expect(fps.y).toBe(12)
+    expect(flex.getChildRect('positioned-theme-absolute')).toEqual({ x: 354, y: 28, width: 36, height: 36 })
+    expect(theme.weight).toBe(25)
+    const fixedFlex = app.components.requireApi<FlexApi>('positioned-fixed-flex')
+    expect(app.components.require('positioned-fixed-flex').x).toBe(900 - 16 - 130)
+    expect(app.components.require('positioned-fixed-flex').y).toBe(16)
+    expect(app.components.require('positioned-fixed-flex').width).toBe(130)
+    expect(app.components.require('positioned-fixed-flex').height).toBe(36)
+    expect(fixedFlex.getChildRect('positioned-fixed-fps')).toEqual({ x: 0, y: 0, width: 86, height: 36 })
+    expect(fixedFlex.getChildRect('positioned-fixed-theme')).toEqual({ x: 94, y: 0, width: 36, height: 36 })
 
     app.destroy()
   })

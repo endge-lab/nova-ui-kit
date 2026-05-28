@@ -11,6 +11,7 @@ import {
   type GridProps,
   type GridResolvedProps,
 } from '@/components/Grid/grid.types'
+import { resolveNovaUiPosition } from '@/shared/layout'
 
 export type GridDescriptor = NovaComponentDescriptor<
   GridResolvedProps,
@@ -30,6 +31,9 @@ export const GRID_FIELD_DEFINITIONS = {
   y: { type: 'number' },
   width: { type: 'number' },
   height: { type: 'number' },
+  position: { type: 'string' },
+  inset: { type: 'spacing' },
+  zIndex: { type: 'number' },
   responsive: { type: 'boolean' },
   columns: { type: 'number' },
   minColumns: { type: 'number' },
@@ -63,6 +67,9 @@ export function normalizeGridProps(props: GridProps = {}): GridResolvedProps {
     y: finiteNumber(props.y, 0),
     width: Math.max(0, finiteNumber(props.width, 0)),
     height: Math.max(0, finiteNumber(props.height, 0)),
+    position: resolveNovaUiPosition(props.position),
+    inset: props.inset,
+    zIndex: finiteOptionalNumber(props.zIndex),
     responsive: props.responsive ?? false,
     columns,
     minColumns,
@@ -94,10 +101,12 @@ export function createGridDescriptor(createNode?: GridNodeFactory): GridDescript
     version: '0.1.0',
     kind: 'node-component',
     dirtyPolicy: {
-      matrix: ['x', 'y'],
+      matrix: ['x', 'y', 'zIndex'],
       update: [
         'width',
         'height',
+        'position',
+        'inset',
         'responsive',
         'columns',
         'minColumns',
@@ -147,4 +156,8 @@ function finiteNumber(value: number | undefined, fallback: number): number {
 
 function finiteInteger(value: number | undefined, fallback: number): number {
   return Math.max(1, Math.trunc(finiteNumber(value, fallback)))
+}
+
+function finiteOptionalNumber(value: number | undefined): number | undefined {
+  return typeof value === 'number' && Number.isFinite(value) ? value : undefined
 }

@@ -48,9 +48,11 @@ import {
   copyRect,
   createLayoutRect,
   readNovaUiNodeProps,
+  isNovaUiOutOfFlowPosition,
   isNovaUiLayoutDisplayed,
   rectEquals,
   relayoutNovaUiLayoutAncestors,
+  resolveNovaUiPositionedLayout,
   resolveSpacing,
   setNovaUiNodeLayoutIntent,
   type NovaUiLayoutRect,
@@ -455,6 +457,7 @@ export class Root<E extends EventList = Record<string, any>>
       copyRect(this.childRect, nextRect)
       for (const child of this.managedChildren) {
         if (!isNovaUiLayoutDisplayed(child)) continue
+        if (isNovaUiOutOfFlowPosition(resolveNovaUiPositionedLayout(child).position)) continue
         const changed = applyNodeLayoutRect(child, this.childRect)
         if (changed) child.dirty({ update: true, render: true })
       }

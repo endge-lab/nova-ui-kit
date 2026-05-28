@@ -17,7 +17,6 @@ import {
   type TextBlockProps,
   type TextBlockResolvedProps,
 } from '@/components/TextBlock/text-block.types'
-import { requireNovaUiRoot } from '@/components/Root/root-target'
 import {
   NOVA_UI_LAYOUT_TARGET,
   TextMeasureCache,
@@ -245,13 +244,6 @@ export class TextBlock<E extends EventList = Record<string, any>>
    */
   render(): void {
     this.renderSchema(buildTextBlockSchema(this.resolveCurrentLayoutProps(), this.measureText, 'node'))
-  }
-
-  /**
-   * Обрабатывает входящее событие TextBlock.
-   */
-  protected override onMount(): void {
-    requireNovaUiRoot(this)
   }
 
   /**

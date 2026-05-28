@@ -24,15 +24,22 @@ import type {
   GridProps,
   GridResolvedProps,
 } from '@/components/Grid/grid.types'
-import { requireNovaUiRoot } from '@/components/Root/root-target'
 import {
   NOVA_UI_LAYOUT_TARGET,
   applyNodeLayoutRect,
+  applyNovaUiLayoutZIndex,
   copyRect,
   createLayoutRect,
+  getNovaUiNodeLayoutIntent,
+  isNovaUiOutOfFlowPosition,
   isNovaUiLayoutDisplayed,
+  mergeNovaUiLayoutIntents,
+  readNovaUiNodeProps,
   rectEquals,
   relayoutNovaUiLayoutAncestors,
+  resolveNovaUiPositionedLayout,
+  resolveNovaUiPositionedRect,
+  resolveSpacing,
   type NovaUiLayoutRect,
   type NovaUiLayoutTarget,
 } from '@/shared/layout'
@@ -49,6 +56,7 @@ import {
   type NovaUiStyleContext,
   type NovaUiStyleReceiveResult,
   type NovaUiStyleTarget,
+  resolveNovaUiClassLayoutIntent,
 } from '@/shared/style'
 import { resolveNovaUiMotionOptions } from '@/shared/motion'
 
@@ -165,23 +173,52 @@ export class Grid<E extends EventList = Record<string, any>>
   /** Пересчитывает сетку только если изменились размеры, props или children. */
   update(): void {
     if (!this.layoutDirty) return
+    if (!this.externalLayout) this.applyResolvedRect(this.resolveStandaloneRect())
 
     const layoutEntries = this.childEntries.filter(entry => isNovaUiLayoutDisplayed(entry.node))
+    const flowEntries: Array<GridChildEntry> = []
+    const positionedEntries: Array<GridChildEntry> = []
+    const layoutsById = new Map<string, GridChildLayout>()
+
+    for (const entry of layoutEntries) {
+      const layout = resolveGridChildLayout(entry.node, entry.rawLayout)
+      layoutsById.set(entry.id, layout)
+      entry.compiledLayout = compileGridChildLayout(layout)
+      if (isNovaUiOutOfFlowPosition(layout.position)) positionedEntries.push(entry)
+      else flowEntries.push(entry)
+    }
+
     const result = this.engine.compute({
       props: this.props,
       width: this.width,
       height: this.height,
-      entries: layoutEntries,
+      entries: flowEntries,
     })
     this.columnCount = result.columnCount
 
-    for (const entry of layoutEntries) {
-      if (rectEquals(entry.prevRect, entry.nextRect)) continue
+    const containerRect = resolveGridContentRect(this.props.padding, this.width, this.height)
+    for (const entry of flowEntries) {
+      this.applyChildLayoutRect(entry, resolveNovaUiPositionedRect(
+        containerRect,
+        entry.nextRect,
+        layoutsById.get(entry.id) ?? {},
+        entry.node,
+      ))
+    }
 
-      const changed = applyNodeLayoutRect(entry.node as NovaNode<any>, entry.nextRect)
-      copyRect(entry.prevRect, entry.nextRect)
-      this.rectsById.set(entry.id, entry.prevRect)
-      if (changed) entry.node.dirty({ update: true, render: true })
+    for (const entry of positionedEntries) {
+      const fallback = {
+        x: entry.prevRect.x,
+        y: entry.prevRect.y,
+        width: entry.prevRect.width || entry.node.width,
+        height: entry.prevRect.height || entry.node.height,
+      }
+      this.applyChildLayoutRect(entry, resolveNovaUiPositionedRect(
+        containerRect,
+        fallback,
+        layoutsById.get(entry.id) ?? {},
+        entry.node,
+      ))
     }
 
     this.layoutDirty = false
@@ -275,17 +312,12 @@ export class Grid<E extends EventList = Record<string, any>>
   /**
    * Обрабатывает входящее событие Grid.
    */
-  protected override onMount(): void {
-    requireNovaUiRoot(this)
-  }
-
-  /**
-   * Обрабатывает входящее событие Grid.
-   */
   protected override onPropsChanged(changedKeys: Array<keyof GridResolvedProps>): void {
     this.props = normalizeGridProps(this.props)
     this.applyDisplayState()
+    this.options({ zIndex: this.props.zIndex })
     if (changedKeys.includes('display')) this.markLayoutAncestorsDirty()
+    if (changedKeys.includes('position') || changedKeys.includes('inset') || changedKeys.includes('zIndex')) this.markLayoutAncestorsDirty()
     if (hasGridLayoutChanges(changedKeys)) this.layoutDirty = true
     if (!this.externalLayout && hasGridGeometryChanges(changedKeys)) {
       this.applyResolvedRect({
@@ -320,6 +352,7 @@ export class Grid<E extends EventList = Record<string, any>>
       y: rect.y,
       width: rect.width,
       height: rect.height,
+      zIndex: this.props.zIndex,
     })
     this.layoutDirty = true
     this.dirty({ update: true, matrix: true, render: true })
@@ -382,16 +415,69 @@ export class Grid<E extends EventList = Record<string, any>>
   private markLayoutAncestorsDirty(): void {
     relayoutNovaUiLayoutAncestors(this)
   }
+
+  private applyChildLayoutRect(entry: GridChildEntry, rect: NovaUiLayoutRect): void {
+    const layout = resolveGridChildLayout(entry.node, entry.rawLayout)
+    if (rectEquals(entry.prevRect, rect)) {
+      applyNovaUiLayoutZIndex(entry.node as NovaNode<any>, layout.zIndex)
+      return
+    }
+
+    const changed = applyNodeLayoutRect(entry.node as NovaNode<any>, rect)
+    applyNovaUiLayoutZIndex(entry.node as NovaNode<any>, layout.zIndex)
+    copyRect(entry.prevRect, rect)
+    this.rectsById.set(entry.id, entry.prevRect)
+    if (changed) entry.node.dirty({ update: true, render: true })
+  }
+
+  private resolveStandaloneRect(): NovaUiLayoutRect {
+    const fallback = {
+      x: this.props.x,
+      y: this.props.y,
+      width: this.props.width,
+      height: this.props.height,
+    }
+    if (this.props.position === 'static') return fallback
+    return resolveNovaUiPositionedRect(
+      { x: 0, y: 0, width: this.surface.width, height: this.surface.height },
+      fallback,
+      { position: this.props.position, inset: this.props.inset, zIndex: this.props.zIndex },
+      this,
+    )
+  }
 }
 
 function hasGridGeometryChanges(keys: Array<keyof GridResolvedProps>): boolean {
-  return keys.includes('x') || keys.includes('y') || keys.includes('width') || keys.includes('height')
+  return keys.includes('x') || keys.includes('y') || keys.includes('width') || keys.includes('height') || keys.includes('position') || keys.includes('inset')
+}
+
+function resolveGridChildLayout(node: unknown, explicitLayout: GridChildLayout = {}): GridChildLayout {
+  const props = readNovaUiNodeProps(node)
+  const propLayout = resolveNovaUiPositionedLayout(node)
+  return mergeNovaUiLayoutIntents<GridChildLayout>(
+    resolveNovaUiClassLayoutIntent(props.className),
+    getNovaUiNodeLayoutIntent(node),
+    propLayout,
+    explicitLayout,
+  )
+}
+
+function resolveGridContentRect(paddingInput: GridResolvedProps['padding'], width: number, height: number): NovaUiLayoutRect {
+  const padding = resolveSpacing(paddingInput)
+  return {
+    x: padding.left,
+    y: padding.top,
+    width: Math.max(0, width - padding.left - padding.right),
+    height: Math.max(0, height - padding.top - padding.bottom),
+  }
 }
 
 function hasGridLayoutChanges(keys: Array<keyof GridResolvedProps>): boolean {
   return (
     keys.includes('width')
     || keys.includes('height')
+    || keys.includes('position')
+    || keys.includes('inset')
     || keys.includes('responsive')
     || keys.includes('columns')
     || keys.includes('minColumns')

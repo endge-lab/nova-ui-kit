@@ -3,7 +3,7 @@ import type {
   NovaUiCommonProps,
   NovaUiCommonResolvedProps,
 } from '@/shared/component/component-props'
-import type { NovaUiLayoutRect } from '@/shared/layout'
+import type { NovaUiLayoutRect, NovaUiPositionedLayout } from '@/shared/layout'
 
 export const SURFACE_SCHEMA_TYPE = 'nova-ui.surface'
 
@@ -17,7 +17,9 @@ export interface SurfaceResolvedProps extends NovaUiCommonResolvedProps {
   motionRotation: number
 }
 
-export interface SurfaceChildSchema<TProps = Record<string, any>> extends NovaElementSchema<TProps> {}
+export interface SurfaceChildSchema<TProps = Record<string, any>> extends NovaElementSchema<TProps> {
+  layout?: NovaUiPositionedLayout
+}
 
 export interface SurfaceSchema extends NovaComponentSchema<SurfaceProps> {
   children?: Array<SurfaceChildSchema>

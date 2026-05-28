@@ -2,6 +2,8 @@ import type { NovaComponentSchema, NovaElementSchema } from '@endge/nova'
 import type {
   NovaUiLayoutRect,
   NovaUiLayoutValue,
+  NovaUiInset,
+  NovaUiPosition,
   NovaUiSpacing,
 } from '@/shared/layout'
 import type {
@@ -23,6 +25,9 @@ export interface GridProps extends NovaUiMotionOptions, NovaUiStyleIdentityProps
   y?: number
   width?: number
   height?: number
+  position?: NovaUiPosition
+  inset?: NovaUiInset
+  zIndex?: number
   responsive?: boolean
   columns?: number
   minColumns?: number
@@ -48,6 +53,9 @@ export interface GridResolvedProps {
   y: number
   width: number
   height: number
+  position: NovaUiPosition
+  inset?: NovaUiInset
+  zIndex?: number
   responsive: boolean
   columns: number
   minColumns: number
@@ -73,6 +81,10 @@ export interface GridResolvedProps {
 export interface GridChildLayout {
   colSpan?: number
   height?: NovaUiLayoutValue
+  width?: NovaUiLayoutValue
+  position?: NovaUiPosition
+  inset?: NovaUiInset
+  zIndex?: number
   minHeight?: number
   maxHeight?: number
   margin?: NovaUiSpacing

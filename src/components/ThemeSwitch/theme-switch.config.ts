@@ -11,6 +11,8 @@ import {
   type ThemeSwitchProps,
   type ThemeSwitchResolvedProps,
 } from '@/components/ThemeSwitch/theme-switch.types'
+import { normalizeThemeSwitchThemes } from '@/components/ThemeSwitch/theme-switch-assets'
+import { resolveNovaUiPosition } from '@/shared/layout'
 
 export type ThemeSwitchDescriptor = NovaComponentDescriptor<
   ThemeSwitchResolvedProps,
@@ -29,6 +31,9 @@ export const THEME_SWITCH_FIELD_DEFINITIONS = {
   y: { type: 'number' },
   width: { type: 'number' },
   height: { type: 'number' },
+  position: { type: 'string' },
+  inset: { type: 'spacing' },
+  zIndex: { type: 'number' },
   placement: { type: 'string' },
   margin: { type: 'number' },
   themes: { type: 'array' },
@@ -44,9 +49,12 @@ export function normalizeThemeSwitchProps(props: ThemeSwitchProps = {}): ThemeSw
     y: props.y,
     width: finiteNumber(props.width, props.mode === 'segmented' ? 88 : 36),
     height: finiteNumber(props.height, 36),
-    placement: props.placement ?? 'top-right',
+    position: resolveNovaUiPosition(props.position),
+    inset: props.inset,
+    zIndex: finiteOptionalNumber(props.zIndex, 2001),
+    placement: props.placement,
     margin: finiteNumber(props.margin, 12),
-    themes: props.themes ?? [],
+    themes: normalizeThemeSwitchThemes(props.themes),
     mode: props.mode ?? 'cycle',
     value: props.value,
     visible: props.visible ?? true,
@@ -62,8 +70,8 @@ export function createThemeSwitchDescriptor(createNode?: ThemeSwitchNodeFactory)
     version: '0.1.0',
     kind: 'node-component',
     dirtyPolicy: {
-      matrix: ['x', 'y', 'placement', 'margin'],
-      update: ['width', 'height', 'mode', 'visible'],
+      matrix: ['x', 'y', 'placement', 'margin', 'zIndex'],
+      update: ['width', 'height', 'position', 'inset', 'mode', 'visible'],
       render: ['themes', 'value'],
     },
     fields: THEME_SWITCH_FIELD_DEFINITIONS,
@@ -81,5 +89,9 @@ export function createThemeSwitchDescriptor(createNode?: ThemeSwitchNodeFactory)
 export const THEME_SWITCH_NODE_DESCRIPTOR = createThemeSwitchDescriptor()
 
 function finiteNumber(value: unknown, fallback: number): number {
+  return typeof value === 'number' && Number.isFinite(value) ? value : fallback
+}
+
+function finiteOptionalNumber(value: unknown, fallback?: number): number | undefined {
   return typeof value === 'number' && Number.isFinite(value) ? value : fallback
 }

@@ -157,7 +157,7 @@ describe('Nova UI style propagation', () => {
     app.destroy()
   })
 
-  it('requires Root for mounted UI Kit components', () => {
+  it('allows standalone UI Kit components with default styling', () => {
     const app = createApp()
     const surface = app.createSurface('style')
 
@@ -165,7 +165,7 @@ describe('Nova UI style propagation', () => {
       type: TEXT_BLOCK_SCHEMA_TYPE,
       id: 'orphan-text',
       props: { text: 'Orphan' },
-    })).toThrow('[Nova UI Kit]')
+    })).not.toThrow()
 
     app.destroy()
   })

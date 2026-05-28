@@ -5,6 +5,10 @@ import {
   normalizeFpsMeterProps,
   type FpsMeterDescriptor,
 } from '@/components/FpsMeter/fps-meter.config'
+import {
+  resolveNovaUiPositionedRect,
+  type NovaUiLayoutRect,
+} from '@/shared/layout'
 import type {
   FpsMeterApi,
   FpsMeterProps,
@@ -62,7 +66,7 @@ export class FpsMeter<E extends EventList = Record<string, any>>
       height: this.props.height,
       styles: {
         background: minimal ? 'rgba(17,24,39,0.66)' : 'rgba(17,24,39,0.82)',
-        border: { color: 'rgba(255,255,255,0.14)', width: 1, radius: 7 },
+        border: { color: 'rgba(255,255,255,0.14)', width: 1, radius: 8 },
       },
     })
     schema.push({
@@ -74,7 +78,7 @@ export class FpsMeter<E extends EventList = Record<string, any>>
       height: this.props.height,
       styles: {
         color: '#ffffff',
-        font: { family: 'Inter, Arial, sans-serif', size: 10, weight: '900' },
+        font: { family: 'Inter, Arial, sans-serif', size: 11, weight: '900' },
         align: { horizontal: 'center', vertical: 'middle' },
       },
     })
@@ -100,15 +104,29 @@ export class FpsMeter<E extends EventList = Record<string, any>>
 
   private applyPlacement(): void {
     const rect = resolveOverlayRect(this.surface.width, this.surface.height, this.props)
-    this.options({ x: rect.x, y: rect.y, width: rect.width, height: rect.height, interactive: false, zIndex: 2000 })
+    this.options({
+      ...(rect.x !== undefined && rect.y !== undefined ? { x: rect.x, y: rect.y } : {}),
+      width: rect.width,
+      height: rect.height,
+      interactive: false,
+      zIndex: this.props.zIndex,
+    })
     this.setLocalRenderBounds({ x: 0, y: 0, width: rect.width, height: rect.height })
   }
 }
 
-function resolveOverlayRect(rootWidth: number, rootHeight: number, props: FpsMeterResolvedProps): { x: number; y: number; width: number; height: number } {
+function resolveOverlayRect(rootWidth: number, rootHeight: number, props: FpsMeterResolvedProps): { x?: number; y?: number; width: number; height: number } {
   const width = props.width
   const height = props.height
   if (typeof props.x === 'number' && typeof props.y === 'number') return { x: props.x, y: props.y, width, height }
+  if (props.position !== 'static') {
+    return resolveNovaUiPositionedRect(
+      { x: 0, y: 0, width: rootWidth, height: rootHeight },
+      { x: 0, y: 0, width, height },
+      props,
+    ) as NovaUiLayoutRect
+  }
+  if (!props.placement) return { width, height }
   const left = props.placement.endsWith('left')
   const top = props.placement.startsWith('top')
   return {

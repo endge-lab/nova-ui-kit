@@ -1,5 +1,6 @@
 import type { NovaAssetRef, NovaComponentSchema } from '@endge/nova'
 import type { NovaOverlayPlacement } from '@/components/FpsMeter/fps-meter.types'
+import type { NovaUiInset, NovaUiPosition } from '@/shared/layout'
 
 export const THEME_SWITCH_SCHEMA_TYPE = 'nova-ui.theme-switch'
 
@@ -17,6 +18,9 @@ export interface ThemeSwitchProps {
   y?: number
   width?: number
   height?: number
+  position?: NovaUiPosition
+  inset?: NovaUiInset
+  zIndex?: number
   placement?: NovaOverlayPlacement
   margin?: number
   themes?: Array<ThemeSwitchTheme>
@@ -31,7 +35,10 @@ export interface ThemeSwitchResolvedProps {
   y?: number
   width: number
   height: number
-  placement: NovaOverlayPlacement
+  position: NovaUiPosition
+  inset?: NovaUiInset
+  zIndex?: number
+  placement?: NovaOverlayPlacement
   margin: number
   themes: Array<ThemeSwitchTheme>
   mode: 'cycle' | 'menu' | 'segmented'

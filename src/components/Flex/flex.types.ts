@@ -2,6 +2,8 @@ import type { NovaComponentSchema, NovaElementSchema } from '@endge/nova'
 import type {
   NovaUiLayoutRect,
   NovaUiLayoutValue,
+  NovaUiInset,
+  NovaUiPosition,
   NovaUiSpacing,
 } from '@/shared/layout'
 import type {
@@ -26,6 +28,9 @@ export interface FlexProps extends NovaUiMotionOptions, NovaUiStyleIdentityProps
   y?: number
   width?: number
   height?: number
+  position?: NovaUiPosition
+  inset?: NovaUiInset
+  zIndex?: number
   row?: boolean
   col?: boolean
   direction?: FlexDirection
@@ -49,6 +54,9 @@ export interface FlexResolvedProps {
   y: number
   width: number
   height: number
+  position: NovaUiPosition
+  inset?: NovaUiInset
+  zIndex?: number
   row: boolean
   col: boolean
   direction: FlexDirection
@@ -72,6 +80,9 @@ export interface FlexResolvedProps {
 export interface FlexChildLayout {
   width?: NovaUiLayoutValue
   height?: NovaUiLayoutValue
+  position?: NovaUiPosition
+  inset?: NovaUiInset
+  zIndex?: number
   minWidth?: number
   maxWidth?: number
   minHeight?: number

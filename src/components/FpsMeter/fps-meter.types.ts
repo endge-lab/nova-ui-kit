@@ -1,4 +1,5 @@
 import type { NovaComponentSchema } from '@endge/nova'
+import type { NovaUiInset, NovaUiPosition } from '@/shared/layout'
 
 export const FPS_METER_SCHEMA_TYPE = 'nova-ui.fps-meter'
 
@@ -9,6 +10,9 @@ export interface FpsMeterProps {
   y?: number
   width?: number
   height?: number
+  position?: NovaUiPosition
+  inset?: NovaUiInset
+  zIndex?: number
   placement?: NovaOverlayPlacement
   margin?: number
   sampleSize?: number
@@ -21,7 +25,10 @@ export interface FpsMeterResolvedProps {
   y?: number
   width: number
   height: number
-  placement: NovaOverlayPlacement
+  position: NovaUiPosition
+  inset?: NovaUiInset
+  zIndex?: number
+  placement?: NovaOverlayPlacement
   margin: number
   sampleSize: number
   variant: 'badge' | 'pill' | 'minimal'

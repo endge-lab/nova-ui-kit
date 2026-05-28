@@ -1,11 +1,15 @@
 import type { NovaNode } from '@endge/nova'
 import type { NovaUiLayoutValue } from '@/shared/layout/layout-value'
+import type { NovaUiInset, NovaUiPosition } from '@/shared/layout/position-layout'
 import type { NovaUiSpacing } from '@/shared/layout/spacing'
 
 /** Layout-намерение node внутри flow-контейнера. */
 export interface NovaUiLayoutIntent {
   width?: NovaUiLayoutValue
   height?: NovaUiLayoutValue
+  position?: NovaUiPosition
+  inset?: NovaUiInset
+  zIndex?: number
   minWidth?: number
   maxWidth?: number
   minHeight?: number

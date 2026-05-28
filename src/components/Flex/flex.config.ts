@@ -11,6 +11,7 @@ import {
   type FlexProps,
   type FlexResolvedProps,
 } from '@/components/Flex/flex.types'
+import { resolveNovaUiPosition } from '@/shared/layout'
 
 export type FlexDescriptor = NovaComponentDescriptor<
   FlexResolvedProps,
@@ -30,6 +31,9 @@ export const FLEX_FIELD_DEFINITIONS = {
   y: { type: 'number' },
   width: { type: 'number' },
   height: { type: 'number' },
+  position: { type: 'string' },
+  inset: { type: 'spacing' },
+  zIndex: { type: 'number' },
   row: { type: 'boolean' },
   col: { type: 'boolean' },
   direction: { type: 'string' },
@@ -58,6 +62,9 @@ export function normalizeFlexProps(props: FlexProps = {}): FlexResolvedProps {
     y: finiteNumber(props.y, 0),
     width: Math.max(0, finiteNumber(props.width, 0)),
     height: Math.max(0, finiteNumber(props.height, 0)),
+    position: resolveNovaUiPosition(props.position),
+    inset: props.inset,
+    zIndex: finiteOptionalNumber(props.zIndex),
     row: props.row ?? false,
     col: props.col ?? false,
     direction: props.col ? 'column' : props.row ? 'row' : props.direction ?? 'row',
@@ -87,10 +94,12 @@ export function createFlexDescriptor(createNode?: FlexNodeFactory): FlexDescript
     version: '0.1.0',
     kind: 'node-component',
     dirtyPolicy: {
-      matrix: ['x', 'y'],
+      matrix: ['x', 'y', 'zIndex'],
       update: [
         'width',
         'height',
+        'position',
+        'inset',
         'row',
         'col',
         'direction',
@@ -134,4 +143,8 @@ export const FLEX_NODE_DESCRIPTOR = createFlexDescriptor()
 
 function finiteNumber(value: number | undefined, fallback: number): number {
   return typeof value === 'number' && Number.isFinite(value) ? value : fallback
+}
+
+function finiteOptionalNumber(value: number | undefined): number | undefined {
+  return typeof value === 'number' && Number.isFinite(value) ? value : undefined
 }

@@ -18,10 +18,14 @@ import {
 } from '@/shared/component/component-props'
 import {
   applyNodeLayoutRect,
+  applyNovaUiLayoutZIndex,
   copyRect,
   createLayoutRect,
+  resolveNovaUiPositionedLayout,
+  resolveNovaUiPositionedRect,
   resolveSpacing,
   type NovaUiLayoutRect,
+  type NovaUiPositionedLayout,
 } from '@/shared/layout'
 import {
   NovaUiStyleMask,
@@ -38,6 +42,7 @@ import { resolveNovaUiMotionDeclarations } from '@/shared/motion'
 export class Surface<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<SurfaceResolvedProps, SurfaceApi, SurfaceProps, E> {
   private readonly managedChildren: Array<NovaNode<E>> = []
+  private readonly managedChildLayouts: Array<NovaUiPositionedLayout | undefined> = []
   private readonly childRect = createLayoutRect()
   private readonly api: SurfaceApi
   private readonly motionPlaybacks: Array<NovaMotionPlayback> = []
@@ -93,6 +98,8 @@ export class Surface<E extends EventList = Record<string, any>>
     const reconciled = reconcileNovaTemplateChildren(this, this.managedChildren, children)
     this.managedChildren.length = 0
     this.managedChildren.push(...reconciled.nodes)
+    this.managedChildLayouts.length = 0
+    this.managedChildLayouts.push(...children.map(child => child.layout))
 
     this.propagateStyleContext(NovaUiStyleMask.AllText)
     this.relayout()
@@ -133,10 +140,18 @@ export class Surface<E extends EventList = Record<string, any>>
       height: Math.max(0, this.height - padding.top - padding.bottom),
     })
 
-    for (const child of this.managedChildren) {
-      applyNodeLayoutRect(child as NovaNode<any>, this.childRect)
+    this.managedChildren.forEach((child, index) => {
+      const layout = resolveNovaUiPositionedLayout(child, this.managedChildLayouts[index])
+      const rect = resolveNovaUiPositionedRect(
+        this.childRect,
+        this.childRect,
+        layout,
+        child,
+      )
+      applyNodeLayoutRect(child as NovaNode<any>, rect)
+      applyNovaUiLayoutZIndex(child as NovaNode<any>, layout.zIndex)
       child.dirty({ matrix: true, update: true, render: true })
-    }
+    })
 
     this.layoutDirty = false
   }
