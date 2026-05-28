@@ -1,4 +1,5 @@
 import type { NovaComponentNode, NovaCursorDeclaration } from '@endge/nova'
+import type { NovaMotionEasingName } from '@endge/nova'
 import type { NovaUiLayoutValue, NovaUiSpacing } from '@/shared/layout'
 import type {
   NovaUiBorder,
@@ -141,7 +142,33 @@ export interface NovaUiStyleDeclarations {
     placeholderColor?: string
   }
   cursor?: NovaCursorDeclaration
+  animation?: NovaUiStyleAnimationDeclaration
   mask: NovaUiStyleMask
+}
+
+export interface NovaUiStyleAnimationDeclaration {
+  name: string
+  duration?: number
+  delay?: number
+  easing?: NovaMotionEasingName
+}
+
+export interface NovaUiStyleKeyframeDeclaration {
+  opacity?: number
+  translateX?: number
+  translateY?: number
+  scaleX?: number
+  scaleY?: number
+}
+
+export interface NovaUiStyleKeyframe {
+  offset: number
+  declarations: NovaUiStyleKeyframeDeclaration
+}
+
+export interface NovaUiStyleKeyframes {
+  name: string
+  frames: Array<NovaUiStyleKeyframe>
 }
 
 /** Скомпилированное правило stylesheet. */
@@ -164,6 +191,7 @@ export interface NovaUiCompiledStyleSheet {
   byType: Map<NovaUiStyleComponentName, Array<NovaUiCompiledStyleRule>>
   byAttr: Map<string, Array<NovaUiCompiledStyleRule>>
   universal: Array<NovaUiCompiledStyleRule>
+  keyframes: Map<string, NovaUiStyleKeyframes>
   version: number
   source?: string
   tokenDependencies?: Array<string>

@@ -5,6 +5,7 @@ import {
   type NovaCursorDeclaration,
   type NovaCursorStateMap,
   type NovaCursorValue,
+  type NovaMotionPlayback,
   type NovaNode,
   type NovaSurface,
 } from '@endge/nova'
@@ -86,6 +87,7 @@ import {
   type NovaUiCompiledStyleSheet,
   type NovaUiStyleInvalidationPlan,
   type NovaUiStyleDeclarations,
+  type NovaUiStyleKeyframeDeclaration,
   type NovaUiStyleInspectionDebug,
   type NovaUiStyleMediaContext,
   type NovaUiStyleSheetGraph,
@@ -112,6 +114,8 @@ export class Root<E extends EventList = Record<string, any>>
   private readonly childRect = createLayoutRect()
   private readonly managedChildren: Array<NovaNode<E>> = []
   private readonly appliedCascade = new WeakMap<NovaUiStylableNode, AppliedCascadeState>()
+  private readonly appliedAnimations = new WeakMap<NovaUiStylableNode, { signature: string; playback: NovaMotionPlayback }>()
+  private readonly appliedAnimationSignatures = new Map<string, string>()
   private readonly api: RootApi
   private layoutDirty = true
   private externalLayout = false
@@ -147,6 +151,7 @@ export class Root<E extends EventList = Record<string, any>>
     const resolvedProps = normalizeRootProps(props)
     super(app, surface, descriptor, resolvedProps, options)
     this.__type = 'Root'
+    this.layoutReady = false
     this.applyDisplayState()
     this.api = {
       setStyleSheetSource: source => this.setStyleSheetSource(source),
@@ -208,6 +213,8 @@ export class Root<E extends EventList = Record<string, any>>
       this.nova.canvas.element.removeEventListener('mouseleave', handleTooltipPointerLeave)
     })
     this.setChildren(options.children ?? [])
+    this.update()
+    this.layoutReady = true
   }
 
   /**
@@ -799,6 +806,9 @@ export class Root<E extends EventList = Record<string, any>>
       nextKeys.add('cursor')
       patch.cursor = declarations.cursor
     }
+    if (declarations.animation !== undefined) {
+      this.applyKeyframeAnimation(node, declarations.animation)
+    }
     if (supportsLayoutDeclarations(node)) {
       for (const key of ['gap', 'rowGap', 'columnGap'] as const) {
         const value = declarations.layout?.[key]
@@ -832,6 +842,41 @@ export class Root<E extends EventList = Record<string, any>>
 
     state.keys = nextKeys
     return Object.keys(patch).length > 0 ? patch : null
+  }
+
+  /**
+   * Запускает class/keyframes animation один раз на стабильную signature.
+   */
+  private applyKeyframeAnimation(
+    node: NovaUiStylableNode,
+    animation: NonNullable<NovaUiStyleDeclarations['animation']>,
+  ): void {
+    const keyframes = this.styleSheet.keyframes.get(animation.name)
+    if (!keyframes || keyframes.frames.length < 2) return
+
+    const first = keyframes.frames[0]?.declarations
+    const last = keyframes.frames[keyframes.frames.length - 1]?.declarations
+    if (!first || !last) return
+
+    const signature = `${animation.name}:${animation.duration ?? 180}:${animation.delay ?? 0}:${animation.easing ?? 'outCubic'}`
+    const persistentKey = node.componentId
+    if (this.appliedAnimationSignatures.get(persistentKey) === signature) return
+    const current = this.appliedAnimations.get(node)
+    if (current?.signature === signature) return
+    current?.playback.cancel()
+
+    const from = resolveAnimationPatch(first)
+    const to = resolveAnimationPatch(last)
+    if (Object.keys(from).length === 0 && Object.keys(to).length === 0) return
+
+    const playback = this.nova.motion.to(node, to, {
+      from,
+      duration: animation.duration ?? 180,
+      delay: animation.delay ?? 0,
+      easing: animation.easing ?? 'outCubic',
+    })
+    this.appliedAnimations.set(node, { signature, playback })
+    this.appliedAnimationSignatures.set(persistentKey, signature)
   }
 
   /**
@@ -1012,6 +1057,7 @@ function mergeRuleDeclarations(rules: ReturnType<typeof matchStyleRules>): NovaU
       ...source.visual,
     }
     if (source.cursor !== undefined) target.cursor = source.cursor
+    if (source.animation !== undefined) target.animation = source.animation
     target.mask |= source.mask
     return target
   }, { mask: NovaUiStyleMask.None })
@@ -1044,9 +1090,18 @@ function mergeStyleDeclarations(...items: Array<NovaUiStyleDeclarations>): NovaU
       ...source.visual,
     }
     if (source.cursor !== undefined) target.cursor = source.cursor
+    if (source.animation !== undefined) target.animation = source.animation
     target.mask |= source.mask
     return target
   }, { mask: NovaUiStyleMask.None })
+}
+
+function resolveAnimationPatch(declarations: NovaUiStyleKeyframeDeclaration): Record<string, number> {
+  const patch: Record<string, number> = {}
+  if (declarations.opacity !== undefined) patch.opacity = declarations.opacity
+  if (declarations.scaleX !== undefined) patch.scaleX = declarations.scaleX
+  if (declarations.scaleY !== undefined) patch.scaleY = declarations.scaleY
+  return patch
 }
 
 function mergeCursorDeclaration(

@@ -55,7 +55,7 @@ export class FpsMeter<E extends EventList = Record<string, any>>
       return
     }
 
-    const fps = Math.max(0, Math.min(999, Math.round(this.nova.debugger.displayFps || this.nova.debugger.lastFps || 0)))
+    const fps = Math.max(0, Math.min(999, Math.round(this.nova.metrics.snapshot().rFps || 0)))
     const schema: NovaSchema = []
     const minimal = this.props.variant === 'minimal'
     schema.push({
@@ -71,7 +71,7 @@ export class FpsMeter<E extends EventList = Record<string, any>>
     })
     schema.push({
       type: 'text',
-      text: this.props.variant === 'badge' ? String(fps) : `${fps} FPS`,
+      text: this.props.variant === 'badge' ? String(fps) : `${fps} rFPS`,
       x: 8,
       y: 0,
       width: Math.max(0, this.props.width - 16),
@@ -87,7 +87,7 @@ export class FpsMeter<E extends EventList = Record<string, any>>
 
   protected override onMount(): void {
     super.onMount()
-    this.nova.debugger.startDisplayMonitor()
+    this.nova.metrics.start()
     this.intervalId = setInterval(() => this.dirty({ render: true }), 250)
   }
 

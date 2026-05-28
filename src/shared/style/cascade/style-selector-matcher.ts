@@ -12,6 +12,7 @@ import {
 import type {
   NovaUiCompiledStyleRule,
   NovaUiCompiledStyleSheet,
+  NovaUiStyleKeyframes,
   NovaUiStyleComponentName,
   NovaUiStyleMediaContext,
   NovaUiStyleSelector,
@@ -36,6 +37,7 @@ export function createEmptyStyleSheet(source = ''): NovaUiCompiledStyleSheet {
     byType: new Map(),
     byAttr: new Map(),
     universal: [],
+    keyframes: new Map(),
     version: 0,
     source,
     tokenDependencies: [],
@@ -46,6 +48,7 @@ export function createEmptyStyleSheet(source = ''): NovaUiCompiledStyleSheet {
 export function compileStyleSheetIndexes(
   rules: Array<NovaUiCompiledStyleRule>,
   source = '',
+  keyframes: Map<string, NovaUiStyleKeyframes> = new Map(),
 ): NovaUiCompiledStyleSheet {
   const sheet: NovaUiCompiledStyleSheet = {
     rules,
@@ -54,6 +57,7 @@ export function compileStyleSheetIndexes(
     byType: new Map(),
     byAttr: new Map(),
     universal: [],
+    keyframes,
     version: Date.now(),
     source,
     tokenDependencies: [],

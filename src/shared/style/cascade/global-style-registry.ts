@@ -4,6 +4,7 @@ import type {
   NovaUiCompiledStyleRule,
   NovaUiCompiledStyleSheet,
   NovaUiStyleDiagnostic,
+  NovaUiStyleKeyframes,
   NovaUiStyleSheetAsset,
   NovaUiStyleThemeDefinition,
 } from '@/shared/style/cascade/style-sheet'
@@ -79,9 +80,11 @@ export function mergeNovaUiStyleSheets(
   let order = 0
   const rules: Array<NovaUiCompiledStyleRule> = []
   const tokenDependencies = new Set<string>()
+  const keyframes = new Map<string, NovaUiStyleKeyframes>()
 
   for (const sheet of styleSheets) {
     for (const dependency of sheet.tokenDependencies ?? []) tokenDependencies.add(dependency)
+    for (const [name, frames] of sheet.keyframes) keyframes.set(name, frames)
     for (const rule of sheet.rules) {
       rules.push({
         ...rule,
@@ -90,7 +93,7 @@ export function mergeNovaUiStyleSheets(
     }
   }
 
-  const merged = compileStyleSheetIndexes(rules, source)
+  const merged = compileStyleSheetIndexes(rules, source, keyframes)
   merged.tokenDependencies = [...tokenDependencies]
   return merged
 }

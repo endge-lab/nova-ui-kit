@@ -9,7 +9,7 @@ import {
   resolveNovaUiPositionedRect,
   type NovaUiLayoutRect,
 } from '@/shared/layout'
-import { THEME_SWITCH_ASSETS, resolveThemeSwitchDefaultIconKind } from '@/components/ThemeSwitch/theme-switch-assets'
+import { THEME_SWITCH_ASSETS } from '@/components/ThemeSwitch/theme-switch-assets'
 import type {
   ThemeSwitchApi,
   ThemeSwitchProps,
@@ -22,6 +22,7 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
   extends NovaComponentNode<ThemeSwitchResolvedProps, ThemeSwitchApi, Record<string, never>, ThemeSwitchProps, E> {
   private readonly api: ThemeSwitchApi
   private pressed = false
+  private assetsRegistered = false
 
   constructor(
     app: NovaApp<E>,
@@ -37,8 +38,8 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
       setProps: patch => this.setProps(patch),
       getProps: () => this.props,
     }
-    this.nova.assets.use(THEME_SWITCH_ASSETS)
     this.options({ interactive: true, cursor: 'pointer', zIndex: 2001 })
+    this.registerAssets()
     this.setupEvents()
     this.applyPlacement()
   }
@@ -76,10 +77,7 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
       },
     })
 
-    const builtinIcon = theme ? resolveThemeSwitchDefaultIconKind(theme.id) : undefined
-    if (builtinIcon) {
-      pushThemeSwitchBuiltinIcon(schema, builtinIcon, this.props.width / 2, this.props.height / 2, 18, builtinIcon === 'moon' ? '#f8fafc' : '#111827', background)
-    } else if (theme?.icon) {
+    if (theme?.icon) {
       schema.push({
         type: 'icon',
         icon: theme.icon,
@@ -89,7 +87,7 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
         height: 18,
         styles: { quality: 'crisp' },
       })
-    } else {
+    } else if (!theme?.icon) {
       schema.push({
         type: 'text',
         text: theme?.label?.slice(0, 2).toUpperCase() ?? 'T',
@@ -111,6 +109,25 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
   protected override onPropsChanged(): void {
     this.props = normalizeThemeSwitchProps(this.props)
     this.applyPlacement()
+  }
+
+  protected override onMount(): void {
+    this.registerAssets()
+    super.onMount()
+  }
+
+  protected override onUnmount(): void {
+    if (this.assetsRegistered) {
+      this.nova.assets.unuse(THEME_SWITCH_ASSETS)
+      this.assetsRegistered = false
+    }
+    super.onUnmount()
+  }
+
+  private registerAssets(): void {
+    if (this.assetsRegistered) return
+    this.nova.assets.use(THEME_SWITCH_ASSETS)
+    this.assetsRegistered = true
   }
 
   private setupEvents(): void {
@@ -166,34 +183,6 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
       zIndex: this.props.zIndex,
     })
     this.setLocalRenderBounds({ x: 0, y: 0, width: rect.width, height: rect.height })
-  }
-}
-
-function pushThemeSwitchBuiltinIcon(schema: NovaSchema, kind: 'moon' | 'sun', cx: number, cy: number, size: number, color: string, background: string): void {
-  const strokeWidth = 1.8
-  if (kind === 'moon') {
-    schema.push({ type: 'circle', x: cx - 2, y: cy + 1, radius: size * 0.39, styles: { border: { color, width: strokeWidth } } })
-    schema.push({ type: 'circle', x: cx + 3, y: cy - 4, radius: size * 0.36, styles: { background } })
-    schema.push({ type: 'line', x1: cx + 5.5, y1: cy - 7, x2: cx + 8.5, y2: cy - 7, styles: { color, width: strokeWidth } })
-    schema.push({ type: 'line', x1: cx + 7, y1: cy - 8.5, x2: cx + 7, y2: cy - 5.5, styles: { color, width: strokeWidth } })
-    schema.push({ type: 'line', x1: cx + 8, y1: cy + 4, x2: cx + 12, y2: cy + 4, styles: { color, width: strokeWidth } })
-    schema.push({ type: 'line', x1: cx + 10, y1: cy + 2, x2: cx + 10, y2: cy + 6, styles: { color, width: strokeWidth } })
-    return
-  }
-
-  schema.push({ type: 'circle', x: cx, y: cy, radius: size * 0.24, styles: { border: { color, width: strokeWidth } } })
-  const inner = size * 0.36
-  const outer = size * 0.48
-  for (let index = 0; index < 8; index += 1) {
-    const angle = (Math.PI * 2 * index) / 8
-    schema.push({
-      type: 'line',
-      x1: cx + Math.cos(angle) * inner,
-      y1: cy + Math.sin(angle) * inner,
-      x2: cx + Math.cos(angle) * outer,
-      y2: cy + Math.sin(angle) * outer,
-      styles: { color, width: strokeWidth },
-    })
   }
 }
 

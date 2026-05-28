@@ -285,6 +285,7 @@ function mergeVirtualRuleDeclarations(rules: ReadonlyArray<NovaUiCompiledStyleRu
       ...source.visual,
     }
     if (source.cursor !== undefined) target.cursor = source.cursor
+    if (source.animation !== undefined) target.animation = source.animation
     target.mask |= source.mask
     return target
   }, { mask: NovaUiStyleMask.None })

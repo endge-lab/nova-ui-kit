@@ -426,6 +426,7 @@ describe('Nova UI Kit components', () => {
         },
       ],
     })
+
     app.raph.run()
     app.raph.run()
 
@@ -504,6 +505,7 @@ describe('Nova UI Kit components', () => {
         },
       ],
     })
+
     app.raph.run()
 
     const root = app.components.requireApi<RootApi>('overlay-root')
@@ -562,6 +564,7 @@ describe('Nova UI Kit components', () => {
         },
       ],
     })
+
     app.raph.run()
 
     const root = app.components.requireApi<RootApi>('overlay-dismiss-root')
@@ -620,6 +623,7 @@ describe('Nova UI Kit components', () => {
         { type: NovaUIKit.Button, id: 'dialog-default-trigger', props: { text: 'Open' } },
       ],
     })
+
     app.raph.run()
     app.raph.run()
 
@@ -2875,6 +2879,11 @@ describe('Nova UI Kit components', () => {
         },
       ],
     })
+
+    expect(app.components.require('positioned-fixed-flex').x).toBe(900 - 16 - 130)
+    expect(app.components.require('positioned-fixed-flex').y).toBe(16)
+    expect(app.components.require('positioned-fixed-flex').layoutReady).toBe(true)
+
     app.raph.run()
     app.raph.run()
 
@@ -2895,6 +2904,38 @@ describe('Nova UI Kit components', () => {
     expect(app.components.require('positioned-fixed-flex').height).toBe(36)
     expect(fixedFlex.getChildRect('positioned-fixed-fps')).toEqual({ x: 0, y: 0, width: 86, height: 36 })
     expect(fixedFlex.getChildRect('positioned-fixed-theme')).toEqual({ x: 94, y: 0, width: 36, height: 36 })
+
+    app.destroy()
+  })
+
+  it('plays class keyframe animation once for stable component ids', () => {
+    const app = createApp()
+    const motionSpy = vi.spyOn(app.motion, 'to')
+    const surface = app.createSurface('class-animation')
+    const toolbar = {
+      type: NovaUIKit.Flex,
+      id: 'animated-toolbar',
+      props: { position: 'fixed', className: 'fade-slide-in', inset: { top: 16, right: 16 }, gap: 8 },
+      children: [
+        { type: NovaUIKit.FpsMeter, id: 'animated-toolbar-fps' },
+      ],
+    }
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'animation-root',
+      props: { width: 900, height: 560 },
+      children: [toolbar],
+    })
+    app.raph.run()
+
+    expect(motionSpy).toHaveBeenCalledTimes(1)
+    expect(motionSpy.mock.calls[0]?.[1]).toEqual({ opacity: 1 })
+
+    app.components.requireApi<RootApi>('animation-root').setChildren([toolbar])
+    app.raph.run()
+
+    expect(motionSpy).toHaveBeenCalledTimes(1)
 
     app.destroy()
   })

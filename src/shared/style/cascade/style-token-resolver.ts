@@ -88,7 +88,7 @@ export function resolveNovaUiStyleSheetTokens(
     declarations: resolveDeclarations(rule.declarations, resolver),
     rightMostClasses: [...rule.rightMostClasses],
   }))
-  const resolved = compileStyleSheetIndexes(rules, sheet.source)
+  const resolved = compileStyleSheetIndexes(rules, sheet.source, sheet.keyframes)
   resolved.tokenDependencies = tokenDependencies
   return resolved
 }

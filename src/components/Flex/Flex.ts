@@ -93,6 +93,7 @@ export class Flex<E extends EventList = Record<string, any>>
     const resolvedProps = normalizeFlexProps(props)
     super(app, surface, descriptor, resolvedProps, options)
     this.__type = 'Flex'
+    this.layoutReady = false
     this.applyDisplayState()
     this.api = {
       setChildren: children => this.setChildren(children),
@@ -100,14 +101,10 @@ export class Flex<E extends EventList = Record<string, any>>
       relayout: () => this.relayout(),
       getChildRect: id => this.getChildRect(id),
     }
-    this.applyResolvedRect({
-      x: resolvedProps.x,
-      y: resolvedProps.y,
-      width: resolvedProps.width,
-      height: resolvedProps.height,
-    })
     this.effectiveStyleContext = mergeStyleContext(this.inheritedStyleContext, resolvedProps.style)
     this.setChildren(options.children ?? [])
+    this.update()
+    this.layoutReady = true
   }
 
   /**

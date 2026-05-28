@@ -16,6 +16,8 @@ import type {
   NovaUiStyleDeclarations,
   NovaUiStyleDiagnostic,
   NovaUiStyleDisplay,
+  NovaUiStyleKeyframeDeclaration,
+  NovaUiStyleKeyframes,
   NovaUiStyleMediaQuery,
   NovaUiStyleSelector,
   NovaUiStyleSelectorCombinator,
@@ -94,9 +96,10 @@ export function validateNovaUiStyleSheetSource(source: string): NovaUiStyleValid
   const diagnostics: Array<NovaUiStyleDiagnostic> = []
   const rules: Array<NovaUiCompiledStyleRule> = []
   const cleanedSource = stripCommentsPreservePositions(source)
+  const keyframeResult = extractKeyframes(cleanedSource, source, diagnostics)
   let order = 0
 
-  for (const parsedRule of parseStyleRules(cleanedSource, source, diagnostics)) {
+  for (const parsedRule of parseStyleRules(keyframeResult.source, source, diagnostics)) {
     const declarations = parseDeclarations(parsedRule.body, source, parsedRule.offset, diagnostics)
     if (!declarations) continue
 
@@ -116,7 +119,7 @@ export function validateNovaUiStyleSheetSource(source: string): NovaUiStyleValid
   }
 
   const ok = !diagnostics.some(item => item.severity === 'error')
-  const styleSheet = ok ? compileStyleSheetIndexes(rules, source) : null
+  const styleSheet = ok ? compileStyleSheetIndexes(rules, source, keyframeResult.keyframes) : null
   if (styleSheet) styleSheet.tokenDependencies = extractNovaUiStyleTokenDependencies(source)
 
   return {
@@ -133,6 +136,120 @@ export function createEmptyStyleSheetValidationResult(source = ''): NovaUiStyleV
     styleSheet: createEmptyStyleSheet(source),
     diagnostics: [],
   }
+}
+
+function extractKeyframes(
+  cleanedSource: string,
+  originalSource: string,
+  diagnostics: Array<NovaUiStyleDiagnostic>,
+): { source: string; keyframes: Map<string, NovaUiStyleKeyframes> } {
+  const keyframes = new Map<string, NovaUiStyleKeyframes>()
+  let source = cleanedSource
+  let cursor = 0
+
+  while (cursor < source.length) {
+    const atIndex = source.indexOf('@keyframes', cursor)
+    if (atIndex < 0) break
+
+    const nameStart = skipWhitespace(source, atIndex + '@keyframes'.length)
+    const blockStart = source.indexOf('{', nameStart)
+    if (blockStart < 0) {
+      diagnostics.push(createDiagnostic('error', 'invalid-keyframes', 'Невалидный @keyframes block.', originalSource, atIndex))
+      break
+    }
+
+    const name = source.slice(nameStart, blockStart).trim()
+    const blockEnd = findMatchingBrace(source, blockStart)
+    if (!name || blockEnd < 0) {
+      diagnostics.push(createDiagnostic('error', 'invalid-keyframes', `Невалидный @keyframes "${name || '<empty>'}".`, originalSource, atIndex))
+      cursor = blockStart + 1
+      continue
+    }
+
+    const frames = parseKeyframeFrames(name, source.slice(blockStart + 1, blockEnd), originalSource, blockStart + 1, diagnostics)
+    if (frames.length > 0) keyframes.set(name, { name, frames })
+    source = `${source.slice(0, atIndex)}${' '.repeat(blockEnd + 1 - atIndex)}${source.slice(blockEnd + 1)}`
+    cursor = atIndex + 1
+  }
+
+  return { source, keyframes }
+}
+
+function parseKeyframeFrames(
+  name: string,
+  body: string,
+  source: string,
+  offset: number,
+  diagnostics: Array<NovaUiStyleDiagnostic>,
+): NovaUiStyleKeyframes['frames'] {
+  const frames: NovaUiStyleKeyframes['frames'] = []
+  let cursor = 0
+
+  while (cursor < body.length) {
+    cursor = skipWhitespace(body, cursor)
+    if (cursor >= body.length) break
+
+    const selectorStart = cursor
+    const blockStart = findNextTopLevel(body, cursor, ['{'])
+    if (blockStart < 0) break
+    const blockEnd = findMatchingBrace(body, blockStart)
+    if (blockEnd < 0) {
+      diagnostics.push(createDiagnostic('error', 'invalid-keyframe-frame', `Невалидный frame в @keyframes "${name}".`, source, offset + selectorStart))
+      break
+    }
+
+    const frameOffset = parseKeyframeOffset(body.slice(selectorStart, blockStart).trim())
+    if (frameOffset === null) {
+      diagnostics.push(createDiagnostic('warning', 'unsupported-keyframe-selector', `Неподдерживаемый keyframe selector в @keyframes "${name}".`, source, offset + selectorStart))
+      cursor = blockEnd + 1
+      continue
+    }
+
+    const declarations = parseKeyframeDeclarations(body.slice(blockStart + 1, blockEnd), source, offset + blockStart + 1, diagnostics)
+    frames.push({ offset: frameOffset, declarations })
+    cursor = blockEnd + 1
+  }
+
+  frames.sort((left, right) => left.offset - right.offset)
+  return frames
+}
+
+function parseKeyframeOffset(value: string): number | null {
+  if (value === 'from') return 0
+  if (value === 'to') return 1
+  if (/^\d+(?:\.\d+)?%$/.test(value)) return Math.max(0, Math.min(1, Number(value.slice(0, -1)) / 100))
+  return null
+}
+
+function parseKeyframeDeclarations(
+  rawBody: string,
+  source: string,
+  offset: number,
+  diagnostics: Array<NovaUiStyleDiagnostic>,
+): NovaUiStyleKeyframeDeclaration {
+  const result: NovaUiStyleKeyframeDeclaration = {}
+
+  for (const rawDeclaration of rawBody.split(';')) {
+    const declaration = rawDeclaration.trim()
+    if (!declaration) continue
+    const separatorIndex = declaration.indexOf(':')
+    if (separatorIndex < 0) continue
+    const key = normalizeStyleDeclarationKey(declaration.slice(0, separatorIndex).trim())
+    const value = declaration.slice(separatorIndex + 1).trim()
+    const numberValue = parseNumberToken(value)
+
+    if (key === 'opacity' && numberValue !== null) result.opacity = Math.max(0, Math.min(1, numberValue))
+    else if (key === 'translateY' && numberValue !== null) result.translateY = numberValue
+    else if (key === 'translateX' && numberValue !== null) result.translateX = numberValue
+    else if (key === 'scale' && numberValue !== null) {
+      result.scaleX = numberValue
+      result.scaleY = numberValue
+    } else if (key === 'scaleX' && numberValue !== null) result.scaleX = numberValue
+    else if (key === 'scaleY' && numberValue !== null) result.scaleY = numberValue
+    else diagnostics.push(createDiagnostic('warning', 'unsupported-keyframe-declaration', `Декларация "${key}" в @keyframes пока не применяется.`, source, offset))
+  }
+
+  return result
 }
 
 function parseStyleRules(
@@ -650,6 +767,7 @@ function parseDeclarationValue(
   }
 
   if (key.startsWith('--')) return stripQuotes(value)
+  if (key === 'animation') return parseAnimation(value, diagnostics, source, offset)
   if (key === 'clip') return parseBoolean(value, diagnostics, source, offset)
   if (key === 'cursor') return parseCursor(value, diagnostics, source, offset)
   if (key === 'display') return parseDisplay(value, diagnostics, source, offset)
@@ -790,7 +908,43 @@ function applyParsedDeclaration(
   }
   if (key === 'cursor') {
     target.cursor = value as never
+    return
   }
+  if (key === 'animation') {
+    target.animation = value as never
+  }
+}
+
+function parseAnimation(
+  value: string,
+  diagnostics: Array<NovaUiStyleDiagnostic>,
+  source: string,
+  offset: number,
+): NovaUiStyleDeclarations['animation'] | null {
+  const parts = value.split(/\s+/).filter(Boolean)
+  const name = parts[0]
+  if (!name) {
+    diagnostics.push(createDiagnostic('error', 'invalid-animation', `Невалидная animation "${value}".`, source, offset))
+    return null
+  }
+
+  const animation: NonNullable<NovaUiStyleDeclarations['animation']> = { name }
+  for (const part of parts.slice(1)) {
+    const time = parseTimeMs(part)
+    if (time !== null) {
+      if (animation.duration === undefined) animation.duration = time
+      else animation.delay = time
+      continue
+    }
+    animation.easing = part as NonNullable<NovaUiStyleDeclarations['animation']>['easing']
+  }
+  return animation
+}
+
+function parseTimeMs(value: string): number | null {
+  if (/^-?\d+(?:\.\d+)?ms$/.test(value)) return Math.max(0, Number(value.slice(0, -2)))
+  if (/^-?\d+(?:\.\d+)?s$/.test(value)) return Math.max(0, Number(value.slice(0, -1)) * 1000)
+  return null
 }
 
 function parseDisplay(

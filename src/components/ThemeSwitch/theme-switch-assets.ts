@@ -5,12 +5,10 @@ import type { ThemeSwitchTheme } from '@/components/ThemeSwitch/theme-switch.typ
 
 export const THEME_SWITCH_ASSETS = NovaAssets.define('nova-ui-kit-theme-switch', {
   icons: {
-    moon: NovaAssets.svg(moonIconSource, { width: 24, height: 24, color: '#111827' }),
+    moon: NovaAssets.svg(moonIconSource, { width: 24, height: 24, color: '#f8fafc' }),
     sun: NovaAssets.svg(sunIconSource, { width: 24, height: 24, color: '#111827' }),
   },
 })
-
-NovaAssets.global.use(THEME_SWITCH_ASSETS)
 
 export const DEFAULT_THEME_SWITCH_THEMES: ThemeSwitchTheme[] = [
   { id: 'light', label: 'Light', icon: THEME_SWITCH_ASSETS.icons.sun },

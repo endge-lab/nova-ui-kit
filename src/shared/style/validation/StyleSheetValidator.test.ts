@@ -87,6 +87,38 @@ describe('Nova UI stylesheet validator', () => {
     ])
   })
 
+  it('parses keyframes and animation declarations', () => {
+    const result = validateNovaUiStyleSheetSource(`
+      @keyframes fade-slide-in {
+        from {
+          opacity: 0;
+          translate-y: -8;
+        }
+
+        to {
+          opacity: 1;
+          translate-y: 0;
+        }
+      }
+
+      .fade-slide-in {
+        animation: fade-slide-in 280ms outCubic;
+      }
+    `)
+
+    expect(result.ok).toBe(true)
+    expect(result.diagnostics).toHaveLength(0)
+    expect(result.styleSheet?.keyframes.get('fade-slide-in')?.frames).toEqual([
+      { offset: 0, declarations: { opacity: 0, translateY: -8 } },
+      { offset: 1, declarations: { opacity: 1, translateY: 0 } },
+    ])
+    expect(result.styleSheet?.rules[0]?.declarations.animation).toEqual({
+      name: 'fade-slide-in',
+      duration: 280,
+      easing: 'outCubic',
+    })
+  })
+
   it('diagnoses unsupported display values', () => {
     const result = validateNovaUiStyleSheetSource(`
       Flex {
