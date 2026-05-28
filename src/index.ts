@@ -1,5 +1,3 @@
-import '@/vue-global-components'
-
 export * from '@/components/ActionList/ActionList'
 export * from '@/components/ActionList/action-list.config'
 export * from '@/components/ActionList/action-list.registry'

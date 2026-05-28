@@ -1,7 +1,7 @@
 {
   "name": "@endge/nova-ui-kit",
   "private": false,
-  "version": "0.7.0",
+  "version": "0.8.0",
   "type": "module",
   "module": "./dist/nova-ui-kit.js",
   "types": "./dist/index.d.ts",
@@ -12,6 +12,10 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
+      "import": "./dist/nova-ui-kit.js"
+    },
+    "./vue": {
+      "types": "./dist/vue-global-components.d.ts",
       "import": "./dist/nova-ui-kit.js"
     }
   },
@@ -31,7 +35,7 @@
     "bench": "vitest bench --run"
   },
   "dependencies": {
-    "@endge/nova": "^0.7.3",
+    "@endge/nova": "^0.10.0",
     "@endge/utils": "^0.23.0"
   },
   "devDependencies": {

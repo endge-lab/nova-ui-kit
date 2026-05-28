@@ -1,6 +1,10 @@
 {
   "packageName": "@endge/nova-ui-kit",
   "version": "0.7.0",
+  "registrar": {
+    "source": "@endge/nova-ui-kit",
+    "import": "registerNovaUIKit"
+  },
   "groups": [
     {
       "id": "nova-ui-kit",
