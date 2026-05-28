@@ -24,6 +24,7 @@ import {
   type DialogsApi,
   type DividerApi,
   type FlexApi,
+  type FpsMeterApi,
   type GridApi,
   type ImageApi,
   type InputApi,
@@ -39,6 +40,7 @@ import {
   type SplitPaneResizePayload,
   type TagApi,
   type TextBlockApi,
+  type ThemeSwitchApi,
   type ToggleApi,
   type ToastRegionApi,
   type TooltipApi,
@@ -227,6 +229,8 @@ describe('Nova UI Kit components', () => {
         { type: NovaUIKit.Surface, id: 'surface', props: { width: 160, height: 80 } },
         { type: NovaUIKit.Divider, id: 'divider', props: { width: 160, lineStyle: 'dashed', border: { width: 2 }, padding: { horizontal: 8 }, margin: { vertical: 4 } } },
         { type: NovaUIKit.Button, id: 'button', props: { text: 'Run' } },
+        { type: NovaUIKit.FpsMeter, id: 'fps-meter', props: { placement: 'top-right', margin: 8 } },
+        { type: NovaUIKit.ThemeSwitch, id: 'theme-switch', props: { themes: [{ id: 'light', label: 'Light' }, { id: 'dark', label: 'Dark' }] } },
         { type: NovaUIKit.Badge, id: 'badge', props: { value: 3 } },
         { type: NovaUIKit.Image, id: 'image', props: { src: createCanvasDrawable(), radius: 8 } },
         { type: NovaUIKit.Tag, id: 'tag', props: { text: 'Ready' } },
@@ -324,6 +328,8 @@ describe('Nova UI Kit components', () => {
     })
 
     app.components.requireApi<ButtonApi>('button').setSelected(true)
+    app.components.requireApi<FpsMeterApi>('fps-meter').setVisible(false)
+    app.components.requireApi<ThemeSwitchApi>('theme-switch').next()
     app.components.requireApi<DividerApi>('divider').setLineStyle('dotted')
     app.components.requireApi<BadgeApi>('badge').setValue(4)
     app.components.requireApi<ImageApi>('image').setSrc(createCanvasDrawable())
@@ -347,6 +353,8 @@ describe('Nova UI Kit components', () => {
     app.components.requireApi<PanelApi>('panel').setTitle('Updated')
 
     expect(app.components.requireApi<ButtonApi>('button').getProps().selected).toBe(true)
+    expect(app.components.requireApi<FpsMeterApi>('fps-meter').getProps().visible).toBe(false)
+    expect(app.components.requireApi<ThemeSwitchApi>('theme-switch').getProps().themes).toHaveLength(2)
     expect(app.components.requireApi<DividerApi>('divider').getProps().lineStyle).toBe('dotted')
     expect(app.components.requireApi<DividerApi>('divider').getProps().border?.width).toBe(2)
     expect(app.components.requireApi<BadgeApi>('badge').getProps().value).toBe(4)

@@ -30,6 +30,7 @@ import {
   TOGGLE_SWITCH_SCHEMA_TYPE,
 } from '@/components/Advanced/advanced.types'
 import { FLEX_SCHEMA_TYPE } from '@/components/Flex/flex.types'
+import { FPS_METER_SCHEMA_TYPE } from '@/components/FpsMeter/fps-meter.types'
 import { GRID_SCHEMA_TYPE } from '@/components/Grid/grid.types'
 import {
   INPUT_FIELD_SCHEMA_TYPE,
@@ -55,6 +56,7 @@ import { SPLIT_PANE_SCHEMA_TYPE } from '@/components/SplitPane/split-pane.types'
 import { SURFACE_SCHEMA_TYPE } from '@/components/Surface/surface.types'
 import { TAG_SCHEMA_TYPE } from '@/components/Tag/tag.types'
 import { TEXT_BLOCK_SCHEMA_TYPE } from '@/components/TextBlock/text-block.types'
+import { THEME_SWITCH_SCHEMA_TYPE } from '@/components/ThemeSwitch/theme-switch.types'
 import { TOGGLE_SCHEMA_TYPE } from '@/components/Toggle/toggle.types'
 import { createTooltipSchema } from '@/components/Tooltip/tooltip.config'
 import { TOOLTIP_SCHEMA_TYPE, TOOLTIPS_SCHEMA_TYPE } from '@/components/Tooltip/tooltip.types'
@@ -95,6 +97,8 @@ export const NovaUIKit = {
   Overlays: OVERLAYS_SCHEMA_TYPE,
   tooltipSchema: createTooltipSchema,
   progressRingSchema: createProgressRingSchema,
+  FpsMeter: FPS_METER_SCHEMA_TYPE,
+  ThemeSwitch: THEME_SWITCH_SCHEMA_TYPE,
   SegmentedControl: SEGMENTED_CONTROL_SCHEMA_TYPE,
   Panel: PANEL_SCHEMA_TYPE,
   SpeedDial: SPEED_DIAL_SCHEMA_TYPE,
