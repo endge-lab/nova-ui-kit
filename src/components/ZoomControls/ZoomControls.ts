@@ -16,6 +16,7 @@ import {
   clamp,
   resolveComponentTextStyle,
 } from '@/shared/component/component-props'
+import { toLocalEventPoint, type NovaUiEventPoint } from '@/shared/component/component-events'
 import { pushText } from '@/shared/component/component-render'
 
 type ZoomControlsPart = 'minus' | 'plus' | null
@@ -25,6 +26,7 @@ export class ZoomControls<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<ZoomControlsResolvedProps, ZoomControlsApi, ZoomControlsProps, E> {
   private hoveredPart: ZoomControlsPart = null
   private pressedPart: ZoomControlsPart = null
+  private readonly eventPoint: NovaUiEventPoint = { x: 0, y: 0 }
   private readonly api: ZoomControlsApi
 
   /** Создает zoom controls и связывает pointer events с изменением value. */
@@ -132,9 +134,10 @@ export class ZoomControls<E extends EventList = Record<string, any>>
   }
 
   private resolvePart(event: MouseEvent): ZoomControlsPart {
-    const x = event.offsetX
-    if (x >= this.minusRect().x && x <= this.minusRect().x + this.minusRect().width) return 'minus'
-    if (x >= this.plusRect().x && x <= this.plusRect().x + this.plusRect().width) return 'plus'
+    const point = toLocalEventPoint(this, event, this.eventPoint)
+    if (point.y < 0 || point.y > this.height) return null
+    if (point.x >= this.minusRect().x && point.x <= this.minusRect().x + this.minusRect().width) return 'minus'
+    if (point.x >= this.plusRect().x && point.x <= this.plusRect().x + this.plusRect().width) return 'plus'
     return null
   }
 

@@ -54,6 +54,7 @@ import {
   rectEquals,
   relayoutNovaUiLayoutAncestors,
   resolveNovaUiPositionedLayout,
+  resolveNovaUiPositionedRect,
   resolveSpacing,
   setNovaUiNodeLayoutIntent,
   type NovaUiLayoutRect,
@@ -464,10 +465,21 @@ export class Root<E extends EventList = Record<string, any>>
 
     if (!rectEquals(this.childRect, nextRect)) {
       copyRect(this.childRect, nextRect)
+    }
+
+    if (this.width > 0 && this.height > 0) {
       for (const child of this.managedChildren) {
         if (!isNovaUiLayoutDisplayed(child)) continue
-        if (isNovaUiOutOfFlowPosition(resolveNovaUiPositionedLayout(child).position)) continue
-        const changed = applyNodeLayoutRect(child, this.childRect)
+        const layout = resolveNovaUiPositionedLayout(child)
+        const rect = isNovaUiOutOfFlowPosition(layout.position)
+          ? resolveNovaUiPositionedRect(
+            this.childRect,
+            { x: child.x, y: child.y, width: child.width, height: child.height },
+            layout,
+            child,
+          )
+          : this.childRect
+        const changed = applyNodeLayoutRect(child, rect)
         if (changed) child.dirty({ update: true, render: true })
       }
     }

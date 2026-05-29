@@ -12,6 +12,9 @@ import {
   resolveNovaUiThemeValue,
 } from '@/shared/style/nova-ui-kit-theme'
 import {
+  NOVA_UI_LAYOUT_TARGET,
+  type NovaUiLayoutConstraints,
+  type NovaUiLayoutMeasure,
   resolveNovaUiPositionedRect,
   type NovaUiLayoutRect,
 } from '@/shared/layout'
@@ -26,9 +29,12 @@ import type {
 /** Переиспользуемый переключатель тем Nova. */
 export class ThemeSwitch<E extends EventList = Record<string, any>>
   extends NovaComponentNode<ThemeSwitchResolvedProps, ThemeSwitchApi, Record<string, never>, ThemeSwitchProps, E> {
+  readonly [NOVA_UI_LAYOUT_TARGET] = true as const
+
   private readonly api: ThemeSwitchApi
   private hovered = false
   private pressed = false
+  private externalLayout = false
 
   constructor(
     app: NovaApp<E>,
@@ -60,7 +66,32 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
   }
 
   update(): void {
-    this.applyPlacement()
+    if (!this.externalLayout) this.applyPlacement()
+  }
+
+  /** Принимает rect от UI Kit layout-контейнера. */
+  applyLayoutRect(rect: NovaUiLayoutRect): boolean {
+    this.externalLayout = true
+    const sizeChanged = this.width !== rect.width || this.height !== rect.height
+    const changed = this.x !== rect.x
+      || this.y !== rect.y
+      || sizeChanged
+    this.options({
+      x: rect.x,
+      y: rect.y,
+      width: rect.width,
+      height: rect.height,
+      interactive: this.props.visible,
+      zIndex: this.props.zIndex,
+    })
+    this.setLocalRenderBounds({ x: 0, y: 0, width: rect.width, height: rect.height })
+    if (changed) this.dirty({ matrix: true, update: sizeChanged, render: true })
+    return changed
+  }
+
+  /** Возвращает preferred size для flow layout. */
+  measureLayout(_constraints: NovaUiLayoutConstraints): NovaUiLayoutMeasure {
+    return { width: this.props.width, height: this.props.height }
   }
 
   render(): void {
@@ -71,15 +102,15 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
 
     const theme = this.currentTheme()
     const buttonProps = normalizeButtonProps({
-      width: this.props.width,
-      height: this.props.height,
+      width: this.width,
+      height: this.height,
       size: 'md',
       icon: theme?.icon,
       text: theme?.icon ? '' : theme?.label?.slice(0, 2).toUpperCase() ?? 'T',
       iconPlacement: 'only',
       background: theme?.background,
     })
-    this.renderer.schema(buildButtonSchema(buttonProps, this.props.width, this.props.height, {
+    this.renderer.schema(buildButtonSchema(buttonProps, this.width, this.height, {
       values: {},
       mask: NovaUiStyleMask.None,
       version: 0,
@@ -91,7 +122,8 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
 
   protected override onPropsChanged(): void {
     this.props = normalizeThemeSwitchProps(this.props)
-    this.applyPlacement()
+    this.options({ interactive: this.props.visible, zIndex: this.props.zIndex })
+    if (!this.externalLayout) this.applyPlacement()
   }
 
   private setupEvents(): void {
@@ -145,6 +177,10 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
 
   private applyPlacement(): void {
     const rect = resolveOverlayRect(this.surface.width, this.surface.height, this.props)
+    const nextX = rect.x ?? this.x
+    const nextY = rect.y ?? this.y
+    const sizeChanged = this.width !== rect.width || this.height !== rect.height
+    const changed = this.x !== nextX || this.y !== nextY || sizeChanged
     this.options({
       ...(rect.x !== undefined && rect.y !== undefined ? { x: rect.x, y: rect.y } : {}),
       width: rect.width,
@@ -153,6 +189,7 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
       zIndex: this.props.zIndex,
     })
     this.setLocalRenderBounds({ x: 0, y: 0, width: rect.width, height: rect.height })
+    if (changed) this.dirty({ matrix: true, update: sizeChanged, render: true })
   }
 }
 

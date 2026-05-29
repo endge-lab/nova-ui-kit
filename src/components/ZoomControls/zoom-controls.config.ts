@@ -12,7 +12,6 @@ import {
   commonMeasureBounds,
   finiteNumber,
   normalizeCommonProps,
-  roundToStep,
 } from '@/shared/component'
 import {
   ZOOM_CONTROLS_SCHEMA_TYPE,
@@ -67,7 +66,7 @@ export function normalizeZoomControlsProps(props: ZoomControlsProps = {}): ZoomC
       pressedBackground: 'var(--nova-zoom-controls-button-pressed-background, #eef2f7)',
       cursor: { hover: 'pointer', pressed: 'pointer', disabled: 'not-allowed' },
     }),
-    value: clamp(roundToStep(finiteNumber(props.value, 1), minZoom, step), minZoom, maxZoom),
+    value: clamp(finiteNumber(props.value, 1), minZoom, maxZoom),
     minZoom,
     maxZoom,
     step,

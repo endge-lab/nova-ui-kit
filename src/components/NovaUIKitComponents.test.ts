@@ -2909,7 +2909,7 @@ describe('Nova UI Kit components', () => {
       ],
     })
 
-    expect(app.components.require('positioned-fixed-flex').x).toBe(900 - 16 - 130)
+    expect(app.components.require('positioned-fixed-flex').x).toBe(420 - 16 - 130)
     expect(app.components.require('positioned-fixed-flex').y).toBe(16)
     expect(app.components.require('positioned-fixed-flex').layoutReady).toBe(true)
 
@@ -2927,12 +2927,101 @@ describe('Nova UI Kit components', () => {
     expect(flex.getChildRect('positioned-theme-absolute')).toEqual({ x: 354, y: 28, width: 36, height: 36 })
     expect(theme.weight).toBe(25)
     const fixedFlex = app.components.requireApi<FlexApi>('positioned-fixed-flex')
-    expect(app.components.require('positioned-fixed-flex').x).toBe(900 - 16 - 130)
+    expect(app.components.require('positioned-fixed-flex').x).toBe(420 - 16 - 130)
     expect(app.components.require('positioned-fixed-flex').y).toBe(16)
     expect(app.components.require('positioned-fixed-flex').width).toBe(130)
     expect(app.components.require('positioned-fixed-flex').height).toBe(36)
     expect(fixedFlex.getChildRect('positioned-fixed-fps')).toEqual({ x: 0, y: 0, width: 86, height: 36 })
     expect(fixedFlex.getChildRect('positioned-fixed-theme')).toEqual({ x: 94, y: 0, width: 36, height: 36 })
+
+    app.destroy()
+  })
+
+  it('keeps fixed toolbar controls hit-testable with canvas event coordinates', () => {
+    const app = createApp()
+    const surface = app.createSurface('fixed-toolbar-zoom-hit')
+    const onChange = vi.fn()
+    const toolbarSchema = (value: number) => ({
+      type: NovaUIKit.Flex,
+      id: 'fixed-toolbar',
+      props: { position: 'fixed', inset: { top: 16, right: 16 }, gap: 8, alignItems: 'center' },
+      children: [
+        { type: NovaUIKit.FpsMeter, id: 'fixed-toolbar-fps' },
+        {
+          type: NovaUIKit.ZoomControls,
+          id: 'fixed-toolbar-zoom',
+          props: { value, step: 0.2, minZoom: 0.1, maxZoom: 3, onChange },
+        },
+        { type: NovaUIKit.ThemeSwitch, id: 'fixed-toolbar-theme' },
+        {
+          type: NovaUIKit.Button,
+          id: 'fixed-toolbar-settings',
+          props: { width: 36, height: 36, iconPlacement: 'only', icon: THEME_SWITCH_ASSETS.icons.sun },
+        },
+      ],
+    })
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'fixed-toolbar-root',
+      props: { width: 420, height: 240, padding: 0 },
+      children: [toolbarSchema(1)],
+    })
+    app.raph.run()
+    app.raph.run()
+
+    const toolbar = app.components.require('fixed-toolbar')
+    const fixedToolbar = app.components.requireApi<FlexApi>('fixed-toolbar')
+    const fps = app.components.require('fixed-toolbar-fps')
+    const zoom = app.components.require('fixed-toolbar-zoom') as NovaNode<TestEvents>
+    const theme = app.components.require('fixed-toolbar-theme')
+    const settings = app.components.require('fixed-toolbar-settings')
+    const x = toolbar.x + zoom.x + zoom.width - 10
+    const y = toolbar.y + zoom.y + 10
+    const expectToolbarMatrices = () => {
+      expect(Math.round(fps.matrix[6])).toBe(100)
+      expect(Math.round(fps.matrix[7])).toBe(16)
+      expect(Math.round(zoom.matrix[6])).toBe(194)
+      expect(Math.round(zoom.matrix[7])).toBe(16)
+      expect(Math.round(theme.matrix[6])).toBe(324)
+      expect(Math.round(theme.matrix[7])).toBe(16)
+      expect(Math.round(settings.matrix[6])).toBe(368)
+      expect(Math.round(settings.matrix[7])).toBe(16)
+    }
+
+    expect(toolbar.x).toBe(420 - 16 - 304)
+    expect(toolbar.y).toBe(16)
+    expect(fixedToolbar.getChildRect('fixed-toolbar-fps')).toEqual({ x: 0, y: 0, width: 86, height: 36 })
+    expect(fixedToolbar.getChildRect('fixed-toolbar-zoom')).toEqual({ x: 94, y: 0, width: 122, height: 36 })
+    expect(fixedToolbar.getChildRect('fixed-toolbar-theme')).toEqual({ x: 224, y: 0, width: 36, height: 36 })
+    expect(fixedToolbar.getChildRect('fixed-toolbar-settings')).toEqual({ x: 268, y: 0, width: 36, height: 36 })
+    expect(fps.x).toBe(0)
+    expect(zoom.x).toBe(94)
+    expect(theme.x).toBe(224)
+    expect(settings.x).toBe(268)
+    expectToolbarMatrices()
+    expect(app.events.hitTest(x, y)?.id).toBe(zoom.id)
+
+    app.handleEvent('mousedown', new MouseEvent('mousedown', { clientX: x, clientY: y, button: 0 }))
+    app.handleEvent('mouseup', new MouseEvent('mouseup', { clientX: x, clientY: y, button: 0 }))
+
+    expect(onChange).toHaveBeenCalledWith(1.2)
+    expect(app.components.requireApi<ZoomControlsApi>('fixed-toolbar-zoom').getProps().value).toBe(1.2)
+
+    app.components.requireApi<RootApi>('fixed-toolbar-root').setChildren([toolbarSchema(1.2)])
+    app.raph.run()
+    app.raph.run()
+
+    expect(toolbar.x).toBe(420 - 16 - 304)
+    expect(fixedToolbar.getChildRect('fixed-toolbar-fps')).toEqual({ x: 0, y: 0, width: 86, height: 36 })
+    expect(fixedToolbar.getChildRect('fixed-toolbar-zoom')).toEqual({ x: 94, y: 0, width: 122, height: 36 })
+    expect(fixedToolbar.getChildRect('fixed-toolbar-theme')).toEqual({ x: 224, y: 0, width: 36, height: 36 })
+    expect(fixedToolbar.getChildRect('fixed-toolbar-settings')).toEqual({ x: 268, y: 0, width: 36, height: 36 })
+    expect(fps.x).toBe(0)
+    expect(zoom.x).toBe(94)
+    expect(theme.x).toBe(224)
+    expect(settings.x).toBe(268)
+    expectToolbarMatrices()
 
     app.destroy()
   })

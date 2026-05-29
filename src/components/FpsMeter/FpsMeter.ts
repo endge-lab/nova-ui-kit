@@ -8,6 +8,9 @@ import {
 import {
   resolveNovaUiPositionedRect,
   type NovaUiLayoutRect,
+  type NovaUiLayoutConstraints,
+  type NovaUiLayoutMeasure,
+  NOVA_UI_LAYOUT_TARGET,
 } from '@/shared/layout'
 import type {
   FpsMeterApi,
@@ -22,8 +25,11 @@ import {
 /** Универсальный overlay-счетчик FPS для Nova-canvas. */
 export class FpsMeter<E extends EventList = Record<string, any>>
   extends NovaComponentNode<FpsMeterResolvedProps, FpsMeterApi, Record<string, never>, FpsMeterProps, E> {
+  readonly [NOVA_UI_LAYOUT_TARGET] = true as const
+
   private readonly api: FpsMeterApi
   private intervalId: ReturnType<typeof setInterval> | undefined
+  private externalLayout = false
 
   constructor(
     app: NovaApp<E>,
@@ -52,7 +58,32 @@ export class FpsMeter<E extends EventList = Record<string, any>>
   }
 
   update(): void {
-    this.applyPlacement()
+    if (!this.externalLayout) this.applyPlacement()
+  }
+
+  /** Принимает rect от UI Kit layout-контейнера. */
+  applyLayoutRect(rect: NovaUiLayoutRect): boolean {
+    this.externalLayout = true
+    const sizeChanged = this.width !== rect.width || this.height !== rect.height
+    const changed = this.x !== rect.x
+      || this.y !== rect.y
+      || sizeChanged
+    this.options({
+      x: rect.x,
+      y: rect.y,
+      width: rect.width,
+      height: rect.height,
+      interactive: false,
+      zIndex: this.props.zIndex,
+    })
+    this.setLocalRenderBounds({ x: 0, y: 0, width: rect.width, height: rect.height })
+    if (changed) this.dirty({ matrix: true, update: sizeChanged, render: true })
+    return changed
+  }
+
+  /** Возвращает preferred size для flow layout. */
+  measureLayout(_constraints: NovaUiLayoutConstraints): NovaUiLayoutMeasure {
+    return { width: this.props.width, height: this.props.height }
   }
 
   render(): void {
@@ -68,8 +99,8 @@ export class FpsMeter<E extends EventList = Record<string, any>>
       type: 'rect',
       x: 0,
       y: 0,
-      width: this.props.width,
-      height: this.props.height,
+      width: this.width,
+      height: this.height,
       styles: {
         background: resolveNovaUiThemeValue(this.nova, minimal ? 'var(--nova-fps-meter-minimal-background, rgba(17,24,39,0.66))' : 'var(--nova-fps-meter-background, rgba(17,24,39,0.82))'),
         border: { color: resolveNovaUiThemeValue(this.nova, 'var(--nova-fps-meter-border-color, rgba(255,255,255,0.14))'), width: 1, radius: 8 },
@@ -80,8 +111,8 @@ export class FpsMeter<E extends EventList = Record<string, any>>
       text: this.props.variant === 'badge' ? String(fps) : `${fps} rFPS`,
       x: 8,
       y: 0,
-      width: Math.max(0, this.props.width - 16),
-      height: this.props.height,
+      width: Math.max(0, this.width - 16),
+      height: this.height,
       styles: {
         color: resolveNovaUiThemeValue(this.nova, 'var(--nova-fps-meter-color, #ffffff)'),
         font: { family: 'Inter, Arial, sans-serif', size: 11, weight: '900' },
@@ -105,11 +136,16 @@ export class FpsMeter<E extends EventList = Record<string, any>>
 
   protected override onPropsChanged(): void {
     this.props = normalizeFpsMeterProps(this.props)
-    this.applyPlacement()
+    this.options({ interactive: false, zIndex: this.props.zIndex })
+    if (!this.externalLayout) this.applyPlacement()
   }
 
   private applyPlacement(): void {
     const rect = resolveOverlayRect(this.surface.width, this.surface.height, this.props)
+    const nextX = rect.x ?? this.x
+    const nextY = rect.y ?? this.y
+    const sizeChanged = this.width !== rect.width || this.height !== rect.height
+    const changed = this.x !== nextX || this.y !== nextY || sizeChanged
     this.options({
       ...(rect.x !== undefined && rect.y !== undefined ? { x: rect.x, y: rect.y } : {}),
       width: rect.width,
@@ -118,6 +154,7 @@ export class FpsMeter<E extends EventList = Record<string, any>>
       zIndex: this.props.zIndex,
     })
     this.setLocalRenderBounds({ x: 0, y: 0, width: rect.width, height: rect.height })
+    if (changed) this.dirty({ matrix: true, update: sizeChanged, render: true })
   }
 }
 
