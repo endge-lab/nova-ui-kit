@@ -48,6 +48,7 @@ import {
   type PopoverApi,
   THEME_SWITCH_ASSETS,
   registerNovaUiGlobalStyleSheet,
+  resolveFpsMeterReading,
   resolveNovaUiThemeValue,
   validateNovaUiStyleSheetSource,
 } from '@/index'
@@ -2935,6 +2936,12 @@ describe('Nova UI Kit components', () => {
     expect(fixedFlex.getChildRect('positioned-fixed-theme')).toEqual({ x: 94, y: 0, width: 36, height: 36 })
 
     app.destroy()
+  })
+
+  it('uses rAF FPS by default but keeps the public FPS label', () => {
+    expect(resolveFpsMeterReading({ fps: 72, rFps: 30 })).toEqual({ value: 30, label: 'FPS' })
+    expect(resolveFpsMeterReading({ fps: 72, rFps: 30 }, 'render')).toEqual({ value: 72, label: 'FPS' })
+    expect(resolveFpsMeterReading({ fps: 1200, rFps: -10 })).toEqual({ value: 0, label: 'FPS' })
   })
 
   it('keeps fixed toolbar controls hit-testable with canvas event coordinates', () => {

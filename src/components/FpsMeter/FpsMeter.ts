@@ -14,6 +14,7 @@ import {
 } from '@/shared/layout'
 import type {
   FpsMeterApi,
+  FpsMeterMetric,
   FpsMeterProps,
   FpsMeterResolvedProps,
 } from '@/components/FpsMeter/fps-meter.types'
@@ -92,7 +93,7 @@ export class FpsMeter<E extends EventList = Record<string, any>>
       return
     }
 
-    const fps = Math.max(0, Math.min(999, Math.round(this.nova.metrics.snapshot().rFps || 0)))
+    const reading = resolveFpsMeterReading(this.nova.metrics.snapshot(), this.props.metric)
     const schema: NovaSchema = []
     const minimal = this.props.variant === 'minimal'
     schema.push({
@@ -108,7 +109,7 @@ export class FpsMeter<E extends EventList = Record<string, any>>
     })
     schema.push({
       type: 'text',
-      text: this.props.variant === 'badge' ? String(fps) : `${fps} rFPS`,
+      text: this.props.variant === 'badge' ? String(reading.value) : `${reading.value} ${reading.label}`,
       x: 8,
       y: 0,
       width: Math.max(0, this.width - 16),
@@ -155,6 +156,17 @@ export class FpsMeter<E extends EventList = Record<string, any>>
     })
     this.setLocalRenderBounds({ x: 0, y: 0, width: rect.width, height: rect.height })
     if (changed) this.dirty({ matrix: true, update: sizeChanged, render: true })
+  }
+}
+
+export function resolveFpsMeterReading(
+  snapshot: { fps?: number; rFps?: number },
+  metric: FpsMeterMetric = 'raf',
+): { value: number; label: 'FPS' } {
+  const raw = metric === 'raf' ? snapshot.rFps : snapshot.fps
+  return {
+    value: Math.max(0, Math.min(999, Math.round(raw || 0))),
+    label: 'FPS',
   }
 }
 

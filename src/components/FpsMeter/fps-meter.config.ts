@@ -36,6 +36,7 @@ export const FPS_METER_FIELD_DEFINITIONS = {
   placement: { type: 'string' },
   margin: { type: 'number' },
   sampleSize: { type: 'number' },
+  metric: { type: 'string' },
   variant: { type: 'string' },
   visible: { type: 'boolean' },
 } as const
@@ -52,6 +53,7 @@ export function normalizeFpsMeterProps(props: FpsMeterProps = {}): FpsMeterResol
     placement: props.placement,
     margin: finiteNumber(props.margin, 12),
     sampleSize: Math.max(2, Math.round(finiteNumber(props.sampleSize, 30))),
+    metric: props.metric === 'render' ? 'render' : 'raf',
     variant: props.variant ?? 'pill',
     visible: props.visible ?? true,
   }
@@ -67,7 +69,7 @@ export function createFpsMeterDescriptor(createNode?: FpsMeterNodeFactory): FpsM
     dirtyPolicy: {
       matrix: ['x', 'y', 'placement', 'margin', 'zIndex'],
       update: ['width', 'height', 'position', 'inset', 'variant', 'visible'],
-      render: ['sampleSize'],
+      render: ['sampleSize', 'metric'],
     },
     fields: FPS_METER_FIELD_DEFINITIONS,
     normalize: schema => normalizeFpsMeterProps(schema.props),
