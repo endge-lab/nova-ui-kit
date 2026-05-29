@@ -49,6 +49,7 @@ import {
   copyRect,
   createLayoutRect,
   readNovaUiNodeProps,
+  isNovaUiLayoutTarget,
   isNovaUiOutOfFlowPosition,
   isNovaUiLayoutDisplayed,
   rectEquals,
@@ -237,7 +238,9 @@ export class Root<E extends EventList = Record<string, any>>
   /** Принимает итоговый rect от внешнего runtime и запускает пересчет Root children. */
   applyLayoutRect(rect: NovaUiLayoutRect): boolean {
     this.externalLayout = true
-    return this.applyResolvedRect(rect)
+    const changed = this.applyResolvedRect(rect)
+    if (changed && this.layoutReady) this.update()
+    return changed
   }
 
   /** Валидирует stylesheet source и применяет пустую схему при ошибке. */
@@ -347,6 +350,7 @@ export class Root<E extends EventList = Record<string, any>>
 
     this.layoutDirty = true
     this.applyCascade()
+    if (this.layoutReady) this.update()
     this.dirty({ update: true, render: true })
   }
 
@@ -471,10 +475,13 @@ export class Root<E extends EventList = Record<string, any>>
       for (const child of this.managedChildren) {
         if (!isNovaUiLayoutDisplayed(child)) continue
         const layout = resolveNovaUiPositionedLayout(child)
+        const measured = isNovaUiLayoutTarget(child) && child.measureLayout
+          ? child.measureLayout({ minWidth: 0, maxWidth: Number.MAX_SAFE_INTEGER, minHeight: 0, maxHeight: Number.MAX_SAFE_INTEGER })
+          : undefined
         const rect = isNovaUiOutOfFlowPosition(layout.position)
           ? resolveNovaUiPositionedRect(
             this.childRect,
-            { x: child.x, y: child.y, width: child.width, height: child.height },
+            { x: child.x, y: child.y, width: measured?.width ?? child.width, height: measured?.height ?? child.height },
             layout,
             child,
           )

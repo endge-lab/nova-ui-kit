@@ -5,6 +5,7 @@ import {
   createLayoutRect,
   isAutoLayoutValue,
   isNovaUiLayoutTarget,
+  readNovaUiNodeProps,
   resolveLayoutValue,
   resolveSpacing,
   type NovaUiCompiledLayoutValue,
@@ -203,8 +204,9 @@ export class FlexLayoutEngine {
   ): FlexMeasuredItem {
     const layout = entry.compiledLayout
     const margin = resolveAxisSpacing(layout.margin, isRow)
-    const widthFallback = entry.node.width
-    const heightFallback = entry.node.height
+    const props = readNovaUiNodeProps(entry.node)
+    const widthFallback = typeof props.width === 'number' && Number.isFinite(props.width) ? props.width : entry.node.width
+    const heightFallback = typeof props.height === 'number' && Number.isFinite(props.height) ? props.height : entry.node.height
     const measured = this.measureAutoItem(entry, mainSize, crossSize, isRow)
     const rawMain = this.resolveMain(layout, mainSize, isRow, widthFallback, heightFallback, measured)
     const rawCross = this.resolveCross(layout, crossSize, isRow, widthFallback, heightFallback, measured)

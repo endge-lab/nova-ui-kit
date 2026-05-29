@@ -3026,6 +3026,66 @@ describe('Nova UI Kit components', () => {
     app.destroy()
   })
 
+  it('applies fixed Flex layout synchronously when template children are patched', () => {
+    const app = createApp()
+    const surface = app.createSurface('fixed-toolbar-sync-layout')
+    const compactToolbar = {
+      type: NovaUIKit.Flex,
+      id: 'sync-fixed-toolbar',
+      props: { position: 'fixed', inset: { top: 16, right: 16 }, gap: 8, alignItems: 'center' },
+      children: [
+        { type: NovaUIKit.FpsMeter, id: 'sync-fixed-toolbar-fps' },
+      ],
+    }
+    const expandedToolbar = {
+      ...compactToolbar,
+      children: [
+        { type: NovaUIKit.FpsMeter, id: 'sync-fixed-toolbar-fps' },
+        { type: NovaUIKit.ZoomControls, id: 'sync-fixed-toolbar-zoom', props: { value: 1, step: 0.2, minZoom: 0.1, maxZoom: 3 } },
+        { type: NovaUIKit.ThemeSwitch, id: 'sync-fixed-toolbar-theme' },
+        {
+          type: NovaUIKit.Button,
+          id: 'sync-fixed-toolbar-settings',
+          props: { width: 36, height: 36, iconPlacement: 'only', icon: THEME_SWITCH_ASSETS.icons.sun },
+        },
+      ],
+    }
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'sync-fixed-toolbar-root',
+      props: { width: 420, height: 240, padding: 0 },
+      children: [compactToolbar],
+    })
+    app.raph.run()
+    app.raph.run()
+
+    app.components.requireApi<RootApi>('sync-fixed-toolbar-root').setChildren([expandedToolbar])
+
+    const toolbar = app.components.require('sync-fixed-toolbar')
+    const fixedToolbar = app.components.requireApi<FlexApi>('sync-fixed-toolbar')
+    const fps = app.components.require('sync-fixed-toolbar-fps')
+    const zoom = app.components.require('sync-fixed-toolbar-zoom')
+    const theme = app.components.require('sync-fixed-toolbar-theme')
+    const settings = app.components.require('sync-fixed-toolbar-settings')
+
+    expect(toolbar.x).toBe(420 - 16 - 304)
+    expect(fixedToolbar.getChildRect('sync-fixed-toolbar-fps')).toEqual({ x: 0, y: 0, width: 86, height: 36 })
+    expect(fixedToolbar.getChildRect('sync-fixed-toolbar-zoom')).toEqual({ x: 94, y: 0, width: 122, height: 36 })
+    expect(fixedToolbar.getChildRect('sync-fixed-toolbar-theme')).toEqual({ x: 224, y: 0, width: 36, height: 36 })
+    expect(fixedToolbar.getChildRect('sync-fixed-toolbar-settings')).toEqual({ x: 268, y: 0, width: 36, height: 36 })
+    expect(fps.x).toBe(0)
+    expect(zoom.x).toBe(94)
+    expect(theme.x).toBe(224)
+    expect(settings.x).toBe(268)
+    expect(Math.round(fps.matrix[6])).toBe(100)
+    expect(Math.round(zoom.matrix[6])).toBe(194)
+    expect(Math.round(theme.matrix[6])).toBe(324)
+    expect(Math.round(settings.matrix[6])).toBe(368)
+
+    app.destroy()
+  })
+
   it('plays class keyframe animation once for stable component ids', () => {
     const app = createApp()
     const motionSpy = vi.spyOn(app.motion, 'to')

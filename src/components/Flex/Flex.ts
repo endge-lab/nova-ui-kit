@@ -42,6 +42,8 @@ import {
   resolveNovaUiPositionedRect,
   resolveSpacing,
   type NovaUiLayoutRect,
+  type NovaUiLayoutConstraints,
+  type NovaUiLayoutMeasure,
   type NovaUiLayoutTarget,
 } from '@/shared/layout'
 import {
@@ -150,7 +152,14 @@ export class Flex<E extends EventList = Record<string, any>>
   /** Принимает итоговый rect от layout-родителя и запускает пересчет детей. */
   applyLayoutRect(rect: NovaUiLayoutRect): boolean {
     this.externalLayout = true
-    return this.applyResolvedRect(rect)
+    const changed = this.applyResolvedRect(rect)
+    if (this.layoutReady && this.layoutDirty) this.update()
+    return changed
+  }
+
+  /** Возвращает preferred size для auto/fixed позиционирования контейнера. */
+  measureLayout(_constraints: NovaUiLayoutConstraints): NovaUiLayoutMeasure {
+    return this.measurePreferredSize()
   }
 
   /** Принимает style context от родителя и точечно проталкивает его детям. */
@@ -313,6 +322,7 @@ export class Flex<E extends EventList = Record<string, any>>
     this.recomputeSubtreeStyleMask()
     this.propagateStyleContext(NovaUiStyleMask.AllText)
     this.layoutDirty = true
+    if (this.layoutReady && !this.externalLayout) this.update()
     this.dirty({ update: true, render: true })
   }
 
@@ -495,12 +505,15 @@ function hasFlexGeometryChanges(keys: Array<keyof FlexResolvedProps>): boolean {
 function measureFlexChild(entry: FlexChildEntry, layout: FlexChildLayout): { width: number; height: number } {
   const layoutWidth = typeof layout.width === 'number' && Number.isFinite(layout.width) ? layout.width : undefined
   const layoutHeight = typeof layout.height === 'number' && Number.isFinite(layout.height) ? layout.height : undefined
+  const props = readNovaUiNodeProps(entry.node)
+  const propsWidth = typeof props.width === 'number' && Number.isFinite(props.width) ? props.width : undefined
+  const propsHeight = typeof props.height === 'number' && Number.isFinite(props.height) ? props.height : undefined
   const measured = isNovaUiLayoutTarget(entry.node) && entry.node.measureLayout
     ? entry.node.measureLayout({ minWidth: 0, maxWidth: Number.MAX_SAFE_INTEGER, minHeight: 0, maxHeight: Number.MAX_SAFE_INTEGER })
     : undefined
   return {
-    width: Math.max(0, layoutWidth ?? measured?.width ?? entry.node.width ?? 0),
-    height: Math.max(0, layoutHeight ?? measured?.height ?? entry.node.height ?? 0),
+    width: Math.max(0, layoutWidth ?? measured?.width ?? propsWidth ?? entry.node.width ?? 0),
+    height: Math.max(0, layoutHeight ?? measured?.height ?? propsHeight ?? entry.node.height ?? 0),
   }
 }
 
