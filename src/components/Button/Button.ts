@@ -116,13 +116,13 @@ export class Button<E extends EventList = Record<string, any>>
       }
       this.focus(event)
       this.pressed = true
+      this.press(event)
       this.dirty({ render: true })
       return false
     })
-    this.on('mouseup', event => {
+    this.on('mouseup', () => {
       if (!this.pressed) return false
       this.pressed = false
-      this.press(event)
       this.dirty({ render: true })
       return false
     })

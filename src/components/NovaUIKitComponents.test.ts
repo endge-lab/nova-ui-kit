@@ -2853,6 +2853,85 @@ describe('Nova UI Kit components', () => {
     app.destroy()
   })
 
+  it('commits ThemeSwitch theme change on pointer down', () => {
+    const app = createApp()
+    const surface = app.createSurface('theme-switch-pointer-down')
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.ThemeSwitch,
+      id: 'theme-switch-pointer-down',
+      props: {
+        x: 16,
+        y: 16,
+        themes: [{ id: 'light', label: 'Light' }, { id: 'dark', label: 'Dark' }],
+      },
+    })
+    app.raph.run()
+
+    expect(app.theme.active()).toBe('light')
+    app.handleEvent('mousedown', new MouseEvent('mousedown', { clientX: 34, clientY: 34, button: 0 }))
+    expect(app.theme.active()).toBe('dark')
+
+    app.handleEvent('mouseleave', new MouseEvent('mouseleave', { clientX: 120, clientY: 120, button: 0 }))
+    app.handleEvent('mouseup', new MouseEvent('mouseup', { clientX: 120, clientY: 120, button: 0 }))
+    expect(app.theme.active()).toBe('dark')
+
+    app.destroy()
+  })
+
+  it('commits toolbar Button and ZoomControls actions on pointer down', () => {
+    const app = createApp()
+    const surface = app.createSurface('toolbar-pointer-down-actions')
+    const buttonPress = vi.fn()
+    const zoomChange = vi.fn()
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'toolbar-pointer-down-root',
+      props: { width: 420, height: 240, padding: 0 },
+      children: [{
+        type: NovaUIKit.Flex,
+        id: 'toolbar-pointer-down',
+        props: { position: 'fixed', inset: { top: 16, right: 16 }, gap: 8, alignItems: 'center' },
+        children: [
+          {
+            type: NovaUIKit.ZoomControls,
+            id: 'toolbar-pointer-down-zoom',
+            props: { value: 1, step: 0.2, minZoom: 0.1, maxZoom: 3, onChange: zoomChange },
+          },
+          {
+            type: NovaUIKit.Button,
+            id: 'toolbar-pointer-down-settings',
+            props: { width: 36, height: 36, onPress: buttonPress },
+          },
+        ],
+      }],
+    })
+    app.raph.run()
+    app.raph.run()
+
+    const toolbar = app.components.require('toolbar-pointer-down')
+    const zoom = app.components.require('toolbar-pointer-down-zoom')
+    const settings = app.components.require('toolbar-pointer-down-settings')
+
+    app.handleEvent('mousedown', new MouseEvent('mousedown', {
+      clientX: toolbar.x + zoom.x + zoom.width - 10,
+      clientY: toolbar.y + zoom.y + 10,
+      button: 0,
+    }))
+    expect(zoomChange).toHaveBeenCalledWith(1.2)
+    expect(app.components.requireApi<ZoomControlsApi>('toolbar-pointer-down-zoom').getProps().value).toBe(1.2)
+
+    app.handleEvent('mousedown', new MouseEvent('mousedown', {
+      clientX: toolbar.x + settings.x + 10,
+      clientY: toolbar.y + settings.y + 10,
+      button: 0,
+    }))
+    expect(buttonPress).toHaveBeenCalledTimes(1)
+
+    app.destroy()
+  })
+
   it('registers built-in light and dark NovaUIKit theme tokens on first component use', () => {
     const app = createApp()
     const surface = app.createSurface('built-in-theme-tokens')

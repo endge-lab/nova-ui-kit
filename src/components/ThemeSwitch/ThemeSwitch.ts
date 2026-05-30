@@ -135,13 +135,13 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
     this.on('mousedown', () => {
       if (!this.props.visible) return false
       this.pressed = true
+      this.nextTheme()
       this.dirty({ render: true })
       return false
     })
     this.on('mouseup', () => {
       if (!this.pressed) return false
       this.pressed = false
-      this.nextTheme()
       this.dirty({ render: true })
       return false
     })

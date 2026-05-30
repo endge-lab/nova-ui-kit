@@ -105,18 +105,12 @@ export class ZoomControls<E extends EventList = Record<string, any>>
       if (!part) return false
       this.focus(event)
       this.pressedPart = part
+      this.zoomBy(part === 'plus' ? 1 : -1)
       this.dirty({ render: true })
       return false
     })
-    this.on('mouseup', event => {
-      const part = this.resolvePart(event)
-      const pressed = this.pressedPart
+    this.on('mouseup', () => {
       this.pressedPart = null
-      if (!pressed || part !== pressed) {
-        this.dirty({ render: true })
-        return false
-      }
-      this.zoomBy(pressed === 'plus' ? 1 : -1)
       this.dirty({ render: true })
       return false
     })
