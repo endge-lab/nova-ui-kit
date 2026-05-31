@@ -2717,10 +2717,16 @@ describe('Nova UI Kit components', () => {
       disabled: 'not-allowed',
     } as const
     const buttonProps = normalizeButtonProps({ cursor, cursorContext: { axis: 'x' } })
+    const defaultButtonProps = normalizeButtonProps()
     const verticalSliderProps = normalizeSliderProps({ orientation: 'vertical' })
 
     expect(buttonProps.cursor).toBe(cursor)
     expect(buttonProps.cursorContext).toEqual({ axis: 'x' })
+    expect(defaultButtonProps.cursor).toEqual({
+      hover: 'pointer',
+      pressed: 'pointer',
+      disabled: 'not-allowed',
+    })
     expect(verticalSliderProps.cursor).toEqual({
       hover: 'ns-resize',
       pressed: 'ns-resize',
@@ -3038,6 +3044,28 @@ describe('Nova UI Kit components', () => {
 
     app.theme.use('dark')
     expect(resolveNovaUiThemeValue(app, 'var(--nova-button-background, #ffffff)')).toBe('#172033')
+
+    app.destroy()
+  })
+
+  it('uses pointer cursor for buttons by default', () => {
+    const app = createApp()
+    const surface = app.createSurface('button-cursor')
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Button,
+      id: 'default-cursor-button',
+      props: {
+        x: 16,
+        y: 16,
+        width: 120,
+        height: 36,
+        text: 'Run',
+      },
+    })
+    app.raph.run()
+
+    app.cursors.syncPointer({ x: 24, y: 24, target: app.events.hitTest(24, 24) })
+    expect(app.canvas.element.style.cursor).toBe('pointer')
 
     app.destroy()
   })

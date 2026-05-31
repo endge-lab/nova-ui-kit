@@ -31,6 +31,8 @@ export type ButtonNodeFactory = <E extends EventList>(
   schema: NovaComponentSchema<ButtonProps>,
 ) => NovaComponentNode<ButtonResolvedProps, ButtonApi, Record<string, never>, ButtonProps, E>
 
+export const BUTTON_DEFAULT_CURSOR = { hover: 'pointer', pressed: 'pointer', disabled: 'not-allowed' } as const
+
 export const BUTTON_FIELD_DEFINITIONS = {
   ...NOVA_UI_COMMON_FIELD_DEFINITIONS,
   text: { type: 'string' },
@@ -108,7 +110,7 @@ function resolveButtonDefaults(variant: ButtonResolvedProps['variant'], size: Bu
       hoverBackground: 'var(--nova-button-primary-hover-background, #1d4ed8)',
       pressedBackground: 'var(--nova-button-primary-pressed-background, #1e40af)',
       activeBackground: 'var(--nova-button-primary-active-background, #1d4ed8)',
-      cursor: { hover: 'pointer', pressed: 'pointer', disabled: 'not-allowed' },
+      cursor: BUTTON_DEFAULT_CURSOR,
     }
   }
   if (variant === 'danger') {
@@ -120,7 +122,7 @@ function resolveButtonDefaults(variant: ButtonResolvedProps['variant'], size: Bu
       border: { color: 'var(--nova-button-danger-border-color, #b91c1c)', width: 1, radius: 7 },
       hoverBackground: 'var(--nova-button-danger-hover-background, #b91c1c)',
       pressedBackground: 'var(--nova-button-danger-pressed-background, #991b1b)',
-      cursor: { hover: 'pointer', pressed: 'pointer', disabled: 'not-allowed' },
+      cursor: BUTTON_DEFAULT_CURSOR,
     }
   }
   if (variant === 'ghost') {
@@ -133,7 +135,7 @@ function resolveButtonDefaults(variant: ButtonResolvedProps['variant'], size: Bu
       hoverBackground: 'var(--nova-button-ghost-hover-background, rgba(148,163,184,0.14))',
       pressedBackground: 'var(--nova-button-ghost-pressed-background, rgba(148,163,184,0.24))',
       activeBackground: 'var(--nova-button-ghost-active-background, rgba(37,99,235,0.14))',
-      cursor: { hover: 'pointer', pressed: 'pointer', disabled: 'not-allowed' },
+      cursor: BUTTON_DEFAULT_CURSOR,
     }
   }
 
@@ -146,6 +148,6 @@ function resolveButtonDefaults(variant: ButtonResolvedProps['variant'], size: Bu
     hoverBackground: 'var(--nova-button-hover-background, #f8fafc)',
     pressedBackground: 'var(--nova-button-pressed-background, #eef2f7)',
     activeBackground: 'var(--nova-button-active-background, #eff6ff)',
-    cursor: { hover: 'pointer', pressed: 'pointer', disabled: 'not-allowed' },
+    cursor: BUTTON_DEFAULT_CURSOR,
   }
 }
