@@ -5,6 +5,7 @@ import { BADGE_DESCRIPTOR } from '@/components/Badge/badge.registry'
 import { BUTTON_DESCRIPTOR } from '@/components/Button/button.registry'
 import { CHECKBOX_DESCRIPTOR } from '@/components/Checkbox/checkbox.registry'
 import { CHIP_DESCRIPTOR } from '@/components/Chip/chip.registry'
+import { COLOR_PICKER_DESCRIPTOR } from '@/components/ColorPicker/color-picker.registry'
 import { DIVIDER_DESCRIPTOR } from '@/components/Divider/divider.registry'
 import { DIALOG_DESCRIPTOR } from '@/components/Dialog/dialog.registry'
 import { DIALOGS_DESCRIPTOR } from '@/components/Dialog/dialogs.registry'
@@ -47,6 +48,7 @@ const NOVA_UI_KIT_DESCRIPTORS: Array<NovaComponentDescriptor<any, any, any, any>
   IMAGE_DESCRIPTOR,
   TAG_DESCRIPTOR,
   CHIP_DESCRIPTOR,
+  COLOR_PICKER_DESCRIPTOR,
   THEME_SWITCH_DESCRIPTOR,
   ZOOM_CONTROLS_DESCRIPTOR,
   SCROLLBAR_DESCRIPTOR,

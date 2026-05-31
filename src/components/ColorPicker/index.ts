@@ -1,0 +1,5 @@
+export * from '@/components/ColorPicker/ColorPicker'
+export * from '@/components/ColorPicker/color-picker.config'
+export * from '@/components/ColorPicker/color-picker.registry'
+export * from '@/components/ColorPicker/color-picker.types'
+export * from '@/components/ColorPicker/color-picker-utils'

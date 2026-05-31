@@ -3,6 +3,7 @@ import { BADGE_SCHEMA_TYPE } from '@/components/Badge/badge.types'
 import { BUTTON_SCHEMA_TYPE } from '@/components/Button/button.types'
 import { CHECKBOX_SCHEMA_TYPE } from '@/components/Checkbox/checkbox.types'
 import { CHIP_SCHEMA_TYPE } from '@/components/Chip/chip.types'
+import { COLOR_PICKER_SCHEMA_TYPE } from '@/components/ColorPicker/color-picker.types'
 import { DIVIDER_SCHEMA_TYPE } from '@/components/Divider/divider.types'
 import { DIALOG_SCHEMA_TYPE, DIALOGS_SCHEMA_TYPE } from '@/components/Dialog/dialog.types'
 import {
@@ -84,6 +85,7 @@ export const NovaUIKit = {
   Image: IMAGE_SCHEMA_TYPE,
   Tag: TAG_SCHEMA_TYPE,
   Chip: CHIP_SCHEMA_TYPE,
+  ColorPicker: COLOR_PICKER_SCHEMA_TYPE,
   SplitPane: SPLIT_PANE_SCHEMA_TYPE,
   ScrollArea: SCROLL_AREA_SCHEMA_TYPE,
   Scrollbar: SCROLLBAR_SCHEMA_TYPE,

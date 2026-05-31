@@ -667,27 +667,29 @@ export class Root<E extends EventList = Record<string, any>>
   private hasTooltipTargetAt(event: MouseEvent): boolean {
     const { x, y } = this.nova.events.getCanvasMousePosition(event)
     const target = this.nova.events.hitTest(x, y)
+
     if (!target || target === this || target === this.tooltipController) return false
-    if (!this.containsNode(target)) return false
 
-    const resolver = target as NovaNode<E> & Partial<NovaTooltipTargetResolver>
-    if (resolver.resolveNovaTooltipTarget?.({ x, y, event })?.tooltip) return true
-
-    const api = (target as unknown as { getProps?: () => Record<string, unknown> }).getProps
-    const tooltip = typeof api === 'function'
-      ? api.call(target).tooltip as TooltipInput
-      : null
-
-    return !!tooltip && typeof tooltip !== 'boolean'
-  }
-
-  /** Проверяет, принадлежит ли target этому Root tree. */
-  private containsNode(target: NovaNode<E>): boolean {
+    const visited = new Set<NovaNode<E>>()
     let current: NovaNode<E> | undefined = target
     while (current) {
-      if (current === this) return true
+      if (visited.has(current)) return false
+      visited.add(current)
+      if (current === this || current === this.tooltipController) return false
+
+      const resolver = current as NovaNode<E> & Partial<NovaTooltipTargetResolver>
+      if (resolver.resolveNovaTooltipTarget?.({ x, y, event })?.tooltip) return true
+
+      const api = (current as unknown as { getProps?: () => Record<string, unknown> }).getProps
+      const tooltip = typeof api === 'function'
+        ? api.call(current).tooltip as TooltipInput
+        : null
+
+      if (tooltip && typeof tooltip !== 'boolean') return true
+
       current = current.parent as NovaNode<E> | undefined
     }
+
     return false
   }
 

@@ -20,6 +20,7 @@ import {
   type ButtonApi,
   type CheckboxApi,
   type ChipApi,
+  type ColorPickerApi,
   type DialogApi,
   type DialogsApi,
   type DividerApi,
@@ -47,6 +48,10 @@ import {
   type ZoomControlsApi,
   type PopoverApi,
   THEME_SWITCH_ASSETS,
+  formatNovaUiColor,
+  normalizeNovaUiColor,
+  parseHexColor,
+  parseRgbaColor,
   registerNovaUiGlobalStyleSheet,
   resolveFpsMeterReading,
   resolveNovaUiThemeValue,
@@ -56,6 +61,7 @@ import { registerNovaUIKit } from '@/registerNovaUIKit'
 import { normalizeBadgeProps } from '@/components/Badge/badge.config'
 import { normalizeButtonProps } from '@/components/Button/button.config'
 import { normalizeCheckboxProps } from '@/components/Checkbox/checkbox.config'
+import { normalizeColorPickerProps } from '@/components/ColorPicker/color-picker.config'
 import { normalizeDividerProps } from '@/components/Divider/divider.config'
 import { normalizeImageProps } from '@/components/Image/image.config'
 import { normalizePanelProps } from '@/components/Panel/panel.config'
@@ -225,7 +231,7 @@ describe('Nova UI Kit components', () => {
       id: 'root',
       props: {
         styleSheet: `
-          Surface, Divider, Panel, Button, Tag, Chip, Checkbox, Toggle, Slider, Scrollbar, ScrollArea, SplitPane, Tooltip, Tooltips, Popover, ActionList, Overlay, Overlays, Dialog, Dialogs, Toast, ToastRegion, SegmentedControl, ZoomControls {
+          Surface, Divider, Panel, Button, Tag, Chip, ColorPicker, Checkbox, Toggle, Slider, Scrollbar, ScrollArea, SplitPane, Tooltip, Tooltips, Popover, ActionList, Overlay, Overlays, Dialog, Dialogs, Toast, ToastRegion, SegmentedControl, ZoomControls {
             color: #123456;
             borderWidth: 2;
             accentColor: #2563eb;
@@ -249,6 +255,14 @@ describe('Nova UI Kit components', () => {
         { type: NovaUIKit.Image, id: 'image', props: { src: createCanvasDrawable(), radius: 8 } },
         { type: NovaUIKit.Tag, id: 'tag', props: { text: 'Ready' } },
         { type: NovaUIKit.Chip, id: 'chip', props: { label: 'Filter', removable: true } },
+        {
+          type: NovaUIKit.ColorPicker,
+          id: 'color-picker',
+          props: {
+            value: '#ffffff',
+            presets: [{ id: 'blue', value: '#bfdbfe', borderColor: '#1d4ed8' }],
+          },
+        },
         {
           type: NovaUIKit.SplitPane,
           id: 'split',
@@ -350,6 +364,7 @@ describe('Nova UI Kit components', () => {
     app.components.requireApi<ImageApi>('image').setSrc(createCanvasDrawable())
     app.components.requireApi<TagApi>('tag').setTone('success')
     app.components.requireApi<ChipApi>('chip').setSelected(true)
+    app.components.requireApi<ColorPickerApi>('color-picker').setValue('#bfdbfe')
     app.components.requireApi<SplitPaneApi>('split').setSizes([120, 180])
     app.components.requireApi<ScrollAreaApi>('scroll-area').scrollTo(0, 80)
     app.components.requireApi<ScrollbarApi>('scrollbar').setValue(40)
@@ -378,6 +393,7 @@ describe('Nova UI Kit components', () => {
     expect(app.components.requireApi<ImageApi>('image').getProps().radius).toBe(8)
     expect(app.components.requireApi<TagApi>('tag').getProps().tone).toBe('success')
     expect(app.components.requireApi<ChipApi>('chip').getProps().selected).toBe(true)
+    expect(app.components.requireApi<ColorPickerApi>('color-picker').getValue()).toBe('#bfdbfe')
     expect(app.components.requireApi<ScrollAreaApi>('scroll-area').getScrollState().y.value).toBe(80)
     expect(app.components.requireApi<ScrollbarApi>('scrollbar').getScrollState().value).toBe(40)
     expect(app.components.requireApi<SliderApi>('slider').getProps().value).toBe(50)
@@ -391,6 +407,59 @@ describe('Nova UI Kit components', () => {
     expect(app.components.requireApi<ToastRegionApi>('toast-region').getProps().items).toHaveLength(2)
     expect(app.components.requireApi<SegmentedControlApi>('segmented').getProps().value).toBe('b')
     expect(app.components.requireApi<PanelApi>('panel').getProps().title).toBe('Updated')
+
+    app.destroy()
+  })
+
+  it('normalizes and parses color picker values', () => {
+    expect(normalizeColorPickerProps({ value: '#fff' })).toMatchObject({
+      value: '#ffffff',
+      customOpen: false,
+      format: 'hex',
+      allowAlpha: true,
+      height: 132,
+    })
+    expect(normalizeColorPickerProps({ customOpen: true }).height).toBe(356)
+    expect(parseHexColor('#0af')).toEqual({ r: 0, g: 170, b: 255, a: 1 })
+    expect(parseHexColor('#00000080')).toEqual({ r: 0, g: 0, b: 0, a: 0.5 })
+    expect(parseHexColor('#bad-input')).toBeNull()
+    expect(parseRgbaColor('rgba(12, 34, 56, 0.4)')).toEqual({ r: 12, g: 34, b: 56, a: 0.4 })
+    expect(formatNovaUiColor({ r: 12, g: 34, b: 56, a: 1 })).toBe('#0c2238')
+    expect(normalizeNovaUiColor('rgba(12, 34, 56, 0.4)')).toBe('rgba(12, 34, 56, 0.4)')
+  })
+
+  it('commits color picker presets and custom input', () => {
+    const commits = vi.fn()
+    const customOpenChanges = vi.fn()
+    const app = createApp()
+    const surface = app.createSurface('color-picker')
+    app.schema.createNode(surface, {
+      type: NovaUIKit.ColorPicker,
+      id: 'color-picker-input',
+      props: {
+        value: '#ffffff',
+        presets: [{ id: 'blue', value: '#bfdbfe', borderColor: '#1d4ed8' }],
+        onCommit: commits,
+        onCustomOpenChange: customOpenChanges,
+      },
+    })
+    app.raph.run()
+
+    app.handleEvent('mousedown', new MouseEvent('mousedown', { clientX: 17, clientY: 17, button: 0 }))
+    app.handleEvent('mouseup', new MouseEvent('mouseup', { clientX: 17, clientY: 17, button: 0 }))
+    expect(commits).toHaveBeenLastCalledWith('#bfdbfe', expect.objectContaining({
+      source: 'preset',
+      preset: expect.objectContaining({ id: 'blue' }),
+    }))
+
+    app.handleEvent('mousedown', new MouseEvent('mousedown', { clientX: 20, clientY: 106, button: 0 }))
+    app.handleEvent('mouseup', new MouseEvent('mouseup', { clientX: 20, clientY: 106, button: 0 }))
+    app.raph.run()
+    expect(customOpenChanges).toHaveBeenLastCalledWith(true, expect.any(MouseEvent))
+    expect(app.components.requireApi<ColorPickerApi>('color-picker-input').getProps().customOpen).toBe(true)
+
+    app.components.requireApi<ColorPickerApi>('color-picker-input').setValue('#123')
+    expect(app.components.requireApi<ColorPickerApi>('color-picker-input').getValue()).toBe('#112233')
 
     app.destroy()
   })

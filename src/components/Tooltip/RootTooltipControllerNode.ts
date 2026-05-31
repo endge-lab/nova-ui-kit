@@ -44,10 +44,10 @@ const DEFAULT_TOOLTIP_PROPS: TooltipProps = {
   hideDelay: 80,
   width: 180,
   height: 34,
-  background: 'var(--nova-tooltip-background, #111827)',
-  color: 'var(--nova-tooltip-color, #ffffff)',
+  background: '#111827',
+  color: '#ffffff',
   border: {
-    color: 'var(--nova-tooltip-border-color, rgba(255,255,255,0.12))',
+    color: 'rgba(255,255,255,0.12)',
     width: 1,
     radius: 7,
   },
@@ -55,7 +55,7 @@ const DEFAULT_TOOLTIP_PROPS: TooltipProps = {
     horizontal: 10,
     vertical: 7,
   },
-  fontFamily: 'var(--nova-tooltip-font-family, Inter, Arial, sans-serif)',
+  fontFamily: 'Inter, Arial, sans-serif',
   fontSize: 13,
   fontWeight: '500',
   lineHeight: 18,
@@ -290,15 +290,27 @@ export class RootTooltipControllerNode<E extends EventList = Record<string, any>
     event: MouseEvent,
   ): TooltipTargetResolution | null {
     if (!target || this.containsControllerNode(target)) return null
+
+    const visited = new Set<NovaNode<E>>()
+    let current: NovaNode<E> | undefined = target
+    while (current) {
+      if (visited.has(current)) return null
+      visited.add(current)
+      if (this.containsControllerNode(current)) return null
+
+      const resolver = current as NovaNode<E> & Partial<NovaTooltipTargetResolver>
+      const resolved = resolver.resolveNovaTooltipTarget?.({ x, y, event })
+      if (resolved?.tooltip) return resolved
+
+      const props = readNodeProps(current)
+      const tooltip = props?.tooltip as TooltipInput
+      if (tooltip) return { tooltip, targetProps: props }
+
+      current = current.parent as NovaNode<E> | undefined
+    }
+
     if (!this.containsRootNode(target)) return null
-
-    const resolver = target as NovaNode<E> & Partial<NovaTooltipTargetResolver>
-    const resolved = resolver.resolveNovaTooltipTarget?.({ x, y, event })
-    if (resolved?.tooltip) return resolved
-
-    const props = readNodeProps(target)
-    const tooltip = props?.tooltip as TooltipInput
-    return tooltip ? { tooltip, targetProps: props } : null
+    return null
   }
 
   /** Проверяет, относится ли node к overlay subtree самого controller. */
