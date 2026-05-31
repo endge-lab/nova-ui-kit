@@ -70,6 +70,7 @@ import { normalizeToggleProps } from '@/components/Toggle/toggle.config'
 import { normalizeTooltipProps } from '@/components/Tooltip/tooltip.config'
 import { RootTooltipControllerNode } from '@/components/Tooltip/RootTooltipControllerNode'
 import { RootDialogControllerNode } from '@/components/Dialog/RootDialogControllerNode'
+import { RootOverlayControllerNode } from '@/components/Overlay/RootOverlayControllerNode'
 import { resolveNovaUiOverlayPosition } from '@/shared/overlay/overlay-position'
 import { RowResizer } from '@/components/RowResizer/RowResizer'
 import { ColResizer } from '@/components/ColResizer/ColResizer'
@@ -589,6 +590,53 @@ describe('Nova UI Kit components', () => {
     app.destroy()
   })
 
+  it('keeps registry overlays above dialogs for menus opened from dialogs', () => {
+    const app = createApp()
+    const surface = app.createSurface('dialog-overlay-stack')
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'dialog-overlay-root',
+      props: { width: 640, height: 420 },
+      children: [
+        {
+          type: NovaUIKit.Overlays,
+          id: 'dialog-overlay-source',
+          props: {
+            definitions: [
+              {
+                type: 'menu',
+                props: { width: 180, height: 88, anchor: { kind: 'pointer', x: 220, y: 120 } },
+              },
+            ],
+          },
+        },
+      ],
+    })
+
+    app.raph.run()
+
+    const rootNode = app.components.require('dialog-overlay-root') as unknown as NovaNode<TestEvents>
+    const root = app.components.requireApi<RootApi>('dialog-overlay-root')
+    root.openDialog({ id: 'settings-dialog', width: 320, height: 180, title: 'Settings' })
+    root.openOverlay('menu', { id: 'settings-menu' })
+    app.raph.run()
+    app.raph.run()
+
+    const dialogSurface = app.surfaces.find(item => item.name === 'dialog-overlay-root:nova-ui-dialog-portal')
+    const overlaySurface = app.surfaces.find(item => item.name === 'dialog-overlay-root:nova-ui-overlay-portal')
+    const dialogController = dialogSurface?.children.find(child => child instanceof RootDialogControllerNode)
+    const overlayController = overlaySurface?.children.find(child => child instanceof RootOverlayControllerNode)
+    expect(dialogController?.weight).toBe(30_000)
+    expect(overlayController?.weight).toBe(40_000)
+    expect(rootNode.surface.weight).toBe(0)
+    expect(dialogSurface?.weight).toBe(30_000)
+    expect(overlaySurface?.weight).toBe(40_000)
+    expect((overlayController?.weight ?? 0)).toBeGreaterThan(dialogController?.weight ?? 0)
+
+    app.destroy()
+  })
+
   it('resolves overlay pointer and rect anchor positions', () => {
     expect(resolveNovaUiOverlayPosition({
       root: { x: 0, y: 0, width: 320, height: 240 },
@@ -639,7 +687,7 @@ describe('Nova UI Kit components', () => {
     const initialInteractiveCount = app.events.interactiveNodes.size
     const rootApi = app.components.requireApi<RootApi>('dialog-default-root')
 
-    expect(root.children.filter(child => child instanceof RootDialogControllerNode)).toHaveLength(0)
+    expect(app.surfaces.some(item => item.name === 'dialog-default-root:nova-ui-dialog-portal')).toBe(false)
     const id = rootApi.openDialog({
       title: 'Default dialog',
       value: 'Default body',
@@ -650,11 +698,16 @@ describe('Nova UI Kit components', () => {
     app.raph.run()
     app.raph.run()
 
-    const controllers = root.children.filter(child => child instanceof RootDialogControllerNode)
+    const dialogSurface = app.surfaces.find(item => item.name === 'dialog-default-root:nova-ui-dialog-portal')
+    const controllers = dialogSurface?.children.filter(child => child instanceof RootDialogControllerNode) ?? []
     expect(controllers).toHaveLength(1)
+    expect(controllers[0].weight).toBe(30_000)
+    expect(root.surface.weight).toBe(0)
+    expect(dialogSurface?.weight).toBe(30_000)
     expect(rootApi.getOpenDialogIds()).toEqual([id])
     expect(app.components.requireApi<DialogApi>(`nova-root-dialog-${id}`).getProps()).toMatchObject({
       open: true,
+      backdrop: true,
       title: 'Default dialog',
       width: 360,
       height: 220,
@@ -662,15 +715,46 @@ describe('Nova UI Kit components', () => {
       className: 'default',
       attrs: { type: 'default' },
     })
-    expect(app.components.requireApi<TextBlockApi>(`nova-root-dialog-${id}-value`).getProps().text).toBe('Default body')
-    expect(root.children).toHaveLength(initialRootChildCount + 1)
+    const backdropNode = app.components.require(`nova-root-dialog-${id}-backdrop`) as unknown as NovaNode<TestEvents>
+    const dialogNode = app.components.require(`nova-root-dialog-${id}`) as unknown as NovaNode<TestEvents>
+    expect(controllers[0].children.indexOf(backdropNode)).toBeLessThan(controllers[0].children.indexOf(dialogNode))
+    expect(backdropNode.width).toBe(900)
+    expect(backdropNode.height).toBe(560)
+    expect(dialogNode.width).toBe(900)
+    expect(dialogNode.height).toBe(560)
+    expect(app.components.requireApi<DialogApi>(`nova-root-dialog-${id}`).getProps()).toMatchObject({
+      width: 360,
+      height: 220,
+    })
+    const dialogApi = app.components.requireApi<DialogApi>(`nova-root-dialog-${id}`)
+    const bodyProps = app.components.requireApi<TextBlockApi>(`nova-root-dialog-${id}-value`).getProps()
+    const bodyNode = app.components.require(`nova-root-dialog-${id}-value`) as unknown as NovaNode<TestEvents>
+    expect(bodyProps.text).toBe('Default body')
+    expect(bodyNode.x).toBeGreaterThan(250)
+    expect(bodyNode.y).toBeGreaterThan(190)
+    dialogApi.moveTo(40, 50)
+    expect(bodyNode.x).toBe(58)
+    expect(bodyNode.y).toBe(122)
+    dialogApi.setChildren([
+      {
+        type: NovaUIKit.TextBlock,
+        id: `nova-root-dialog-${id}-updated-value`,
+        props: { text: 'Updated body' },
+      },
+    ])
+    const updatedBodyNode = app.components.require(`nova-root-dialog-${id}-updated-value`) as unknown as NovaNode<TestEvents>
+    expect(updatedBodyNode.visible).toBe(true)
+    expect(updatedBodyNode.active).toBe(true)
+    expect(updatedBodyNode.x).toBe(58)
+    expect(updatedBodyNode.y).toBe(122)
+    expect(root.children).toHaveLength(initialRootChildCount)
     expect(app.events.interactiveNodes.size).toBeGreaterThanOrEqual(initialInteractiveCount)
 
     rootApi.closeDialog(id)
     app.raph.run()
     app.raph.run()
     expect(rootApi.getOpenDialogIds()).toEqual([])
-    expect(root.children.filter(child => child instanceof RootDialogControllerNode)).toHaveLength(1)
+    expect(dialogSurface?.children.filter(child => child instanceof RootDialogControllerNode)).toHaveLength(1)
 
     app.destroy()
   })
@@ -757,7 +841,8 @@ describe('Nova UI Kit components', () => {
       attrs: { type: 'confirm' },
     })
     expect(app.components.requireApi<TextBlockApi>('dialog-custom-body').getProps().text).toBe('Remove task: T-42')
-    expect(root.children.filter(child => child instanceof RootDialogControllerNode)).toHaveLength(1)
+    const dialogSurface = app.surfaces.find(item => item.name === 'dialog-custom-root:nova-ui-dialog-portal')
+    expect(dialogSurface?.children.filter(child => child instanceof RootDialogControllerNode)).toHaveLength(1)
     expect(root.children).toHaveLength(initialRootChildCount)
     expect(app.events.interactiveNodes.size).toBeGreaterThanOrEqual(initialInteractiveCount)
 
@@ -818,7 +903,8 @@ describe('Nova UI Kit components', () => {
     app.raph.run()
 
     const elapsed = realNow() - startedAt
-    const controllers = root.children.filter(child => child instanceof RootDialogControllerNode)
+    const dialogSurface = app.surfaces.find(item => item.name === 'dialog-bench-root:nova-ui-dialog-portal')
+    const controllers = dialogSurface?.children.filter(child => child instanceof RootDialogControllerNode) ?? []
     expect(controllers).toHaveLength(1)
     expect(root.children).toHaveLength(initialRootChildCount)
     expect(app.events.interactiveNodes.size).toBe(initialInteractiveCount)
@@ -1035,16 +1121,17 @@ describe('Nova UI Kit components', () => {
     const root = app.components.require('tooltip-default-root') as unknown as NovaNode<TestEvents>
     const initialRootChildCount = root.children.length
     const initialInteractiveCount = app.events.interactiveNodes.size
-    expect(root.children.filter(child => child instanceof RootTooltipControllerNode)).toHaveLength(0)
+    expect(app.surfaces.some(item => item.name === 'tooltip-default-root:nova-ui-tooltip-portal')).toBe(false)
 
     dispatchMouse(app.canvas.element, 'mousemove', 10, 10)
     vi.advanceTimersByTime(310)
     app.raph.run()
     app.raph.run()
 
-    const controllers = root.children.filter(child => child instanceof RootTooltipControllerNode)
+    const tooltipSurface = app.surfaces.find(item => item.name === 'tooltip-default-root:nova-ui-tooltip-portal')
+    const controllers = tooltipSurface?.children.filter(child => child instanceof RootTooltipControllerNode) ?? []
     expect(controllers).toHaveLength(1)
-    expect(root.children).toHaveLength(initialRootChildCount + 1)
+    expect(root.children).toHaveLength(initialRootChildCount)
     expect(app.events.interactiveNodes.size).toBe(initialInteractiveCount)
 
     dispatchMouse(app.canvas.element, 'mousemove', 200, 200)
@@ -1052,7 +1139,7 @@ describe('Nova UI Kit components', () => {
     app.raph.run()
     app.raph.run()
 
-    expect(root.children.filter(child => child instanceof RootTooltipControllerNode)).toHaveLength(1)
+    expect(tooltipSurface?.children.filter(child => child instanceof RootTooltipControllerNode)).toHaveLength(1)
     expect(app.events.interactiveNodes.size).toBe(initialInteractiveCount)
 
     app.destroy()
@@ -1152,7 +1239,8 @@ describe('Nova UI Kit components', () => {
     expect((app.components.require('nova-root-tooltip-surface') as any).getProps().x).toBeGreaterThan(
       targetBounds.x + (targetBounds.width - 280) / 2,
     )
-    expect(root.children.filter(child => child instanceof RootTooltipControllerNode)).toHaveLength(1)
+    const tooltipSurface = app.surfaces.find(item => item.name === 'tooltip-custom-root:nova-ui-tooltip-portal')
+    expect(tooltipSurface?.children.filter(child => child instanceof RootTooltipControllerNode)).toHaveLength(1)
     expect(root.children).toHaveLength(initialRootChildCount)
     expect(app.events.interactiveNodes.size).toBe(initialInteractiveCount)
 
@@ -1226,7 +1314,8 @@ describe('Nova UI Kit components', () => {
 
     const root = app.components.require('tooltip-bench-root') as unknown as NovaNode<TestEvents>
     app.components.requireApi<RootApi>('tooltip-bench-root').registerTooltipDefinitions('__bench__', [])
-    const controller = root.children.find(child => child instanceof RootTooltipControllerNode) as RootTooltipControllerNode<TestEvents>
+    const tooltipSurface = app.surfaces.find(item => item.name === 'tooltip-bench-root:nova-ui-tooltip-portal')
+    const controller = tooltipSurface?.children.find(child => child instanceof RootTooltipControllerNode) as RootTooltipControllerNode<TestEvents>
     const initialRootChildCount = root.children.length
     const initialInteractiveCount = app.events.interactiveNodes.size
     const startedAt = realNow()
@@ -1240,7 +1329,7 @@ describe('Nova UI Kit components', () => {
     app.raph.run()
 
     const elapsed = realNow() - startedAt
-    const controllers = root.children.filter(child => child instanceof RootTooltipControllerNode)
+    const controllers = tooltipSurface?.children.filter(child => child instanceof RootTooltipControllerNode) ?? []
 
     expect(controllers).toHaveLength(1)
     expect(root.children).toHaveLength(initialRootChildCount)

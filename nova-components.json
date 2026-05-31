@@ -2182,6 +2182,15 @@
               }
             },
             {
+              "name": "textAlign",
+              "type": "'left' | 'center' | 'right'",
+              "required": false,
+              "description": {
+                "ru": "Горизонтальное выравнивание текста кнопки.",
+                "en": "Horizontal alignment for the button label."
+              }
+            },
+            {
               "name": "variant",
               "type": "'default' | 'primary' | 'ghost' | 'danger'",
               "required": false,

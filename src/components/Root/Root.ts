@@ -139,6 +139,9 @@ export class Root<E extends EventList = Record<string, any>>
   private tooltipController: RootTooltipControllerNode<E> | null = null
   private dialogController: RootDialogControllerNode<E> | null = null
   private overlayController: RootOverlayControllerNode<E> | null = null
+  private tooltipSurface: NovaSurface<E> | null = null
+  private dialogSurface: NovaSurface<E> | null = null
+  private overlaySurface: NovaSurface<E> | null = null
   private readonly disposeGlobalStylesSubscription: () => void
 
   /**
@@ -493,6 +496,7 @@ export class Root<E extends EventList = Record<string, any>>
 
     this.tooltipController?.syncRootRect(this.width, this.height)
     this.dialogController?.syncRootRect(this.width, this.height)
+    this.syncPortalSurfaces()
     this.layoutDirty = false
   }
 
@@ -586,6 +590,7 @@ export class Root<E extends EventList = Record<string, any>>
     this.tooltipController?.syncRootRect(rect.width, rect.height)
     this.overlayController?.syncRootRect(rect.width, rect.height)
     this.dialogController?.syncRootRect(rect.width, rect.height)
+    this.syncPortalSurfaces()
     this.layoutDirty = true
     this.dirty({ update: true, matrix: true, render: true })
     return true
@@ -594,8 +599,9 @@ export class Root<E extends EventList = Record<string, any>>
   /** Создает единственный controller tooltip-ов для текущего Root. */
   private ensureTooltipController(): RootTooltipControllerNode<E> {
     if (!this.tooltipController) {
-      this.tooltipController = new RootTooltipControllerNode(this.nova, this.surface)
-      this.addChild(this.tooltipController)
+      const surface = this.ensurePortalSurface('tooltip', 50_000)
+      this.tooltipController = new RootTooltipControllerNode(this.nova, surface, this)
+      surface.addChild(this.tooltipController)
       this.tooltipController.syncRootRect(this.width, this.height)
     }
     return this.tooltipController
@@ -604,8 +610,9 @@ export class Root<E extends EventList = Record<string, any>>
   /** Создает единственный controller диалогов для текущего Root. */
   private ensureDialogController(): RootDialogControllerNode<E> {
     if (!this.dialogController) {
-      this.dialogController = new RootDialogControllerNode(this.nova, this.surface)
-      this.addChild(this.dialogController)
+      const surface = this.ensurePortalSurface('dialog', 30_000)
+      this.dialogController = new RootDialogControllerNode(this.nova, surface, this)
+      surface.addChild(this.dialogController)
       this.dialogController.syncRootRect(this.width, this.height)
     }
     return this.dialogController
@@ -614,11 +621,46 @@ export class Root<E extends EventList = Record<string, any>>
   /** Создает единственный controller overlays для текущего Root. */
   private ensureOverlayController(): RootOverlayControllerNode<E> {
     if (!this.overlayController) {
-      this.overlayController = new RootOverlayControllerNode(this.nova, this.surface)
-      this.addChild(this.overlayController)
+      const surface = this.ensurePortalSurface('overlay', 40_000)
+      this.overlayController = new RootOverlayControllerNode(this.nova, surface, this)
+      surface.addChild(this.overlayController)
       this.overlayController.syncRootRect(this.width, this.height)
     }
     return this.overlayController
+  }
+
+  /** Создает отдельный top-level surface для portal-контроллеров. */
+  private ensurePortalSurface(kind: 'dialog' | 'overlay' | 'tooltip', zIndex: number): NovaSurface<E> {
+    const current = kind === 'dialog'
+      ? this.dialogSurface
+      : kind === 'overlay'
+        ? this.overlaySurface
+        : this.tooltipSurface
+    if (current) {
+      current.options({ width: this.width, height: this.height, zIndex, interactive: false })
+      return current
+    }
+
+    const surface = this.nova.createSurface(`${this.componentId}:nova-ui-${kind}-portal`)
+    surface.options({
+      width: this.width,
+      height: this.height,
+      zIndex,
+      interactive: false,
+    })
+
+    if (kind === 'dialog') this.dialogSurface = surface
+    else if (kind === 'overlay') this.overlaySurface = surface
+    else this.tooltipSurface = surface
+
+    return surface
+  }
+
+  /** Синхронизирует portal-surfaces с размером Root. */
+  private syncPortalSurfaces(): void {
+    this.dialogSurface?.options({ width: this.width, height: this.height })
+    this.overlaySurface?.options({ width: this.width, height: this.height })
+    this.tooltipSurface?.options({ width: this.width, height: this.height })
   }
 
   /** Проверяет наличие tooltip target до создания overlay controller. */
@@ -1037,6 +1079,15 @@ export class Root<E extends EventList = Record<string, any>>
    */
   override dispose(): void {
     this.disposeGlobalStylesSubscription()
+    for (const surface of [this.dialogSurface, this.overlaySurface, this.tooltipSurface]) {
+      if (surface) this.nova.removeSurface(surface)
+    }
+    this.dialogSurface = null
+    this.overlaySurface = null
+    this.tooltipSurface = null
+    this.dialogController = null
+    this.overlayController = null
+    this.tooltipController = null
     super.dispose()
   }
 

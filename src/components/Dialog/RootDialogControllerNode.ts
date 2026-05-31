@@ -8,6 +8,10 @@ import {
 import type { EventList } from '@endge/utils'
 import { DIALOG_SCHEMA_TYPE } from '@/components/Dialog/dialog.types'
 import { normalizeDialogProps } from '@/components/Dialog/dialog.config'
+import {
+  NOVA_UI_ROOT_TARGET,
+  type NovaUiRootTarget,
+} from '@/components/Root/root-target'
 import type {
   DialogDefinition,
   DialogInput,
@@ -16,8 +20,8 @@ import type {
   DialogResolvedProps,
   DialogSlotContext,
 } from '@/components/Dialog/dialog.types'
+import { SURFACE_SCHEMA_TYPE } from '@/components/Surface/surface.types'
 import { TEXT_BLOCK_SCHEMA_TYPE } from '@/components/TextBlock/text-block.types'
-import { applyNodeLayoutRect } from '@/shared/layout'
 
 interface RegisteredDialogSource {
   sourceId: string
@@ -58,6 +62,8 @@ const DEFAULT_DIALOG_PROPS: DialogProps = {
 
 /** Единственный overlay-controller диалогов внутри одного UI Kit Root. */
 export class RootDialogControllerNode<E extends EventList = Record<string, any>> extends NovaNode<E> {
+  readonly [NOVA_UI_ROOT_TARGET] = true as const
+
   private readonly sources = new Map<string, RegisteredDialogSource>()
   private readonly definitions = new Map<string, DialogDefinition>()
   private readonly managedChildren: Array<NovaNode<E>> = []
@@ -66,16 +72,31 @@ export class RootDialogControllerNode<E extends EventList = Record<string, any>>
   private dirtyScheduled = false
 
   /** Создает controller-node и размещает его поверх Root. */
-  constructor(app: NovaApp<E>, surface: NovaSurface<E>) {
+  constructor(
+    app: NovaApp<E>,
+    surface: NovaSurface<E>,
+    private readonly ownerRoot?: NovaNode<E> & NovaUiRootTarget,
+  ) {
     super(app, surface)
     this.options({
       x: 0,
       y: 0,
       width: app.width,
       height: app.height,
-      zIndex: 20_000,
+      zIndex: 30_000,
       interactive: false,
     })
+  }
+
+  /** Проксирует Root API для UI Kit компонентов внутри dialog portal. */
+  getApi(): ReturnType<NovaUiRootTarget['getApi']> {
+    if (!this.ownerRoot) throw new Error('[Nova UI Kit] Dialog portal is not attached to Root')
+    return this.ownerRoot.getApi()
+  }
+
+  /** Проксирует style cascade refresh для UI Kit компонентов внутри dialog portal. */
+  refreshStyleCascade(): void {
+    this.ownerRoot?.refreshStyleCascade()
   }
 
   /** Синхронизирует размер controller с Root. */
@@ -151,17 +172,22 @@ export class RootDialogControllerNode<E extends EventList = Record<string, any>>
   /** Обновляет subtree открытых диалогов. */
   update(): void {
     this.dirtyScheduled = false
-    const children = this.activeDialogs.map((dialog, index) => this.createDialogSchema(dialog, index))
+    const children = this.activeDialogs.flatMap((dialog, index) => this.createDialogLayerSchemas(dialog, index))
     const reconciled = reconcileNovaTemplateChildren(this, this.managedChildren, children)
     this.managedChildren.length = 0
     this.managedChildren.push(...reconciled.nodes)
     for (const child of this.managedChildren) {
-      applyNodeLayoutRect(child, {
+      const changed = child.x !== 0
+        || child.y !== 0
+        || child.width !== this.width
+        || child.height !== this.height
+      child.options({
         x: 0,
         y: 0,
         width: this.width,
         height: this.height,
       })
+      if (changed) child.dirty({ matrix: true, update: true, render: true })
     }
   }
 
@@ -200,19 +226,36 @@ export class RootDialogControllerNode<E extends EventList = Record<string, any>>
     }
   }
 
-  /** Создает schema node для одного открытого диалога. */
-  private createDialogSchema(dialog: ActiveDialog, index: number): NovaElementSchema<any> {
+  /** Создает visual backdrop и panel-node одного открытого диалога. */
+  private createDialogLayerSchemas(dialog: ActiveDialog, index: number): Array<NovaElementSchema<any>> {
     const props = this.resolveDialogProps(dialog)
     const slot = this.createSlotContext(dialog, index, props)
     const body = dialog.slot
       ? dialog.slot(slot)
       : createDefaultDialogBody(slot)
     const userOpenChange = props.onOpenChange
+    const schemas: Array<NovaElementSchema<any>> = []
 
-    return {
+    if (props.backdrop) schemas.push({
+      type: SURFACE_SCHEMA_TYPE,
+      id: `nova-root-dialog-${dialog.id}-backdrop`,
+      key: `${dialog.id}:backdrop`,
+      props: {
+        x: 0,
+        y: 0,
+        width: this.width,
+        height: this.height,
+        background: 'var(--nova-dialog-backdrop-background, rgba(15,23,42,0.38))',
+        border: { width: 0 },
+        padding: 0,
+      },
+    })
+
+    schemas.push({
       type: DIALOG_SCHEMA_TYPE,
       id: `nova-root-dialog-${dialog.id}`,
       key: dialog.id,
+      renderBackdrop: false,
       props: {
         ...props,
         onOpenChange: (open: boolean, event?: Event) => {
@@ -221,7 +264,9 @@ export class RootDialogControllerNode<E extends EventList = Record<string, any>>
         },
       },
       children: body,
-    }
+    })
+
+    return schemas
   }
 
   /** Создает implicit slot context для custom dialog template. */

@@ -9,6 +9,10 @@ import {
 import type { EventList } from '@endge/utils'
 import { SURFACE_SCHEMA_TYPE } from '@/components/Surface/surface.types'
 import { createTooltipSchema, normalizeTooltipProps } from '@/components/Tooltip/tooltip.config'
+import {
+  NOVA_UI_ROOT_TARGET,
+  type NovaUiRootTarget,
+} from '@/components/Root/root-target'
 import type {
   NovaTooltipTargetResolver,
   TooltipDefinition,
@@ -65,6 +69,8 @@ const DEFAULT_TOOLTIP_PROPS: TooltipProps = {
 
 /** Единственный overlay-controller tooltip-ов внутри одного UI Kit Root. */
 export class RootTooltipControllerNode<E extends EventList = Record<string, any>> extends NovaNode<E> {
+  readonly [NOVA_UI_ROOT_TARGET] = true as const
+
   private readonly sources = new Map<string, RegisteredTooltipSource>()
   private readonly definitions = new Map<string, TooltipDefinition>()
   private readonly managedChildren: Array<NovaNode<E>> = []
@@ -75,16 +81,31 @@ export class RootTooltipControllerNode<E extends EventList = Record<string, any>
   private mutedUntil = 0
 
   /** Создает controller-node и размещает его поверх Root. */
-  constructor(app: NovaApp<E>, surface: NovaSurface<E>) {
+  constructor(
+    app: NovaApp<E>,
+    surface: NovaSurface<E>,
+    private readonly ownerRoot?: NovaNode<E> & NovaUiRootTarget,
+  ) {
     super(app, surface)
     this.options({
       x: 0,
       y: 0,
       width: app.width,
       height: app.height,
-      zIndex: 10_000,
+      zIndex: 50_000,
       interactive: false,
     })
+  }
+
+  /** Проксирует Root API для UI Kit компонентов внутри tooltip portal. */
+  getApi(): ReturnType<NovaUiRootTarget['getApi']> {
+    if (!this.ownerRoot) throw new Error('[Nova UI Kit] Tooltip portal is not attached to Root')
+    return this.ownerRoot.getApi()
+  }
+
+  /** Проксирует style cascade refresh для UI Kit компонентов внутри tooltip portal. */
+  refreshStyleCascade(): void {
+    this.ownerRoot?.refreshStyleCascade()
   }
 
   /** Синхронизирует размер controller с Root. */
@@ -292,7 +313,7 @@ export class RootTooltipControllerNode<E extends EventList = Record<string, any>
 
   /** Проверяет, принадлежит ли target тому же Root tree, что и controller. */
   private containsRootNode(node: NovaNode<E>): boolean {
-    const root = this.parent
+    const root = this.ownerRoot
     let current: NovaNode<E> | undefined = node
     while (current) {
       if (current === root) return true

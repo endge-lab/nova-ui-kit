@@ -10,12 +10,14 @@ export const BUTTON_SCHEMA_TYPE = 'nova-ui.button'
 
 export type ButtonVariant = 'default' | 'primary' | 'ghost' | 'danger'
 export type ButtonIconPlacement = 'left' | 'right' | 'top' | 'bottom' | 'only'
+export type ButtonTextAlign = 'left' | 'center' | 'right'
 
 export interface ButtonProps extends NovaUiCommonProps {
   text?: string
   icon?: NovaUiIconSource
   trailingIcon?: NovaUiIconSource
   iconPlacement?: ButtonIconPlacement
+  textAlign?: ButtonTextAlign
   variant?: ButtonVariant
   size?: NovaUiComponentSize
   loading?: boolean
@@ -28,6 +30,7 @@ export interface ButtonResolvedProps extends NovaUiCommonResolvedProps {
   icon?: NovaUiIconSource
   trailingIcon?: NovaUiIconSource
   iconPlacement: ButtonIconPlacement
+  textAlign: ButtonTextAlign
   variant: ButtonVariant
   size: NovaUiComponentSize
   loading: boolean

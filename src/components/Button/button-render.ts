@@ -42,19 +42,19 @@ export function buildButtonSchema(
     pushIcon(schema, props.icon, (width - iconSize) / 2, (height - iconSize) / 2, iconSize, iconOpacity)
   } else if (props.iconPlacement === 'right') {
     const iconX = width - padding.horizontal - iconSize
-    pushText(schema, props.text, padding.horizontal, padding.vertical, Math.max(0, contentWidth - (hasIcon ? iconSize + padding.gap : 0)), contentHeight, textStyle, { align: 'center' })
+    pushText(schema, props.text, padding.horizontal, padding.vertical, Math.max(0, contentWidth - (hasIcon ? iconSize + padding.gap : 0)), contentHeight, textStyle, { align: props.textAlign })
     pushIcon(schema, props.icon, iconX, (height - iconSize) / 2, iconSize, iconOpacity)
   } else if (props.iconPlacement === 'top' || props.iconPlacement === 'bottom') {
     const iconY = props.iconPlacement === 'top' ? padding.vertical : height - padding.vertical - iconSize
     const textY = props.iconPlacement === 'top' ? iconY + iconSize + padding.gap : padding.vertical
     pushIcon(schema, props.icon, (width - iconSize) / 2, iconY, iconSize, iconOpacity)
-    pushText(schema, props.text, padding.horizontal, textY, contentWidth, Math.max(0, contentHeight - (hasIcon ? iconSize + padding.gap : 0)), textStyle, { align: 'center' })
+    pushText(schema, props.text, padding.horizontal, textY, contentWidth, Math.max(0, contentHeight - (hasIcon ? iconSize + padding.gap : 0)), textStyle, { align: props.textAlign })
   } else {
     const iconX = padding.horizontal
     const textX = hasIcon ? iconX + iconSize + padding.gap : padding.horizontal
     const trailingWidth = hasTrailingIcon ? iconSize + padding.gap : 0
     pushIcon(schema, props.icon, iconX, (height - iconSize) / 2, iconSize, iconOpacity)
-    pushText(schema, props.text, textX, padding.vertical, Math.max(0, contentWidth - (hasIcon ? iconSize + padding.gap : 0) - trailingWidth), contentHeight, textStyle, { align: hasText ? 'center' : 'left' })
+    pushText(schema, props.text, textX, padding.vertical, Math.max(0, contentWidth - (hasIcon ? iconSize + padding.gap : 0) - trailingWidth), contentHeight, textStyle, { align: hasText ? props.textAlign : 'left' })
     pushIcon(schema, props.trailingIcon, width - padding.horizontal - iconSize, (height - iconSize) / 2, iconSize, iconOpacity)
   }
 

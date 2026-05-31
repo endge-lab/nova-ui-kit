@@ -63,6 +63,7 @@ export interface DialogResolvedProps extends NovaUiCommonResolvedProps, NovaUiPa
 }
 
 export interface DialogSchema extends NovaComponentSchema<DialogProps> {
+  renderBackdrop?: boolean
   children?: Array<NovaComponentSchema>
 }
 
@@ -118,5 +119,6 @@ export interface DialogApi {
   moveTo: (x: number, y: number, event?: Event) => void
   resizeTo: (width: number, height: number, event?: Event) => void
   setProps: (patch: DialogProps) => void
+  setChildren: (children: Array<NovaElementSchema<any>>) => void
   getProps: () => Readonly<DialogResolvedProps>
 }

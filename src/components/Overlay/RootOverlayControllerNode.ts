@@ -9,6 +9,10 @@ import type { EventList } from '@endge/utils'
 import { TEXT_BLOCK_SCHEMA_TYPE } from '@/components/TextBlock/text-block.types'
 import { OVERLAY_SCHEMA_TYPE } from '@/components/Overlay/overlay.types'
 import { normalizeOverlayProps } from '@/components/Overlay/overlay.config'
+import {
+  NOVA_UI_ROOT_TARGET,
+  type NovaUiRootTarget,
+} from '@/components/Root/root-target'
 import type {
   OverlayDefinition,
   OverlayInput,
@@ -60,6 +64,8 @@ const DEFAULT_OVERLAY_PROPS: OverlayProps = {
 
 /** Единый overlay-controller внутри одного UI Kit Root. */
 export class RootOverlayControllerNode<E extends EventList = Record<string, any>> extends NovaNode<E> {
+  readonly [NOVA_UI_ROOT_TARGET] = true as const
+
   private readonly sources = new Map<string, RegisteredOverlaySource>()
   private readonly definitions = new Map<string, OverlayDefinition>()
   private readonly managedChildren: Array<NovaNode<E>> = []
@@ -68,16 +74,31 @@ export class RootOverlayControllerNode<E extends EventList = Record<string, any>
   private dirtyScheduled = false
 
   /** Создает controller-node и размещает его поверх Root. */
-  constructor(app: NovaApp<E>, surface: NovaSurface<E>) {
+  constructor(
+    app: NovaApp<E>,
+    surface: NovaSurface<E>,
+    private readonly ownerRoot?: NovaNode<E> & NovaUiRootTarget,
+  ) {
     super(app, surface)
     this.options({
       x: 0,
       y: 0,
       width: app.width,
       height: app.height,
-      zIndex: 18_000,
+      zIndex: 40_000,
       interactive: false,
     })
+  }
+
+  /** Проксирует Root API для UI Kit компонентов внутри overlay portal. */
+  getApi(): ReturnType<NovaUiRootTarget['getApi']> {
+    if (!this.ownerRoot) throw new Error('[Nova UI Kit] Overlay portal is not attached to Root')
+    return this.ownerRoot.getApi()
+  }
+
+  /** Проксирует style cascade refresh для UI Kit компонентов внутри overlay portal. */
+  refreshStyleCascade(): void {
+    this.ownerRoot?.refreshStyleCascade()
   }
 
   /** Синхронизирует размер controller с Root. */
