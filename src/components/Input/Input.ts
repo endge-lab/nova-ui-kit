@@ -12,6 +12,7 @@ import {
   type NovaSchema,
   type NovaSurface,
   type NovaTextInputLayoutResult,
+  type NovaTextMeasureContext,
 } from '@endge/nova'
 import {
   INPUT_NODE_DESCRIPTOR,
@@ -32,6 +33,7 @@ import {
   resolveInteractionBackground,
 } from '@/shared/component/component-props'
 import { pushIcon, pushText } from '@/shared/component/component-render'
+import { measureNovaUiTextWidth } from '@/shared/layout/text-measure'
 
 const layoutEngine = new NovaInputTextLayoutEngine()
 const clipboard = new NovaClipboardService()
@@ -53,6 +55,7 @@ export class Input<E extends EventList = Record<string, any>>
   protected readonly api: InputApi
   protected revealed = false
   protected scrollY = 0
+  protected readonly textMeasureCache = new Map<string, number>()
 
   /**
    * Создает экземпляр Input и подготавливает базовое состояние.
@@ -627,9 +630,14 @@ export class Input<E extends EventList = Record<string, any>>
       height: this.height,
       fontSize: style.fontSize,
       lineHeight: style.lineHeight,
+      fontFamily: style.fontFamily,
+      fontWeight: style.fontWeight,
+      fontStyle: style.fontStyle,
       multiline: this.kindName === 'textarea',
       wrap: this.props.wrap,
+      align: this.props.align,
       scrollY: this.scrollY,
+      measureText: (text, context) => this.measureInputText(text, context),
       padding: {
         top: this.kindName === 'textarea' ? 8 : Math.max(0, (this.height - style.lineHeight) / 2),
         left: leftInset,
@@ -637,6 +645,18 @@ export class Input<E extends EventList = Record<string, any>>
         bottom: 8,
       },
     })
+  }
+
+  /**
+   * Измеряет glyph так же, как canvas-текст Input.
+   */
+  protected measureInputText(text: string, context: NovaTextMeasureContext): number {
+    const key = `${context.fontFamily}|${context.fontSize}|${context.fontWeight}|${context.fontStyle}|${text}`
+    const cached = this.textMeasureCache.get(key)
+    if (cached !== undefined) return cached
+    const width = measureNovaUiTextWidth(text, context)
+    this.textMeasureCache.set(key, width)
+    return width
   }
 
   /**
