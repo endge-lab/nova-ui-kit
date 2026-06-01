@@ -654,7 +654,10 @@ export class Input<E extends EventList = Record<string, any>>
     const key = `${context.fontFamily}|${context.fontSize}|${context.fontWeight}|${context.fontStyle}|${text}`
     const cached = this.textMeasureCache.get(key)
     if (cached !== undefined) return cached
-    const width = measureNovaUiTextWidth(text, context)
+    const width = measureNovaUiTextWidth(text, {
+      ...context,
+      fontStyle: context.fontStyle ?? 'normal',
+    })
     this.textMeasureCache.set(key, width)
     return width
   }

@@ -1100,6 +1100,56 @@ describe('Nova UI Kit components', () => {
     app.destroy()
   })
 
+  it('keeps sibling ScrollArea scroll offsets independent on wheel input', () => {
+    const app = createApp()
+    const surface = app.createSurface('scroll-area-siblings')
+
+    app.schema.createNode(surface, {
+      type: NovaUIKit.Root,
+      id: 'scroll-siblings-root',
+      children: [
+        {
+          type: NovaUIKit.ScrollArea,
+          id: 'scroll-left',
+          props: { width: 220, height: 120, contentHeight: 520, scrollbarVisibility: 'always' },
+          children: [
+            { type: NovaUIKit.Surface, id: 'scroll-left-content', props: { background: '#f8fafc' } },
+          ],
+        },
+        {
+          type: NovaUIKit.ScrollArea,
+          id: 'scroll-right',
+          props: { x: 260, width: 220, height: 120, contentHeight: 520, scrollbarVisibility: 'always' },
+          children: [
+            { type: NovaUIKit.Surface, id: 'scroll-right-content', props: { background: '#f8fafc' } },
+          ],
+        },
+      ],
+    })
+    app.raph.run()
+
+    const leftWheel = new WheelEvent('wheel', { clientX: 40, clientY: 40, deltaY: 80 })
+    Object.defineProperties(leftWheel, {
+      offsetX: { value: 40 },
+      offsetY: { value: 40 },
+    })
+    app.handleEvent('wheel', leftWheel)
+    app.raph.run()
+    expect(app.components.requireApi<ScrollAreaApi>('scroll-left').getScrollState().y.value).toBe(80)
+    expect(app.components.requireApi<ScrollAreaApi>('scroll-right').getScrollState().y.value).toBe(0)
+
+    const rightWheel = new WheelEvent('wheel', { clientX: 300, clientY: 40, deltaY: 56 })
+    Object.defineProperties(rightWheel, {
+      offsetX: { value: 300 },
+      offsetY: { value: 40 },
+    })
+    app.handleEvent('wheel', rightWheel)
+    app.raph.run()
+    expect(app.components.requireApi<ScrollAreaApi>('scroll-left').getScrollState().y.value).toBe(80)
+    expect(app.components.requireApi<ScrollAreaApi>('scroll-right').getScrollState().y.value).toBe(56)
+    app.destroy()
+  })
+
   it('supports full ScrollArea scrollbar-y slots and active idle visibility', () => {
     vi.useFakeTimers()
     const app = createApp()
