@@ -30,7 +30,7 @@ export function buildButtonSchema(
   })
   const textStyle = resolveComponentTextStyle(props, inheritedStyleContext, {}, resolveThemeValue)
   const padding = sizeTokenPadding(props.size)
-  const iconSize = padding.icon
+  const iconSize = Math.max(0, padding.icon)
   const hasIcon = !!props.icon
   const hasTrailingIcon = !!props.trailingIcon && props.iconPlacement !== 'only'
   const hasText = !!props.text && props.iconPlacement !== 'only'
@@ -39,7 +39,8 @@ export function buildButtonSchema(
   const iconOpacity = props.loading ? 0.45 : 1
 
   if (props.iconPlacement === 'only') {
-    pushIcon(schema, props.icon, (width - iconSize) / 2, (height - iconSize) / 2, iconSize, iconOpacity)
+    const onlyIconSize = Math.max(0, Math.min(iconSize, contentWidth, contentHeight, width, height))
+    pushIcon(schema, props.icon, (width - onlyIconSize) / 2, (height - onlyIconSize) / 2, onlyIconSize, iconOpacity)
   } else if (props.iconPlacement === 'right') {
     const iconX = width - padding.horizontal - iconSize
     pushText(schema, props.text, padding.horizontal, padding.vertical, Math.max(0, contentWidth - (hasIcon ? iconSize + padding.gap : 0)), contentHeight, textStyle, { align: props.textAlign })
