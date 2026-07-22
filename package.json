@@ -1,7 +1,7 @@
 {
   "name": "@endge/nova-ui-kit",
   "private": false,
-  "version": "0.10.6",
+  "version": "0.10.7",
   "type": "module",
   "module": "./dist/nova-ui-kit.js",
   "types": "./dist/index.d.ts",
@@ -35,8 +35,8 @@
     "bench": "vitest bench --run"
   },
   "dependencies": {
-    "@endge/nova": "^0.10.0",
-    "@endge/utils": "^0.23.0"
+    "@endge/nova": "^0.13.4",
+    "@endge/utils": "^0.24.3"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.1",
