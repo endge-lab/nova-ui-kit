@@ -1,7 +1,7 @@
 {
   "name": "@endge/nova-ui-kit",
   "private": false,
-  "version": "0.10.11",
+  "version": "0.10.12",
   "type": "module",
   "module": "./dist/nova-ui-kit.js",
   "types": "./dist/index.d.ts",
@@ -32,16 +32,20 @@
     "build": "vite build",
     "test": "vitest run",
     "test:watch": "vitest",
-    "bench": "vitest bench --run"
+    "bench": "vitest bench --run",
+    "lint-check": "eslint . --cache",
+    "lint-fix": "eslint . --fix --cache"
   },
   "dependencies": {
     "@endge/nova": "^0.13.6",
     "@endge/utils": "^0.25.0"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "9.3.0",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vue/language-core": "^3.3.11",
     "@vue/tsconfig": "^0.9.1",
+    "eslint": "10.9.1",
     "rimraf": "^6.0.1",
     "typescript": "~6.0.3",
     "unplugin-dts": "^1.0.3",
