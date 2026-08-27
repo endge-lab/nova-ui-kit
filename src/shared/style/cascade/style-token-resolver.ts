@@ -9,7 +9,7 @@ import {
   compileStyleSheetIndexes,
 } from '@/shared/style/cascade/style-selector-matcher'
 
-const VAR_PATTERN = /var\(\s*(--[\w-]+)\s*(?:,\s*([^)]+))?\)/g
+const VAR_PATTERN = /var\(\s*(--[\w-]+)\s*(?:,([^)]+))?\)/g
 const NUMERIC_TOKEN_KEYS = new Set([
   'fontSize',
   'lineHeight',

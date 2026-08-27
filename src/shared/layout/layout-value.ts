@@ -6,7 +6,7 @@ export type NovaUiLayoutValue
     | 'fill'
 
 /** Быстрый тип значения для layout hot path. */
-export const enum NovaUiLayoutValueKind {
+export enum NovaUiLayoutValueKind {
   Px = 0,
   Percent = 1,
   Auto = 2,

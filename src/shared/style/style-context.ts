@@ -14,15 +14,15 @@ export interface NovaUiInheritedTextStyle {
 }
 
 /** Bitmask ключей наследуемого style context. */
-export const enum NovaUiStyleMask {
+export enum NovaUiStyleMask {
   None = 0,
-  Color = 1 << 0,
-  FontFamily = 1 << 1,
-  FontSize = 1 << 2,
-  FontWeight = 1 << 3,
-  FontStyle = 1 << 4,
-  LineHeight = 1 << 5,
-  AllText = Color | FontFamily | FontSize | FontWeight | FontStyle | LineHeight,
+  Color = 1,
+  FontFamily = 2,
+  FontSize = 4,
+  FontWeight = 8,
+  FontStyle = 16,
+  LineHeight = 32,
+  AllText = 63,
 }
 
 /** Контекст стилей, который контейнер передает потомкам. */

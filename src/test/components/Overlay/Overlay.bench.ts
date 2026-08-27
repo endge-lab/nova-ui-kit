@@ -32,13 +32,6 @@ describe('nova UI Kit overlay registry benchmark', () => {
   })
 })
 
-afterAll(() => {
-  for (const app of apps.splice(0)) {
-    app.destroy()
-    app.canvas.element.remove()
-  }
-})
-
 beforeAll(() => {
   Object.defineProperty(window, 'devicePixelRatio', {
     value: 1,
@@ -66,6 +59,13 @@ beforeAll(() => {
     } as DOMRect
   })
   root = createRoot()
+})
+
+afterAll(() => {
+  for (const app of apps.splice(0)) {
+    app.destroy()
+    app.canvas.element.remove()
+  }
 })
 
 function createRoot(): Root<Record<string, any>> {
