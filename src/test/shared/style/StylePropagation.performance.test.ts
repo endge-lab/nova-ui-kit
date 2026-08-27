@@ -40,6 +40,14 @@ interface BenchStats {
   rating: 'плохо' | 'приемлемо' | 'хорошо' | 'отлично' | 'идеально'
 }
 
+const TEXT_LAYOUT_MASK = (
+  NovaUiStyleMask.FontFamily
+  | NovaUiStyleMask.FontSize
+  | NovaUiStyleMask.FontWeight
+  | NovaUiStyleMask.FontStyle
+  | NovaUiStyleMask.LineHeight
+)
+
 /**
  * Описывает ответственность BenchTextTarget в архитектуре проекта.
  */
@@ -137,15 +145,6 @@ class BenchContainerTarget implements NovaUiStyleTarget {
     return mask & ~this._ownStyleMask
   }
 }
-
-const TEXT_LAYOUT_MASK = (
-  NovaUiStyleMask.FontFamily
-  | NovaUiStyleMask.FontSize
-  | NovaUiStyleMask.FontWeight
-  | NovaUiStyleMask.FontStyle
-  | NovaUiStyleMask.LineHeight
-)
-
 const BENCH_ITERATIONS = 6
 
 describe('nova UI style propagation performance', () => {

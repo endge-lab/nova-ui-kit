@@ -836,6 +836,42 @@ function parseDeclarations(
   return declarations
 }
 
+const NUMERIC_KEYS = new Set([
+  'fontSize',
+  'lineHeight',
+  'opacity',
+  'borderWidth',
+  'borderRadius',
+  'minWidth',
+  'maxWidth',
+  'minHeight',
+  'maxHeight',
+  'flexGrow',
+  'flexShrink',
+  'order',
+  'gap',
+  'rowGap',
+  'columnGap',
+  'disabledOpacity',
+])
+
+const STRING_KEYS = new Set([
+  'color',
+  'fontFamily',
+  'fontWeight',
+  'fontStyle',
+  'background',
+  'borderColor',
+  'accentColor',
+  'trackColor',
+  'thumbColor',
+  'hoverBackground',
+  'pressedBackground',
+  'activeBackground',
+  'placeholderColor',
+  'alignSelf',
+])
+
 function parseDeclarationValue(
   key: string,
   value: string,
@@ -1350,39 +1386,3 @@ function getLineStarts(source: string): Array<number> {
   LINE_STARTS_CACHE.set(source, starts)
   return starts
 }
-
-const STRING_KEYS = new Set([
-  'color',
-  'fontFamily',
-  'fontWeight',
-  'fontStyle',
-  'background',
-  'borderColor',
-  'accentColor',
-  'trackColor',
-  'thumbColor',
-  'hoverBackground',
-  'pressedBackground',
-  'activeBackground',
-  'placeholderColor',
-  'alignSelf',
-])
-
-const NUMERIC_KEYS = new Set([
-  'fontSize',
-  'lineHeight',
-  'opacity',
-  'borderWidth',
-  'borderRadius',
-  'minWidth',
-  'maxWidth',
-  'minHeight',
-  'maxHeight',
-  'flexGrow',
-  'flexShrink',
-  'order',
-  'gap',
-  'rowGap',
-  'columnGap',
-  'disabledOpacity',
-])

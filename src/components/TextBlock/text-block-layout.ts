@@ -16,6 +16,8 @@ const DEFAULT_MAX_LINES = Number.POSITIVE_INFINITY
 const MAX_LAYOUT_LINES = 1000
 const ELLIPSIS = '...'
 
+const resolvePadding = resolveSpacing as (padding?: TextBlockProps['padding']) => TextBlockResolvedPadding
+
 export function normalizeTextBlockProps(props: TextBlockProps = {}): TextBlockResolvedProps {
   const fontSize = positiveNumber(props.fontSize ?? props.style?.fontSize, DEFAULT_FONT_SIZE)
 
@@ -271,9 +273,6 @@ function measurePlain(text: string, props: TextBlockResolvedProps, measureText: 
     fontStyle: props.fontStyle,
   })
 }
-
-const resolvePadding = resolveSpacing as (padding?: TextBlockProps['padding']) => TextBlockResolvedPadding
-
 function resolveVerticalOffset(align: TextBlockResolvedProps['verticalAlign'], innerHeight: number, contentHeight: number): number {
   const free = Math.max(0, innerHeight - contentHeight)
   if (align === 'bottom') {
