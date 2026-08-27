@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { normalizeButtonProps } from '@/components/Button/button.config'
 import { buildButtonSchema } from '@/components/Button/button-render'
+import { normalizeButtonProps } from '@/components/Button/button.config'
 import { EMPTY_STYLE_CONTEXT } from '@/shared/style'
 
 describe('button render schema', () => {

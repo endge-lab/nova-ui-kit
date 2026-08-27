@@ -1,5 +1,5 @@
 export * from '@/components/Grid/Grid'
 export * from '@/components/Grid/grid.config'
 export * from '@/components/Grid/grid.registry'
-export * from '@/components/Grid/GridLayoutEngine'
 export * from '@/components/Grid/grid.types'
+export * from '@/components/Grid/GridLayoutEngine'

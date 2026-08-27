@@ -1,9 +1,11 @@
 // @vitest-environment jsdom
 
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { NovaApp } from '@endge/nova'
+import type { ActionListApi, BadgeApi, ButtonApi, CheckboxApi, ChipApi, ColorPickerApi, DialogApi, DialogsApi, DividerApi, FlexApi, FpsMeterApi, GridApi, ImageApi, InputApi, OverlayApi, OverlaysApi, PanelApi, PopoverApi, RootApi, ScrollAreaApi, ScrollbarApi, SegmentedControlApi, SliderApi, SplitPaneApi, SplitPaneResizePayload, TagApi, TextBlockApi, ThemeSwitchApi, ToastRegionApi, ToggleApi, TooltipApi, ZoomControlsApi } from '@/index'
 import {
   Command,
   Nova,
+
   NovaComponent,
   NovaComponentNode,
   NovaNode,
@@ -11,60 +13,19 @@ import {
   RaphSchedulerType,
   RendererType,
   Watch,
-  type NovaApp,
 } from '@endge/nova'
-import {
-  NovaUIKit,
-  type ActionListApi,
-  type BadgeApi,
-  type ButtonApi,
-  type CheckboxApi,
-  type ChipApi,
-  type ColorPickerApi,
-  type DialogApi,
-  type DialogsApi,
-  type DividerApi,
-  type FlexApi,
-  type FpsMeterApi,
-  type GridApi,
-  type ImageApi,
-  type InputApi,
-  type OverlayApi,
-  type OverlaysApi,
-  type PanelApi,
-  type RootApi,
-  type ScrollAreaApi,
-  type ScrollbarApi,
-  type SegmentedControlApi,
-  type SliderApi,
-  type SplitPaneApi,
-  type SplitPaneResizePayload,
-  type TagApi,
-  type TextBlockApi,
-  type ThemeSwitchApi,
-  type ToggleApi,
-  type ToastRegionApi,
-  type TooltipApi,
-  type ZoomControlsApi,
-  type PopoverApi,
-  THEME_SWITCH_ASSETS,
-  formatNovaUiColor,
-  normalizeNovaUiColor,
-  parseHexColor,
-  parseRgbaColor,
-  registerNovaUiGlobalStyleSheet,
-  resolveFpsMeterReading,
-  resolveNovaUiThemeValue,
-  validateNovaUiStyleSheetSource,
-} from '@/index'
-import { registerNovaUIKit } from '@/registerNovaUIKit'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { normalizeBadgeProps } from '@/components/Badge/badge.config'
 import { normalizeButtonProps } from '@/components/Button/button.config'
 import { normalizeCheckboxProps } from '@/components/Checkbox/checkbox.config'
 import { normalizeColorPickerProps } from '@/components/ColorPicker/color-picker.config'
+import { ColResizer } from '@/components/ColResizer/ColResizer'
+import { RootDialogControllerNode } from '@/components/Dialog/RootDialogControllerNode'
 import { normalizeDividerProps } from '@/components/Divider/divider.config'
 import { normalizeImageProps } from '@/components/Image/image.config'
+import { RootOverlayControllerNode } from '@/components/Overlay/RootOverlayControllerNode'
 import { normalizePanelProps } from '@/components/Panel/panel.config'
+import { RowResizer } from '@/components/RowResizer/RowResizer'
 import { normalizeScrollAreaProps } from '@/components/ScrollArea/scroll-area.config'
 import { normalizeScrollbarProps } from '@/components/Scrollbar/scrollbar.config'
 import { normalizeSegmentedControlProps } from '@/components/SegmentedControl/segmented-control.config'
@@ -73,13 +34,29 @@ import { normalizeSplitPaneProps } from '@/components/SplitPane/split-pane.confi
 import { normalizeSurfaceProps } from '@/components/Surface/surface.config'
 import { normalizeTagProps } from '@/components/Tag/tag.config'
 import { normalizeToggleProps } from '@/components/Toggle/toggle.config'
-import { normalizeTooltipProps } from '@/components/Tooltip/tooltip.config'
 import { RootTooltipControllerNode } from '@/components/Tooltip/RootTooltipControllerNode'
-import { RootDialogControllerNode } from '@/components/Dialog/RootDialogControllerNode'
-import { RootOverlayControllerNode } from '@/components/Overlay/RootOverlayControllerNode'
+import { normalizeTooltipProps } from '@/components/Tooltip/tooltip.config'
+import {
+
+  formatNovaUiColor,
+
+  normalizeNovaUiColor,
+  NovaUIKit,
+
+  parseHexColor,
+  parseRgbaColor,
+
+  registerNovaUiGlobalStyleSheet,
+  resolveFpsMeterReading,
+  resolveNovaUiThemeValue,
+
+  THEME_SWITCH_ASSETS,
+
+  validateNovaUiStyleSheetSource,
+
+} from '@/index'
+import { registerNovaUIKit } from '@/registerNovaUIKit'
 import { resolveNovaUiOverlayPosition } from '@/shared/overlay/overlay-position'
-import { RowResizer } from '@/components/RowResizer/RowResizer'
-import { ColResizer } from '@/components/ColResizer/ColResizer'
 
 type TestEvents = Record<string, any>
 
@@ -101,7 +78,7 @@ class InspectorCardNode extends NovaNode<TestEvents> {
   type: 'ui-kit.decorated-card',
   dirtyPolicy: { update: ['state.version'], render: ['title'] },
 })
-class DecoratedUiKitCardNode extends NovaComponentNode<{ title: string; state: { version: number } }> {
+class DecoratedUiKitCardNode extends NovaComponentNode<{ title: string, state: { version: number } }> {
   @Prop.string({ default: 'Card' })
   declare title: string
 
@@ -143,7 +120,9 @@ function create2DContextStub(): CanvasRenderingContext2D {
      * Возвращает значение состояния текущего класса.
      */
     get(target, prop) {
-      if (!(prop in target)) target[prop] = vi.fn()
+      if (!(prop in target)) {
+        target[prop] = vi.fn()
+      }
       return target[prop]
     },
     /**
@@ -177,7 +156,9 @@ function installCanvasMocks(): void {
     configurable: true,
   })
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation((type: string) => {
-    if (type === RendererType.Web2D) return create2DContextStub()
+    if (type === RendererType.Web2D) {
+      return create2DContextStub()
+    }
     return null
   })
   vi.spyOn(HTMLCanvasElement.prototype, 'getBoundingClientRect').mockImplementation(function getRect(this: HTMLCanvasElement) {
@@ -215,7 +196,7 @@ function createApp(): NovaApp<TestEvents> {
   return app
 }
 
-describe('Nova UI Kit components', () => {
+describe('nova UI Kit components', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
     document.body.innerHTML = ''
@@ -855,7 +836,7 @@ describe('Nova UI Kit components', () => {
                   background: '#f8fafc',
                   border: { color: '#94a3b8', width: 1, radius: 10 },
                 },
-                slot: slot => {
+                slot: (slot) => {
                   contexts.push(slot as Record<string, any>)
                   return [
                     {
@@ -1291,7 +1272,7 @@ describe('Nova UI Kit components', () => {
                   border: { color: '#fed7aa', width: 1, radius: 8 },
                   delay: 0,
                 },
-                slot: slot => {
+                slot: (slot) => {
                   contexts.push(slot as Record<string, any>)
                   return [
                     {
@@ -1480,7 +1461,7 @@ describe('Nova UI Kit components', () => {
             scrollbarVisibility: 'always',
           },
           slots: {
-            track: scope => {
+            track: (scope) => {
               contexts.push(scope as Record<string, any>)
               return [{
                 type: NovaUIKit.Surface,

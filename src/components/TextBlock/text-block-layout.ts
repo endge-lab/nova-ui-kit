@@ -124,10 +124,13 @@ function buildSourceLines(
     const wrapped = wrapParagraph(paragraph, props, innerWidth, measureText)
     if (wrapped.length === 0) {
       lines.push(createMeasuredLine('', props, measureText))
-    } else {
+    }
+    else {
       lines.push(...wrapped)
     }
-    if (lines.length >= limit) return lines
+    if (lines.length >= limit) {
+      return lines
+    }
   }
 
   return lines
@@ -139,9 +142,15 @@ function wrapParagraph(
   innerWidth: number,
   measureText: TextBlockMeasureFn,
 ): Array<Pick<TextBlockLayoutLine, 'text' | 'width'>> {
-  if (innerWidth <= 0) return [createMeasuredLine('', props, measureText)]
-  if (paragraph.length === 0) return [createMeasuredLine('', props, measureText)]
-  if (props.wordBreak === 'break-all') return wrapByCharacters(paragraph, props, innerWidth, measureText)
+  if (innerWidth <= 0) {
+    return [createMeasuredLine('', props, measureText)]
+  }
+  if (paragraph.length === 0) {
+    return [createMeasuredLine('', props, measureText)]
+  }
+  if (props.wordBreak === 'break-all') {
+    return wrapByCharacters(paragraph, props, innerWidth, measureText)
+  }
 
   const words = props.whiteSpace === 'pre-wrap'
     ? paragraph.match(/\S+\s*|\s+/g) ?? ['']
@@ -151,7 +160,9 @@ function wrapParagraph(
 
   for (const rawWord of words) {
     const word = props.whiteSpace === 'pre-wrap' ? rawWord : rawWord.trim()
-    if (!word) continue
+    if (!word) {
+      continue
+    }
 
     const separator = props.whiteSpace === 'pre-wrap' || current.length === 0 ? '' : ' '
     const candidate = `${current}${separator}${word}`
@@ -166,7 +177,8 @@ function wrapParagraph(
       const broken = wrapByCharacters(word, props, innerWidth, measureText)
       lines.push(...broken.slice(0, -1))
       current = broken[broken.length - 1]?.text ?? ''
-    } else {
+    }
+    else {
       current = word
     }
   }
@@ -192,7 +204,8 @@ function wrapByCharacters(
     if (current.length > 0 && measurePlain(candidate, props, measureText) > innerWidth) {
       lines.push(createMeasuredLine(current, props, measureText))
       current = char
-    } else {
+    }
+    else {
       current = candidate
     }
   }
@@ -211,9 +224,15 @@ function fitWithEllipsis(
   measureText: TextBlockMeasureFn,
   force: boolean,
 ): string {
-  if (innerWidth <= 0) return ''
-  if (measurePlain(ELLIPSIS, props, measureText) > innerWidth) return ''
-  if (!force && measurePlain(text, props, measureText) <= innerWidth) return text
+  if (innerWidth <= 0) {
+    return ''
+  }
+  if (measurePlain(ELLIPSIS, props, measureText) > innerWidth) {
+    return ''
+  }
+  if (!force && measurePlain(text, props, measureText) <= innerWidth) {
+    return text
+  }
 
   const chars = Array.from(text)
   let left = 0
@@ -224,7 +243,8 @@ function fitWithEllipsis(
     const candidate = `${chars.slice(0, middle).join('')}${ELLIPSIS}`
     if (measurePlain(candidate, props, measureText) <= innerWidth) {
       left = middle
-    } else {
+    }
+    else {
       right = middle - 1
     }
   }
@@ -256,8 +276,12 @@ const resolvePadding = resolveSpacing as (padding?: TextBlockProps['padding']) =
 
 function resolveVerticalOffset(align: TextBlockResolvedProps['verticalAlign'], innerHeight: number, contentHeight: number): number {
   const free = Math.max(0, innerHeight - contentHeight)
-  if (align === 'bottom') return free
-  if (align === 'middle') return free / 2
+  if (align === 'bottom') {
+    return free
+  }
+  if (align === 'middle') {
+    return free / 2
+  }
   return 0
 }
 
@@ -274,8 +298,12 @@ function collapseWhiteSpace(text: string): string {
 }
 
 function normalizeMaxLines(value: number | undefined): number {
-  if (value === undefined) return DEFAULT_MAX_LINES
-  if (!Number.isFinite(value)) return DEFAULT_MAX_LINES
+  if (value === undefined) {
+    return DEFAULT_MAX_LINES
+  }
+  if (!Number.isFinite(value)) {
+    return DEFAULT_MAX_LINES
+  }
   return Math.max(0, Math.floor(value))
 }
 
@@ -288,6 +316,8 @@ function positiveNumber(value: number | undefined, fallback: number): number {
 }
 
 function clamp01(value: number): number {
-  if (!Number.isFinite(value)) return 1
+  if (!Number.isFinite(value)) {
+    return 1
+  }
   return Math.max(0, Math.min(1, value))
 }

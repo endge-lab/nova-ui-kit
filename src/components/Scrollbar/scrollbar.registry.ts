@@ -1,12 +1,13 @@
 import type { NovaSchemaRegistry } from '@endge/nova'
+import type { ScrollbarDescriptor } from '@/components/Scrollbar/scrollbar.config'
+import type { ScrollbarSchema } from '@/components/Scrollbar/scrollbar.types'
 import { Scrollbar } from '@/components/Scrollbar/Scrollbar'
 import {
-  SCROLLBAR_FIELD_DEFINITIONS,
   createScrollbarDescriptor,
   normalizeScrollbarProps,
-  type ScrollbarDescriptor,
+  SCROLLBAR_FIELD_DEFINITIONS,
+
 } from '@/components/Scrollbar/scrollbar.config'
-import type { ScrollbarSchema } from '@/components/Scrollbar/scrollbar.types'
 
 export const SCROLLBAR_DESCRIPTOR: ScrollbarDescriptor = createScrollbarDescriptor((context, schema) => {
   const scrollbarSchema = schema as ScrollbarSchema

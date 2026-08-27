@@ -1,10 +1,11 @@
 import type { NovaSchemaRegistry } from '@endge/nova'
+import type { OverlaysSchema } from '@/components/Overlay/overlay.types'
+import type { OverlaysDescriptor } from '@/components/Overlay/overlays.config'
 import { Overlays } from '@/components/Overlay/Overlays'
 import {
   createOverlaysDescriptor,
-  type OverlaysDescriptor,
+
 } from '@/components/Overlay/overlays.config'
-import type { OverlaysSchema } from '@/components/Overlay/overlay.types'
 
 export const OVERLAYS_DESCRIPTOR: OverlaysDescriptor = createOverlaysDescriptor((context, schema) => {
   const overlaysSchema = schema as OverlaysSchema

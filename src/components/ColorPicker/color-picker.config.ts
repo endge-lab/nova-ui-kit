@@ -1,18 +1,17 @@
 import type { NovaComponentCreateContext, NovaComponentDescriptor, NovaComponentNode, NovaComponentSchema } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  NOVA_UI_COMMON_DIRTY_POLICY,
-  NOVA_UI_COMMON_FIELD_DEFINITIONS,
-  commonMeasureBounds,
-  normalizeCommonProps,
-} from '@/shared/component'
+import type { ColorPickerApi, ColorPickerProps, ColorPickerResolvedProps } from '@/components/ColorPicker/color-picker.types'
+import { normalizeNovaUiColor } from '@/components/ColorPicker/color-picker-utils'
 import {
   COLOR_PICKER_SCHEMA_TYPE,
-  type ColorPickerApi,
-  type ColorPickerProps,
-  type ColorPickerResolvedProps,
+
 } from '@/components/ColorPicker/color-picker.types'
-import { normalizeNovaUiColor } from '@/components/ColorPicker/color-picker-utils'
+import {
+  commonMeasureBounds,
+  normalizeCommonProps,
+  NOVA_UI_COMMON_DIRTY_POLICY,
+  NOVA_UI_COMMON_FIELD_DEFINITIONS,
+} from '@/shared/component'
 
 export type ColorPickerDescriptor = NovaComponentDescriptor<ColorPickerResolvedProps, ColorPickerApi, Record<string, never>, ColorPickerProps>
 
@@ -73,7 +72,9 @@ export function createColorPickerDescriptor(createNode?: ColorPickerNodeFactory)
     normalize: schema => normalizeColorPickerProps(schema.props),
     measureBounds: (_context, schema) => commonMeasureBounds(schema, normalizeColorPickerProps),
   }
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 

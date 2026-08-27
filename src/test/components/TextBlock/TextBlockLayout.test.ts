@@ -1,10 +1,10 @@
+import type { TextBlockMeasureFn } from '@/components/TextBlock/text-block.types'
 import { describe, expect, it } from 'vitest'
 import { layoutTextBlock, normalizeTextBlockProps } from '@/components/TextBlock/text-block-layout'
-import type { TextBlockMeasureFn } from '@/components/TextBlock/text-block.types'
 
 const measureText: TextBlockMeasureFn = text => text.length * 8
 
-describe('TextBlock layout', () => {
+describe('textBlock layout', () => {
   it('wraps normal text into stable lines', () => {
     const props = normalizeTextBlockProps({
       text: 'alpha beta gamma',

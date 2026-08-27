@@ -5,11 +5,10 @@ import type {
   NovaComponentSchema,
 } from '@endge/nova'
 import type { EventList } from '@endge/utils'
+import type { FpsMeterApi, FpsMeterProps, FpsMeterResolvedProps } from '@/components/FpsMeter/fps-meter.types'
 import {
   FPS_METER_SCHEMA_TYPE,
-  type FpsMeterApi,
-  type FpsMeterProps,
-  type FpsMeterResolvedProps,
+
 } from '@/components/FpsMeter/fps-meter.types'
 import { resolveNovaUiPosition } from '@/shared/layout'
 
@@ -79,7 +78,9 @@ export function createFpsMeterDescriptor(createNode?: FpsMeterNodeFactory): FpsM
     },
   }
 
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 

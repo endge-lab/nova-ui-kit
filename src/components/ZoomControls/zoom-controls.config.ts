@@ -5,20 +5,19 @@ import type {
   NovaComponentSchema,
 } from '@endge/nova'
 import type { EventList } from '@endge/utils'
+import type { ZoomControlsApi, ZoomControlsProps, ZoomControlsResolvedProps } from '@/components/ZoomControls/zoom-controls.types'
 import {
-  NOVA_UI_COMMON_DIRTY_POLICY,
-  NOVA_UI_COMMON_FIELD_DEFINITIONS,
+  ZOOM_CONTROLS_SCHEMA_TYPE,
+
+} from '@/components/ZoomControls/zoom-controls.types'
+import {
   clamp,
   commonMeasureBounds,
   finiteNumber,
   normalizeCommonProps,
+  NOVA_UI_COMMON_DIRTY_POLICY,
+  NOVA_UI_COMMON_FIELD_DEFINITIONS,
 } from '@/shared/component'
-import {
-  ZOOM_CONTROLS_SCHEMA_TYPE,
-  type ZoomControlsApi,
-  type ZoomControlsProps,
-  type ZoomControlsResolvedProps,
-} from '@/components/ZoomControls/zoom-controls.types'
 
 export type ZoomControlsDescriptor = NovaComponentDescriptor<
   ZoomControlsResolvedProps,
@@ -96,7 +95,9 @@ export function createZoomControlsDescriptor(createNode?: ZoomControlsNodeFactor
     measureBounds: (_context, schema) => commonMeasureBounds(schema, normalizeZoomControlsProps),
   }
 
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 

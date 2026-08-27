@@ -1,30 +1,32 @@
-import { NovaComponentNode, type NovaApp, type NovaSchema, type NovaSurface } from '@endge/nova'
+import type { NovaApp, NovaSchema, NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import { normalizeButtonProps } from '@/components/Button/button.config'
-import { buildButtonSchema } from '@/components/Button/button-render'
-import {
-  THEME_SWITCH_NODE_DESCRIPTOR,
-  normalizeThemeSwitchProps,
-  type ThemeSwitchDescriptor,
-} from '@/components/ThemeSwitch/theme-switch.config'
-import {
-  ensureNovaUIKitThemes,
-  resolveNovaUiThemeValue,
-} from '@/shared/style/nova-ui-kit-theme'
-import {
-  NOVA_UI_LAYOUT_TARGET,
-  type NovaUiLayoutConstraints,
-  type NovaUiLayoutMeasure,
-  resolveNovaUiPositionedRect,
-  type NovaUiLayoutRect,
-} from '@/shared/layout'
-import { NovaUiStyleMask } from '@/shared/style'
+import type { ThemeSwitchDescriptor } from '@/components/ThemeSwitch/theme-switch.config'
 import type {
   ThemeSwitchApi,
   ThemeSwitchProps,
   ThemeSwitchResolvedProps,
   ThemeSwitchTheme,
 } from '@/components/ThemeSwitch/theme-switch.types'
+import type { NovaUiLayoutConstraints, NovaUiLayoutMeasure, NovaUiLayoutRect } from '@/shared/layout'
+import { NovaComponentNode } from '@endge/nova'
+import { buildButtonSchema } from '@/components/Button/button-render'
+import { normalizeButtonProps } from '@/components/Button/button.config'
+import {
+  normalizeThemeSwitchProps,
+  THEME_SWITCH_NODE_DESCRIPTOR,
+
+} from '@/components/ThemeSwitch/theme-switch.config'
+import {
+  NOVA_UI_LAYOUT_TARGET,
+
+  resolveNovaUiPositionedRect,
+
+} from '@/shared/layout'
+import { NovaUiStyleMask } from '@/shared/style'
+import {
+  ensureNovaUIKitThemes,
+  resolveNovaUiThemeValue,
+} from '@/shared/style/nova-ui-kit-theme'
 
 /** Переиспользуемый переключатель тем Nova. */
 export class ThemeSwitch<E extends EventList = Record<string, any>>
@@ -66,7 +68,9 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
   }
 
   update(): void {
-    if (!this.externalLayout) this.applyPlacement()
+    if (!this.externalLayout) {
+      this.applyPlacement()
+    }
   }
 
   /** Принимает rect от UI Kit layout-контейнера. */
@@ -85,7 +89,9 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
       zIndex: this.props.zIndex,
     })
     this.setLocalRenderBounds({ x: 0, y: 0, width: rect.width, height: rect.height })
-    if (changed) this.dirty({ matrix: true, update: sizeChanged, render: true })
+    if (changed) {
+      this.dirty({ matrix: true, update: sizeChanged, render: true })
+    }
     return changed
   }
 
@@ -123,31 +129,41 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
   protected override onPropsChanged(): void {
     this.props = normalizeThemeSwitchProps(this.props)
     this.options({ interactive: this.props.visible, zIndex: this.props.zIndex })
-    if (!this.externalLayout) this.applyPlacement()
+    if (!this.externalLayout) {
+      this.applyPlacement()
+    }
   }
 
   private setupEvents(): void {
     this.on('mouseenter', () => {
-      if (!this.props.visible) return
+      if (!this.props.visible) {
+        return
+      }
       this.hovered = true
       this.dirty({ render: true })
     })
     this.on('mousedown', () => {
-      if (!this.props.visible) return false
+      if (!this.props.visible) {
+        return false
+      }
       this.pressed = true
       this.nextTheme()
       this.dirty({ render: true })
       return false
     })
     this.on('mouseup', () => {
-      if (!this.pressed) return false
+      if (!this.pressed) {
+        return false
+      }
       this.pressed = false
       this.dirty({ render: true })
       return false
     })
     this.on('mouseleave', () => {
       this.hovered = false
-      if (!this.pressed) return
+      if (!this.pressed) {
+        return
+      }
       this.pressed = false
       this.dirty({ render: true })
     })
@@ -159,16 +175,21 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
   }
 
   private nextTheme(): void {
-    if (this.props.themes.length === 0) return
+    if (this.props.themes.length === 0) {
+      return
+    }
     const current = this.currentTheme()
     const index = Math.max(0, this.props.themes.findIndex(theme => theme.id === current?.id))
     const next = this.props.themes[(index + 1) % this.props.themes.length]
-    if (!next) return
+    if (!next) {
+      return
+    }
 
     if (this.props.value === undefined) {
       try {
         this.nova.theme.use(next.id)
-      } catch {
+      }
+      catch {
         // ThemeSwitch can still work as controlled component when theme service has no such id.
       }
     }
@@ -189,14 +210,18 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
       zIndex: this.props.zIndex,
     })
     this.setLocalRenderBounds({ x: 0, y: 0, width: rect.width, height: rect.height })
-    if (changed) this.dirty({ matrix: true, update: sizeChanged, render: true })
+    if (changed) {
+      this.dirty({ matrix: true, update: sizeChanged, render: true })
+    }
   }
 }
 
-function resolveOverlayRect(rootWidth: number, rootHeight: number, props: ThemeSwitchResolvedProps): { x?: number; y?: number; width: number; height: number } {
+function resolveOverlayRect(rootWidth: number, rootHeight: number, props: ThemeSwitchResolvedProps): { x?: number, y?: number, width: number, height: number } {
   const width = props.width
   const height = props.height
-  if (typeof props.x === 'number' && typeof props.y === 'number') return { x: props.x, y: props.y, width, height }
+  if (typeof props.x === 'number' && typeof props.y === 'number') {
+    return { x: props.x, y: props.y, width, height }
+  }
   if (props.position !== 'static') {
     return resolveNovaUiPositionedRect(
       { x: 0, y: 0, width: rootWidth, height: rootHeight },
@@ -204,7 +229,9 @@ function resolveOverlayRect(rootWidth: number, rootHeight: number, props: ThemeS
       props,
     ) as NovaUiLayoutRect
   }
-  if (!props.placement) return { width, height }
+  if (!props.placement) {
+    return { width, height }
+  }
   const left = props.placement.endsWith('left')
   const top = props.placement.startsWith('top')
   return {

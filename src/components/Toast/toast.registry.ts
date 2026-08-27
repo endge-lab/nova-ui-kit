@@ -1,7 +1,8 @@
 import type { NovaSchemaRegistry } from '@endge/nova'
-import { Toast, ToastRegion } from '@/components/Toast/Toast'
-import { TOAST_FIELD_DEFINITIONS, TOAST_REGION_FIELD_DEFINITIONS, createToastDescriptor, createToastRegionDescriptor, normalizeToastProps, normalizeToastRegionProps, type ToastDescriptor, type ToastRegionDescriptor } from '@/components/Toast/toast.config'
+import type { ToastDescriptor, ToastRegionDescriptor } from '@/components/Toast/toast.config'
 import type { ToastRegionSchema, ToastSchema } from '@/components/Toast/toast.types'
+import { Toast, ToastRegion } from '@/components/Toast/Toast'
+import { createToastDescriptor, createToastRegionDescriptor, normalizeToastProps, normalizeToastRegionProps, TOAST_FIELD_DEFINITIONS, TOAST_REGION_FIELD_DEFINITIONS } from '@/components/Toast/toast.config'
 
 export const TOAST_DESCRIPTOR: ToastDescriptor = createToastDescriptor((context, schema) => {
   const toastSchema = schema as ToastSchema

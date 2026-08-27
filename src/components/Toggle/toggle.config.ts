@@ -1,17 +1,16 @@
 import type { NovaComponentCreateContext, NovaComponentDescriptor, NovaComponentNode, NovaComponentSchema } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  NOVA_UI_COMMON_DIRTY_POLICY,
-  NOVA_UI_COMMON_FIELD_DEFINITIONS,
-  commonMeasureBounds,
-  normalizeCommonProps,
-} from '@/shared/component'
+import type { ToggleApi, ToggleProps, ToggleResolvedProps } from '@/components/Toggle/toggle.types'
 import {
   TOGGLE_SCHEMA_TYPE,
-  type ToggleApi,
-  type ToggleProps,
-  type ToggleResolvedProps,
+
 } from '@/components/Toggle/toggle.types'
+import {
+  commonMeasureBounds,
+  normalizeCommonProps,
+  NOVA_UI_COMMON_DIRTY_POLICY,
+  NOVA_UI_COMMON_FIELD_DEFINITIONS,
+} from '@/shared/component'
 
 export type ToggleDescriptor = NovaComponentDescriptor<ToggleResolvedProps, ToggleApi, Record<string, never>, ToggleProps>
 
@@ -63,7 +62,9 @@ export function createToggleDescriptor(createNode?: ToggleNodeFactory): ToggleDe
     normalize: schema => normalizeToggleProps(schema.props),
     measureBounds: (_context, schema) => commonMeasureBounds(schema, normalizeToggleProps),
   }
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 

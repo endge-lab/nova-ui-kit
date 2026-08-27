@@ -1,22 +1,21 @@
 import type { NovaNode } from '@endge/nova'
+import type {
+  FlexAlign,
+  FlexChildLayout,
+  FlexResolvedProps,
+} from '@/components/Flex/flex.types'
+import type { NovaUiCompiledLayoutValue, NovaUiLayoutRect, NovaUiResolvedSpacing } from '@/shared/layout'
 import {
   clampLayoutNumber,
   compileLayoutValue,
   createLayoutRect,
   isAutoLayoutValue,
   isNovaUiLayoutTarget,
+
   readNovaUiNodeProps,
   resolveLayoutValue,
   resolveSpacing,
-  type NovaUiCompiledLayoutValue,
-  type NovaUiLayoutRect,
-  type NovaUiResolvedSpacing,
 } from '@/shared/layout'
-import type {
-  FlexAlign,
-  FlexChildLayout,
-  FlexResolvedProps,
-} from '@/components/Flex/flex.types'
 
 interface AxisSpacing {
   mainStart: number
@@ -152,7 +151,9 @@ export class FlexLayoutEngine {
     this.sortedEntries.push(...entries)
     this.sortedEntries.sort((a, b) => {
       const orderDiff = a.compiledLayout.order - b.compiledLayout.order
-      if (orderDiff !== 0) return orderDiff
+      if (orderDiff !== 0) {
+        return orderDiff
+      }
       return 0
     })
   }
@@ -189,7 +190,9 @@ export class FlexLayoutEngine {
       line.totalShrink += item.flexShrink
     }
 
-    if (line.items.length > 0) this.lines.push(line)
+    if (line.items.length > 0) {
+      this.lines.push(line)
+    }
   }
 
   /**
@@ -248,7 +251,7 @@ export class FlexLayoutEngine {
     isRow: boolean,
     widthFallback: number,
     heightFallback: number,
-    measured: { width: number; height: number } | undefined,
+    measured: { width: number, height: number } | undefined,
   ): number {
     if (!isAutoLayoutValue(layout.flexBasis)) {
       return resolveLayoutValue(layout.flexBasis, available, 0)
@@ -270,7 +273,7 @@ export class FlexLayoutEngine {
     isRow: boolean,
     widthFallback: number,
     heightFallback: number,
-    measured: { width: number; height: number } | undefined,
+    measured: { width: number, height: number } | undefined,
   ): number {
     const value = isRow ? layout.height : layout.width
     const fallback = measured
@@ -282,15 +285,19 @@ export class FlexLayoutEngine {
   /**
    * Измеряет layout или runtime-метрики FlexLayoutEngine.
    */
-  private measureAutoItem(entry: FlexChildEntry, mainSize: number, crossSize: number, isRow: boolean): { width: number; height: number } | undefined {
+  private measureAutoItem(entry: FlexChildEntry, mainSize: number, crossSize: number, isRow: boolean): { width: number, height: number } | undefined {
     const layout = entry.compiledLayout
     const mainValue = isRow ? layout.width : layout.height
     const crossValue = isRow ? layout.height : layout.width
     const needsMainMeasure = isAutoLayoutValue(layout.flexBasis) && isAutoLayoutValue(mainValue)
     const needsCrossMeasure = isAutoLayoutValue(crossValue)
 
-    if (!needsMainMeasure && !needsCrossMeasure) return undefined
-    if (!isNovaUiLayoutTarget(entry.node) || !entry.node.measureLayout) return undefined
+    if (!needsMainMeasure && !needsCrossMeasure) {
+      return undefined
+    }
+    if (!isNovaUiLayoutTarget(entry.node) || !entry.node.measureLayout) {
+      return undefined
+    }
 
     return entry.node.measureLayout({
       minWidth: layout.minWidth,
@@ -361,7 +368,9 @@ export class FlexLayoutEngine {
   private resolveLineCrossSizes(line: FlexLine, parentAlign: FlexAlign): void {
     for (const item of line.items) {
       const align = item.alignSelf ?? parentAlign
-      if (align !== 'stretch') continue
+      if (align !== 'stretch') {
+        continue
+      }
 
       item.targetCross = clampLayoutNumber(
         Math.max(0, line.cross - item.margin.crossStart - item.margin.crossEnd),
@@ -405,7 +414,8 @@ export class FlexLayoutEngine {
         rect.y = crossCursor + crossOffset
         rect.width = item.targetMain
         rect.height = item.targetCross
-      } else {
+      }
+      else {
         rect.x = crossCursor + crossOffset
         rect.y = context.padding.top + mainCursor
         rect.width = item.targetCross
@@ -420,8 +430,12 @@ export class FlexLayoutEngine {
    * Нормализует и возвращает итоговое значение FlexLayoutEngine.
    */
   private resolveJustifiedStart(justify: FlexResolvedProps['justifyContent'], freeMain: number): number {
-    if (justify === 'center') return freeMain / 2
-    if (justify === 'end') return freeMain
+    if (justify === 'center') {
+      return freeMain / 2
+    }
+    if (justify === 'end') {
+      return freeMain
+    }
     return 0
   }
 
@@ -450,8 +464,12 @@ export class FlexLayoutEngine {
     margin: AxisSpacing,
   ): number {
     const free = Math.max(0, lineCross - itemCross - margin.crossStart - margin.crossEnd)
-    if (align === 'center') return margin.crossStart + free / 2
-    if (align === 'end') return margin.crossStart + free
+    if (align === 'center') {
+      return margin.crossStart + free / 2
+    }
+    if (align === 'end') {
+      return margin.crossStart + free
+    }
     return margin.crossStart
   }
 }
@@ -507,7 +525,9 @@ function isAlreadyOrdered(entries: Array<FlexChildEntry>): boolean {
 
   for (const entry of entries) {
     const order = entry.compiledLayout.order
-    if (order < previousOrder) return false
+    if (order < previousOrder) {
+      return false
+    }
     previousOrder = order
   }
 

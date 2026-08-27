@@ -31,4 +31,3 @@ export interface ImageApi {
   setProps: (patch: ImageProps) => void
   getProps: () => Readonly<ImageResolvedProps>
 }
-

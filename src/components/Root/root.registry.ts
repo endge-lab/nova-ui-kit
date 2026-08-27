@@ -1,12 +1,13 @@
 import type { NovaSchemaRegistry } from '@endge/nova'
+import type { RootDescriptor } from '@/components/Root/root.config'
+import type { RootSchema } from '@/components/Root/root.types'
 import { Root } from '@/components/Root/Root'
 import {
-  ROOT_FIELD_DEFINITIONS,
   createRootDescriptor,
   normalizeRootProps,
-  type RootDescriptor,
+  ROOT_FIELD_DEFINITIONS,
+
 } from '@/components/Root/root.config'
-import type { RootSchema } from '@/components/Root/root.types'
 
 export const ROOT_DESCRIPTOR: RootDescriptor = createRootDescriptor((context, schema) => {
   const rootSchema = schema as RootSchema

@@ -5,18 +5,17 @@ import type {
   NovaComponentSchema,
 } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  NOVA_UI_COMMON_DIRTY_POLICY,
-  NOVA_UI_COMMON_FIELD_DEFINITIONS,
-  commonMeasureBounds,
-  normalizeCommonProps,
-} from '@/shared/component'
+import type { ImageApi, ImageProps, ImageResolvedProps } from '@/components/Image/image.types'
 import {
   IMAGE_SCHEMA_TYPE,
-  type ImageApi,
-  type ImageProps,
-  type ImageResolvedProps,
+
 } from '@/components/Image/image.types'
+import {
+  commonMeasureBounds,
+  normalizeCommonProps,
+  NOVA_UI_COMMON_DIRTY_POLICY,
+  NOVA_UI_COMMON_FIELD_DEFINITIONS,
+} from '@/shared/component'
 
 export type ImageDescriptor = NovaComponentDescriptor<
   ImageResolvedProps,
@@ -73,7 +72,9 @@ export function createImageDescriptor(createNode?: ImageNodeFactory): ImageDescr
     measureBounds: (_context, schema) => commonMeasureBounds(schema, normalizeImageProps),
   }
 
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 

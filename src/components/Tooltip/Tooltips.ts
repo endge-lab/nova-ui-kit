@@ -1,18 +1,19 @@
 import type { NovaApp, NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  TOOLTIPS_NODE_DESCRIPTOR,
-  normalizeTooltipsProps,
-  type TooltipsDescriptor,
-} from '@/components/Tooltip/tooltips.config'
 import type {
   TooltipDefinition,
   TooltipsApi,
   TooltipsProps,
   TooltipsResolvedProps,
 } from '@/components/Tooltip/tooltip.types'
-import { NovaUiComponentNode } from '@/shared/component'
+import type { TooltipsDescriptor } from '@/components/Tooltip/tooltips.config'
 import { findNovaUiRoot } from '@/components/Root/root-target'
+import {
+  normalizeTooltipsProps,
+  TOOLTIPS_NODE_DESCRIPTOR,
+
+} from '@/components/Tooltip/tooltips.config'
+import { NovaUiComponentNode } from '@/shared/component'
 
 /** Регистрирует набор tooltip templates в ближайшем Root без участия layout. */
 export class Tooltips<E extends EventList = Record<string, any>>
@@ -71,7 +72,9 @@ export class Tooltips<E extends EventList = Record<string, any>>
     this.applyCommonPropsChanged(changedKeys)
     this.visible = false
     this.options({ interactive: false })
-    if (changedKeys.includes('definitions')) this.syncRootDefinitions()
+    if (changedKeys.includes('definitions')) {
+      this.syncRootDefinitions()
+    }
   }
 
   /** Заменяет definitions текущего source. */

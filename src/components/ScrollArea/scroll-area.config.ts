@@ -1,19 +1,18 @@
 import type { NovaComponentCreateContext, NovaComponentDescriptor, NovaComponentNode, NovaComponentSchema } from '@endge/nova'
 import type { EventList } from '@endge/utils'
+import type { ScrollAreaApi, ScrollAreaProps, ScrollAreaResolvedProps } from '@/components/ScrollArea/scroll-area.types'
 import {
-  NOVA_UI_COMMON_DIRTY_POLICY,
-  NOVA_UI_COMMON_FIELD_DEFINITIONS,
+  SCROLL_AREA_SCHEMA_TYPE,
+
+} from '@/components/ScrollArea/scroll-area.types'
+import {
   clamp,
   commonMeasureBounds,
   finiteNumber,
   normalizeCommonProps,
+  NOVA_UI_COMMON_DIRTY_POLICY,
+  NOVA_UI_COMMON_FIELD_DEFINITIONS,
 } from '@/shared/component'
-import {
-  SCROLL_AREA_SCHEMA_TYPE,
-  type ScrollAreaApi,
-  type ScrollAreaProps,
-  type ScrollAreaResolvedProps,
-} from '@/components/ScrollArea/scroll-area.types'
 
 export type ScrollAreaDescriptor = NovaComponentDescriptor<ScrollAreaResolvedProps, ScrollAreaApi, Record<string, never>, ScrollAreaProps>
 
@@ -106,7 +105,9 @@ export function createScrollAreaDescriptor(createNode?: ScrollAreaNodeFactory): 
     normalize: schema => normalizeScrollAreaProps(schema.props),
     measureBounds: (_context, schema) => commonMeasureBounds(schema, normalizeScrollAreaProps),
   }
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 

@@ -1,25 +1,25 @@
 import type { NovaComponentSchema, NovaCursorContext, NovaCursorDeclaration, NovaElementSchema } from '@endge/nova'
+import type { DialogDefinition, DialogInput, DialogProps } from '@/components/Dialog/dialog.types'
+import type { OverlayDefinition, OverlayInput, OverlayProps } from '@/components/Overlay/overlay.types'
+import type { TooltipDefinition } from '@/components/Tooltip/tooltip.types'
 import type {
   NovaUiLayoutRect,
   NovaUiSpacing,
 } from '@/shared/layout'
 import type {
   NovaUiBorder,
+  NovaUiCompiledStyleSheet,
   NovaUiInheritedTextStyle,
+  NovaUiStylableNode,
   NovaUiStyleDiagnostic,
   NovaUiStyleDisplay,
+  NovaUiStyleIdentityProps,
   NovaUiStyleInspectionDebug,
-  NovaUiCompiledStyleSheet,
   NovaUiStyleMediaContext,
   NovaUiStyleSheetAsset,
   NovaUiStyleTokenResolver,
-  NovaUiStyleIdentityProps,
   NovaUiStyleValidationResult,
-  NovaUiStylableNode,
 } from '@/shared/style'
-import type { TooltipDefinition } from '@/components/Tooltip/tooltip.types'
-import type { DialogDefinition, DialogInput, DialogProps } from '@/components/Dialog/dialog.types'
-import type { OverlayDefinition, OverlayInput, OverlayProps } from '@/components/Overlay/overlay.types'
 
 /** Schema type корневого компонента Nova UI Kit. */
 export const ROOT_SCHEMA_TYPE = 'nova-ui.root'

@@ -1,12 +1,6 @@
-import { reconcileNovaTemplateChildren, type NovaApp, type NovaNode, type NovaSurface } from '@endge/nova'
+import type { NovaApp, NovaNode, NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import { ColResizer } from '@/components/ColResizer/ColResizer'
-import { RowResizer } from '@/components/RowResizer/RowResizer'
-import {
-  SPLIT_PANE_NODE_DESCRIPTOR,
-  normalizeSplitPaneProps,
-  type SplitPaneDescriptor,
-} from '@/components/SplitPane/split-pane.config'
+import type { SplitPaneDescriptor } from '@/components/SplitPane/split-pane.config'
 import type {
   SplitPaneApi,
   SplitPaneChildSchema,
@@ -14,10 +8,18 @@ import type {
   SplitPaneResizePayload,
   SplitPaneResolvedProps,
 } from '@/components/SplitPane/split-pane.types'
+import { reconcileNovaTemplateChildren } from '@endge/nova'
+import { ColResizer } from '@/components/ColResizer/ColResizer'
+import { RowResizer } from '@/components/RowResizer/RowResizer'
 import {
-  NovaUiComponentNode,
+  normalizeSplitPaneProps,
+  SPLIT_PANE_NODE_DESCRIPTOR,
+
+} from '@/components/SplitPane/split-pane.config'
+import {
   buildBoxSchema,
   clamp,
+  NovaUiComponentNode,
 } from '@/shared/component'
 import {
   applyNodeLayoutRect,
@@ -46,7 +48,7 @@ export class SplitPane<E extends EventList = Record<string, any>>
     app: NovaApp<E>,
     surface: NovaSurface<E>,
     props: SplitPaneProps = {},
-    options: { componentId?: string; children?: Array<SplitPaneChildSchema> } = {},
+    options: { componentId?: string, children?: Array<SplitPaneChildSchema> } = {},
     descriptor: SplitPaneDescriptor = SPLIT_PANE_NODE_DESCRIPTOR,
   ) {
     super(app, surface, descriptor, normalizeSplitPaneProps(props), options)
@@ -120,10 +122,14 @@ export class SplitPane<E extends EventList = Record<string, any>>
   /**
    * Применяет подготовленное состояние SplitPane.
    */
-  private applyPaneRect(pane: NovaNode<E> | undefined, rect: { x: number; y: number; width: number; height: number }): void {
-    if (!pane) return
+  private applyPaneRect(pane: NovaNode<E> | undefined, rect: { x: number, y: number, width: number, height: number }): void {
+    if (!pane) {
+      return
+    }
     const changed = applyNodeLayoutRect(pane, rect)
-    if (changed) pane.dirty({ matrix: true, update: true, render: true })
+    if (changed) {
+      pane.dirty({ matrix: true, update: true, render: true })
+    }
   }
 
   /**
@@ -143,7 +149,9 @@ export class SplitPane<E extends EventList = Record<string, any>>
         pane.active = active
         pane.dirty({ update: true })
       }
-      if (!active) this.applyPaneRect(pane, emptyRect)
+      if (!active) {
+        this.applyPaneRect(pane, emptyRect)
+      }
     }
   }
 
@@ -152,8 +160,12 @@ export class SplitPane<E extends EventList = Record<string, any>>
    */
   render(): void {
     const schema = buildBoxSchema(this.props, this.width, this.height, { resolveThemeValue: value => this.resolveThemeValue(value) })
-    if (schema.length > 0) this.renderer.schema(schema)
-    if (this.props.clip) this.renderer.clip(0, 0, this.width, this.height)
+    if (schema.length > 0) {
+      this.renderer.schema(schema)
+    }
+    if (this.props.clip) {
+      this.renderer.clip(0, 0, this.width, this.height)
+    }
   }
 
   /**
@@ -188,7 +200,9 @@ export class SplitPane<E extends EventList = Record<string, any>>
       return
     }
 
-    if (this.resizerNode) return
+    if (this.resizerNode) {
+      return
+    }
     this.resizerNode = this.props.direction === 'horizontal'
       ? new ColResizer<E>(this.nova, this.surface, this.resolveThemeValue(this.props.resizer.color) ?? this.props.resizer.color, this.props.resizer.lineWidth)
       : new RowResizer<E>(this.nova, this.surface, this.resolveThemeValue(this.props.resizer.color) ?? this.props.resizer.color, this.props.resizer.lineWidth)
@@ -288,9 +302,9 @@ export class SplitPane<E extends EventList = Record<string, any>>
    * Нормализует и возвращает итоговое значение SplitPane.
    */
   private resolveRects(firstSizeOverride?: number): {
-    first: { x: number; y: number; width: number; height: number }
-    second: { x: number; y: number; width: number; height: number }
-    resizer: { x: number; y: number; width: number; height: number }
+    first: { x: number, y: number, width: number, height: number }
+    second: { x: number, y: number, width: number, height: number }
+    resizer: { x: number, y: number, width: number, height: number }
   } {
     const horizontal = this.props.direction === 'horizontal'
     const total = horizontal ? this.width : this.height
@@ -315,8 +329,12 @@ export class SplitPane<E extends EventList = Record<string, any>>
    * Нормализует и возвращает итоговое значение SplitPane.
    */
   private resolvePixelSizes(total: number): [number, number] {
-    if (this.props.collapsedPane === 'first') return [0, total]
-    if (this.props.collapsedPane === 'second') return [total, 0]
+    if (this.props.collapsedPane === 'first') {
+      return [0, total]
+    }
+    if (this.props.collapsedPane === 'second') {
+      return [total, 0]
+    }
 
     const [rawFirst, rawSecond] = this.props.sizes
     const ratioMode = rawFirst <= 1 && rawSecond <= 1

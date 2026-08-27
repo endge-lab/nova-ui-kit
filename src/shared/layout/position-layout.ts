@@ -1,10 +1,10 @@
 import type { NovaNode } from '@endge/nova'
+import type { NovaUiLayoutRect, NovaUiLayoutValue } from '@/shared/layout'
 import {
   compileLayoutValue,
   isAutoLayoutValue,
+
   resolveLayoutValue,
-  type NovaUiLayoutRect,
-  type NovaUiLayoutValue,
 } from '@/shared/layout'
 import { readNovaUiNodeProps } from '@/shared/layout/layout-intent'
 
@@ -59,9 +59,15 @@ export function resolveNovaUiPositionedLayout(
     result.inset = layout.inset ?? props.inset as NovaUiInset | undefined
   }
   const zIndex = finiteOptionalNumber(layout.zIndex ?? props.zIndex)
-  if (zIndex !== undefined) result.zIndex = zIndex
-  if (layout.width !== undefined) result.width = layout.width
-  if (layout.height !== undefined) result.height = layout.height
+  if (zIndex !== undefined) {
+    result.zIndex = zIndex
+  }
+  if (layout.width !== undefined) {
+    result.width = layout.width
+  }
+  if (layout.height !== undefined) {
+    result.height = layout.height
+  }
   return result
 }
 
@@ -73,7 +79,9 @@ export function resolveNovaUiPositionedRect(
   node?: NovaNode<any>,
 ): NovaUiLayoutRect {
   const position = resolveNovaUiPosition(layout.position)
-  if (position === 'static') return { ...fallback }
+  if (position === 'static') {
+    return { ...fallback }
+  }
 
   const inset = resolveInset(layout.inset)
   if (position === 'relative') {
@@ -117,12 +125,16 @@ export function resolveNovaUiPositionedRect(
 
 /** Применяет z-index node без переписывания geometry. */
 export function applyNovaUiLayoutZIndex(node: NovaNode<any>, zIndex: number | undefined): void {
-  if (zIndex === undefined) return
+  if (zIndex === undefined) {
+    return
+  }
   const props = readNovaUiNodeProps(node)
   if (props.zIndex !== zIndex && 'setProps' in node && typeof (node as { setProps?: unknown }).setProps === 'function') {
     ;(node as unknown as { setProps: (patch: { zIndex: number }) => void }).setProps({ zIndex })
   }
-  if (node.weight === zIndex) return
+  if (node.weight === zIndex) {
+    return
+  }
   node.options({ zIndex })
 }
 
@@ -130,7 +142,9 @@ function resolveInset(value: NovaUiInset | undefined): ResolvedInset {
   if (typeof value === 'number' && Number.isFinite(value)) {
     return { top: value, right: value, bottom: value, left: value }
   }
-  if (!value || typeof value !== 'object') return {}
+  if (!value || typeof value !== 'object') {
+    return {}
+  }
   return {
     top: finiteOptionalNumber(value.top),
     right: finiteOptionalNumber(value.right),
@@ -144,9 +158,13 @@ function resolveMaybeLayoutValue(
   available: number,
   fallback: number,
 ): number | undefined {
-  if (value === undefined || value === 'auto') return undefined
+  if (value === undefined || value === 'auto') {
+    return undefined
+  }
   const compiled = compileLayoutValue(value, 'auto')
-  if (isAutoLayoutValue(compiled)) return undefined
+  if (isAutoLayoutValue(compiled)) {
+    return undefined
+  }
   return Math.max(0, resolveLayoutValue(compiled, available, fallback))
 }
 

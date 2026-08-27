@@ -1,17 +1,16 @@
 import type { NovaComponentCreateContext, NovaComponentDescriptor, NovaComponentNode, NovaComponentSchema } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  NOVA_UI_COMMON_DIRTY_POLICY,
-  NOVA_UI_COMMON_FIELD_DEFINITIONS,
-  commonMeasureBounds,
-  normalizeCommonProps,
-} from '@/shared/component'
+import type { PanelApi, PanelProps, PanelResolvedProps } from '@/components/Panel/panel.types'
 import {
   PANEL_SCHEMA_TYPE,
-  type PanelApi,
-  type PanelProps,
-  type PanelResolvedProps,
+
 } from '@/components/Panel/panel.types'
+import {
+  commonMeasureBounds,
+  normalizeCommonProps,
+  NOVA_UI_COMMON_DIRTY_POLICY,
+  NOVA_UI_COMMON_FIELD_DEFINITIONS,
+} from '@/shared/component'
 
 export type PanelDescriptor = NovaComponentDescriptor<PanelResolvedProps, PanelApi, Record<string, never>, PanelProps>
 
@@ -64,7 +63,9 @@ export function createPanelDescriptor(createNode?: PanelNodeFactory): PanelDescr
     normalize: schema => normalizePanelProps(schema.props),
     measureBounds: (_context, schema) => commonMeasureBounds(schema, normalizePanelProps),
   }
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 

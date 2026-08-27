@@ -450,10 +450,14 @@ export const NOVA_UI_KIT_DARK_TOKENS = {
 } as const
 
 export function ensureNovaUIKitThemes<E extends EventList>(app: NovaApp<E>): void {
-  if (REGISTERED_APPS.has(app)) return
+  if (REGISTERED_APPS.has(app)) {
+    return
+  }
   REGISTERED_APPS.add(app)
   const active = app.theme.active()
-  if (active) return
+  if (active) {
+    return
+  }
   app.theme.register({
     id: 'light',
     title: 'Light',
@@ -470,7 +474,9 @@ export function resolveNovaUiThemeValue<E extends EventList>(
   app: NovaApp<E>,
   value: string | undefined,
 ): string | undefined {
-  if (!value || !value.includes('var(')) return value
+  if (!value || !value.includes('var(')) {
+    return value
+  }
   let result = ''
   let cursor = 0
 
@@ -503,10 +509,14 @@ function findMatchingParen(source: string, openIndex: number): number {
   let depth = 0
   for (let index = openIndex; index < source.length; index += 1) {
     const char = source[index]
-    if (char === '(') depth += 1
+    if (char === '(') {
+      depth += 1
+    }
     else if (char === ')') {
       depth -= 1
-      if (depth === 0) return index
+      if (depth === 0) {
+        return index
+      }
     }
   }
   return -1
@@ -516,9 +526,15 @@ function findTopLevelComma(source: string): number {
   let depth = 0
   for (let index = 0; index < source.length; index += 1) {
     const char = source[index]
-    if (char === '(') depth += 1
-    else if (char === ')') depth = Math.max(0, depth - 1)
-    else if (char === ',' && depth === 0) return index
+    if (char === '(') {
+      depth += 1
+    }
+    else if (char === ')') {
+      depth = Math.max(0, depth - 1)
+    }
+    else if (char === ',' && depth === 0) {
+      return index
+    }
   }
   return -1
 }

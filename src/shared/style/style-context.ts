@@ -73,13 +73,27 @@ export function isNovaUiStyleTarget(node: unknown): node is NovaNode<any> & Nova
 export function inheritedTextStyleMask(style?: NovaUiInheritedTextStyle): NovaUiStyleMask {
   let mask = NovaUiStyleMask.None
 
-  if (!style) return mask
-  if (style.color !== undefined) mask |= NovaUiStyleMask.Color
-  if (style.fontFamily !== undefined) mask |= NovaUiStyleMask.FontFamily
-  if (style.fontSize !== undefined) mask |= NovaUiStyleMask.FontSize
-  if (style.fontWeight !== undefined) mask |= NovaUiStyleMask.FontWeight
-  if (style.fontStyle !== undefined) mask |= NovaUiStyleMask.FontStyle
-  if (style.lineHeight !== undefined) mask |= NovaUiStyleMask.LineHeight
+  if (!style) {
+    return mask
+  }
+  if (style.color !== undefined) {
+    mask |= NovaUiStyleMask.Color
+  }
+  if (style.fontFamily !== undefined) {
+    mask |= NovaUiStyleMask.FontFamily
+  }
+  if (style.fontSize !== undefined) {
+    mask |= NovaUiStyleMask.FontSize
+  }
+  if (style.fontWeight !== undefined) {
+    mask |= NovaUiStyleMask.FontWeight
+  }
+  if (style.fontStyle !== undefined) {
+    mask |= NovaUiStyleMask.FontStyle
+  }
+  if (style.lineHeight !== undefined) {
+    mask |= NovaUiStyleMask.LineHeight
+  }
 
   return mask
 }
@@ -90,7 +104,9 @@ export function mergeStyleContext(
   style?: NovaUiInheritedTextStyle,
 ): NovaUiStyleContext {
   const mask = inheritedTextStyleMask(style)
-  if (mask === NovaUiStyleMask.None) return parent
+  if (mask === NovaUiStyleMask.None) {
+    return parent
+  }
 
   return {
     values: {

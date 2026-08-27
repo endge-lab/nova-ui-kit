@@ -1,12 +1,13 @@
 import type { NovaSchemaRegistry } from '@endge/nova'
+import type { TagDescriptor } from '@/components/Tag/tag.config'
+import type { TagSchema } from '@/components/Tag/tag.types'
 import { Tag } from '@/components/Tag/Tag'
 import {
-  TAG_FIELD_DEFINITIONS,
   createTagDescriptor,
   normalizeTagProps,
-  type TagDescriptor,
+  TAG_FIELD_DEFINITIONS,
+
 } from '@/components/Tag/tag.config'
-import type { TagSchema } from '@/components/Tag/tag.types'
 
 export const TAG_DESCRIPTOR: TagDescriptor = createTagDescriptor((context, schema) => {
   const tagSchema = schema as TagSchema

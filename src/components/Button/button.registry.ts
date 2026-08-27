@@ -1,12 +1,13 @@
 import type { NovaSchemaRegistry } from '@endge/nova'
+import type { ButtonDescriptor } from '@/components/Button/button.config'
+import type { ButtonSchema } from '@/components/Button/button.types'
 import { Button } from '@/components/Button/Button'
 import {
   BUTTON_FIELD_DEFINITIONS,
+
   createButtonDescriptor,
   normalizeButtonProps,
-  type ButtonDescriptor,
 } from '@/components/Button/button.config'
-import type { ButtonSchema } from '@/components/Button/button.types'
 
 export const BUTTON_DESCRIPTOR: ButtonDescriptor = createButtonDescriptor((context, schema) => {
   const buttonSchema = schema as ButtonSchema

@@ -1,20 +1,24 @@
 import type { NovaApp, NovaSchema, NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  SEGMENTED_CONTROL_NODE_DESCRIPTOR,
-  normalizeSegmentedControlProps,
-  type SegmentedControlDescriptor,
-} from '@/components/SegmentedControl/segmented-control.config'
+import type { SegmentedControlDescriptor } from '@/components/SegmentedControl/segmented-control.config'
 import type {
   SegmentedControlApi,
   SegmentedControlProps,
   SegmentedControlResolvedProps,
 } from '@/components/SegmentedControl/segmented-control.types'
 import {
-  NovaUiComponentNode,
+  normalizeSegmentedControlProps,
+  SEGMENTED_CONTROL_NODE_DESCRIPTOR,
+
+} from '@/components/SegmentedControl/segmented-control.config'
+import {
   buildBoxSchema,
+  NovaUiComponentNode,
+  pushIcon,
+  pushText,
   resolveComponentTextStyle,
- pushIcon, pushText, sizeTokenPadding } from '@/shared/component'
+  sizeTokenPadding,
+} from '@/shared/component'
 
 /**
  * Описывает ответственность SegmentedControl в архитектуре проекта.
@@ -68,7 +72,9 @@ export class SegmentedControl<E extends EventList = Record<string, any>>
       return
     }
     const item = this.props.items.find(candidate => candidate.value === value)
-    if (!item || item.disabled || value === this.props.value) return
+    if (!item || item.disabled || value === this.props.value) {
+      return
+    }
     this.setProps({ value })
     this.playUiSound('change')
     this.props.onChange?.(value, event)
@@ -137,11 +143,15 @@ export class SegmentedControl<E extends EventList = Record<string, any>>
    * Обновляет значение состояния SegmentedControl.
    */
   private setupEvents(): void {
-    this.on('mousemove', event => {
-      if (this.props.disabled) return
+    this.on('mousemove', (event) => {
+      if (this.props.disabled) {
+        return
+      }
       const previous = this.hoveredIndex
       this.hoveredIndex = this.indexFromEvent(event)
-      if (this.hoveredIndex >= 0 && this.hoveredIndex !== previous) this.playUiSound('hover')
+      if (this.hoveredIndex >= 0 && this.hoveredIndex !== previous) {
+        this.playUiSound('hover')
+      }
       this.dirty({ render: true })
     })
     this.on('mouseleave', () => {
@@ -149,7 +159,7 @@ export class SegmentedControl<E extends EventList = Record<string, any>>
       this.pressedIndex = -1
       this.dirty({ render: true })
     })
-    this.on('mousedown', event => {
+    this.on('mousedown', (event) => {
       if (this.props.disabled) {
         this.playUiSound('disabledPress')
         return false
@@ -159,11 +169,13 @@ export class SegmentedControl<E extends EventList = Record<string, any>>
       this.dirty({ render: true })
       return false
     })
-    this.on('mouseup', event => {
+    this.on('mouseup', (event) => {
       const index = this.pressedIndex
       this.pressedIndex = -1
       const value = this.props.items[index]?.value
-      if (index >= 0 && value !== undefined) this.setValue(value, event)
+      if (index >= 0 && value !== undefined) {
+        this.setValue(value, event)
+      }
       this.dirty({ render: true })
       return false
     })
@@ -175,7 +187,9 @@ export class SegmentedControl<E extends EventList = Record<string, any>>
   private indexFromEvent(event: MouseEvent): number {
     const { x, y } = this.events.getCanvasMousePosition(event)
     const [localX, localY] = this.toLocal(x, y)
-    if (localY < 0 || localY > this.height || localX < 0 || localX > this.width || this.props.items.length === 0) return -1
+    if (localY < 0 || localY > this.height || localX < 0 || localX > this.width || this.props.items.length === 0) {
+      return -1
+    }
     const index = Math.min(this.props.items.length - 1, Math.floor(localX / Math.max(1, this.width / this.props.items.length)))
     return this.props.items[index]?.disabled ? -1 : index
   }

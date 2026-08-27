@@ -1,13 +1,9 @@
 import type { NovaComponentCreateContext, NovaComponentDescriptor, NovaComponentNode, NovaComponentSchema } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  NOVA_UI_COMMON_DIRTY_POLICY,
-  NOVA_UI_COMMON_FIELD_DEFINITIONS,
-  commonMeasureBounds,
-  normalizeCommonProps,
-} from '@/shared/component'
+import type { AdvancedComponentApi, AdvancedComponentKind, AdvancedComponentProps, AdvancedComponentResolvedProps } from '@/components/Advanced/advanced.types'
 import {
   ACCORDION_SCHEMA_TYPE,
+
   BLOCK_UI_SCHEMA_TYPE,
   CAROUSEL_SCHEMA_TYPE,
   DOCK_SCHEMA_TYPE,
@@ -29,11 +25,13 @@ import {
   STEPPER_SCHEMA_TYPE,
   TABS_SCHEMA_TYPE,
   TOGGLE_SWITCH_SCHEMA_TYPE,
-  type AdvancedComponentApi,
-  type AdvancedComponentKind,
-  type AdvancedComponentProps,
-  type AdvancedComponentResolvedProps,
 } from '@/components/Advanced/advanced.types'
+import {
+  commonMeasureBounds,
+  normalizeCommonProps,
+  NOVA_UI_COMMON_DIRTY_POLICY,
+  NOVA_UI_COMMON_FIELD_DEFINITIONS,
+} from '@/shared/component'
 
 export type AdvancedComponentDescriptor = NovaComponentDescriptor<AdvancedComponentResolvedProps, AdvancedComponentApi, Record<string, never>, AdvancedComponentProps>
 
@@ -191,7 +189,9 @@ export function createAdvancedComponentDescriptor(
     measureBounds: (_context, schema) => commonMeasureBounds(schema, props => normalizeAdvancedComponentProps(kind, props)),
   }
 
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 
@@ -247,8 +247,8 @@ function resolveAdvancedDefaults(
   }
 }
 
-export function severityPalette(severity: string): { background: string; color: string; border: string; accent: string } {
-  const palettes: Record<string, { background: string; color: string; border: string; accent: string }> = {
+export function severityPalette(severity: string): { background: string, color: string, border: string, accent: string } {
+  const palettes: Record<string, { background: string, color: string, border: string, accent: string }> = {
     neutral: { background: '#f8fafc', color: '#334155', border: '#cbd5e1', accent: '#64748b' },
     info: { background: '#eff6ff', color: '#1d4ed8', border: '#bfdbfe', accent: '#2563eb' },
     success: { background: '#ecfdf5', color: '#047857', border: '#a7f3d0', accent: '#059669' },

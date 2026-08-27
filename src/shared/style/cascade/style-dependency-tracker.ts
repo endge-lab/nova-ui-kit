@@ -1,5 +1,6 @@
-import { NovaPhase, type NovaApp, type NovaNode } from '@endge/nova'
+import type { NovaApp, NovaNode } from '@endge/nova'
 import type { EventList } from '@endge/utils'
+import { NovaPhase } from '@endge/nova'
 
 export interface NovaUiStyleDirtyPolicy {
   update?: boolean
@@ -16,8 +17,8 @@ export interface NovaUiStyleTokenRead {
 export type NovaUiStyleTokenScope = 'local' | 'global'
 
 export interface NovaUiTrackedStyleTokenResolver {
-  token(name: string, fallback?: string, dirty?: NovaUiStyleDirtyPolicy): string
-  record(name: string, dirty?: NovaUiStyleDirtyPolicy, scope?: NovaUiStyleTokenScope): void
+  token: (name: string, fallback?: string, dirty?: NovaUiStyleDirtyPolicy) => string
+  record: (name: string, dirty?: NovaUiStyleDirtyPolicy, scope?: NovaUiStyleTokenScope) => void
 }
 
 interface OwnerState {
@@ -48,15 +49,21 @@ export class NovaUiStyleDependencyTracker<E extends EventList = Record<string, a
     }
 
     for (const key of state.reads.keys()) {
-      if (nextReads.has(key)) continue
+      if (nextReads.has(key)) {
+        continue
+      }
       this.unsubscribeOwnerAtom(owner, state, key)
     }
 
     for (const [key, read] of nextReads) {
       const previous = state.reads.get(key)
-      if (previous && sameDirtyPolicy(previous.dirty, read.dirty)) continue
+      if (previous && sameDirtyPolicy(previous.dirty, read.dirty)) {
+        continue
+      }
 
-      if (previous) this.unsubscribeOwnerAtom(owner, state, key)
+      if (previous) {
+        this.unsubscribeOwnerAtom(owner, state, key)
+      }
       state.reads.set(key, read)
       this.subscribeOwnerAtom(owner, state, key, read)
     }
@@ -65,7 +72,9 @@ export class NovaUiStyleDependencyTracker<E extends EventList = Record<string, a
   /** Удаляет все подписки owner-а. */
   clearOwner(owner: NovaNode<E>): void {
     const state = this.owners.get(owner)
-    if (!state) return
+    if (!state) {
+      return
+    }
 
     for (const key of [...state.reads.keys()]) {
       this.unsubscribeOwnerAtom(owner, state, key)
@@ -76,13 +85,17 @@ export class NovaUiStyleDependencyTracker<E extends EventList = Record<string, a
   /** Возвращает количество активных owner subscriptions для benchmark/debug. */
   subscriptionCount(): number {
     let total = 0
-    for (const owners of this.atomOwners.values()) total += owners.size
+    for (const owners of this.atomOwners.values()) {
+      total += owners.size
+    }
     return total
   }
 
   private resolveOwnerState(owner: NovaNode<E>): OwnerState {
     const existing = this.owners.get(owner)
-    if (existing) return existing
+    if (existing) {
+      return existing
+    }
 
     const state: OwnerState = {
       reads: new Map(),
@@ -111,13 +124,17 @@ export class NovaUiStyleDependencyTracker<E extends EventList = Record<string, a
   }
 
   private unsubscribeOwnerAtom(owner: NovaNode<E>, state: OwnerState, key: string): void {
-    for (const dispose of state.disposers.get(key) ?? []) dispose()
+    for (const dispose of state.disposers.get(key) ?? []) {
+      dispose()
+    }
     state.disposers.delete(key)
     state.reads.delete(key)
 
     const owners = this.atomOwners.get(key)
     owners?.delete(owner)
-    if (owners?.size === 0) this.atomOwners.delete(key)
+    if (owners?.size === 0) {
+      this.atomOwners.delete(key)
+    }
   }
 }
 
@@ -155,7 +172,9 @@ export function createNovaUiStyleTokenDataPath(
   scope: NovaUiStyleTokenScope = 'local',
 ): string {
   const tokenId = encodeNovaUiStyleToken(normalizeStyleTokenName(token))
-  if (scope === 'global') return `nova.ui.styles.global.tokens.${tokenId}.version`
+  if (scope === 'global') {
+    return `nova.ui.styles.global.tokens.${tokenId}.version`
+  }
   return `nova.ui.styles.apps.${getNovaUiAppStyleScopeId(app)}.tokens.${tokenId}.version`
 }
 
@@ -164,7 +183,9 @@ export function createNovaUiStyleSheetDataPath(
   app: NovaApp<any>,
   scope: NovaUiStyleTokenScope = 'local',
 ): string {
-  if (scope === 'global') return 'nova.ui.styles.global.sheet.version'
+  if (scope === 'global') {
+    return 'nova.ui.styles.global.sheet.version'
+  }
   return `nova.ui.styles.apps.${getNovaUiAppStyleScopeId(app)}.sheet.version`
 }
 
@@ -195,7 +216,9 @@ export function bumpNovaUiStyleTokenVersions(
 
 export function getNovaUiAppStyleScopeId(app: NovaApp<any>): string {
   const existing = APP_SCOPE_IDS.get(app)
-  if (existing) return existing
+  if (existing) {
+    return existing
+  }
 
   const next = `a_${nextAppScopeId.toString(36)}`
   nextAppScopeId += 1
@@ -243,8 +266,14 @@ function sameDirtyPolicy(left: NovaUiStyleDirtyPolicy, right: NovaUiStyleDirtyPo
 
 function dirtyPolicyToPhases(policy: NovaUiStyleDirtyPolicy): Array<string> {
   const phases: Array<string> = []
-  if (policy.update) phases.push(NovaPhase.Update)
-  if (policy.matrix) phases.push(NovaPhase.Matrix)
-  if (policy.render) phases.push(NovaPhase.Render)
+  if (policy.update) {
+    phases.push(NovaPhase.Update)
+  }
+  if (policy.matrix) {
+    phases.push(NovaPhase.Matrix)
+  }
+  if (policy.render) {
+    phases.push(NovaPhase.Render)
+  }
   return phases
 }

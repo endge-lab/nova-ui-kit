@@ -1,20 +1,19 @@
 import type { NovaComponentCreateContext, NovaComponentDescriptor, NovaComponentNode, NovaComponentSchema } from '@endge/nova'
 import type { EventList } from '@endge/utils'
+import type { SliderApi, SliderProps, SliderResolvedProps } from '@/components/Slider/slider.types'
 import {
-  NOVA_UI_COMMON_DIRTY_POLICY,
-  NOVA_UI_COMMON_FIELD_DEFINITIONS,
+  SLIDER_SCHEMA_TYPE,
+
+} from '@/components/Slider/slider.types'
+import {
   clamp,
   commonMeasureBounds,
   finiteNumber,
   normalizeCommonProps,
+  NOVA_UI_COMMON_DIRTY_POLICY,
+  NOVA_UI_COMMON_FIELD_DEFINITIONS,
   roundToStep,
 } from '@/shared/component'
-import {
-  SLIDER_SCHEMA_TYPE,
-  type SliderApi,
-  type SliderProps,
-  type SliderResolvedProps,
-} from '@/components/Slider/slider.types'
 
 export type SliderDescriptor = NovaComponentDescriptor<SliderResolvedProps, SliderApi, Record<string, never>, SliderProps>
 
@@ -86,7 +85,9 @@ export function createSliderDescriptor(createNode?: SliderNodeFactory): SliderDe
     normalize: schema => normalizeSliderProps(schema.props),
     measureBounds: (_context, schema) => commonMeasureBounds(schema, normalizeSliderProps),
   }
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 

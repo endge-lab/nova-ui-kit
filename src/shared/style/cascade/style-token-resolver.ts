@@ -1,6 +1,3 @@
-import {
-  compileStyleSheetIndexes,
-} from '@/shared/style/cascade/style-selector-matcher'
 import type {
   NovaUiCompiledStyleRule,
   NovaUiCompiledStyleSheet,
@@ -8,6 +5,9 @@ import type {
   NovaUiStyleSheetAsset,
   NovaUiStyleTokenResolver,
 } from '@/shared/style/cascade/style-sheet'
+import {
+  compileStyleSheetIndexes,
+} from '@/shared/style/cascade/style-selector-matcher'
 
 const VAR_PATTERN = /var\(\s*(--[\w-]+)\s*(?:,\s*([^)]+))?\)/g
 const NUMERIC_TOKEN_KEYS = new Set([
@@ -81,7 +81,9 @@ export function resolveNovaUiStyleSheetTokens(
   resolver: NovaUiStyleTokenResolver | null,
 ): NovaUiCompiledStyleSheet {
   const tokenDependencies = sheet.tokenDependencies ?? extractNovaUiStyleTokenDependencies(sheet.source ?? '')
-  if (!resolver || tokenDependencies.length === 0) return sheet
+  if (!resolver || tokenDependencies.length === 0) {
+    return sheet
+  }
 
   const rules = sheet.rules.map<NovaUiCompiledStyleRule>(rule => ({
     ...rule,
@@ -109,8 +111,12 @@ function resolveObject(value: unknown, resolver: NovaUiStyleTokenResolver, key =
     }
     return resolved
   }
-  if (!value || typeof value !== 'object') return value
-  if (Array.isArray(value)) return value.map(item => resolveObject(item, resolver, key))
+  if (!value || typeof value !== 'object') {
+    return value
+  }
+  if (Array.isArray(value)) {
+    return value.map(item => resolveObject(item, resolver, key))
+  }
 
   const result: Record<string, unknown> = {}
   for (const [key, child] of Object.entries(value)) {

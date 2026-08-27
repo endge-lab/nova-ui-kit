@@ -5,13 +5,12 @@ import type {
   NovaComponentSchema,
 } from '@endge/nova'
 import type { EventList } from '@endge/utils'
+import type { TextBlockApi, TextBlockProps, TextBlockResolvedProps } from '@/components/TextBlock/text-block.types'
 import { normalizeTextBlockProps } from '@/components/TextBlock/text-block-layout'
 import { buildTextBlockSchema } from '@/components/TextBlock/text-block.schema'
 import {
   TEXT_BLOCK_SCHEMA_TYPE,
-  type TextBlockApi,
-  type TextBlockProps,
-  type TextBlockResolvedProps,
+
 } from '@/components/TextBlock/text-block.types'
 import { measureNovaUiTextWidth } from '@/shared/layout'
 
@@ -114,7 +113,9 @@ export function createTextBlockDescriptor(createNode?: TextBlockNodeFactory): Te
     },
   }
 
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 

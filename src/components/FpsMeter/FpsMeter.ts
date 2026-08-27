@@ -1,23 +1,24 @@
-import { NovaComponentNode, type NovaApp, type NovaSchema, type NovaSurface } from '@endge/nova'
+import type { NovaApp, NovaSchema, NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  FPS_METER_NODE_DESCRIPTOR,
-  normalizeFpsMeterProps,
-  type FpsMeterDescriptor,
-} from '@/components/FpsMeter/fps-meter.config'
-import {
-  resolveNovaUiPositionedRect,
-  type NovaUiLayoutRect,
-  type NovaUiLayoutConstraints,
-  type NovaUiLayoutMeasure,
-  NOVA_UI_LAYOUT_TARGET,
-} from '@/shared/layout'
+import type { FpsMeterDescriptor } from '@/components/FpsMeter/fps-meter.config'
 import type {
   FpsMeterApi,
   FpsMeterMetric,
   FpsMeterProps,
   FpsMeterResolvedProps,
 } from '@/components/FpsMeter/fps-meter.types'
+import type { NovaUiLayoutConstraints, NovaUiLayoutMeasure, NovaUiLayoutRect } from '@/shared/layout'
+import { NovaComponentNode } from '@endge/nova'
+import {
+  FPS_METER_NODE_DESCRIPTOR,
+
+  normalizeFpsMeterProps,
+} from '@/components/FpsMeter/fps-meter.config'
+import {
+  NOVA_UI_LAYOUT_TARGET,
+
+  resolveNovaUiPositionedRect,
+} from '@/shared/layout'
 import {
   ensureNovaUIKitThemes,
   resolveNovaUiThemeValue,
@@ -59,7 +60,9 @@ export class FpsMeter<E extends EventList = Record<string, any>>
   }
 
   update(): void {
-    if (!this.externalLayout) this.applyPlacement()
+    if (!this.externalLayout) {
+      this.applyPlacement()
+    }
   }
 
   /** Принимает rect от UI Kit layout-контейнера. */
@@ -78,7 +81,9 @@ export class FpsMeter<E extends EventList = Record<string, any>>
       zIndex: this.props.zIndex,
     })
     this.setLocalRenderBounds({ x: 0, y: 0, width: rect.width, height: rect.height })
-    if (changed) this.dirty({ matrix: true, update: sizeChanged, render: true })
+    if (changed) {
+      this.dirty({ matrix: true, update: sizeChanged, render: true })
+    }
     return changed
   }
 
@@ -130,7 +135,9 @@ export class FpsMeter<E extends EventList = Record<string, any>>
   }
 
   protected override onUnmount(): void {
-    if (this.intervalId) clearInterval(this.intervalId)
+    if (this.intervalId) {
+      clearInterval(this.intervalId)
+    }
     this.intervalId = undefined
     super.onUnmount()
   }
@@ -138,7 +145,9 @@ export class FpsMeter<E extends EventList = Record<string, any>>
   protected override onPropsChanged(): void {
     this.props = normalizeFpsMeterProps(this.props)
     this.options({ interactive: false, zIndex: this.props.zIndex })
-    if (!this.externalLayout) this.applyPlacement()
+    if (!this.externalLayout) {
+      this.applyPlacement()
+    }
   }
 
   private applyPlacement(): void {
@@ -155,14 +164,16 @@ export class FpsMeter<E extends EventList = Record<string, any>>
       zIndex: this.props.zIndex,
     })
     this.setLocalRenderBounds({ x: 0, y: 0, width: rect.width, height: rect.height })
-    if (changed) this.dirty({ matrix: true, update: sizeChanged, render: true })
+    if (changed) {
+      this.dirty({ matrix: true, update: sizeChanged, render: true })
+    }
   }
 }
 
 export function resolveFpsMeterReading(
-  snapshot: { fps?: number; rFps?: number },
+  snapshot: { fps?: number, rFps?: number },
   metric: FpsMeterMetric = 'raf',
-): { value: number; label: 'FPS' } {
+): { value: number, label: 'FPS' } {
   const raw = metric === 'raf' ? snapshot.rFps : snapshot.fps
   return {
     value: Math.max(0, Math.min(999, Math.round(raw || 0))),
@@ -170,10 +181,12 @@ export function resolveFpsMeterReading(
   }
 }
 
-function resolveOverlayRect(rootWidth: number, rootHeight: number, props: FpsMeterResolvedProps): { x?: number; y?: number; width: number; height: number } {
+function resolveOverlayRect(rootWidth: number, rootHeight: number, props: FpsMeterResolvedProps): { x?: number, y?: number, width: number, height: number } {
   const width = props.width
   const height = props.height
-  if (typeof props.x === 'number' && typeof props.y === 'number') return { x: props.x, y: props.y, width, height }
+  if (typeof props.x === 'number' && typeof props.y === 'number') {
+    return { x: props.x, y: props.y, width, height }
+  }
   if (props.position !== 'static') {
     return resolveNovaUiPositionedRect(
       { x: 0, y: 0, width: rootWidth, height: rootHeight },
@@ -181,7 +194,9 @@ function resolveOverlayRect(rootWidth: number, rootHeight: number, props: FpsMet
       props,
     ) as NovaUiLayoutRect
   }
-  if (!props.placement) return { width, height }
+  if (!props.placement) {
+    return { width, height }
+  }
   const left = props.placement.endsWith('left')
   const top = props.placement.startsWith('top')
   return {

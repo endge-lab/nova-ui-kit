@@ -1,42 +1,44 @@
-import { reconcileNovaTemplateChildren } from '@endge/nova'
 import type { NovaApp, NovaMotionPlayback, NovaNode, NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  SURFACE_NODE_DESCRIPTOR,
-  normalizeSurfaceProps,
-  type SurfaceDescriptor,
-} from '@/components/Surface/surface.config'
+import type { SurfaceDescriptor } from '@/components/Surface/surface.config'
 import type {
   SurfaceApi,
   SurfaceChildSchema,
   SurfaceProps,
   SurfaceResolvedProps,
 } from '@/components/Surface/surface.types'
+import type { NovaUiLayoutRect, NovaUiPositionedLayout } from '@/shared/layout'
+import type { NovaUiStyleContext, NovaUiStyleReceiveResult } from '@/shared/style'
+import { reconcileNovaTemplateChildren } from '@endge/nova'
 import {
-  NovaUiComponentNode,
+  normalizeSurfaceProps,
+  SURFACE_NODE_DESCRIPTOR,
+
+} from '@/components/Surface/surface.config'
+import {
   buildBoxSchema,
+  NovaUiComponentNode,
 } from '@/shared/component/component-props'
 import {
   applyNodeLayoutRect,
   applyNovaUiLayoutZIndex,
   copyRect,
   createLayoutRect,
+
   resolveNovaUiPositionedLayout,
   resolveNovaUiPositionedRect,
   resolveSpacing,
-  type NovaUiLayoutRect,
-  type NovaUiPositionedLayout,
 } from '@/shared/layout'
+import { resolveNovaUiMotionDeclarations } from '@/shared/motion'
 import {
-  NovaUiStyleMask,
   isNovaUiStyleTarget,
   mergeStyleContext,
   mergeStyleReceiveResult,
+
+  NovaUiStyleMask,
+
   styleContextChangedMask,
-  type NovaUiStyleContext,
-  type NovaUiStyleReceiveResult,
 } from '@/shared/style'
-import { resolveNovaUiMotionDeclarations } from '@/shared/motion'
 
 /** Базовый visual container UI Kit: фон, border, clip, padding и children. */
 export class Surface<E extends EventList = Record<string, any>>
@@ -55,7 +57,7 @@ export class Surface<E extends EventList = Record<string, any>>
     app: NovaApp<E>,
     surface: NovaSurface<E>,
     props: SurfaceProps = {},
-    options: { componentId?: string; children?: Array<SurfaceChildSchema> } = {},
+    options: { componentId?: string, children?: Array<SurfaceChildSchema> } = {},
     descriptor: SurfaceDescriptor = SURFACE_NODE_DESCRIPTOR,
   ) {
     super(app, surface, descriptor, normalizeSurfaceProps(props), options)
@@ -87,7 +89,9 @@ export class Surface<E extends EventList = Record<string, any>>
    */
   override applyLayoutRect(rect: NovaUiLayoutRect): boolean {
     const changed = super.applyLayoutRect(rect)
-    if (changed || hasActiveMotionTransform(this.props)) this.applyMotionTransform()
+    if (changed || hasActiveMotionTransform(this.props)) {
+      this.applyMotionTransform()
+    }
     return changed
   }
 
@@ -130,7 +134,9 @@ export class Surface<E extends EventList = Record<string, any>>
    * Обновляет runtime-состояние Surface.
    */
   update(): void {
-    if (!this.layoutDirty) return
+    if (!this.layoutDirty) {
+      return
+    }
 
     const padding = resolveSpacing(this.props.padding)
     copyRect(this.childRect, {
@@ -161,8 +167,12 @@ export class Surface<E extends EventList = Record<string, any>>
    */
   render(): void {
     const schema = buildBoxSchema(this.props, this.width, this.height, { resolveThemeValue: value => this.resolveThemeValue(value) })
-    if (schema.length > 0) this.renderer.schema(schema)
-    if (this.props.clip) this.renderer.clip(0, 0, this.width, this.height)
+    if (schema.length > 0) {
+      this.renderer.schema(schema)
+    }
+    if (this.props.clip) {
+      this.renderer.clip(0, 0, this.width, this.height)
+    }
   }
 
   /**
@@ -186,9 +196,15 @@ export class Surface<E extends EventList = Record<string, any>>
   protected override onPropsChanged(changedKeys: Array<keyof SurfaceResolvedProps>): void {
     this.props = normalizeSurfaceProps(this.props)
     this.applyCommonPropsChanged(changedKeys)
-    if (hasMotionTransformChanges(changedKeys)) this.applyMotionTransform()
-    if (changedKeys.includes('padding')) this.relayout()
-    if (changedKeys.includes('motion')) this.syncMotion()
+    if (hasMotionTransformChanges(changedKeys)) {
+      this.applyMotionTransform()
+    }
+    if (changedKeys.includes('padding')) {
+      this.relayout()
+    }
+    if (changedKeys.includes('motion')) {
+      this.syncMotion()
+    }
   }
 
   /**
@@ -196,13 +212,19 @@ export class Surface<E extends EventList = Record<string, any>>
    */
   private propagateStyleContext(changedMask: NovaUiStyleMask): NovaUiStyleReceiveResult {
     const result: NovaUiStyleReceiveResult = { update: false, render: false, layout: false }
-    if (changedMask === NovaUiStyleMask.None) return result
+    if (changedMask === NovaUiStyleMask.None) {
+      return result
+    }
 
     const context = mergeStyleContext(this.inheritedStyleContext, this.props.style)
     for (const child of this.managedChildren) {
-      if (!isNovaUiStyleTarget(child)) continue
+      if (!isNovaUiStyleTarget(child)) {
+        continue
+      }
       const childMask = child.getSubtreeStyleMask()
-      if ((changedMask & childMask) === 0) continue
+      if ((changedMask & childMask) === 0) {
+        continue
+      }
       mergeStyleReceiveResult(result, child.receiveStyleContext(context, changedMask & childMask))
     }
     return result
@@ -259,7 +281,9 @@ export class Surface<E extends EventList = Record<string, any>>
    * Останавливает runtime-процесс Surface.
    */
   private stopMotion(resetOffset = false): void {
-    for (const playback of this.motionPlaybacks) playback.cancel()
+    for (const playback of this.motionPlaybacks) {
+      playback.cancel()
+    }
     this.motionPlaybacks.length = 0
     if (resetOffset && (this.props.motionOffsetY !== 0 || this.props.motionRotation !== 0)) {
       this.props.motionOffsetY = 0

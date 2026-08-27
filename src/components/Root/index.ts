@@ -1,5 +1,5 @@
 export * from '@/components/Root/Root'
+export * from '@/components/Root/root-target'
 export * from '@/components/Root/root.config'
 export * from '@/components/Root/root.registry'
-export * from '@/components/Root/root-target'
 export * from '@/components/Root/root.types'

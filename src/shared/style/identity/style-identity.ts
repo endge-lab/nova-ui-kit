@@ -10,8 +10,12 @@ export interface NovaUiStyleIdentityProps {
 
 /** Нормализованное имя класса для быстрых selector checks. */
 export function normalizeStyleClasses(className?: string | Array<string>): Array<string> {
-  if (!className) return []
-  if (Array.isArray(className)) return className.filter(Boolean)
+  if (!className) {
+    return []
+  }
+  if (Array.isArray(className)) {
+    return className.filter(Boolean)
+  }
 
   return className
     .split(/\s+/)

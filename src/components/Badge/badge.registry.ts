@@ -1,12 +1,13 @@
 import type { NovaSchemaRegistry } from '@endge/nova'
+import type { BadgeDescriptor } from '@/components/Badge/badge.config'
+import type { BadgeSchema } from '@/components/Badge/badge.types'
 import { Badge } from '@/components/Badge/Badge'
 import {
   BADGE_FIELD_DEFINITIONS,
+
   createBadgeDescriptor,
   normalizeBadgeProps,
-  type BadgeDescriptor,
 } from '@/components/Badge/badge.config'
-import type { BadgeSchema } from '@/components/Badge/badge.types'
 
 export const BADGE_DESCRIPTOR: BadgeDescriptor = createBadgeDescriptor((context, schema) => {
   const badgeSchema = schema as BadgeSchema
@@ -28,4 +29,3 @@ export function registerBadge(registry: { register: (descriptor: BadgeDescriptor
 export function registerBadgeSchema(registry: NovaSchemaRegistry): void {
   registerBadge(registry)
 }
-

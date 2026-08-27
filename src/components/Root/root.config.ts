@@ -5,11 +5,10 @@ import type {
   NovaComponentSchema,
 } from '@endge/nova'
 import type { EventList } from '@endge/utils'
+import type { RootApi, RootProps, RootResolvedProps } from '@/components/Root/root.types'
 import {
   ROOT_SCHEMA_TYPE,
-  type RootApi,
-  type RootProps,
-  type RootResolvedProps,
+
 } from '@/components/Root/root.types'
 
 export type RootDescriptor = NovaComponentDescriptor<
@@ -105,7 +104,9 @@ export function createRootDescriptor(createNode?: RootNodeFactory): RootDescript
     },
   }
 
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 

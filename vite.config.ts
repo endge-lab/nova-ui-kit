@@ -1,7 +1,7 @@
-import path from 'path'
-import { defineConfig } from 'vite'
+import path from 'node:path'
 import vue from '@vitejs/plugin-vue'
 import dts from 'unplugin-dts/vite'
+import { defineConfig } from 'vite'
 
 const externalPackages = ['@endge/nova', '@endge/utils']
 

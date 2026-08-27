@@ -1,14 +1,15 @@
 import type { NovaApp, NovaSchema, NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  SLIDER_NODE_DESCRIPTOR,
-  normalizeSliderProps,
-  type SliderDescriptor,
-} from '@/components/Slider/slider.config'
+import type { SliderDescriptor } from '@/components/Slider/slider.config'
 import type { SliderApi, SliderProps, SliderResolvedProps } from '@/components/Slider/slider.types'
 import {
-  NovaUiComponentNode,
+  normalizeSliderProps,
+  SLIDER_NODE_DESCRIPTOR,
+
+} from '@/components/Slider/slider.config'
+import {
   clamp,
+  NovaUiComponentNode,
 } from '@/shared/component'
 
 /**
@@ -62,7 +63,9 @@ export class Slider<E extends EventList = Record<string, any>>
       return
     }
     const next = normalizeSliderProps({ ...this.props, value }).value
-    if (next === this.props.value) return
+    if (next === this.props.value) {
+      return
+    }
     this.setProps({ value: next })
     this.playUiSound('change')
     this.props.onChange?.(next, event)
@@ -139,10 +142,12 @@ export class Slider<E extends EventList = Record<string, any>>
    */
   private setupEvents(): void {
     this.on('mouseenter', () => {
-      if (this.props.disabled) return
+      if (this.props.disabled) {
+        return
+      }
       this.playUiSound('hover')
     })
-    this.on('mousedown', event => {
+    this.on('mousedown', (event) => {
       if (this.props.disabled) {
         this.playUiSound('disabledPress')
         return false
@@ -156,15 +161,19 @@ export class Slider<E extends EventList = Record<string, any>>
       this.dirty({ render: true })
       return false
     })
-    this.on('dragmove', event => {
-      if (!this.dragging) return false
+    this.on('dragmove', (event) => {
+      if (!this.dragging) {
+        return false
+      }
       const next = this.valueFromEvent(event)
       this.props.onInput?.(next, event)
       this.setValue(next, event)
       return false
     })
-    this.on('dragend', event => {
-      if (!this.dragging) return false
+    this.on('dragend', (event) => {
+      if (!this.dragging) {
+        return false
+      }
       this.dragging = false
       const next = this.valueFromEvent(event)
       this.props.onInput?.(next, event)
@@ -173,13 +182,15 @@ export class Slider<E extends EventList = Record<string, any>>
       this.dirty({ render: true })
       return false
     })
-    this.on('keydown', event => {
+    this.on('keydown', (event) => {
       const delta = event.key === 'ArrowRight' || event.key === 'ArrowUp'
         ? this.props.step
         : event.key === 'ArrowLeft' || event.key === 'ArrowDown'
           ? -this.props.step
           : 0
-      if (delta !== 0) this.setValue(this.props.value + delta, event)
+      if (delta !== 0) {
+        this.setValue(this.props.value + delta, event)
+      }
     })
   }
 
@@ -209,7 +220,9 @@ export class Slider<E extends EventList = Record<string, any>>
    * Выполняет внутренний шаг percentForValue для Slider.
    */
   private percentForValue(value: number): number {
-    if (this.props.max === this.props.min) return 0
+    if (this.props.max === this.props.min) {
+      return 0
+    }
     return clamp((value - this.props.min) / (this.props.max - this.props.min), 0, 1)
   }
 }

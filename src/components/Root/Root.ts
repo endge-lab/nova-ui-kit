@@ -1,69 +1,66 @@
-import {
-  NovaComponentNode,
-  reconcileNovaTemplateChildren,
-  type NovaApp,
-  type NovaCursorDeclaration,
-  type NovaCursorStateMap,
-  type NovaCursorValue,
-  type NovaMotionPlayback,
-  type NovaNode,
-  type NovaSurface,
-} from '@endge/nova'
+import type { NovaApp, NovaCursorDeclaration, NovaCursorStateMap, NovaCursorValue, NovaMotionPlayback, NovaNode, NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  ROOT_NODE_DESCRIPTOR,
-  normalizeRootProps,
-  type RootDescriptor,
-} from '@/components/Root/root.config'
-import {
-  NOVA_UI_ROOT_TARGET,
-  type NovaUiRootTarget,
-} from '@/components/Root/root-target'
+import type {
+  DialogDefinition,
+  DialogInput,
+  DialogProps,
+} from '@/components/Dialog/dialog.types'
+import type {
+  OverlayDefinition,
+  OverlayInput,
+  OverlayProps,
+} from '@/components/Overlay/overlay.types'
+import type { NovaUiRootTarget } from '@/components/Root/root-target'
+import type { RootDescriptor } from '@/components/Root/root.config'
 import type {
   RootApi,
   RootChildSchema,
   RootProps,
   RootResolvedProps,
 } from '@/components/Root/root.types'
-import { RootDialogControllerNode } from '@/components/Dialog/RootDialogControllerNode'
-import type {
-  DialogDefinition,
-  DialogInput,
-  DialogProps,
-} from '@/components/Dialog/dialog.types'
-import { RootOverlayControllerNode } from '@/components/Overlay/RootOverlayControllerNode'
-import type {
-  OverlayDefinition,
-  OverlayInput,
-  OverlayProps,
-} from '@/components/Overlay/overlay.types'
-import { RootTooltipControllerNode } from '@/components/Tooltip/RootTooltipControllerNode'
 import type {
   NovaTooltipTargetResolver,
   TooltipDefinition,
   TooltipInput,
 } from '@/components/Tooltip/tooltip.types'
+import type { NovaUiLayoutRect, NovaUiLayoutTarget } from '@/shared/layout'
+import type { NovaUiCompiledStyleSheet, NovaUiStylableNode, NovaUiStyleDeclarations, NovaUiStyleInspectionDebug, NovaUiStyleInvalidationPlan, NovaUiStyleKeyframeDeclaration, NovaUiStyleMediaContext, NovaUiStyleReceiveResult, NovaUiStyleSheetAsset, NovaUiStyleSheetGraph, NovaUiStyleTokenResolver, NovaUiStyleValidationResult } from '@/shared/style'
 import {
-  NOVA_UI_LAYOUT_TARGET,
+
+  NovaComponentNode,
+
+  reconcileNovaTemplateChildren,
+} from '@endge/nova'
+import { RootDialogControllerNode } from '@/components/Dialog/RootDialogControllerNode'
+import { RootOverlayControllerNode } from '@/components/Overlay/RootOverlayControllerNode'
+import {
+  NOVA_UI_ROOT_TARGET,
+
+} from '@/components/Root/root-target'
+import {
+  normalizeRootProps,
+  ROOT_NODE_DESCRIPTOR,
+
+} from '@/components/Root/root.config'
+import { RootTooltipControllerNode } from '@/components/Tooltip/RootTooltipControllerNode'
+import {
   applyNodeLayoutRect,
   copyRect,
   createLayoutRect,
-  readNovaUiNodeProps,
+  isNovaUiLayoutDisplayed,
   isNovaUiLayoutTarget,
   isNovaUiOutOfFlowPosition,
-  isNovaUiLayoutDisplayed,
+  NOVA_UI_LAYOUT_TARGET,
+
+  readNovaUiNodeProps,
   rectEquals,
   relayoutNovaUiLayoutAncestors,
   resolveNovaUiPositionedLayout,
   resolveNovaUiPositionedRect,
   resolveSpacing,
   setNovaUiNodeLayoutIntent,
-  type NovaUiLayoutRect,
-  type NovaUiLayoutTarget,
 } from '@/shared/layout'
 import {
-  EMPTY_STYLE_CONTEXT,
-  NovaUiStyleMask,
   borderRadiusToRendererValue,
   bumpNovaUiStyleSheetVersion,
   bumpNovaUiStyleTokenVersions,
@@ -71,33 +68,25 @@ import {
   createEmptyStyleSheetValidationResult,
   createNovaUiStyleIdentityRegistry,
   createNovaUiStyleSheetGraph,
+  EMPTY_STYLE_CONTEXT,
   getNovaUiBuiltInUtilityStyleSheet,
   getNovaUiGlobalStyleSheet,
   getNovaUiStyleMediaSignature,
-  isNovaUiStyleTarget,
   isNovaUiStyleSheetAsset,
+  isNovaUiStyleTarget,
   matchStyleRules,
   mergeNovaUiStyleSheets,
   mergeStyleContext,
-  resolveNovaUiClassUtilities,
-  resolveNovaUiStyleSheetTokens,
+
+  NovaUiStyleMask,
+
   planNovaUiMediaInvalidation,
   planNovaUiStyleSheetInvalidation,
+  resolveNovaUiClassUtilities,
+  resolveNovaUiStyleSheetTokens,
   styleContextChangedMask,
   subscribeNovaUiGlobalStyleSheets,
   validateNovaUiStyleSheetSource,
-  type NovaUiCompiledStyleSheet,
-  type NovaUiStyleInvalidationPlan,
-  type NovaUiStyleDeclarations,
-  type NovaUiStyleKeyframeDeclaration,
-  type NovaUiStyleInspectionDebug,
-  type NovaUiStyleMediaContext,
-  type NovaUiStyleSheetGraph,
-  type NovaUiStyleSheetAsset,
-  type NovaUiStyleTokenResolver,
-  type NovaUiStyleReceiveResult,
-  type NovaUiStyleValidationResult,
-  type NovaUiStylableNode,
 } from '@/shared/style'
 import { ensureNovaUIKitThemes } from '@/shared/style/nova-ui-kit-theme'
 
@@ -117,7 +106,7 @@ export class Root<E extends EventList = Record<string, any>>
   private readonly childRect = createLayoutRect()
   private readonly managedChildren: Array<NovaNode<E>> = []
   private readonly appliedCascade = new WeakMap<NovaUiStylableNode, AppliedCascadeState>()
-  private readonly appliedAnimations = new WeakMap<NovaUiStylableNode, { signature: string; playback: NovaMotionPlayback }>()
+  private readonly appliedAnimations = new WeakMap<NovaUiStylableNode, { signature: string, playback: NovaMotionPlayback }>()
   private readonly appliedAnimationSignatures = new Map<string, string>()
   private readonly api: RootApi
   private layoutDirty = true
@@ -151,7 +140,7 @@ export class Root<E extends EventList = Record<string, any>>
     app: NovaApp<E>,
     surface: NovaSurface<E>,
     props: RootProps = {},
-    options: { componentId?: string; children?: Array<RootChildSchema> } = {},
+    options: { componentId?: string, children?: Array<RootChildSchema> } = {},
     descriptor: RootDescriptor = ROOT_NODE_DESCRIPTOR,
   ) {
     ensureNovaUIKitThemes(app)
@@ -242,7 +231,9 @@ export class Root<E extends EventList = Record<string, any>>
   applyLayoutRect(rect: NovaUiLayoutRect): boolean {
     this.externalLayout = true
     const changed = this.applyResolvedRect(rect)
-    if (changed && this.layoutReady) this.update()
+    if (changed && this.layoutReady) {
+      this.update()
+    }
     return changed
   }
 
@@ -285,8 +276,12 @@ export class Root<E extends EventList = Record<string, any>>
   refreshStyleTokens(): void {
     const changedTokens = this.collectChangedResolvedTokens()
     this.styleSheet = this.resolveStyleSheetTokens(this.rawStyleSheet)
-    if (changedTokens.length > 0) bumpNovaUiStyleTokenVersions(this.nova, changedTokens)
-    if (changedTokens.length > 0) bumpNovaUiStyleSheetVersion(this.nova)
+    if (changedTokens.length > 0) {
+      bumpNovaUiStyleTokenVersions(this.nova, changedTokens)
+    }
+    if (changedTokens.length > 0) {
+      bumpNovaUiStyleSheetVersion(this.nova)
+    }
     this.applyPlannedCascade()
   }
 
@@ -318,7 +313,9 @@ export class Root<E extends EventList = Record<string, any>>
       ? this.nova.components.get(node)
       : node
 
-    if (!isStylableNode(target)) return null
+    if (!isStylableNode(target)) {
+      return null
+    }
 
     const rules = matchStyleRules(target, this.styleSheet, this.getMediaContext())
     const state = this.resolveAppliedState(target)
@@ -353,7 +350,9 @@ export class Root<E extends EventList = Record<string, any>>
 
     this.layoutDirty = true
     this.applyCascade()
-    if (this.layoutReady) this.update()
+    if (this.layoutReady) {
+      this.update()
+    }
     this.dirty({ update: true, render: true })
   }
 
@@ -450,7 +449,9 @@ export class Root<E extends EventList = Record<string, any>>
 
   /** Делегирует pointer tracking controller-у, создавая его только для tooltip targets. */
   handleTooltipPointerMove(event: MouseEvent): void {
-    if (!this.tooltipController && !this.hasTooltipTargetAt(event)) return
+    if (!this.tooltipController && !this.hasTooltipTargetAt(event)) {
+      return
+    }
     this.ensureTooltipController().handlePointerMove(event)
   }
 
@@ -460,7 +461,9 @@ export class Root<E extends EventList = Record<string, any>>
   update(): void {
     this.refreshStyleTokensIfNeeded()
     this.refreshMediaCascadeIfNeeded()
-    if (!this.layoutDirty) return
+    if (!this.layoutDirty) {
+      return
+    }
 
     const padding = resolveSpacing(this.props.padding)
     const nextRect = {
@@ -476,21 +479,25 @@ export class Root<E extends EventList = Record<string, any>>
 
     if (this.width > 0 && this.height > 0) {
       for (const child of this.managedChildren) {
-        if (!isNovaUiLayoutDisplayed(child)) continue
+        if (!isNovaUiLayoutDisplayed(child)) {
+          continue
+        }
         const layout = resolveNovaUiPositionedLayout(child)
         const measured = isNovaUiLayoutTarget(child) && child.measureLayout
           ? child.measureLayout({ minWidth: 0, maxWidth: Number.MAX_SAFE_INTEGER, minHeight: 0, maxHeight: Number.MAX_SAFE_INTEGER })
           : undefined
         const rect = isNovaUiOutOfFlowPosition(layout.position)
           ? resolveNovaUiPositionedRect(
-            this.childRect,
-            { x: child.x, y: child.y, width: measured?.width ?? child.width, height: measured?.height ?? child.height },
-            layout,
-            child,
-          )
+              this.childRect,
+              { x: child.x, y: child.y, width: measured?.width ?? child.width, height: measured?.height ?? child.height },
+              layout,
+              child,
+            )
           : this.childRect
         const changed = applyNodeLayoutRect(child, rect)
-        if (changed) child.dirty({ update: true, render: true })
+        if (changed) {
+          child.dirty({ update: true, render: true })
+        }
       }
     }
 
@@ -534,8 +541,12 @@ export class Root<E extends EventList = Record<string, any>>
       })
     }
 
-    if (this.props.clip) this.renderer.clip(0, 0, this.width, this.height)
-    if (schema.length > 0) this.renderer.schema(schema)
+    if (this.props.clip) {
+      this.renderer.clip(0, 0, this.width, this.height)
+    }
+    if (schema.length > 0) {
+      this.renderer.schema(schema)
+    }
   }
 
   /**
@@ -544,7 +555,9 @@ export class Root<E extends EventList = Record<string, any>>
   protected override onPropsChanged(changedKeys: Array<keyof RootResolvedProps>): void {
     this.props = normalizeRootProps(this.props)
     this.applyDisplayState()
-    if (hasRootLayoutChanges(changedKeys)) this.layoutDirty = true
+    if (hasRootLayoutChanges(changedKeys)) {
+      this.layoutDirty = true
+    }
     if (!this.externalLayout && hasRootGeometryChanges(changedKeys)) {
       this.applyResolvedRect({
         x: this.props.x,
@@ -576,7 +589,9 @@ export class Root<E extends EventList = Record<string, any>>
    * Применяет подготовленное состояние Root.
    */
   private applyResolvedRect(rect: NovaUiLayoutRect): boolean {
-    if (rectEquals(this.ownRect, rect)) return false
+    if (rectEquals(this.ownRect, rect)) {
+      return false
+    }
 
     copyRect(this.ownRect, rect)
     super.options({
@@ -649,9 +664,13 @@ export class Root<E extends EventList = Record<string, any>>
       interactive: false,
     })
 
-    if (kind === 'dialog') this.dialogSurface = surface
-    else if (kind === 'overlay') this.overlaySurface = surface
-    else this.tooltipSurface = surface
+    if (kind === 'dialog') {
+      this.dialogSurface = surface
+    }
+    else if (kind === 'overlay') {
+      this.overlaySurface = surface
+    }
+    else { this.tooltipSurface = surface }
 
     return surface
   }
@@ -668,24 +687,34 @@ export class Root<E extends EventList = Record<string, any>>
     const { x, y } = this.nova.events.getCanvasMousePosition(event)
     const target = this.nova.events.hitTest(x, y)
 
-    if (!target || target === this || target === this.tooltipController) return false
+    if (!target || target === this || target === this.tooltipController) {
+      return false
+    }
 
     const visited = new Set<NovaNode<E>>()
     let current: NovaNode<E> | undefined = target
     while (current) {
-      if (visited.has(current)) return false
+      if (visited.has(current)) {
+        return false
+      }
       visited.add(current)
-      if (current === this || current === this.tooltipController) return false
+      if (current === this || current === this.tooltipController) {
+        return false
+      }
 
       const resolver = current as NovaNode<E> & Partial<NovaTooltipTargetResolver>
-      if (resolver.resolveNovaTooltipTarget?.({ x, y, event })?.tooltip) return true
+      if (resolver.resolveNovaTooltipTarget?.({ x, y, event })?.tooltip) {
+        return true
+      }
 
       const api = (current as unknown as { getProps?: () => Record<string, unknown> }).getProps
       const tooltip = typeof api === 'function'
         ? api.call(current).tooltip as TooltipInput
         : null
 
-      if (tooltip && typeof tooltip !== 'boolean') return true
+      if (tooltip && typeof tooltip !== 'boolean') {
+        return true
+      }
 
       current = current.parent as NovaNode<E> | undefined
     }
@@ -735,7 +764,9 @@ export class Root<E extends EventList = Record<string, any>>
       return
     }
 
-    if (version === this.resolvedTokenVersion) return
+    if (version === this.resolvedTokenVersion) {
+      return
+    }
 
     this.refreshStyleTokens()
   }
@@ -754,8 +785,10 @@ export class Root<E extends EventList = Record<string, any>>
   private applyCascade(): void {
     this.mediaSignature = getNovaUiStyleMediaSignature(this.styleSheet, this.getMediaContext())
     this.mediaContext = this.getMediaContext()
-    this.traverseAll(node => {
-      if (isStylableNode(node)) this.applyCascadeToNode(node)
+    this.traverseAll((node) => {
+      if (isStylableNode(node)) {
+        this.applyCascadeToNode(node)
+      }
     })
 
     const previous = this.effectiveStyleContext
@@ -811,11 +844,17 @@ export class Root<E extends EventList = Record<string, any>>
     const declarations = mergeStyleDeclarations(utilityDeclarations, mergeRuleDeclarations(rules))
     const patch = this.createCascadePatch(node, declarations)
     setNovaUiNodeLayoutIntent(node, declarations.layout)
-    if (declarations.layout) this.markLayoutAncestorsDirty(node)
-    if (!patch) return
+    if (declarations.layout) {
+      this.markLayoutAncestorsDirty(node)
+    }
+    if (!patch) {
+      return
+    }
 
     node.setProps(patch)
-    if ('display' in patch) this.markLayoutAncestorsDirty(node)
+    if ('display' in patch) {
+      this.markLayoutAncestorsDirty(node)
+    }
   }
 
   /**
@@ -877,7 +916,9 @@ export class Root<E extends EventList = Record<string, any>>
     if (supportsLayoutDeclarations(node)) {
       for (const key of ['gap', 'rowGap', 'columnGap'] as const) {
         const value = declarations.layout?.[key]
-        if (value === undefined) continue
+        if (value === undefined) {
+          continue
+        }
         nextKeys.add(key)
         patch[key] = value
       }
@@ -894,14 +935,18 @@ export class Root<E extends EventList = Record<string, any>>
         'placeholderColor',
       ] as const) {
         const value = declarations.visual[key]
-        if (value === undefined) continue
+        if (value === undefined) {
+          continue
+        }
         nextKeys.add(key)
         patch[key] = value
       }
     }
 
     for (const key of state.keys) {
-      if (nextKeys.has(key)) continue
+      if (nextKeys.has(key)) {
+        continue
+      }
       patch[key] = fallbackCascadeValue(key, state.baseline[key])
     }
 
@@ -917,22 +962,32 @@ export class Root<E extends EventList = Record<string, any>>
     animation: NonNullable<NovaUiStyleDeclarations['animation']>,
   ): void {
     const keyframes = this.styleSheet.keyframes.get(animation.name)
-    if (!keyframes || keyframes.frames.length < 2) return
+    if (!keyframes || keyframes.frames.length < 2) {
+      return
+    }
 
     const first = keyframes.frames[0]?.declarations
     const last = keyframes.frames[keyframes.frames.length - 1]?.declarations
-    if (!first || !last) return
+    if (!first || !last) {
+      return
+    }
 
     const signature = `${animation.name}:${animation.duration ?? 180}:${animation.delay ?? 0}:${animation.easing ?? 'outCubic'}`
     const persistentKey = node.componentId
-    if (this.appliedAnimationSignatures.get(persistentKey) === signature) return
+    if (this.appliedAnimationSignatures.get(persistentKey) === signature) {
+      return
+    }
     const current = this.appliedAnimations.get(node)
-    if (current?.signature === signature) return
+    if (current?.signature === signature) {
+      return
+    }
     current?.playback.cancel()
 
     const from = resolveAnimationPatch(first)
     const to = resolveAnimationPatch(last)
-    if (Object.keys(from).length === 0 && Object.keys(to).length === 0) return
+    if (Object.keys(from).length === 0 && Object.keys(to).length === 0) {
+      return
+    }
 
     const playback = this.nova.motion.to(node, to, {
       from,
@@ -949,7 +1004,9 @@ export class Root<E extends EventList = Record<string, any>>
    */
   private resolveAppliedState(node: NovaUiStylableNode): AppliedCascadeState {
     const existing = this.appliedCascade.get(node)
-    if (existing) return existing
+    if (existing) {
+      return existing
+    }
 
     const props = node.getProps() as Record<string, unknown>
     const state: AppliedCascadeState = {
@@ -987,7 +1044,9 @@ export class Root<E extends EventList = Record<string, any>>
   private refreshMediaCascadeIfNeeded(): void {
     const nextContext = this.getMediaContext()
     const nextSignature = getNovaUiStyleMediaSignature(this.styleSheet, nextContext)
-    if (nextSignature === this.mediaSignature) return
+    if (nextSignature === this.mediaSignature) {
+      return
+    }
 
     bumpNovaUiStyleSheetVersion(this.nova)
     const registry = createNovaUiStyleIdentityRegistry(this)
@@ -1001,7 +1060,7 @@ export class Root<E extends EventList = Record<string, any>>
   /**
    * Возвращает значение состояния Root.
    */
-  private getMediaContext(): { width: number; height: number } {
+  private getMediaContext(): { width: number, height: number } {
     return {
       width: this.width,
       height: this.height,
@@ -1029,7 +1088,9 @@ export class Root<E extends EventList = Record<string, any>>
     }
 
     for (const token of [...this.resolvedTokenValues.keys()]) {
-      if (!nextTokens.has(token)) this.resolvedTokenValues.delete(token)
+      if (!nextTokens.has(token)) {
+        this.resolvedTokenValues.delete(token)
+      }
     }
     return changed
   }
@@ -1059,13 +1120,19 @@ export class Root<E extends EventList = Record<string, any>>
       render: false,
       layout: false,
     }
-    if (changedMask === NovaUiStyleMask.None) return result
+    if (changedMask === NovaUiStyleMask.None) {
+      return result
+    }
 
     for (const child of this.children) {
-      if (!isNovaUiStyleTarget(child)) continue
+      if (!isNovaUiStyleTarget(child)) {
+        continue
+      }
 
       const childMask = child.getSubtreeStyleMask()
-      if ((changedMask & childMask) === 0) continue
+      if ((changedMask & childMask) === 0) {
+        continue
+      }
 
       const childResult = child.receiveStyleContext(this.effectiveStyleContext, changedMask & childMask)
       result.update ||= childResult.update
@@ -1082,7 +1149,9 @@ export class Root<E extends EventList = Record<string, any>>
   override dispose(): void {
     this.disposeGlobalStylesSubscription()
     for (const surface of [this.dialogSurface, this.overlaySurface, this.tooltipSurface]) {
-      if (surface) this.nova.removeSurface(surface)
+      if (surface) {
+        this.nova.removeSurface(surface)
+      }
     }
     this.dialogSurface = null
     this.overlaySurface = null
@@ -1092,7 +1161,6 @@ export class Root<E extends EventList = Record<string, any>>
     this.tooltipController = null
     super.dispose()
   }
-
 }
 
 function mergeRuleDeclarations(rules: ReturnType<typeof matchStyleRules>): NovaUiStyleDeclarations {
@@ -1130,8 +1198,12 @@ function mergeRuleDeclarations(rules: ReturnType<typeof matchStyleRules>): NovaU
       ...target.visual,
       ...source.visual,
     }
-    if (source.cursor !== undefined) target.cursor = source.cursor
-    if (source.animation !== undefined) target.animation = source.animation
+    if (source.cursor !== undefined) {
+      target.cursor = source.cursor
+    }
+    if (source.animation !== undefined) {
+      target.animation = source.animation
+    }
     target.mask |= source.mask
     return target
   }, { mask: NovaUiStyleMask.None })
@@ -1163,8 +1235,12 @@ function mergeStyleDeclarations(...items: Array<NovaUiStyleDeclarations>): NovaU
       ...target.visual,
       ...source.visual,
     }
-    if (source.cursor !== undefined) target.cursor = source.cursor
-    if (source.animation !== undefined) target.animation = source.animation
+    if (source.cursor !== undefined) {
+      target.cursor = source.cursor
+    }
+    if (source.animation !== undefined) {
+      target.animation = source.animation
+    }
     target.mask |= source.mask
     return target
   }, { mask: NovaUiStyleMask.None })
@@ -1172,9 +1248,15 @@ function mergeStyleDeclarations(...items: Array<NovaUiStyleDeclarations>): NovaU
 
 function resolveAnimationPatch(declarations: NovaUiStyleKeyframeDeclaration): Record<string, number> {
   const patch: Record<string, number> = {}
-  if (declarations.opacity !== undefined) patch.opacity = declarations.opacity
-  if (declarations.scaleX !== undefined) patch.scaleX = declarations.scaleX
-  if (declarations.scaleY !== undefined) patch.scaleY = declarations.scaleY
+  if (declarations.opacity !== undefined) {
+    patch.opacity = declarations.opacity
+  }
+  if (declarations.scaleX !== undefined) {
+    patch.scaleX = declarations.scaleX
+  }
+  if (declarations.scaleY !== undefined) {
+    patch.scaleY = declarations.scaleY
+  }
   return patch
 }
 
@@ -1183,7 +1265,9 @@ function mergeCursorDeclaration(
   source: NovaCursorDeclaration,
   state: string,
 ): NovaCursorDeclaration {
-  if (Array.isArray(source)) return source
+  if (Array.isArray(source)) {
+    return source
+  }
   const base = normalizeCursorStateMap(target)
   if (isCursorStateName(state) && isCursorValue(source)) {
     base[state] = source
@@ -1192,8 +1276,12 @@ function mergeCursorDeclaration(
 }
 
 function normalizeCursorStateMap(source: NovaCursorDeclaration | undefined): NovaCursorStateMap {
-  if (!source) return {}
-  if (Array.isArray(source)) return {}
+  if (!source) {
+    return {}
+  }
+  if (Array.isArray(source)) {
+    return {}
+  }
   if (isCursorValue(source)) {
     return { default: source }
   }
@@ -1213,19 +1301,45 @@ function readBaselineValue<T>(state: AppliedCascadeState, key: string, fallback:
 }
 
 function fallbackCascadeValue(key: string, value: unknown): unknown {
-  if (value !== undefined) return value
-  if (key === 'style') return {}
-  if (key === 'background') return ''
-  if (key === 'opacity') return 1
-  if (key === 'border') return { width: 0 }
-  if (key === 'clip') return false
-  if (key === 'padding') return 0
-  if (key === 'margin') return 0
-  if (key === 'display') return 'normal'
-  if (key === 'gap' || key === 'rowGap' || key === 'columnGap') return 0
-  if (key === 'disabledOpacity') return 0.45
-  if (key === 'cursor') return null
-  if (key === 'cursorContext') return null
+  if (value !== undefined) {
+    return value
+  }
+  if (key === 'style') {
+    return {}
+  }
+  if (key === 'background') {
+    return ''
+  }
+  if (key === 'opacity') {
+    return 1
+  }
+  if (key === 'border') {
+    return { width: 0 }
+  }
+  if (key === 'clip') {
+    return false
+  }
+  if (key === 'padding') {
+    return 0
+  }
+  if (key === 'margin') {
+    return 0
+  }
+  if (key === 'display') {
+    return 'normal'
+  }
+  if (key === 'gap' || key === 'rowGap' || key === 'columnGap') {
+    return 0
+  }
+  if (key === 'disabledOpacity') {
+    return 0.45
+  }
+  if (key === 'cursor') {
+    return null
+  }
+  if (key === 'cursorContext') {
+    return null
+  }
   if (
     key === 'accentColor'
     || key === 'trackColor'
@@ -1234,7 +1348,9 @@ function fallbackCascadeValue(key: string, value: unknown): unknown {
     || key === 'pressedBackground'
     || key === 'activeBackground'
     || key === 'placeholderColor'
-  ) return ''
+  ) {
+    return ''
+  }
   return value
 }
 
@@ -1262,13 +1378,19 @@ function resolveActiveNovaUiThemeStyleSheet(
   asset: NovaUiStyleSheetAsset | null,
   activeThemeId: string | null,
 ): NovaUiCompiledStyleSheet | null {
-  if (!asset || !activeThemeId) return null
+  if (!asset || !activeThemeId) {
+    return null
+  }
   const styleSheets = (asset.themes ?? [])
     .filter(theme => theme.id === activeThemeId)
     .map(theme => theme.styleSheet)
     .filter((sheet): sheet is NovaUiCompiledStyleSheet => !!sheet)
-  if (styleSheets.length === 0) return null
-  if (styleSheets.length === 1) return styleSheets[0] ?? null
+  if (styleSheets.length === 0) {
+    return null
+  }
+  if (styleSheets.length === 1) {
+    return styleSheets[0] ?? null
+  }
 
   return mergeNovaUiStyleSheets(styleSheets, styleSheets.map(sheet => sheet.source).filter(Boolean).join('\n'))
 }

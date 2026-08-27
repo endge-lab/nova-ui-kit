@@ -1,12 +1,13 @@
 import type { NovaSchemaRegistry } from '@endge/nova'
+import type { DividerDescriptor } from '@/components/Divider/divider.config'
+import type { DividerSchema } from '@/components/Divider/divider.types'
 import { Divider } from '@/components/Divider/Divider'
 import {
-  DIVIDER_FIELD_DEFINITIONS,
   createDividerDescriptor,
+  DIVIDER_FIELD_DEFINITIONS,
+
   normalizeDividerProps,
-  type DividerDescriptor,
 } from '@/components/Divider/divider.config'
-import type { DividerSchema } from '@/components/Divider/divider.types'
 
 export const DIVIDER_DESCRIPTOR: DividerDescriptor = createDividerDescriptor((context, schema) => {
   const dividerSchema = schema as DividerSchema

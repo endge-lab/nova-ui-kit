@@ -1,18 +1,6 @@
-import {
-  reconcileNovaTemplateChildren,
-  type NovaApp,
-  type NovaComponentSchema,
-  type NovaNode,
-  type NovaSchema,
-  type NovaSurface,
-} from '@endge/nova'
+import type { NovaApp, NovaComponentSchema, NovaNode, NovaSchema, NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  TOOLTIP_NODE_DESCRIPTOR,
-  createTooltipSchema,
-  normalizeTooltipProps,
-  type TooltipDescriptor,
-} from '@/components/Tooltip/tooltip.config'
+import type { TooltipDescriptor } from '@/components/Tooltip/tooltip.config'
 import type {
   TooltipApi,
   TooltipContent,
@@ -20,6 +8,16 @@ import type {
   TooltipProps,
   TooltipResolvedProps,
 } from '@/components/Tooltip/tooltip.types'
+import {
+
+  reconcileNovaTemplateChildren,
+} from '@endge/nova'
+import {
+  createTooltipSchema,
+  normalizeTooltipProps,
+  TOOLTIP_NODE_DESCRIPTOR,
+
+} from '@/components/Tooltip/tooltip.config'
 import {
   NovaUiComponentNode,
 } from '@/shared/component'
@@ -43,7 +41,7 @@ export class Tooltip<E extends EventList = Record<string, any>>
     app: NovaApp<E>,
     surface: NovaSurface<E>,
     props: TooltipProps = {},
-    options: { componentId?: string; trigger?: NovaComponentSchema; children?: Array<NovaComponentSchema> } = {},
+    options: { componentId?: string, trigger?: NovaComponentSchema, children?: Array<NovaComponentSchema> } = {},
     descriptor: TooltipDescriptor = TOOLTIP_NODE_DESCRIPTOR,
   ) {
     super(app, surface, descriptor, normalizeTooltipProps(props), options)
@@ -130,19 +128,29 @@ export class Tooltip<E extends EventList = Record<string, any>>
    */
   private setupEvents(): void {
     this.on('mouseenter', () => {
-      if (this.shouldOpenOnPointer('hover')) this.scheduleOpen()
+      if (this.shouldOpenOnPointer('hover')) {
+        this.scheduleOpen()
+      }
     })
     this.on('mouseleave', () => {
-      if (this.shouldOpenOnPointer('hover')) this.scheduleClose()
+      if (this.shouldOpenOnPointer('hover')) {
+        this.scheduleClose()
+      }
     })
     this.on('focus', () => {
-      if (this.shouldOpenOnFocus()) this.scheduleOpen()
+      if (this.shouldOpenOnFocus()) {
+        this.scheduleOpen()
+      }
     })
     this.on('blur', () => {
-      if (this.shouldOpenOnFocus()) this.scheduleClose()
+      if (this.shouldOpenOnFocus()) {
+        this.scheduleClose()
+      }
     })
-    this.on('click', event => {
-      if (this.shouldOpenOnPointer('click', event as unknown as PointerEvent)) this.setOpen(!this.props.open, event as unknown as Event)
+    this.on('click', (event) => {
+      if (this.shouldOpenOnPointer('click', event as unknown as PointerEvent)) {
+        this.setOpen(!this.props.open, event as unknown as Event)
+      }
     })
   }
 
@@ -152,11 +160,15 @@ export class Tooltip<E extends EventList = Record<string, any>>
   private setOpen(open: boolean, event?: Event): void {
     window.clearTimeout(this.openTimer)
     window.clearTimeout(this.hideTimer)
-    if (this.props.open === open) return
+    if (this.props.open === open) {
+      return
+    }
     this.setProps({ open })
     this.props.onOpenChange?.(open, event)
-    if (open) this.props.onShow?.(event)
-    else this.props.onHide?.(event)
+    if (open) {
+      this.props.onShow?.(event)
+    }
+    else { this.props.onHide?.(event) }
   }
 
   /**
@@ -165,7 +177,9 @@ export class Tooltip<E extends EventList = Record<string, any>>
   private moveTo(x: number, y: number): void {
     this.anchorX = x
     this.anchorY = y
-    if (this.props.open && this.props.followCursor) this.dirty({ render: true })
+    if (this.props.open && this.props.followCursor) {
+      this.dirty({ render: true })
+    }
   }
 
   /**
@@ -179,7 +193,9 @@ export class Tooltip<E extends EventList = Record<string, any>>
    * Планирует отложенное выполнение Tooltip.
    */
   private scheduleOpen(event?: Event): void {
-    if (this.props.disabled) return
+    if (this.props.disabled) {
+      return
+    }
     window.clearTimeout(this.hideTimer)
     window.clearTimeout(this.openTimer)
     this.openTimer = window.setTimeout(() => this.setOpen(true, event), this.props.delay)
@@ -198,9 +214,15 @@ export class Tooltip<E extends EventList = Record<string, any>>
    * Выполняет внутренний шаг shouldOpenOnFocus для Tooltip.
    */
   private shouldOpenOnFocus(): boolean {
-    if (this.props.disabled || this.props.trigger === 'manual') return false
-    if (this.props.trigger === 'focus') return true
-    if (typeof this.props.trigger === 'object') return this.props.trigger.keyboard === 'focus'
+    if (this.props.disabled || this.props.trigger === 'manual') {
+      return false
+    }
+    if (this.props.trigger === 'focus') {
+      return true
+    }
+    if (typeof this.props.trigger === 'object') {
+      return this.props.trigger.keyboard === 'focus'
+    }
 
     return this.props.trigger === 'hover'
   }
@@ -209,14 +231,30 @@ export class Tooltip<E extends EventList = Record<string, any>>
    * Выполняет внутренний шаг shouldOpenOnPointer для Tooltip.
    */
   private shouldOpenOnPointer(kind: 'hover' | 'click', event?: PointerEvent): boolean {
-    if (this.props.disabled || this.props.trigger === 'manual') return false
-    if (this.props.trigger === kind) return true
-    if (this.props.trigger === 'hover' && kind === 'hover') return true
-    if (this.props.trigger === 'click' && kind === 'click') return true
-    if (typeof this.props.trigger !== 'object') return false
-    if (this.props.trigger.pointer !== kind) return false
-    if (event && this.props.trigger.button && !matchesPointerButton(event, this.props.trigger.button)) return false
-    if (event && this.props.trigger.modifier && !matchesModifier(event, this.props.trigger.modifier)) return false
+    if (this.props.disabled || this.props.trigger === 'manual') {
+      return false
+    }
+    if (this.props.trigger === kind) {
+      return true
+    }
+    if (this.props.trigger === 'hover' && kind === 'hover') {
+      return true
+    }
+    if (this.props.trigger === 'click' && kind === 'click') {
+      return true
+    }
+    if (typeof this.props.trigger !== 'object') {
+      return false
+    }
+    if (this.props.trigger.pointer !== kind) {
+      return false
+    }
+    if (event && this.props.trigger.button && !matchesPointerButton(event, this.props.trigger.button)) {
+      return false
+    }
+    if (event && this.props.trigger.modifier && !matchesModifier(event, this.props.trigger.modifier)) {
+      return false
+    }
 
     return true
   }
@@ -225,7 +263,9 @@ export class Tooltip<E extends EventList = Record<string, any>>
    * Применяет подготовленное состояние Tooltip.
    */
   private applyCollision(schema: NovaSchema): void {
-    if (schema.length === 0 || !this.props.collision.shift) return
+    if (schema.length === 0 || !this.props.collision.shift) {
+      return
+    }
 
     const bounds = resolveSchemaBounds(schema)
     const padding = this.props.collision.padding
@@ -238,7 +278,9 @@ export class Tooltip<E extends EventList = Record<string, any>>
     const dx = Math.min(0, maxX - (bounds.x + bounds.width)) + Math.max(0, padding - bounds.x)
     const dy = Math.min(0, maxY - (bounds.y + bounds.height)) + Math.max(0, padding - bounds.y)
 
-    if (dx === 0 && dy === 0) return
+    if (dx === 0 && dy === 0) {
+      return
+    }
     for (const item of schema) {
       const shape = item as Record<string, any>
       shape.x = (shape.x ?? 0) + dx
@@ -248,21 +290,31 @@ export class Tooltip<E extends EventList = Record<string, any>>
 }
 
 function matchesPointerButton(event: PointerEvent, button: TooltipPointerButton): boolean {
-  if (button === 'left') return event.button === 0
-  if (button === 'middle') return event.button === 1
+  if (button === 'left') {
+    return event.button === 0
+  }
+  if (button === 'middle') {
+    return event.button === 1
+  }
 
   return event.button === 2
 }
 
 function matchesModifier(event: PointerEvent, modifier: 'ctrl' | 'meta' | 'shift' | 'alt'): boolean {
-  if (modifier === 'ctrl') return event.ctrlKey
-  if (modifier === 'meta') return event.metaKey
-  if (modifier === 'shift') return event.shiftKey
+  if (modifier === 'ctrl') {
+    return event.ctrlKey
+  }
+  if (modifier === 'meta') {
+    return event.metaKey
+  }
+  if (modifier === 'shift') {
+    return event.shiftKey
+  }
 
   return event.altKey
 }
 
-function resolveSchemaBounds(schema: NovaSchema): { x: number; y: number; width: number; height: number } {
+function resolveSchemaBounds(schema: NovaSchema): { x: number, y: number, width: number, height: number } {
   let minX = Number.POSITIVE_INFINITY
   let minY = Number.POSITIVE_INFINITY
   let maxX = Number.NEGATIVE_INFINITY
@@ -280,7 +332,9 @@ function resolveSchemaBounds(schema: NovaSchema): { x: number; y: number; width:
     maxY = Math.max(maxY, y + height)
   }
 
-  if (!Number.isFinite(minX) || !Number.isFinite(minY)) return { x: 0, y: 0, width: 0, height: 0 }
+  if (!Number.isFinite(minX) || !Number.isFinite(minY)) {
+    return { x: 0, y: 0, width: 0, height: 0 }
+  }
 
   return {
     x: minX,

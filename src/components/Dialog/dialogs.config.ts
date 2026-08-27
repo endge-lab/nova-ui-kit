@@ -5,18 +5,17 @@ import type {
   NovaComponentSchema,
 } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  NOVA_UI_COMMON_DIRTY_POLICY,
-  NOVA_UI_COMMON_FIELD_DEFINITIONS,
-  commonMeasureBounds,
-  normalizeCommonProps,
-} from '@/shared/component'
+import type { DialogsApi, DialogsProps, DialogsResolvedProps } from '@/components/Dialog/dialog.types'
 import {
   DIALOGS_SCHEMA_TYPE,
-  type DialogsApi,
-  type DialogsProps,
-  type DialogsResolvedProps,
+
 } from '@/components/Dialog/dialog.types'
+import {
+  commonMeasureBounds,
+  normalizeCommonProps,
+  NOVA_UI_COMMON_DIRTY_POLICY,
+  NOVA_UI_COMMON_FIELD_DEFINITIONS,
+} from '@/shared/component'
 
 export type DialogsDescriptor = NovaComponentDescriptor<
   DialogsResolvedProps,
@@ -66,7 +65,9 @@ export function createDialogsDescriptor(createNode?: DialogsNodeFactory): Dialog
     measureBounds: (_context, schema) => commonMeasureBounds(schema, normalizeDialogsProps),
   }
 
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 

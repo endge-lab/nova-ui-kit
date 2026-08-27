@@ -1,13 +1,13 @@
-import { bench, describe } from 'vitest'
 import {
   layoutNovaTextInput,
   novaCaretRectAtIndex,
   novaTextIndexAtPoint,
   splitGraphemes,
 } from '@endge/nova'
+import { bench, describe } from 'vitest'
 import { normalizeInputProps } from '@/components/Input/input.config'
 
-describe('Nova UI Kit input benchmarks', () => {
+describe('nova UI Kit input benchmarks', () => {
   bench('normalize 10k input props', () => {
     for (let index = 0; index < 10_000; index += 1) {
       normalizeInputProps({
@@ -20,7 +20,7 @@ describe('Nova UI Kit input benchmarks', () => {
   })
 
   bench('layout 1k centered proportional input fields', () => {
-    const measureText = createMeasuredText({ W: 12, i: 3, '.': 4, ' ': 4, m: 11 })
+    const measureText = createMeasuredText({ 'W': 12, 'i': 3, '.': 4, ' ': 4, 'm': 11 })
     for (let index = 0; index < 1_000; index += 1) {
       layoutNovaTextInput({
         text: `Wi. mixed ${index}`,
@@ -46,7 +46,7 @@ describe('Nova UI Kit input benchmarks', () => {
       fontSize: 13,
       lineHeight: 18,
       padding: 10,
-      measureText: createMeasuredText({ W: 12, i: 3, '.': 4, ' ': 4, m: 11 }),
+      measureText: createMeasuredText({ 'W': 12, 'i': 3, '.': 4, ' ': 4, 'm': 11 }),
     })
     for (let index = 0; index < 100_000; index += 1) {
       const caret = novaCaretRectAtIndex(layout, index % layout.text.length)

@@ -1,12 +1,13 @@
 import type { NovaSchemaRegistry } from '@endge/nova'
+import type { AdvancedComponentDescriptor } from '@/components/Advanced/advanced.config'
+import type { AdvancedComponentKind, AdvancedComponentSchema } from '@/components/Advanced/advanced.types'
 import { createAdvancedComponent } from '@/components/Advanced/advanced'
 import {
   ADVANCED_COMPONENT_FIELD_DEFINITIONS,
+
   createAdvancedComponentDescriptor,
   normalizeAdvancedComponentProps,
-  type AdvancedComponentDescriptor,
 } from '@/components/Advanced/advanced.config'
-import type { AdvancedComponentKind, AdvancedComponentSchema } from '@/components/Advanced/advanced.types'
 
 function createDescriptor(kind: AdvancedComponentKind): AdvancedComponentDescriptor {
   const descriptor = createAdvancedComponentDescriptor(kind, (context, schema) => {

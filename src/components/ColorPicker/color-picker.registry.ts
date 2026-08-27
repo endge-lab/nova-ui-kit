@@ -1,12 +1,13 @@
 import type { NovaSchemaRegistry } from '@endge/nova'
-import { ColorPicker } from '@/components/ColorPicker/ColorPicker'
+import type { ColorPickerDescriptor } from '@/components/ColorPicker/color-picker.config'
+import type { ColorPickerSchema } from '@/components/ColorPicker/color-picker.types'
 import {
   COLOR_PICKER_FIELD_DEFINITIONS,
+
   createColorPickerDescriptor,
   normalizeColorPickerProps,
-  type ColorPickerDescriptor,
 } from '@/components/ColorPicker/color-picker.config'
-import type { ColorPickerSchema } from '@/components/ColorPicker/color-picker.types'
+import { ColorPicker } from '@/components/ColorPicker/ColorPicker'
 
 export const COLOR_PICKER_DESCRIPTOR: ColorPickerDescriptor = createColorPickerDescriptor((context, schema) => {
   const colorPickerSchema = schema as ColorPickerSchema

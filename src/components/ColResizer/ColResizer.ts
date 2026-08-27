@@ -1,7 +1,7 @@
-import { NovaNode } from '@endge/nova'
-import type { NovaApp , NovaSurface } from '@endge/nova'
+import type { NovaApp, NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
 import type { ResizerOptions } from '@/domain/domain.types'
+import { NovaNode } from '@endge/nova'
 import { resolveNovaUiMotionOptions } from '@/shared/motion'
 
 /**
@@ -47,8 +47,10 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
    * Обновляет значение состояния ColResizer.
    */
   private setupEvents(): void {
-    this.on('dragstart', e => {
-      if (this.disabled) return false
+    this.on('dragstart', (e) => {
+      if (this.disabled) {
+        return false
+      }
       this._onChangeStart(e)
       if (e.defaultPrevented) {
         return false
@@ -63,7 +65,9 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
     })
 
     this.on('dragmove', (e, dx) => {
-      if (this.disabled) return false
+      if (this.disabled) {
+        return false
+      }
       this._onChangeMove(e, dx)
       if (e.defaultPrevented) {
         return false
@@ -72,8 +76,10 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
       return false
     })
 
-    this.on('dragend', e => {
-      if (this.disabled) return false
+    this.on('dragend', (e) => {
+      if (this.disabled) {
+        return false
+      }
       this._onChangeEnd(e)
       if (e.defaultPrevented) {
         return false
@@ -88,7 +94,9 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
     })
 
     this.on('mouseenter', () => {
-      if (this.disabled) return
+      if (this.disabled) {
+        return
+      }
       this.isHover = true
       this.nova.invalidate()
     })
@@ -137,9 +145,9 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
       {
         type: 'line',
         x1: centerX,
-        y1: y1,
+        y1,
         x2: centerX,
-        y2: y2,
+        y2,
         styles: {
           color: this.isDragging ? this.activeColor : this.isHover ? this.hoverColor : this.color,
           width: this.lineWidth,
@@ -175,8 +183,8 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
     } = opts
     super.options({
       ...rest,
-      interactive: disabled === true ? false : true,
-      active: disabled === true ? false : true,
+      interactive: disabled !== true,
+      active: disabled !== true,
       cursor: { hover: 'col-resize', pressed: 'col-resize', dragging: 'col-resize', disabled: 'not-allowed' },
       cursorContext: { axis: 'x', disabled: disabled === true },
     })

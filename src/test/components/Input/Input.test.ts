@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 
+import type { InputApi } from '@/index'
 import {
   Nova,
   RaphSchedulerType,
@@ -12,20 +13,20 @@ import {
   it,
   vi,
 } from 'vitest'
-import {
-  NovaUIKit,
-  registerNovaUIKit,
-  type InputApi,
-} from '@/index'
 import { normalizeInputProps } from '@/components/Input/input.config'
 import {
-  INPUT_DESCRIPTORS,
   INPUT_DESCRIPTOR,
+  INPUT_DESCRIPTORS,
   NUMBER_INPUT_DESCRIPTOR,
   TEXT_AREA_DESCRIPTOR,
 } from '@/components/Input/input.registry'
+import {
 
-describe('Nova UI Kit input components', () => {
+  NovaUIKit,
+  registerNovaUIKit,
+} from '@/index'
+
+describe('nova UI Kit input components', () => {
   afterEach(() => {
     vi.restoreAllMocks()
   })
@@ -69,7 +70,9 @@ describe('Nova UI Kit input components', () => {
 
   it('places caret and insertion index on the rendered centered proportional text', () => {
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation((type: string) => {
-      if (type === RendererType.Web2D || type === '2d') return create2DContextStub({ W: 12, i: 3, '.': 4, X: 9 })
+      if (type === RendererType.Web2D || type === '2d') {
+        return create2DContextStub({ 'W': 12, 'i': 3, '.': 4, 'X': 9 })
+      }
       return null
     })
     const canvas = document.createElement('canvas')
@@ -123,7 +126,9 @@ function create2DContextStub(widths: Record<string, number>): CanvasRenderingCon
      * Возвращает значение состояния CanvasRenderingContext2D stub.
      */
     get(target, prop) {
-      if (!(prop in target)) target[prop] = vi.fn()
+      if (!(prop in target)) {
+        target[prop] = vi.fn()
+      }
       return target[prop]
     },
     /**

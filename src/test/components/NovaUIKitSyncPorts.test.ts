@@ -1,8 +1,10 @@
 // @vitest-environment jsdom
 
+import type { NovaApp } from '@endge/nova'
+import type { Panel, Surface } from '@/index'
+import { Nova, RaphSchedulerType, RendererType } from '@endge/nova'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { Nova, RaphSchedulerType, RendererType, type NovaApp } from '@endge/nova'
-import { NovaUIKit, type Panel, type Surface } from '@/index'
+import { NovaUIKit } from '@/index'
 import { registerNovaUIKit } from '@/registerNovaUIKit'
 
 type TestEvents = Record<string, any>
@@ -16,7 +18,9 @@ function create2DContextStub(): CanvasRenderingContext2D {
      * Возвращает значение состояния текущего класса.
      */
     get(target, prop) {
-      if (!(prop in target)) target[prop] = vi.fn()
+      if (!(prop in target)) {
+        target[prop] = vi.fn()
+      }
       return target[prop]
     },
     /**
@@ -32,7 +36,9 @@ function create2DContextStub(): CanvasRenderingContext2D {
 function installCanvasMocks(): void {
   Object.defineProperty(window, 'devicePixelRatio', { value: 1, configurable: true })
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation((type: string) => {
-    if (type === RendererType.Web2D) return create2DContextStub()
+    if (type === RendererType.Web2D) {
+      return create2DContextStub()
+    }
     return null
   })
 }
@@ -50,7 +56,7 @@ function createApp(): NovaApp<TestEvents> {
   return app
 }
 
-describe('Nova UI Kit sync ports', () => {
+describe('nova UI Kit sync ports', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
     document.body.innerHTML = ''

@@ -1,11 +1,7 @@
 import type { NovaApp, NovaSchema, NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  COLOR_PICKER_NODE_DESCRIPTOR,
-  normalizeColorPickerProps,
-  resolveColorPickerHeight,
-  type ColorPickerDescriptor,
-} from '@/components/ColorPicker/color-picker.config'
+import type { NovaUiHsvaColor, NovaUiRgbaColor } from '@/components/ColorPicker/color-picker-utils'
+import type { ColorPickerDescriptor } from '@/components/ColorPicker/color-picker.config'
 import type {
   ColorPickerApi,
   ColorPickerFieldId,
@@ -22,15 +18,20 @@ import {
   formatNovaUiColor,
   hsvaToRgba,
   normalizeNovaUiColor,
+
   parseHexColor,
   parseNovaUiColor,
   rgbaToHsva,
-  type NovaUiHsvaColor,
-  type NovaUiRgbaColor,
 } from '@/components/ColorPicker/color-picker-utils'
 import {
-  NovaUiComponentNode,
+  COLOR_PICKER_NODE_DESCRIPTOR,
+
+  normalizeColorPickerProps,
+  resolveColorPickerHeight,
+} from '@/components/ColorPicker/color-picker.config'
+import {
   buildBoxSchema,
+  NovaUiComponentNode,
   pushText,
   resolveComponentTextStyle,
 } from '@/shared/component'
@@ -122,7 +123,9 @@ export class ColorPicker<E extends EventList = Record<string, any>>
     })
     this.appendPresets(schema)
     this.appendCustomButton(schema)
-    if (this.props.customOpen) this.appendCustomControls(schema)
+    if (this.props.customOpen) {
+      this.appendCustomControls(schema)
+    }
     this.renderer.schema(schema)
   }
 
@@ -137,7 +140,9 @@ export class ColorPicker<E extends EventList = Record<string, any>>
         height: resolveColorPickerHeight(this.props.customOpen),
       })
     }
-    if (changedKeys.includes('value')) this.syncDraftFromValue()
+    if (changedKeys.includes('value')) {
+      this.syncDraftFromValue()
+    }
     this.options({ interactive: !this.props.disabled })
     this.applyCommonPropsChanged(changedKeys)
   }
@@ -224,10 +229,14 @@ export class ColorPicker<E extends EventList = Record<string, any>>
   private appendCustomControls(schema: NovaSchema): void {
     this.appendPickerArea(schema, 0, CUSTOM_TOP)
     this.appendStrip(schema, 'hue', 0, CUSTOM_TOP + PICKER_HEIGHT + 10)
-    if (this.props.allowAlpha) this.appendStrip(schema, 'alpha', 0, CUSTOM_TOP + PICKER_HEIGHT + 32)
+    if (this.props.allowAlpha) {
+      this.appendStrip(schema, 'alpha', 0, CUSTOM_TOP + PICKER_HEIGHT + 32)
+    }
     this.appendFormatSwitch(schema, 0, CUSTOM_TOP + PICKER_HEIGHT + 56)
-    if (this.props.format === 'hex') this.appendHexField(schema, 0, CUSTOM_TOP + PICKER_HEIGHT + 94)
-    else this.appendRgbaFields(schema, 0, CUSTOM_TOP + PICKER_HEIGHT + 94)
+    if (this.props.format === 'hex') {
+      this.appendHexField(schema, 0, CUSTOM_TOP + PICKER_HEIGHT + 94)
+    }
+    else { this.appendRgbaFields(schema, 0, CUSTOM_TOP + PICKER_HEIGHT + 94) }
   }
 
   /**
@@ -390,13 +399,15 @@ export class ColorPicker<E extends EventList = Record<string, any>>
    * Настраивает события pointer и keyboard.
    */
   private setupEvents(): void {
-    this.on('mousemove', event => {
+    this.on('mousemove', (event) => {
       if (this.dragging) {
         this.updateCustomColorFromEvent(this.dragging, event)
         return false
       }
       const hit = this.hitTestEvent(event)
-      if (hit.id === this.hoveredId) return
+      if (hit.id === this.hoveredId) {
+        return
+      }
       this.hoveredId = hit.id
       this.dirty({ render: true })
     })
@@ -405,8 +416,10 @@ export class ColorPicker<E extends EventList = Record<string, any>>
       this.pressedId = null
       this.dirty({ render: true })
     })
-    this.on('mousedown', event => {
-      if (this.props.disabled) return false
+    this.on('mousedown', (event) => {
+      if (this.props.disabled) {
+        return false
+      }
       this.focus(event)
       const hit = this.hitTestEvent(event)
       this.pressedId = hit.id
@@ -420,8 +433,10 @@ export class ColorPicker<E extends EventList = Record<string, any>>
       this.dirty({ render: true })
       return false
     })
-    this.on('dragmove', event => {
-      if (!this.dragging) return false
+    this.on('dragmove', (event) => {
+      if (!this.dragging) {
+        return false
+      }
       this.updateCustomColorFromEvent(this.dragging, event)
       return false
     })
@@ -429,8 +444,10 @@ export class ColorPicker<E extends EventList = Record<string, any>>
       this.dragging = null
       return false
     })
-    this.on('keydown', event => {
-      if (!this.activeField) return
+    this.on('keydown', (event) => {
+      if (!this.activeField) {
+        return
+      }
       this.handleFieldKey(event)
       return false
     })
@@ -440,7 +457,9 @@ export class ColorPicker<E extends EventList = Record<string, any>>
    * Выполняет действие по найденной интерактивной зоне.
    */
   private handleHit(hit: ColorPickerHit, event: MouseEvent): void {
-    if (hit.kind !== 'field') this.activeField = null
+    if (hit.kind !== 'field') {
+      this.activeField = null
+    }
     if (hit.kind === 'preset' && hit.preset) {
       this.setValue(hit.preset.value, { source: 'preset', preset: hit.preset, event }, true)
       return
@@ -476,7 +495,9 @@ export class ColorPicker<E extends EventList = Record<string, any>>
     if (kind === 'hue') {
       const hueY = CUSTOM_TOP + PICKER_HEIGHT + 10
       this.hsva.h = clamp01(localX / PICKER_WIDTH) * 360
-      if (localY < hueY - 8 || localY > hueY + STRIP_HEIGHT + 8) return
+      if (localY < hueY - 8 || localY > hueY + STRIP_HEIGHT + 8) {
+        return
+      }
     }
     if (kind === 'alpha' && this.props.allowAlpha) {
       this.hsva.a = clampAlpha(localX / PICKER_WIDTH)
@@ -488,7 +509,9 @@ export class ColorPicker<E extends EventList = Record<string, any>>
    * Обрабатывает ввод символов в активное поле.
    */
   private handleFieldKey(event: KeyboardEvent): void {
-    if (!this.activeField) return
+    if (!this.activeField) {
+      return
+    }
     if (event.key === 'Escape') {
       this.activeField = null
       this.invalidField = null
@@ -503,9 +526,13 @@ export class ColorPicker<E extends EventList = Record<string, any>>
       this.updateActiveDraft(value => value.slice(0, -1), event)
       return
     }
-    if (event.key.length !== 1) return
-    const allowed = this.activeField === 'hex' ? /^[#0-9a-fA-F]$/.test(event.key) : /^[0-9.]$/.test(event.key)
-    if (!allowed) return
+    if (event.key.length !== 1) {
+      return
+    }
+    const allowed = this.activeField === 'hex' ? /^[#0-9a-f]$/i.test(event.key) : /^[0-9.]$/.test(event.key)
+    if (!allowed) {
+      return
+    }
     this.updateActiveDraft(value => `${value}${event.key}`, event)
   }
 
@@ -513,9 +540,13 @@ export class ColorPicker<E extends EventList = Record<string, any>>
    * Обновляет draft активного поля и применяет валидное значение.
    */
   private updateActiveDraft(mutator: (value: string) => string, event: KeyboardEvent): void {
-    if (!this.activeField) return
-    if (this.activeField === 'hex') this.hexDraft = mutator(this.hexDraft)
-    else this.rgbaDraft[this.activeField] = mutator(this.rgbaDraft[this.activeField])
+    if (!this.activeField) {
+      return
+    }
+    if (this.activeField === 'hex') {
+      this.hexDraft = mutator(this.hexDraft)
+    }
+    else { this.rgbaDraft[this.activeField] = mutator(this.rgbaDraft[this.activeField]) }
     this.applyDraftField(event)
   }
 
@@ -523,7 +554,9 @@ export class ColorPicker<E extends EventList = Record<string, any>>
    * Применяет текущий draft, если он валиден.
    */
   private applyDraftField(event?: Event): void {
-    if (!this.activeField) return
+    if (!this.activeField) {
+      return
+    }
     const rgba = this.activeField === 'hex'
       ? parseHexColor(this.hexDraft)
       : parseRgbaDraft(this.rgbaDraft)
@@ -545,14 +578,18 @@ export class ColorPicker<E extends EventList = Record<string, any>>
       this.setProps({ value: next })
       this.props.onValueChange?.(next, context)
     }
-    if (commit) this.props.onCommit?.(next, context)
+    if (commit) {
+      this.props.onCommit?.(next, context)
+    }
   }
 
   /**
    * Переключает раскрытие custom-блока.
    */
   private setCustomOpen(open: boolean, event?: Event): void {
-    if (open === this.props.customOpen) return
+    if (open === this.props.customOpen) {
+      return
+    }
     this.setProps({ customOpen: open, height: resolveColorPickerHeight(open) })
     this.props.onCustomOpenChange?.(open, event)
   }
@@ -575,7 +612,9 @@ export class ColorPicker<E extends EventList = Record<string, any>>
     const [localX, localY] = this.toLocal(x, y)
     for (let index = 0; index < this.props.presets.length; index += 1) {
       const preset = this.props.presets[index]
-      if (!preset) continue
+      if (!preset) {
+        continue
+      }
       const col = index % PRESET_COLUMNS
       const row = Math.floor(index / PRESET_COLUMNS)
       const swatchX = col * (PRESET_SIZE + PRESET_GAP)
@@ -587,10 +626,16 @@ export class ColorPicker<E extends EventList = Record<string, any>>
     if (localX >= 0 && localX <= PICKER_WIDTH && localY >= CUSTOM_BUTTON_TOP && localY <= CUSTOM_BUTTON_TOP + CUSTOM_BUTTON_HEIGHT) {
       return { id: 'custom-button', kind: 'custom-button' }
     }
-    if (!this.props.customOpen) return { id: null }
-    if (localX >= 0 && localX <= PICKER_WIDTH && localY >= CUSTOM_TOP && localY <= CUSTOM_TOP + PICKER_HEIGHT) return { id: 'custom:sv', kind: 'sv' }
+    if (!this.props.customOpen) {
+      return { id: null }
+    }
+    if (localX >= 0 && localX <= PICKER_WIDTH && localY >= CUSTOM_TOP && localY <= CUSTOM_TOP + PICKER_HEIGHT) {
+      return { id: 'custom:sv', kind: 'sv' }
+    }
     const hueY = CUSTOM_TOP + PICKER_HEIGHT + 10
-    if (localX >= 0 && localX <= PICKER_WIDTH && localY >= hueY && localY <= hueY + STRIP_HEIGHT) return { id: 'custom:hue', kind: 'hue' }
+    if (localX >= 0 && localX <= PICKER_WIDTH && localY >= hueY && localY <= hueY + STRIP_HEIGHT) {
+      return { id: 'custom:hue', kind: 'hue' }
+    }
     const alphaY = CUSTOM_TOP + PICKER_HEIGHT + 32
     if (this.props.allowAlpha && localX >= 0 && localX <= PICKER_WIDTH && localY >= alphaY && localY <= alphaY + STRIP_HEIGHT) {
       return { id: 'custom:alpha', kind: 'alpha' }
@@ -606,7 +651,9 @@ export class ColorPicker<E extends EventList = Record<string, any>>
     if (this.props.format === 'rgba' && localY >= fieldY && localY <= fieldY + FIELD_HEIGHT) {
       const fields = this.resolveRgbaFieldRects()
       for (const field of fields) {
-        if (localX >= field.x && localX <= field.x + field.width) return { id: `field:${field.id}`, kind: 'field', field: field.id }
+        if (localX >= field.x && localX <= field.x + field.width) {
+          return { id: `field:${field.id}`, kind: 'field', field: field.id }
+        }
       }
     }
     return { id: null }
@@ -615,7 +662,7 @@ export class ColorPicker<E extends EventList = Record<string, any>>
   /**
    * Возвращает геометрию RGBA-полей.
    */
-  private resolveRgbaFieldRects(): Array<{ id: ColorPickerFieldId; x: number; width: number }> {
+  private resolveRgbaFieldRects(): Array<{ id: ColorPickerFieldId, x: number, width: number }> {
     const gap = 8
     const widths = [46, 46, 46, 70]
     let cursor = 0
@@ -642,7 +689,9 @@ function parseRgbaDraft(draft: Record<'r' | 'g' | 'b' | 'a', string>): NovaUiRgb
   const g = Number(draft.g)
   const b = Number(draft.b)
   const a = Number(draft.a)
-  if (![r, g, b, a].every(Number.isFinite)) return null
+  if (![r, g, b, a].every(Number.isFinite)) {
+    return null
+  }
   return {
     r: clampColorChannel(r),
     g: clampColorChannel(g),

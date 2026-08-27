@@ -1,16 +1,17 @@
 import type { NovaApp, NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  OVERLAYS_NODE_DESCRIPTOR,
-  normalizeOverlaysProps,
-  type OverlaysDescriptor,
-} from '@/components/Overlay/overlays.config'
 import type {
   OverlayDefinition,
   OverlaysApi,
   OverlaysProps,
   OverlaysResolvedProps,
 } from '@/components/Overlay/overlay.types'
+import type { OverlaysDescriptor } from '@/components/Overlay/overlays.config'
+import {
+  normalizeOverlaysProps,
+  OVERLAYS_NODE_DESCRIPTOR,
+
+} from '@/components/Overlay/overlays.config'
 import { findNovaUiRoot } from '@/components/Root/root-target'
 import { NovaUiComponentNode } from '@/shared/component'
 
@@ -71,7 +72,9 @@ export class Overlays<E extends EventList = Record<string, any>>
     this.applyCommonPropsChanged(changedKeys)
     this.visible = false
     this.options({ interactive: false })
-    if (changedKeys.includes('definitions')) this.syncRootDefinitions()
+    if (changedKeys.includes('definitions')) {
+      this.syncRootDefinitions()
+    }
   }
 
   /** Заменяет definitions текущего source. */

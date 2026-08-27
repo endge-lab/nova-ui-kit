@@ -1,12 +1,13 @@
 import type { NovaSchemaRegistry } from '@endge/nova'
+import type { PanelDescriptor } from '@/components/Panel/panel.config'
+import type { PanelSchema } from '@/components/Panel/panel.types'
 import { Panel } from '@/components/Panel/Panel'
 import {
-  PANEL_FIELD_DEFINITIONS,
   createPanelDescriptor,
   normalizePanelProps,
-  type PanelDescriptor,
+  PANEL_FIELD_DEFINITIONS,
+
 } from '@/components/Panel/panel.config'
-import type { PanelSchema } from '@/components/Panel/panel.types'
 
 export const PANEL_DESCRIPTOR: PanelDescriptor = createPanelDescriptor((context, schema) => {
   const panelSchema = schema as PanelSchema

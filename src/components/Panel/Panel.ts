@@ -1,21 +1,24 @@
-import { reconcileNovaTemplateChildren, type NovaApp, type NovaNode, type NovaSchema, type NovaSurface } from '@endge/nova'
+import type { NovaApp, NovaNode, NovaSchema, NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  PANEL_NODE_DESCRIPTOR,
-  normalizePanelProps,
-  type PanelDescriptor,
-} from '@/components/Panel/panel.config'
+import type { PanelDescriptor } from '@/components/Panel/panel.config'
 import type {
   PanelApi,
   PanelChildSchema,
   PanelProps,
   PanelResolvedProps,
 } from '@/components/Panel/panel.types'
+import { reconcileNovaTemplateChildren } from '@endge/nova'
 import {
-  NovaUiComponentNode,
+  normalizePanelProps,
+  PANEL_NODE_DESCRIPTOR,
+
+} from '@/components/Panel/panel.config'
+import {
   buildBoxSchema,
+  NovaUiComponentNode,
+  pushText,
   resolveComponentTextStyle,
- pushText } from '@/shared/component'
+} from '@/shared/component'
 import {
   applyNodeLayoutRect,
   copyRect,
@@ -39,7 +42,7 @@ export class Panel<E extends EventList = Record<string, any>>
     app: NovaApp<E>,
     surface: NovaSurface<E>,
     props: PanelProps = {},
-    options: { componentId?: string; children?: Array<PanelChildSchema> } = {},
+    options: { componentId?: string, children?: Array<PanelChildSchema> } = {},
     descriptor: PanelDescriptor = PANEL_NODE_DESCRIPTOR,
   ) {
     super(app, surface, descriptor, normalizePanelProps(props), options)
@@ -121,7 +124,9 @@ export class Panel<E extends EventList = Record<string, any>>
       })
     }
     this.renderer.schema(schema)
-    if (this.props.clip) this.renderer.clip(0, 0, this.width, this.height)
+    if (this.props.clip) {
+      this.renderer.clip(0, 0, this.width, this.height)
+    }
   }
 
   /**

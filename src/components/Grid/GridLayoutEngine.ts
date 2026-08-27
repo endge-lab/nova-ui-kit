@@ -1,21 +1,20 @@
 import type { NovaNode } from '@endge/nova'
+import type {
+  GridAlign,
+  GridChildLayout,
+  GridResolvedProps,
+} from '@/components/Grid/grid.types'
+import type { NovaUiCompiledLayoutValue, NovaUiLayoutRect, NovaUiResolvedSpacing } from '@/shared/layout'
 import {
   clampLayoutNumber,
   compileLayoutValue,
   createLayoutRect,
   isAutoLayoutValue,
   isNovaUiLayoutTarget,
+
   resolveLayoutValue,
   resolveSpacing,
-  type NovaUiCompiledLayoutValue,
-  type NovaUiLayoutRect,
-  type NovaUiResolvedSpacing,
 } from '@/shared/layout'
-import type {
-  GridAlign,
-  GridChildLayout,
-  GridResolvedProps,
-} from '@/components/Grid/grid.types'
 
 interface CompiledGridChildLayout {
   colSpan: number
@@ -131,7 +130,9 @@ export class GridLayoutEngine {
     this.sortedEntries.push(...entries)
     this.sortedEntries.sort((a, b) => {
       const orderDiff = a.compiledLayout.order - b.compiledLayout.order
-      if (orderDiff !== 0) return orderDiff
+      if (orderDiff !== 0) {
+        return orderDiff
+      }
       return 0
     })
   }
@@ -228,7 +229,9 @@ export class GridLayoutEngine {
    * Нормализует и возвращает итоговое значение GridLayoutEngine.
    */
   private resolveColumnCount(props: GridResolvedProps, innerWidth: number): number {
-    if (!props.responsive) return Math.max(1, props.columns)
+    if (!props.responsive) {
+      return Math.max(1, props.columns)
+    }
 
     const rawColumns = Math.max(
       1,
@@ -263,8 +266,8 @@ export class GridLayoutEngine {
     const rawHeight = !isAutoLayoutValue(layout.height)
       ? resolveLayoutValue(layout.height, innerHeight, 0)
       : !isAutoLayoutValue(rowHeight)
-        ? resolveLayoutValue(rowHeight, innerHeight, 0)
-        : measured?.height ?? entry.node.height
+          ? resolveLayoutValue(rowHeight, innerHeight, 0)
+          : measured?.height ?? entry.node.height
 
     return clampLayoutNumber(rawHeight, layout.minHeight, layout.maxHeight)
   }
@@ -272,11 +275,15 @@ export class GridLayoutEngine {
   /**
    * Измеряет layout или runtime-метрики GridLayoutEngine.
    */
-  private measureAutoItem(entry: GridChildEntry, cellWidth: number, innerHeight: number): { width: number; height: number } | undefined {
+  private measureAutoItem(entry: GridChildEntry, cellWidth: number, innerHeight: number): { width: number, height: number } | undefined {
     const layout = entry.compiledLayout
 
-    if (!isAutoLayoutValue(layout.height)) return undefined
-    if (!isNovaUiLayoutTarget(entry.node) || !entry.node.measureLayout) return undefined
+    if (!isAutoLayoutValue(layout.height)) {
+      return undefined
+    }
+    if (!isNovaUiLayoutTarget(entry.node) || !entry.node.measureLayout) {
+      return undefined
+    }
 
     return entry.node.measureLayout({
       minWidth: 0,
@@ -304,8 +311,12 @@ export class GridLayoutEngine {
    */
   private resolveOffset(align: GridAlign, available: number, target: number): number {
     const free = Math.max(0, available - target)
-    if (align === 'center') return free / 2
-    if (align === 'end') return free
+    if (align === 'center') {
+      return free / 2
+    }
+    if (align === 'end') {
+      return free
+    }
     return 0
   }
 }
@@ -349,7 +360,9 @@ function isAlreadyOrdered(entries: Array<GridChildEntry>): boolean {
 
   for (const entry of entries) {
     const order = entry.compiledLayout.order
-    if (order < previousOrder) return false
+    if (order < previousOrder) {
+      return false
+    }
     previousOrder = order
   }
 

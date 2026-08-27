@@ -34,13 +34,19 @@ export function isNovaUiMotionEnabled(options?: NovaUiMotionOptions): boolean {
 }
 
 export function readNovaUiMotionPreset(motion: NovaUiMotionDeclaration | undefined): NovaUiMotionPreset | null {
-  if (motion === false || !motion || Array.isArray(motion)) return null
-  if (typeof motion === 'string') return motion
+  if (motion === false || !motion || Array.isArray(motion)) {
+    return null
+  }
+  if (typeof motion === 'string') {
+    return motion
+  }
   return motion.name ?? motion.preset
 }
 
 export function readNovaUiMotionConfig(motion: NovaUiMotionDeclaration | undefined): NovaUiMotionConfig {
-  if (motion === false || !motion || typeof motion === 'string' || Array.isArray(motion)) return {}
+  if (motion === false || !motion || typeof motion === 'string' || Array.isArray(motion)) {
+    return {}
+  }
   return motion
 }
 
@@ -60,7 +66,9 @@ export function resolveNovaUiMotionDeclaration(motion: NovaUiMotionDeclaration |
   options: NovaMotionOptions
 } | null {
   const preset = readNovaUiMotionPreset(motion)
-  if (!preset) return null
+  if (!preset) {
+    return null
+  }
   const config = readNovaUiMotionConfig(motion)
   return {
     preset,
@@ -74,7 +82,9 @@ export function resolveNovaUiMotionDeclarations(motion: NovaUiMotionDeclaration 
   config: NovaUiMotionConfig
   options: NovaMotionOptions
 }> {
-  if (motion === false || !motion) return []
+  if (motion === false || !motion) {
+    return []
+  }
   const items = Array.isArray(motion) ? motion : [motion]
   return items
     .map(item => resolveNovaUiMotionDeclaration(item))
@@ -82,7 +92,9 @@ export function resolveNovaUiMotionDeclarations(motion: NovaUiMotionDeclaration 
 }
 
 function normalizeNovaUiMotionOptions(options?: NovaMotionOptions | NovaUiMotionConfig): NovaMotionOptions {
-  if (!options) return {}
+  if (!options) {
+    return {}
+  }
   const { repeat, height: _height, angle: _angle, opacity: _opacity, background: _background, name: _name, preset: _preset, ...rest } = options as NovaUiMotionConfig & NovaUiMotionObject
   return {
     ...rest,

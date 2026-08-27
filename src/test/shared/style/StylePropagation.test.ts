@@ -1,24 +1,25 @@
 // @vitest-environment jsdom
 
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { NovaApp } from '@endge/nova'
+import type { ButtonApi } from '@/components/Button/button.types'
+import type { Flex } from '@/components/Flex/Flex'
+import type { InputApi } from '@/components/Input/input.types'
+import type { Root } from '@/components/Root/Root'
+import type { TextBlockApi } from '@/components/TextBlock/text-block.types'
+import type { TextBlock } from '@/components/TextBlock/TextBlock'
 import {
   Nova,
+
   RaphSchedulerType,
   RendererType,
-  type NovaApp,
 } from '@endge/nova'
-import type { ButtonApi } from '@/components/Button/button.types'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { BUTTON_SCHEMA_TYPE } from '@/components/Button/button.types'
 import { FLEX_SCHEMA_TYPE } from '@/components/Flex/flex.types'
 import { GRID_SCHEMA_TYPE } from '@/components/Grid/grid.types'
-import type { Flex } from '@/components/Flex/Flex'
-import type { InputApi } from '@/components/Input/input.types'
 import { SEARCH_INPUT_SCHEMA_TYPE } from '@/components/Input/input.types'
-import type { Root } from '@/components/Root/Root'
 import { ROOT_SCHEMA_TYPE } from '@/components/Root/root.types'
 import { SURFACE_SCHEMA_TYPE } from '@/components/Surface/surface.types'
-import type { TextBlock } from '@/components/TextBlock/TextBlock'
-import type { TextBlockApi } from '@/components/TextBlock/text-block.types'
 import { TEXT_BLOCK_SCHEMA_TYPE } from '@/components/TextBlock/text-block.types'
 import { registerNovaUIKit } from '@/registerNovaUIKit'
 
@@ -57,7 +58,9 @@ function installCanvasMocks(): void {
   })
 
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation((type: string) => {
-    if (type === RendererType.Web2D) return create2DContextStub()
+    if (type === RendererType.Web2D) {
+      return create2DContextStub()
+    }
     return null
   })
 
@@ -109,7 +112,7 @@ function inputApi(app: NovaApp<TestEvents>, id: string): InputApi {
   return app.components.requireApi<InputApi>(id)
 }
 
-describe('Nova UI style propagation', () => {
+describe('nova UI style propagation', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
     document.body.innerHTML = ''

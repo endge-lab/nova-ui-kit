@@ -12,12 +12,16 @@ export class TextMeasureCache {
   /** Возвращает cached width или вычисляет его через переданную функцию. */
   get(key: string, measure: () => number): number {
     const cached = this.values.get(key)
-    if (cached !== undefined) return cached
+    if (cached !== undefined) {
+      return cached
+    }
 
     const value = measure()
     if (this.values.size >= this.limit) {
       const firstKey = this.values.keys().next().value
-      if (firstKey !== undefined) this.values.delete(firstKey)
+      if (firstKey !== undefined) {
+        this.values.delete(firstKey)
+      }
     }
     this.values.set(key, value)
     return value

@@ -35,7 +35,9 @@ export function hitTestRectPart<TPart extends string>(
       && point.y >= item.rect.y
       && point.x <= item.rect.x + item.rect.width
       && point.y <= item.rect.y + item.rect.height
-    ) return item.part
+    ) {
+      return item.part
+    }
   }
   return null
 }

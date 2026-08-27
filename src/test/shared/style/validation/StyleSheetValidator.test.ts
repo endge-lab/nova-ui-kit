@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { validateNovaUiStyleSheetSource } from '@/shared/style/validation'
 
-describe('Nova UI stylesheet validator', () => {
+describe('nova UI stylesheet validator', () => {
   it('parses comments, selector syntax and supported declarations', () => {
     const result = validateNovaUiStyleSheetSource(`
       /* Комментарии не мешают позициям diagnostics. */

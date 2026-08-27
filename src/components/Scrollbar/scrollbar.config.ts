@@ -1,19 +1,18 @@
 import type { NovaComponentCreateContext, NovaComponentDescriptor, NovaComponentNode, NovaComponentSchema } from '@endge/nova'
 import type { EventList } from '@endge/utils'
+import type { ScrollbarApi, ScrollbarProps, ScrollbarResolvedProps } from '@/components/Scrollbar/scrollbar.types'
 import {
-  NOVA_UI_COMMON_DIRTY_POLICY,
-  NOVA_UI_COMMON_FIELD_DEFINITIONS,
+  SCROLLBAR_SCHEMA_TYPE,
+
+} from '@/components/Scrollbar/scrollbar.types'
+import {
   clamp,
   commonMeasureBounds,
   finiteNumber,
   normalizeCommonProps,
+  NOVA_UI_COMMON_DIRTY_POLICY,
+  NOVA_UI_COMMON_FIELD_DEFINITIONS,
 } from '@/shared/component'
-import {
-  SCROLLBAR_SCHEMA_TYPE,
-  type ScrollbarApi,
-  type ScrollbarProps,
-  type ScrollbarResolvedProps,
-} from '@/components/Scrollbar/scrollbar.types'
 
 export type ScrollbarDescriptor = NovaComponentDescriptor<ScrollbarResolvedProps, ScrollbarApi, Record<string, never>, ScrollbarProps>
 
@@ -76,7 +75,9 @@ export function createScrollbarDescriptor(createNode?: ScrollbarNodeFactory): Sc
     normalize: schema => normalizeScrollbarProps(schema.props),
     measureBounds: (_context, schema) => commonMeasureBounds(schema, normalizeScrollbarProps),
   }
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 

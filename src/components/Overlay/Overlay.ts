@@ -1,25 +1,24 @@
-import {
-  reconcileNovaTemplateChildren,
-  type NovaApp,
-  type NovaNode,
-  type NovaSchema,
-  type NovaSurface,
-} from '@endge/nova'
+import type { NovaApp, NovaNode, NovaSchema, NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  OVERLAY_NODE_DESCRIPTOR,
-  normalizeOverlayProps,
-  type OverlayDescriptor,
-} from '@/components/Overlay/overlay.config'
+import type { OverlayDescriptor } from '@/components/Overlay/overlay.config'
 import type {
   OverlayApi,
   OverlayProps,
   OverlayResolvedProps,
   OverlaySchema,
 } from '@/components/Overlay/overlay.types'
-import { NovaUiComponentNode, buildBoxSchema } from '@/shared/component'
-import { applyNodeLayoutRect, createLayoutRect, resolveSpacing } from '@/shared/layout'
 import type { NovaUiOverlayAnchor } from '@/shared/overlay/overlay.types'
+import {
+
+  reconcileNovaTemplateChildren,
+} from '@endge/nova'
+import {
+  normalizeOverlayProps,
+  OVERLAY_NODE_DESCRIPTOR,
+
+} from '@/components/Overlay/overlay.config'
+import { buildBoxSchema, NovaUiComponentNode } from '@/shared/component'
+import { applyNodeLayoutRect, createLayoutRect, resolveSpacing } from '@/shared/layout'
 import { resolveNovaUiOverlayPosition } from '@/shared/overlay/overlay-position'
 
 /** Низкоуровневый anchored overlay surface с произвольным Nova UI body. */
@@ -36,7 +35,7 @@ export class Overlay<E extends EventList = Record<string, any>>
     app: NovaApp<E>,
     surface: NovaSurface<E>,
     props: OverlayProps = {},
-    options: { componentId?: string; children?: OverlaySchema['children'] } = {},
+    options: { componentId?: string, children?: OverlaySchema['children'] } = {},
     descriptor: OverlayDescriptor = OVERLAY_NODE_DESCRIPTOR,
   ) {
     super(app, surface, descriptor, normalizeOverlayProps(props), options)
@@ -74,7 +73,9 @@ export class Overlay<E extends EventList = Record<string, any>>
     }
 
     this.resolveRects()
-    for (const child of this.bodyNodes) applyNodeLayoutRect(child as NovaNode<any>, this.bodyRect)
+    for (const child of this.bodyNodes) {
+      applyNodeLayoutRect(child as NovaNode<any>, this.bodyRect)
+    }
     this.bodyLayoutReady = true
     this.applyBodyOpenState()
   }
@@ -114,7 +115,9 @@ export class Overlay<E extends EventList = Record<string, any>>
     this.props = normalizeOverlayProps(this.props)
     this.applyCommonPropsChanged(changedKeys)
     if (changedKeys.includes('open') || changedKeys.includes('display')) {
-      if (!this.props.open || this.props.display === 'none') this.bodyLayoutReady = false
+      if (!this.props.open || this.props.display === 'none') {
+        this.bodyLayoutReady = false
+      }
       this.applyOpenState()
       this.applyBodyOpenState()
     }
@@ -122,7 +125,9 @@ export class Overlay<E extends EventList = Record<string, any>>
 
   /** Переключает открытость overlay. */
   private setOpen(open: boolean, event?: Event): void {
-    if (open === this.props.open) return
+    if (open === this.props.open) {
+      return
+    }
     this.setProps({ open })
     this.props.onOpenChange?.(open, event)
   }
@@ -135,22 +140,24 @@ export class Overlay<E extends EventList = Record<string, any>>
 
   /** Настраивает dismiss-события overlay. */
   private setupEvents(): void {
-    this.on('mousedown', event => {
+    this.on('mousedown', (event) => {
       const { x, y } = this.events.getCanvasMousePosition(event)
       const [localX, localY] = this.toLocal(x, y)
       if (
-        this.props.dismiss.outside &&
-        (localX < this.surfaceRect.x ||
-          localX > this.surfaceRect.x + this.surfaceRect.width ||
-          localY < this.surfaceRect.y ||
-          localY > this.surfaceRect.y + this.surfaceRect.height)
+        this.props.dismiss.outside
+        && (localX < this.surfaceRect.x
+          || localX > this.surfaceRect.x + this.surfaceRect.width
+          || localY < this.surfaceRect.y
+          || localY > this.surfaceRect.y + this.surfaceRect.height)
       ) {
         this.setOpen(false, event)
       }
       return false
     })
-    this.on('keydown', event => {
-      if (this.props.open && this.props.dismiss.escape && event.key === 'Escape') this.setOpen(false, event)
+    this.on('keydown', (event) => {
+      if (this.props.open && this.props.dismiss.escape && event.key === 'Escape') {
+        this.setOpen(false, event)
+      }
     })
   }
 
@@ -200,7 +207,9 @@ export class Overlay<E extends EventList = Record<string, any>>
 
   /** Нормализует anchor в систему координат Root. */
   private normalizeAnchor(anchor: NovaUiOverlayAnchor): NovaUiOverlayAnchor {
-    if (anchor.kind === 'root') return { kind: 'root' }
+    if (anchor.kind === 'root') {
+      return { kind: 'root' }
+    }
     return anchor
   }
 }

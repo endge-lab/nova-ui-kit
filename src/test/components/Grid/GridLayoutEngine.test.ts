@@ -1,11 +1,11 @@
-import { describe, expect, it } from 'vitest'
 import type { NovaNode } from '@endge/nova'
+import type { GridChildLayout } from '@/components/Grid/grid.types'
+import { describe, expect, it } from 'vitest'
 import { normalizeGridProps } from '@/components/Grid/grid.config'
 import {
-  GridLayoutEngine,
   createGridChildEntry,
+  GridLayoutEngine,
 } from '@/components/Grid/GridLayoutEngine'
-import type { GridChildLayout } from '@/components/Grid/grid.types'
 import { NOVA_UI_LAYOUT_TARGET } from '@/shared/layout'
 
 function createNode(width = 0, height = 0): NovaNode<any> {
@@ -31,7 +31,7 @@ function createMeasuredEntry(id: string, layout: GridChildLayout, width: number,
   return createGridChildEntry(id, node, layout)
 }
 
-describe('GridLayoutEngine', () => {
+describe('gridLayoutEngine', () => {
   it('places children into fixed columns with padding and gap', () => {
     const engine = new GridLayoutEngine()
     const first = createEntry('first', {})

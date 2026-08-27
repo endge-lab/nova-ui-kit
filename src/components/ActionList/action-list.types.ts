@@ -1,6 +1,6 @@
 import type { NovaComponentSchema } from '@endge/nova'
-import type { NovaUiCommonProps, NovaUiCommonResolvedProps, NovaUiIconSource } from '@/shared/component'
 import type { NovaUiPartStyleOptions } from '@/domain/domain.types'
+import type { NovaUiCommonProps, NovaUiCommonResolvedProps, NovaUiIconSource } from '@/shared/component'
 
 export const ACTION_LIST_SCHEMA_TYPE = 'nova-ui.action-list'
 

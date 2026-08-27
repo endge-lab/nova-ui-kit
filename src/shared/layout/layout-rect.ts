@@ -36,6 +36,8 @@ export function copyRect(target: NovaUiLayoutRect, source: NovaUiLayoutRect): vo
 
 /** Ограничивает число диапазоном min/max. */
 export function clampLayoutNumber(value: number, min = 0, max = Number.POSITIVE_INFINITY): number {
-  if (!Number.isFinite(value)) return min
+  if (!Number.isFinite(value)) {
+    return min
+  }
   return Math.max(min, Math.min(max, value))
 }

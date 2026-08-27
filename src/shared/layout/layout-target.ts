@@ -1,6 +1,6 @@
 import type { NovaNode } from '@endge/nova'
-import { readNovaUiNodeProps } from '@/shared/layout/layout-intent'
 import type { NovaUiLayoutRect } from '@/shared/layout/layout-rect'
+import { readNovaUiNodeProps } from '@/shared/layout/layout-intent'
 
 /** Символ помечает компонент, который принимает rect от layout-родителя. */
 export const NOVA_UI_LAYOUT_TARGET = Symbol.for('@endge/nova-ui-kit.layout-target')
@@ -22,7 +22,7 @@ export interface NovaUiLayoutMeasure {
 /** Контракт компонента, который умеет принимать rect от layout-родителя. */
 export interface NovaUiLayoutTarget {
   readonly [NOVA_UI_LAYOUT_TARGET]: true
-  applyLayoutRect(rect: NovaUiLayoutRect): boolean
+  applyLayoutRect: (rect: NovaUiLayoutRect) => boolean
   measureLayout?: (constraints: NovaUiLayoutConstraints) => NovaUiLayoutMeasure
 }
 
@@ -40,7 +40,7 @@ export function isNovaUiLayoutDisplayed(node: unknown): boolean {
 export function relayoutNovaUiLayoutAncestors(node: { parent?: unknown }): void {
   let parent = node.parent
   while (parent && typeof parent === 'object') {
-    const candidate = parent as { parent?: unknown; getApi?: () => { relayout?: () => void } }
+    const candidate = parent as { parent?: unknown, getApi?: () => { relayout?: () => void } }
     candidate.getApi?.().relayout?.()
     parent = candidate.parent
   }
@@ -48,7 +48,9 @@ export function relayoutNovaUiLayoutAncestors(node: { parent?: unknown }): void 
 
 /** Применяет rect к UI Kit target или к обычному NovaNode через options. */
 export function applyNodeLayoutRect(node: NovaNode<any>, rect: NovaUiLayoutRect): boolean {
-  if (isNovaUiLayoutTarget(node)) return node.applyLayoutRect(rect)
+  if (isNovaUiLayoutTarget(node)) {
+    return node.applyLayoutRect(rect)
+  }
 
   let changed = false
 

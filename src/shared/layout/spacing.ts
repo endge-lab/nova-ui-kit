@@ -1,9 +1,9 @@
 /** Универсальное описание отступов для UI Kit layout. */
-export type NovaUiSpacing =
-  | number
-  | { all?: number }
-  | { horizontal?: number; vertical?: number }
-  | { left?: number; right?: number; top?: number; bottom?: number }
+export type NovaUiSpacing
+  = | number
+    | { all?: number }
+    | { horizontal?: number, vertical?: number }
+    | { left?: number, right?: number, top?: number, bottom?: number }
 
 /** Числовые отступы после normalization. */
 export interface NovaUiResolvedSpacing {
@@ -55,7 +55,7 @@ export function resolveSpacing(value?: NovaUiSpacing): NovaUiResolvedSpacing {
     }
   }
 
-  const edgeSpacing = value as { left?: number; right?: number; top?: number; bottom?: number }
+  const edgeSpacing = value as { left?: number, right?: number, top?: number, bottom?: number }
   return {
     left: finiteSpacingNumber(edgeSpacing.left),
     right: finiteSpacingNumber(edgeSpacing.right),

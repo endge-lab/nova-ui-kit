@@ -1,13 +1,5 @@
 import type { NovaSchema } from '@endge/nova'
-import {
-  type NovaScrollbarAxis,
-  type NovaScrollbarGeometry,
-  type NovaScrollbarGeometryInput,
-  type NovaScrollbarRect,
-  type NovaScrollbarResolvedVisualOptions,
-  type NovaScrollbarVisualOptions,
-  type NovaScrollbarVisualState,
-} from '@/components/Scrollbar/scrollbar.types'
+import type { NovaScrollbarAxis, NovaScrollbarGeometry, NovaScrollbarGeometryInput, NovaScrollbarRect, NovaScrollbarResolvedVisualOptions, NovaScrollbarVisualOptions, NovaScrollbarVisualState } from '@/components/Scrollbar/scrollbar.types'
 import { clamp, finiteNumber } from '@/shared/component'
 
 /**
@@ -89,7 +81,9 @@ export function createNovaScrollbarSchema(
   state: NovaScrollbarVisualState = { alpha: 1, hoveredAxis: null, draggingAxis: null },
 ): NovaSchema {
   const alpha = clamp(finiteNumber(state.alpha, 1), 0, 1)
-  if (alpha <= 0) return []
+  if (alpha <= 0) {
+    return []
+  }
   const active = state.hoveredAxis === geometry.axis || state.draggingAxis === geometry.axis
   return [
     {

@@ -1,7 +1,7 @@
-import { NovaNode } from '@endge/nova'
-import type { NovaApp , NovaSurface } from '@endge/nova'
+import type { NovaApp, NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
 import type { ResizerOptions } from '@/domain/domain.types'
+import { NovaNode } from '@endge/nova'
 import { resolveNovaUiMotionOptions } from '@/shared/motion'
 
 /**
@@ -50,10 +50,14 @@ export class RowResizer<E extends EventList> extends NovaNode<E> {
    * Обновляет значение состояния RowResizer.
    */
   private setupEvents(): void {
-    this.on('dragstart', e => {
-      if (this._disabled) return false
+    this.on('dragstart', (e) => {
+      if (this._disabled) {
+        return false
+      }
       this._onChangeStart(e)
-      if (e.defaultPrevented) return false
+      if (e.defaultPrevented) {
+        return false
+      }
       this._isDragging = true
       if (this._motionEnabled) {
         this.nova.motion.to(this, { scaleY: 1.08, opacity: 0.85 }, resolveNovaUiMotionOptions('pressFeedback'))
@@ -63,17 +67,25 @@ export class RowResizer<E extends EventList> extends NovaNode<E> {
     })
 
     this.on('dragmove', (e, _dx, dy) => {
-      if (this._disabled) return false
+      if (this._disabled) {
+        return false
+      }
       this._onChangeMove(e, dy)
-      if (e.defaultPrevented) return false
+      if (e.defaultPrevented) {
+        return false
+      }
       this.nova.invalidate()
       return false
     })
 
-    this.on('dragend', e => {
-      if (this._disabled) return false
+    this.on('dragend', (e) => {
+      if (this._disabled) {
+        return false
+      }
       this._onChangeEnd(e)
-      if (e.defaultPrevented) return false
+      if (e.defaultPrevented) {
+        return false
+      }
       this._isDragging = false
       if (this._motionEnabled) {
         this.nova.motion.to(this, { scaleY: 1, opacity: 1 }, resolveNovaUiMotionOptions('pressFeedback'))
@@ -83,7 +95,9 @@ export class RowResizer<E extends EventList> extends NovaNode<E> {
     })
 
     this.on('mouseenter', () => {
-      if (this._disabled) return
+      if (this._disabled) {
+        return
+      }
       this._isHover = true
       this.nova.invalidate()
     })
@@ -139,8 +153,8 @@ export class RowResizer<E extends EventList> extends NovaNode<E> {
 
     super.options({
       ...rest,
-      interactive: disabled === true ? false : true,
-      active: disabled === true ? false : true,
+      interactive: disabled !== true,
+      active: disabled !== true,
       cursor: { hover: 'row-resize', pressed: 'row-resize', dragging: 'row-resize', disabled: 'not-allowed' },
       cursorContext: { axis: 'y', disabled: disabled === true },
     })

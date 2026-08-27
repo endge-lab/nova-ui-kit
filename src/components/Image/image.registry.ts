@@ -1,12 +1,13 @@
 import type { NovaSchemaRegistry } from '@endge/nova'
+import type { ImageDescriptor } from '@/components/Image/image.config'
+import type { ImageSchema } from '@/components/Image/image.types'
 import { Image } from '@/components/Image/Image'
 import {
-  IMAGE_FIELD_DEFINITIONS,
   createImageDescriptor,
+  IMAGE_FIELD_DEFINITIONS,
+
   normalizeImageProps,
-  type ImageDescriptor,
 } from '@/components/Image/image.config'
-import type { ImageSchema } from '@/components/Image/image.types'
 
 export const IMAGE_DESCRIPTOR: ImageDescriptor = createImageDescriptor((context, schema) => {
   const imageSchema = schema as ImageSchema
@@ -28,4 +29,3 @@ export function registerImage(registry: { register: (descriptor: ImageDescriptor
 export function registerImageSchema(registry: NovaSchemaRegistry): void {
   registerImage(registry)
 }
-

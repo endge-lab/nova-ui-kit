@@ -1,16 +1,17 @@
 import type { NovaApp, NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  DIALOGS_NODE_DESCRIPTOR,
-  normalizeDialogsProps,
-  type DialogsDescriptor,
-} from '@/components/Dialog/dialogs.config'
 import type {
   DialogDefinition,
   DialogsApi,
   DialogsProps,
   DialogsResolvedProps,
 } from '@/components/Dialog/dialog.types'
+import type { DialogsDescriptor } from '@/components/Dialog/dialogs.config'
+import {
+  DIALOGS_NODE_DESCRIPTOR,
+
+  normalizeDialogsProps,
+} from '@/components/Dialog/dialogs.config'
 import { findNovaUiRoot } from '@/components/Root/root-target'
 import { NovaUiComponentNode } from '@/shared/component'
 
@@ -71,7 +72,9 @@ export class Dialogs<E extends EventList = Record<string, any>>
     this.applyCommonPropsChanged(changedKeys)
     this.visible = false
     this.options({ interactive: false })
-    if (changedKeys.includes('definitions')) this.syncRootDefinitions()
+    if (changedKeys.includes('definitions')) {
+      this.syncRootDefinitions()
+    }
   }
 
   /** Заменяет definitions текущего source. */

@@ -1,6 +1,6 @@
 import type { NovaComponentSchema, NovaElementSchema } from '@endge/nova'
-import type { NovaUiCommonProps, NovaUiCommonResolvedProps } from '@/shared/component'
 import type { NovaUiPartStyleOptions } from '@/domain/domain.types'
+import type { NovaUiCommonProps, NovaUiCommonResolvedProps } from '@/shared/component'
 import type {
   NovaUiOverlayAnchor,
   NovaUiOverlayCollisionOptions,
@@ -13,9 +13,9 @@ export const OVERLAYS_SCHEMA_TYPE = 'nova-ui.overlays'
 
 export type OverlayKind = 'menu' | 'panel' | 'popover'
 
-export type OverlayInput =
-  | string
-  | ({
+export type OverlayInput
+  = | string
+    | ({
       type?: string
       id?: string
       value?: unknown
@@ -41,7 +41,7 @@ export interface OverlayResolvedProps extends NovaUiCommonResolvedProps, NovaUiP
   offset: number
   anchor: NovaUiOverlayAnchor
   collision: Required<NovaUiOverlayCollisionOptions>
-  dismiss: { outside: boolean; escape: boolean }
+  dismiss: { outside: boolean, escape: boolean }
   modal: boolean
   backdrop: boolean
   onOpenChange?: (open: boolean, event?: Event) => void

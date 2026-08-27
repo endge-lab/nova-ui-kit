@@ -1,10 +1,6 @@
-import type { EventList } from '@endge/utils'
 import type { NovaApp, NovaAssetDrawableInput, NovaSchema, NovaSurface } from '@endge/nova'
-import {
-  IMAGE_NODE_DESCRIPTOR,
-  normalizeImageProps,
-  type ImageDescriptor,
-} from '@/components/Image/image.config'
+import type { EventList } from '@endge/utils'
+import type { ImageDescriptor } from '@/components/Image/image.config'
 import type {
   ImageApi,
   ImageFit,
@@ -12,8 +8,13 @@ import type {
   ImageResolvedProps,
 } from '@/components/Image/image.types'
 import {
-  NovaUiComponentNode,
+  IMAGE_NODE_DESCRIPTOR,
+
+  normalizeImageProps,
+} from '@/components/Image/image.config'
+import {
   buildBoxSchema,
+  NovaUiComponentNode,
 } from '@/shared/component'
 import { borderRadiusToRendererValue } from '@/shared/style'
 
@@ -133,9 +134,13 @@ export class Image<E extends EventList = Record<string, any>>
    */
   private resolveDrawable(source: NovaAssetDrawableInput): CanvasImageSource | undefined {
     const drawable = this.nova.assets.resolveDrawable(source)
-    if (!drawable) return undefined
+    if (!drawable) {
+      return undefined
+    }
 
-    if (this.props.radius <= 0 && this.props.fit === 'fill') return drawable
+    if (this.props.radius <= 0 && this.props.fit === 'fill') {
+      return drawable
+    }
     return this.resolveRoundedDrawable(drawable, this.props.fit, this.props.radius)
   }
 
@@ -147,7 +152,9 @@ export class Image<E extends EventList = Record<string, any>>
     const height = Math.max(1, Math.round(this.height))
     const key = `${this.nova.assets.resolveDrawableKey('image', this.resolveSource(), () => 'inline')}:${width}:${height}:${fit}:${radius}`
 
-    if (this.roundedCache && this.roundedCacheKey === key) return this.roundedCache
+    if (this.roundedCache && this.roundedCacheKey === key) {
+      return this.roundedCache
+    }
 
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')

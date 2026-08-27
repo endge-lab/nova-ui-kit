@@ -21,7 +21,9 @@ export function findNovaUiRoot(node: NovaNode<any>): (NovaNode<any> & NovaUiRoot
   let parent = node.parent
 
   while (parent) {
-    if (isNovaUiRootTarget(parent)) return parent
+    if (isNovaUiRootTarget(parent)) {
+      return parent
+    }
     parent = parent.parent
   }
 

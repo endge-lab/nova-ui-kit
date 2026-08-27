@@ -1,26 +1,26 @@
 import type { NovaMotionEasingName, NovaNodeProperties } from '@endge/nova'
 import type { Side } from '@endge/utils'
 
-export type NovaUiMotionPreset =
-  | 'fadeIn'
-  | 'textColorPulse'
-  | 'expandCollapse'
-  | 'gapShift'
-  | 'responsiveReflow'
-  | 'hoverLine'
-  | 'dragOverlay'
-  | 'pressFeedback'
-  | 'radialReveal'
-  | 'dockMagnify'
-  | 'slideFade'
-  | 'maskFade'
-  | 'shimmer'
-  | 'bounce'
-  | 'spin'
-  | 'meterSweep'
-  | 'thumbSpring'
-  | 'activeIndicator'
-  | 'stepAdvance'
+export type NovaUiMotionPreset
+  = | 'fadeIn'
+    | 'textColorPulse'
+    | 'expandCollapse'
+    | 'gapShift'
+    | 'responsiveReflow'
+    | 'hoverLine'
+    | 'dragOverlay'
+    | 'pressFeedback'
+    | 'radialReveal'
+    | 'dockMagnify'
+    | 'slideFade'
+    | 'maskFade'
+    | 'shimmer'
+    | 'bounce'
+    | 'spin'
+    | 'meterSweep'
+    | 'thumbSpring'
+    | 'activeIndicator'
+    | 'stepAdvance'
 
 export interface NovaUiMotionConfig {
   duration?: number
@@ -36,8 +36,8 @@ export interface NovaUiMotionConfig {
 }
 
 export type NovaUiMotionObject = NovaUiMotionConfig & (
-  | { name: NovaUiMotionPreset; preset?: never }
-  | { preset: NovaUiMotionPreset; name?: never }
+  | { name: NovaUiMotionPreset, preset?: never }
+  | { preset: NovaUiMotionPreset, name?: never }
 )
 
 export type NovaUiMotionItem = NovaUiMotionPreset | NovaUiMotionObject

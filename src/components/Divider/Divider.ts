@@ -1,18 +1,19 @@
-import type { EventList } from '@endge/utils'
 import type { NovaApp, NovaSchema, NovaSurface } from '@endge/nova'
-import {
-  DIVIDER_NODE_DESCRIPTOR,
-  normalizeDividerProps,
-  type DividerDescriptor,
-} from '@/components/Divider/divider.config'
+import type { EventList } from '@endge/utils'
+import type { DividerDescriptor } from '@/components/Divider/divider.config'
 import type {
   DividerApi,
   DividerProps,
   DividerResolvedProps,
 } from '@/components/Divider/divider.types'
 import {
-  NovaUiComponentNode,
+  DIVIDER_NODE_DESCRIPTOR,
+
+  normalizeDividerProps,
+} from '@/components/Divider/divider.config'
+import {
   finiteNumber,
+  NovaUiComponentNode,
   resolveComponentTextStyle,
 } from '@/shared/component/component-props'
 import { resolveSpacing } from '@/shared/layout'
@@ -75,7 +76,8 @@ export class Divider<E extends EventList = Record<string, any>>
 
     if (this.props.orientation === 'vertical') {
       this.pushVerticalLine(schema, contentX + contentWidth / 2, contentY, contentHeight, thickness, color, opacity, dashPattern)
-    } else {
+    }
+    else {
       this.pushHorizontalLine(schema, contentX, contentY + contentHeight / 2, contentWidth, thickness, color, opacity, dashPattern)
     }
 
@@ -96,9 +98,15 @@ export class Divider<E extends EventList = Record<string, any>>
   }
 
   private resolveDashPattern(thickness: number): Array<number> | undefined {
-    if (this.props.dashPattern?.length) return this.props.dashPattern
-    if (this.props.lineStyle === 'dashed') return [Math.max(4, thickness * 4), Math.max(3, thickness * 3)]
-    if (this.props.lineStyle === 'dotted') return [Math.max(1, thickness), Math.max(2, thickness * 2)]
+    if (this.props.dashPattern?.length) {
+      return this.props.dashPattern
+    }
+    if (this.props.lineStyle === 'dashed') {
+      return [Math.max(4, thickness * 4), Math.max(3, thickness * 3)]
+    }
+    if (this.props.lineStyle === 'dotted') {
+      return [Math.max(1, thickness), Math.max(2, thickness * 2)]
+    }
     return undefined
   }
 
@@ -112,7 +120,9 @@ export class Divider<E extends EventList = Record<string, any>>
     opacity: number,
     dashPattern?: Array<number>,
   ): void {
-    if (width <= 0 || thickness <= 0) return
+    if (width <= 0 || thickness <= 0) {
+      return
+    }
     if (this.props.lineStyle !== 'double') {
       schema.push({ type: 'line', x1: x, y1: y, x2: x + width, y2: y, styles: { color, width: thickness, opacity, dashPattern } })
       return
@@ -134,7 +144,9 @@ export class Divider<E extends EventList = Record<string, any>>
     opacity: number,
     dashPattern?: Array<number>,
   ): void {
-    if (height <= 0 || thickness <= 0) return
+    if (height <= 0 || thickness <= 0) {
+      return
+    }
     if (this.props.lineStyle !== 'double') {
       schema.push({ type: 'line', x1: x, y1: y, x2: x, y2: y + height, styles: { color, width: thickness, opacity, dashPattern } })
       return

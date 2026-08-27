@@ -5,18 +5,17 @@ import type {
   NovaComponentSchema,
 } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  NOVA_UI_COMMON_DIRTY_POLICY,
-  NOVA_UI_COMMON_FIELD_DEFINITIONS,
-  commonMeasureBounds,
-  normalizeCommonProps,
-} from '@/shared/component'
+import type { TooltipsApi, TooltipsProps, TooltipsResolvedProps } from '@/components/Tooltip/tooltip.types'
 import {
   TOOLTIPS_SCHEMA_TYPE,
-  type TooltipsApi,
-  type TooltipsProps,
-  type TooltipsResolvedProps,
+
 } from '@/components/Tooltip/tooltip.types'
+import {
+  commonMeasureBounds,
+  normalizeCommonProps,
+  NOVA_UI_COMMON_DIRTY_POLICY,
+  NOVA_UI_COMMON_FIELD_DEFINITIONS,
+} from '@/shared/component'
 
 export type TooltipsDescriptor = NovaComponentDescriptor<
   TooltipsResolvedProps,
@@ -66,7 +65,9 @@ export function createTooltipsDescriptor(createNode?: TooltipsNodeFactory): Tool
     measureBounds: (_context, schema) => commonMeasureBounds(schema, normalizeTooltipsProps),
   }
 
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 

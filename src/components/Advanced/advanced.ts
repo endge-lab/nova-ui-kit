@@ -1,12 +1,6 @@
 import type { NovaApp, NovaSchema, NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  ADVANCED_COMPONENT_SCHEMA_TYPES,
-  createAdvancedComponentDescriptor,
-  normalizeAdvancedComponentProps,
-  severityPalette,
-  type AdvancedComponentDescriptor,
-} from '@/components/Advanced/advanced.config'
+import type { AdvancedComponentDescriptor } from '@/components/Advanced/advanced.config'
 import type {
   AdvancedComponentApi,
   AdvancedComponentKind,
@@ -14,14 +8,21 @@ import type {
   AdvancedComponentResolvedProps,
   AdvancedItem,
 } from '@/components/Advanced/advanced.types'
+import type { NovaUiPartStyle } from '@/domain/domain.types'
 import {
-  NovaUiComponentNode,
+  ADVANCED_COMPONENT_SCHEMA_TYPES,
+
+  createAdvancedComponentDescriptor,
+  normalizeAdvancedComponentProps,
+  severityPalette,
+} from '@/components/Advanced/advanced.config'
+import {
   buildBoxSchema,
   clamp,
+  NovaUiComponentNode,
   resolveComponentTextStyle,
 } from '@/shared/component/component-props'
 import { pushIcon, pushText } from '@/shared/component/component-render'
-import type { NovaUiPartStyle } from '@/domain/domain.types'
 
 const TWO_PI = Math.PI * 2
 
@@ -88,11 +89,15 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
    * Обновляет значение состояния AdvancedComponent.
    */
   setOpen(open: boolean, event?: Event): void {
-    if (this.props.open === open) return
+    if (this.props.open === open) {
+      return
+    }
     this.setProps({ open, expanded: open })
     this.props.onOpenChange?.(open, event)
-    if (open) this.props.onShow?.(event)
-    else this.props.onHide?.(event)
+    if (open) {
+      this.props.onShow?.(event)
+    }
+    else { this.props.onHide?.(event) }
   }
 
   /**
@@ -253,7 +258,9 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
    */
   private renderImagePreview(schema: NovaSchema): void {
     this.pushRect(schema, 12, 12, this.width - 24, this.height - 24, this.props.parts?.image?.background ?? '#bae6fd', 'image', 14)
-    if (this.props.image) pushIcon(schema, this.props.image, 20, 20, Math.max(24, Math.min(this.width, this.height) - 40))
+    if (this.props.image) {
+      pushIcon(schema, this.props.image, 20, 20, Math.max(24, Math.min(this.width, this.height) - 40))
+    }
     this.pushRect(schema, 12, 12, this.width - 24, this.height - 24, 'rgba(15,23,42,0.28)', 'previewMask', 14)
     pushText(schema, this.props.title || 'Preview', 24, this.height / 2 - 12, this.width - 48, 24, this.textStyle({ color: '#ffffff', fontWeight: '700' }), { align: 'center' })
   }
@@ -354,7 +361,9 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
     const size = Math.min(20, this.height - 6)
     const y = (this.height - size) / 2
     schema.push({ type: 'circle', x: size / 2, y: y + size / 2, radius: size / 2, styles: { background: '#ffffff', border: { color: this.props.checked ? this.props.accentColor ?? '#2563eb' : '#cbd5e1', width: 2 } } })
-    if (this.props.checked) schema.push({ type: 'circle', x: size / 2, y: y + size / 2, radius: size / 2 - 6, styles: { background: this.props.accentColor ?? '#2563eb' } })
+    if (this.props.checked) {
+      schema.push({ type: 'circle', x: size / 2, y: y + size / 2, radius: size / 2 - 6, styles: { background: this.props.accentColor ?? '#2563eb' } })
+    }
     pushText(schema, this.props.text, size + 10, 0, this.width - size - 10, this.height, this.textStyle())
   }
 
@@ -432,7 +441,9 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
   private renderDisclosure(schema: NovaSchema): void {
     pushText(schema, this.props.title, 16, 12, this.width - 48, 22, this.textStyle({ fontWeight: '700' }))
     pushText(schema, this.props.expanded ? 'v' : '>', this.width - 34, 12, 18, 22, this.textStyle({ fontWeight: '700' }), { align: 'center' })
-    if (!this.props.expanded) return
+    if (!this.props.expanded) {
+      return
+    }
     this.props.items.forEach((item, index) => {
       const y = 50 + index * 22
       schema.push({ type: 'circle', x: 22, y: y + 9, radius: 4, styles: { background: item.color ?? this.props.accentColor ?? '#2563eb' } })
@@ -468,7 +479,9 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
 
     items.forEach((item, index) => {
       const x = left + index * step
-      if (index > 0) schema.push({ type: 'line', x1: left + (index - 1) * step + 14, y1: y, x2: x - 14, y2: y, styles: { color: index <= this.props.activeIndex ? this.props.accentColor ?? '#2563eb' : '#cbd5e1', width: 3 } })
+      if (index > 0) {
+        schema.push({ type: 'line', x1: left + (index - 1) * step + 14, y1: y, x2: x - 14, y2: y, styles: { color: index <= this.props.activeIndex ? this.props.accentColor ?? '#2563eb' : '#cbd5e1', width: 3 } })
+      }
       schema.push({ type: 'circle', x, y, radius: 13, styles: { background: index <= this.props.activeIndex ? this.props.accentColor ?? '#2563eb' : '#ffffff', border: { color: index <= this.props.activeIndex ? this.props.accentColor ?? '#2563eb' : '#cbd5e1', width: 2 } } })
       pushText(schema, item.label ?? '', x - 38, 56, 76, 18, this.textStyle({ color: '#475569', fontSize: 11 }), { align: 'center' })
     })
@@ -478,10 +491,14 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
    * Обновляет значение состояния AdvancedComponent.
    */
   private setupEvents(): void {
-    this.on('mousemove', event => {
-      if (this.props.disabled) return
+    this.on('mousemove', (event) => {
+      if (this.props.disabled) {
+        return
+      }
       const next = this.indexFromEvent(event)
-      if (next !== this.hoveredIndex && next >= 0) this.playUiSound('hover')
+      if (next !== this.hoveredIndex && next >= 0) {
+        this.playUiSound('hover')
+      }
       this.hoveredIndex = next
       this.dirty({ render: true })
     })
@@ -490,7 +507,7 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
       this.pressedIndex = -1
       this.dirty({ render: true })
     })
-    this.on('mousedown', event => {
+    this.on('mousedown', (event) => {
       if (this.props.disabled) {
         this.playUiSound('disabledPress')
         return false
@@ -500,16 +517,20 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
       this.dirty({ render: true })
       return false
     })
-    this.on('mouseup', event => {
+    this.on('mouseup', (event) => {
       const index = this.pressedIndex
       this.pressedIndex = -1
-      if (this.props.kind === 'ToggleSwitch') this.toggle(event)
+      if (this.props.kind === 'ToggleSwitch') {
+        this.toggle(event)
+      }
       if (index >= 0 && this.props.items[index]) {
         const item = this.props.items[index]
         this.props.onPress?.(item, index, event)
         if (this.props.kind === 'Tabs' || this.props.kind === 'Stepper') {
           this.setProps({ activeIndex: index })
-          if (this.props.kind === 'Stepper') this.props.onStepChange?.(index, event)
+          if (this.props.kind === 'Stepper') {
+            this.props.onStepChange?.(index, event)
+          }
         }
         this.setValue(item.value ?? index, event)
       }
@@ -523,11 +544,17 @@ export class AdvancedComponent<E extends EventList = Record<string, any>>
    */
   private indexFromEvent(event: MouseEvent): number {
     const items = this.props.items
-    if (items.length === 0) return -1
+    if (items.length === 0) {
+      return -1
+    }
     const { x, y } = this.events.getCanvasMousePosition(event)
     const [localX, localY] = this.toLocal(x, y)
-    if (localX < 0 || localX > this.width || localY < 0 || localY > this.height) return -1
-    if (this.props.kind === 'SelectButton' || this.props.kind === 'Tabs') return Math.min(items.length - 1, Math.floor(localX / (this.width / items.length)))
+    if (localX < 0 || localX > this.width || localY < 0 || localY > this.height) {
+      return -1
+    }
+    if (this.props.kind === 'SelectButton' || this.props.kind === 'Tabs') {
+      return Math.min(items.length - 1, Math.floor(localX / (this.width / items.length)))
+    }
     return Math.min(items.length - 1, Math.floor((localX / this.width) * items.length))
   }
 

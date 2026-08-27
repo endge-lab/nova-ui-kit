@@ -1,12 +1,13 @@
 import type { NovaSchemaRegistry } from '@endge/nova'
+import type { SliderDescriptor } from '@/components/Slider/slider.config'
+import type { SliderSchema } from '@/components/Slider/slider.types'
 import { Slider } from '@/components/Slider/Slider'
 import {
-  SLIDER_FIELD_DEFINITIONS,
   createSliderDescriptor,
   normalizeSliderProps,
-  type SliderDescriptor,
+  SLIDER_FIELD_DEFINITIONS,
+
 } from '@/components/Slider/slider.config'
-import type { SliderSchema } from '@/components/Slider/slider.types'
 
 export const SLIDER_DESCRIPTOR: SliderDescriptor = createSliderDescriptor((context, schema) => {
   const sliderSchema = schema as SliderSchema

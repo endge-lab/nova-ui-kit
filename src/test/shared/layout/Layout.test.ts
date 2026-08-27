@@ -1,5 +1,5 @@
-import { describe, expect, it, vi } from 'vitest'
 import type { NovaNode } from '@endge/nova'
+import { describe, expect, it, vi } from 'vitest'
 import {
   applyNodeLayoutRect,
   compileLayoutValue,
@@ -13,7 +13,7 @@ import {
   resolveSpacing,
 } from '@/shared/layout'
 
-describe('Nova UI layout primitives', () => {
+describe('nova UI layout primitives', () => {
   it('compiles and resolves percent, fill and px values', () => {
     expect(resolveLayoutValue(compileLayoutValue('100%', 0), 320, 0)).toBe(320)
     expect(resolveLayoutValue(compileLayoutValue('50%', 0), 320, 0)).toBe(160)

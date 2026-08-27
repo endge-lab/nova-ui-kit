@@ -1,10 +1,11 @@
 import type { NovaSchemaRegistry } from '@endge/nova'
+import type { TooltipsSchema } from '@/components/Tooltip/tooltip.types'
+import type { TooltipsDescriptor } from '@/components/Tooltip/tooltips.config'
 import { Tooltips } from '@/components/Tooltip/Tooltips'
 import {
   createTooltipsDescriptor,
-  type TooltipsDescriptor,
+
 } from '@/components/Tooltip/tooltips.config'
-import type { TooltipsSchema } from '@/components/Tooltip/tooltip.types'
 
 export const TOOLTIPS_DESCRIPTOR: TooltipsDescriptor = createTooltipsDescriptor((context, schema) => {
   const tooltipsSchema = schema as TooltipsSchema

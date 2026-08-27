@@ -1,20 +1,21 @@
-import type { EventList } from '@endge/utils'
 import type { NovaApp, NovaSurface } from '@endge/nova'
-import {
-  BUTTON_NODE_DESCRIPTOR,
-  normalizeButtonProps,
-  type ButtonDescriptor,
-} from '@/components/Button/button.config'
+import type { EventList } from '@endge/utils'
+import type { ButtonDescriptor } from '@/components/Button/button.config'
 import type {
   ButtonApi,
   ButtonProps,
   ButtonResolvedProps,
 } from '@/components/Button/button.types'
+import { buildButtonSchema } from '@/components/Button/button-render'
+import {
+  BUTTON_NODE_DESCRIPTOR,
+
+  normalizeButtonProps,
+} from '@/components/Button/button.config'
+import { findNovaUiRoot } from '@/components/Root/root-target'
 import {
   NovaUiComponentNode,
 } from '@/shared/component/component-props'
-import { findNovaUiRoot } from '@/components/Root/root-target'
-import { buildButtonSchema } from '@/components/Button/button-render'
 
 /**
  * Описывает ответственность Button в архитектуре проекта.
@@ -99,7 +100,9 @@ export class Button<E extends EventList = Record<string, any>>
    */
   private setupEvents(): void {
     this.on('mouseenter', () => {
-      if (this.props.disabled) return
+      if (this.props.disabled) {
+        return
+      }
       this.hovered = true
       this.playUiSound('hover')
       this.dirty({ render: true })
@@ -109,7 +112,7 @@ export class Button<E extends EventList = Record<string, any>>
       this.pressed = false
       this.dirty({ render: true })
     })
-    this.on('mousedown', event => {
+    this.on('mousedown', (event) => {
       if (this.props.disabled || this.props.loading) {
         this.playUiSound('disabledPress')
         return false
@@ -121,13 +124,17 @@ export class Button<E extends EventList = Record<string, any>>
       return false
     })
     this.on('mouseup', () => {
-      if (!this.pressed) return false
+      if (!this.pressed) {
+        return false
+      }
       this.pressed = false
       this.dirty({ render: true })
       return false
     })
-    this.on('keydown', event => {
-      if (event.key !== 'Enter' && event.key !== ' ') return
+    this.on('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') {
+        return
+      }
       this.press(event)
     })
   }

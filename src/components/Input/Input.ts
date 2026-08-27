@@ -1,24 +1,6 @@
+import type { NovaApp, NovaInputValidationResult, NovaRectLike, NovaSchema, NovaSurface, NovaTextInputLayoutResult, NovaTextMeasureContext } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  NovaCaretBlinkController,
-  NovaClipboardService,
-  NovaInputProxyService,
-  NovaInputValidationController,
-  NovaInputTextLayoutEngine,
-  NovaTextInputController,
-  type NovaApp,
-  type NovaInputValidationResult,
-  type NovaRectLike,
-  type NovaSchema,
-  type NovaSurface,
-  type NovaTextInputLayoutResult,
-  type NovaTextMeasureContext,
-} from '@endge/nova'
-import {
-  INPUT_NODE_DESCRIPTOR,
-  normalizeInputProps,
-  type InputDescriptor,
-} from '@/components/Input/input.config'
+import type { InputDescriptor } from '@/components/Input/input.config'
 import type {
   InputApi,
   InputComponentKind,
@@ -27,8 +9,24 @@ import type {
   SelectInputOption,
 } from '@/components/Input/input.types'
 import {
-  NovaUiComponentNode,
+
+  NovaCaretBlinkController,
+  NovaClipboardService,
+  NovaInputProxyService,
+  NovaInputTextLayoutEngine,
+  NovaInputValidationController,
+
+  NovaTextInputController,
+
+} from '@endge/nova'
+import {
+  INPUT_NODE_DESCRIPTOR,
+
+  normalizeInputProps,
+} from '@/components/Input/input.config'
+import {
   buildBoxSchema,
+  NovaUiComponentNode,
   resolveComponentTextStyle,
   resolveInteractionBackground,
 } from '@/shared/component/component-props'
@@ -64,7 +62,7 @@ export class Input<E extends EventList = Record<string, any>>
     app: NovaApp<E>,
     surface: NovaSurface<E>,
     props: InputProps = {},
-    options: { componentId?: string; kind?: InputComponentKind } = {},
+    options: { componentId?: string, kind?: InputComponentKind } = {},
     descriptor: InputDescriptor = INPUT_NODE_DESCRIPTOR,
   ) {
     const kind = options.kind ?? 'input'
@@ -76,7 +74,9 @@ export class Input<E extends EventList = Record<string, any>>
     this.api = this.createApi()
     this.options({ interactive: !this.props.disabled })
     this.setupEvents()
-    if (this.props.autofocus) this.focusInput()
+    if (this.props.autofocus) {
+      this.focusInput()
+    }
   }
 
   protected kindName: InputComponentKind = 'input'
@@ -102,7 +102,9 @@ export class Input<E extends EventList = Record<string, any>>
     this.layoutCache = this.createTextLayout()
     const schema = this.renderInputFrame()
     this.pushInputContent(schema)
-    if (this.kindName === 'select' && this.props.opened) this.pushSelectMenu(schema)
+    if (this.kindName === 'select' && this.props.opened) {
+      this.pushSelectMenu(schema)
+    }
     this.renderer.schema(schema)
   }
 
@@ -120,7 +122,9 @@ export class Input<E extends EventList = Record<string, any>>
     if (changedKeys.includes('disabled') || changedKeys.includes('readonly') || changedKeys.includes('maxLength')) {
       this.controller = this.createController(this.controller.getState().draft)
     }
-    if (changedKeys.includes('validate')) this.validator = this.createValidator()
+    if (changedKeys.includes('validate')) {
+      this.validator = this.createValidator()
+    }
   }
 
   /**
@@ -132,7 +136,7 @@ export class Input<E extends EventList = Record<string, any>>
     super.onUnmount()
   }
 
-  protected readonly caret = new NovaCaretBlinkController(visible => {
+  protected readonly caret = new NovaCaretBlinkController((visible) => {
     this.caretVisible = visible
     this.dirty({ render: true })
   })
@@ -232,10 +236,18 @@ export class Input<E extends EventList = Record<string, any>>
     const text = empty ? this.props.placeholder : visibleText
     const iconSize = Math.max(12, Math.min(18, (this.props.fontSize ?? textStyle.fontSize) + 3))
 
-    if (this.props.icon) pushIcon(schema, this.props.icon, 10, (this.height - iconSize) / 2, iconSize, this.props.disabled ? 0.5 : 0.85)
-    if (this.kindName === 'search' && !this.props.icon) this.pushSearchGlyph(schema, 12, this.height / 2, iconSize)
-    if (this.props.prefix) pushText(schema, this.props.prefix, 10, 0, 36, this.height, { ...textStyle, color: this.resolveThemeValue('var(--nova-input-affix-color, #64748b)') ?? textStyle.color }, { align: 'center' })
-    if (this.props.suffix) pushText(schema, this.props.suffix, this.width - 46, 0, 36, this.height, { ...textStyle, color: this.resolveThemeValue('var(--nova-input-affix-color, #64748b)') ?? textStyle.color }, { align: 'center' })
+    if (this.props.icon) {
+      pushIcon(schema, this.props.icon, 10, (this.height - iconSize) / 2, iconSize, this.props.disabled ? 0.5 : 0.85)
+    }
+    if (this.kindName === 'search' && !this.props.icon) {
+      this.pushSearchGlyph(schema, 12, this.height / 2, iconSize)
+    }
+    if (this.props.prefix) {
+      pushText(schema, this.props.prefix, 10, 0, 36, this.height, { ...textStyle, color: this.resolveThemeValue('var(--nova-input-affix-color, #64748b)') ?? textStyle.color }, { align: 'center' })
+    }
+    if (this.props.suffix) {
+      pushText(schema, this.props.suffix, this.width - 46, 0, 36, this.height, { ...textStyle, color: this.resolveThemeValue('var(--nova-input-affix-color, #64748b)') ?? textStyle.color }, { align: 'center' })
+    }
 
     const contentX = layout.contentX
     const contentY = this.kindName === 'textarea' ? layout.contentY : (this.height - textStyle.lineHeight) / 2
@@ -255,7 +267,8 @@ export class Input<E extends EventList = Record<string, any>>
 
     if (this.kindName === 'textarea') {
       this.pushMultilineText(schema, layout, text, contentY, textStyle, textColor)
-    } else {
+    }
+    else {
       pushText(schema, text, contentX, contentY, contentWidth, contentHeight, { ...textStyle, color: textColor }, { align: this.props.align, ellipsis: true })
     }
 
@@ -271,10 +284,18 @@ export class Input<E extends EventList = Record<string, any>>
       })
     }
 
-    if (this.props.clearable && state.draft.length > 0) this.pushClearButton(schema)
-    if (this.kindName === 'password' && this.props.revealable) this.pushRevealButton(schema)
-    if (this.kindName === 'select') this.pushSelectChevron(schema)
-    if (this.isInvalid() && this.kindName !== 'field') this.pushErrorMark(schema)
+    if (this.props.clearable && state.draft.length > 0) {
+      this.pushClearButton(schema)
+    }
+    if (this.kindName === 'password' && this.props.revealable) {
+      this.pushRevealButton(schema)
+    }
+    if (this.kindName === 'select') {
+      this.pushSelectChevron(schema)
+    }
+    if (this.isInvalid() && this.kindName !== 'field') {
+      this.pushErrorMark(schema)
+    }
   }
 
   /**
@@ -296,8 +317,12 @@ export class Input<E extends EventList = Record<string, any>>
     const top = layout.contentY
     const bottom = layout.contentY + layout.contentHeight
     for (const line of layout.lines) {
-      if (line.y + line.height < top) continue
-      if (line.y > bottom) continue
+      if (line.y + line.height < top) {
+        continue
+      }
+      if (line.y > bottom) {
+        continue
+      }
       pushText(schema, line.text, layout.contentX, line.y, layout.contentWidth, line.height, { ...style, color }, { align: this.props.align, ellipsis: false })
     }
   }
@@ -339,7 +364,9 @@ export class Input<E extends EventList = Record<string, any>>
    */
   protected setupEvents(): void {
     this.on('mouseenter', () => {
-      if (this.props.disabled) return
+      if (this.props.disabled) {
+        return
+      }
       this.hovered = true
       this.playUiSound('hover')
       this.dirty({ render: true })
@@ -350,7 +377,7 @@ export class Input<E extends EventList = Record<string, any>>
       this.selecting = false
       this.dirty({ render: true })
     })
-    this.on('mousedown', event => {
+    this.on('mousedown', (event) => {
       if (this.props.disabled) {
         this.playUiSound('disabledPress')
         return false
@@ -382,8 +409,10 @@ export class Input<E extends EventList = Record<string, any>>
       this.dirty({ render: true })
       return false
     })
-    this.on('mousemove', event => {
-      if (!this.selecting || this.props.disabled) return
+    this.on('mousemove', (event) => {
+      if (!this.selecting || this.props.disabled) {
+        return
+      }
       const index = this.indexFromEvent(event)
       const selection = this.controller.getSelection()
       this.controller.select(selection.start, index)
@@ -396,17 +425,17 @@ export class Input<E extends EventList = Record<string, any>>
       this.dirty({ render: true })
       return false
     })
-    this.on('dblclick', event => {
+    this.on('dblclick', (event) => {
       const index = this.indexFromEvent(event)
       this.selectWord(index)
       return false
     })
     this.on('focus', () => this.focusInput())
     this.on('blur', () => this.blurInput())
-    this.on('keydown', event => {
+    this.on('keydown', (event) => {
       this.handleKeydown(event)
     })
-    this.on('wheel', event => {
+    this.on('wheel', (event) => {
       if (this.kindName === 'number' && this.controller.getState().focused) {
         this.stepNumber(event.deltaY < 0 ? 1 : -1, event)
         return false
@@ -423,9 +452,13 @@ export class Input<E extends EventList = Record<string, any>>
    * Обрабатывает runtime-событие Input.
    */
   protected handleKeydown(event: KeyboardEvent): void {
-    if (this.props.disabled) return
+    if (this.props.disabled) {
+      return
+    }
     const command = event.metaKey || event.ctrlKey
-    if (this.shouldDelegateKeyToProxy(event)) return
+    if (this.shouldDelegateKeyToProxy(event)) {
+      return
+    }
     if (command && event.key.toLowerCase() === 'c') {
       void clipboard.writeText(this.controller.getSelectedText(), this.proxy.element)
       event.preventDefault()
@@ -439,7 +472,7 @@ export class Input<E extends EventList = Record<string, any>>
       return
     }
     if (command && event.key.toLowerCase() === 'v') {
-      void clipboard.readText(this.proxy.element).then(result => {
+      void clipboard.readText(this.proxy.element).then((result) => {
         if (result.ok && result.text !== undefined) {
           this.controller.insertText(result.text, { event, reason: 'paste' })
           this.afterInput('paste', event)
@@ -454,14 +487,18 @@ export class Input<E extends EventList = Record<string, any>>
       return
     }
     const handled = this.controller.handleKeydown(event, { event, reason: 'keyboard' })
-    if (handled) this.afterInput(event.key === 'Enter' ? 'commit' : 'keyboard', event)
-    if (this.kindName === 'search' && event.key === 'Enter') this.props.onSearch?.(this.controller.getState().draft, this.context('search', event))
+    if (handled) {
+      this.afterInput(event.key === 'Enter' ? 'commit' : 'keyboard', event)
+    }
+    if (this.kindName === 'search' && event.key === 'Enter') {
+      this.props.onSearch?.(this.controller.getState().draft, this.context('search', event))
+    }
   }
 
   /**
    * Обновляет значение состояния Input.
    */
-  protected setInputValue(value: string | number, context: { event?: Event; reason?: string } = {}): void {
+  protected setInputValue(value: string | number, context: { event?: Event, reason?: string } = {}): void {
     this.controller.setValue(this.formatValue(value), context)
     this.syncProxy()
     this.runValidationIfNeeded('onChange', context.event)
@@ -472,7 +509,7 @@ export class Input<E extends EventList = Record<string, any>>
   /**
    * Фиксирует подготовленные изменения Input.
    */
-  protected commitInput(context: { event?: Event; reason?: string } = {}): void {
+  protected commitInput(context: { event?: Event, reason?: string } = {}): void {
     this.controller.commit(context)
     this.runValidationIfNeeded('onCommit', context.event)
     this.props.onCommit?.(this.readParsedValue(), this.context(context.reason ?? 'commit', context.event))
@@ -483,7 +520,7 @@ export class Input<E extends EventList = Record<string, any>>
   /**
    * Выполняет расширяемый шаг cancelInput для Input.
    */
-  protected cancelInput(context: { event?: Event; reason?: string } = {}): void {
+  protected cancelInput(context: { event?: Event, reason?: string } = {}): void {
     this.controller.cancel(context)
     this.props.onCancel?.(this.context(context.reason ?? 'cancel', context.event))
     this.syncProxy()
@@ -496,7 +533,9 @@ export class Input<E extends EventList = Record<string, any>>
   protected focusInput(event?: Event): void {
     this.focus(event)
     this.controller.focus()
-    if (this.props.selectOnFocus) this.controller.selectAll()
+    if (this.props.selectOnFocus) {
+      this.controller.selectAll()
+    }
     const state = this.controller.getState()
     this.proxy.focus(state.draft, state.selectionStart, state.selectionEnd)
     this.caret.start()
@@ -531,7 +570,7 @@ export class Input<E extends EventList = Record<string, any>>
   /**
    * Выполняет расширяемый шаг runValidation для Input.
    */
-  protected async runValidation(reason: string): Promise<{ result: NovaInputValidationResult; message?: string }> {
+  protected async runValidation(reason: string): Promise<{ result: NovaInputValidationResult, message?: string }> {
     const state = await this.validator.validate(this.readParsedValue(), this.context(reason))
     this.validationMessage = state.message
     this.props.onValidationChange?.(state.result, this.context(reason))
@@ -543,8 +582,10 @@ export class Input<E extends EventList = Record<string, any>>
    * Выполняет расширяемый шаг runValidationIfNeeded для Input.
    */
   protected runValidationIfNeeded(mode: InputResolvedProps['validation'], event?: Event): void {
-    if (this.props.validation !== mode || !this.props.validate) return
-    void this.validator.validate(this.readParsedValue(), this.context(mode, event)).then(state => {
+    if (this.props.validation !== mode || !this.props.validate) {
+      return
+    }
+    void this.validator.validate(this.readParsedValue(), this.context(mode, event)).then((state) => {
       this.validationMessage = state.message
       this.props.onValidationChange?.(state.result, this.context(mode, event))
       this.dirty({ render: true })
@@ -556,7 +597,9 @@ export class Input<E extends EventList = Record<string, any>>
    */
   protected readParsedValue(): unknown {
     const text = this.controller.getState().draft
-    if (this.props.parse) return this.props.parse(text, this.context('parse'))
+    if (this.props.parse) {
+      return this.props.parse(text, this.context('parse'))
+    }
     if (this.kindName === 'number') {
       const value = Number(text)
       return Number.isFinite(value) ? value : undefined
@@ -568,7 +611,9 @@ export class Input<E extends EventList = Record<string, any>>
    * Выполняет расширяемый шаг formatValue для Input.
    */
   protected formatValue(value: unknown): string {
-    if (this.props.format) return this.props.format(value, this.context('format'))
+    if (this.props.format) {
+      return this.props.format(value, this.context('format'))
+    }
     if (this.kindName === 'number' && typeof value === 'number' && Number.isFinite(value) && this.props.precision !== undefined) {
       return value.toFixed(this.props.precision)
     }
@@ -586,7 +631,9 @@ export class Input<E extends EventList = Record<string, any>>
       disabled: this.props.disabled,
       maxLength: this.props.maxLength,
       onCommit: (_value, context) => {
-        if (context.reason !== 'api') this.props.onCommit?.(this.readParsedValue(), this.context(context.reason ?? 'commit', context.event))
+        if (context.reason !== 'api') {
+          this.props.onCommit?.(this.readParsedValue(), this.context(context.reason ?? 'commit', context.event))
+        }
       },
       onCancel: context => this.props.onCancel?.(this.context(context.reason ?? 'cancel', context.event)),
     })
@@ -606,7 +653,9 @@ export class Input<E extends EventList = Record<string, any>>
     return new NovaInputProxyService({
       engine: this.props.inputEngine,
       onInput: (value, event) => {
-        if (this.props.inputEngine === 'canvas') return
+        if (this.props.inputEngine === 'canvas') {
+          return
+        }
         this.controller.setDraft(value, { event, reason: 'proxy' })
         this.syncControllerSelectionFromProxy()
         this.afterInput('proxy', event)
@@ -653,7 +702,9 @@ export class Input<E extends EventList = Record<string, any>>
   protected measureInputText(text: string, context: NovaTextMeasureContext): number {
     const key = `${context.fontFamily}|${context.fontSize}|${context.fontWeight}|${context.fontStyle}|${text}`
     const cached = this.textMeasureCache.get(key)
-    if (cached !== undefined) return cached
+    if (cached !== undefined) {
+      return cached
+    }
     const width = measureNovaUiTextWidth(text, {
       ...context,
       fontStyle: context.fontStyle ?? 'normal',
@@ -666,7 +717,9 @@ export class Input<E extends EventList = Record<string, any>>
    * Выполняет расширяемый шаг displayText для Input.
    */
   protected displayText(value: string): string {
-    if (this.kindName === 'password' && !this.revealed) return '*'.repeat(value.length)
+    if (this.kindName === 'password' && !this.revealed) {
+      return '*'.repeat(value.length)
+    }
     const selected = this.kindName === 'select'
       ? this.props.options.find(option => String(option.value) === value)
       : undefined
@@ -717,7 +770,9 @@ export class Input<E extends EventList = Record<string, any>>
    */
   protected syncControllerSelectionFromProxy(): void {
     const element = this.proxy.element
-    if (!element) return
+    if (!element) {
+      return
+    }
     this.controller.select(element.selectionStart ?? 0, element.selectionEnd ?? element.selectionStart ?? 0)
   }
 
@@ -726,16 +781,30 @@ export class Input<E extends EventList = Record<string, any>>
    */
   protected shouldDelegateKeyToProxy(event: KeyboardEvent): boolean {
     const element = this.proxy.element
-    if (!element || this.props.inputEngine === 'canvas') return false
-    if (element.ownerDocument.activeElement !== element) return false
-    if (this.props.readonly) return false
+    if (!element || this.props.inputEngine === 'canvas') {
+      return false
+    }
+    if (element.ownerDocument.activeElement !== element) {
+      return false
+    }
+    if (this.props.readonly) {
+      return false
+    }
 
     const command = event.metaKey || event.ctrlKey
     const key = event.key.toLowerCase()
-    if (command && (key === 'x' || key === 'v')) return true
-    if (!command && (event.key === 'Backspace' || event.key === 'Delete')) return true
-    if (!command && event.key.length === 1 && !event.altKey) return true
-    if (this.kindName === 'textarea' && event.key === 'Enter' && !event.metaKey && !event.ctrlKey) return true
+    if (command && (key === 'x' || key === 'v')) {
+      return true
+    }
+    if (!command && (event.key === 'Backspace' || event.key === 'Delete')) {
+      return true
+    }
+    if (!command && event.key.length === 1 && !event.altKey) {
+      return true
+    }
+    if (this.kindName === 'textarea' && event.key === 'Enter' && !event.metaKey && !event.ctrlKey) {
+      return true
+    }
     return false
   }
 
@@ -763,10 +832,14 @@ export class Input<E extends EventList = Record<string, any>>
    * Выполняет расширяемый шаг optionFromEvent для Input.
    */
   protected optionFromEvent(event: MouseEvent): SelectInputOption | undefined {
-    if (this.kindName !== 'select' || !this.props.opened) return undefined
+    if (this.kindName !== 'select' || !this.props.opened) {
+      return undefined
+    }
     const { x, y } = this.events.getCanvasMousePosition(event)
     const [localX, localY] = this.toLocal(x, y)
-    if (localX < 0 || localX > this.width || localY < this.height + 4) return undefined
+    if (localX < 0 || localX > this.width || localY < this.height + 4) {
+      return undefined
+    }
     const index = Math.floor((localY - this.height - 8) / 28)
     return this.props.options[index]
   }
@@ -775,7 +848,9 @@ export class Input<E extends EventList = Record<string, any>>
    * Выполняет расширяемый шаг pickOption для Input.
    */
   protected pickOption(option: SelectInputOption, event?: Event): void {
-    if (option.disabled) return
+    if (option.disabled) {
+      return
+    }
     this.setInputValue(option.value, { event, reason: 'select' })
     this.commitInput({ event, reason: 'select' })
     this.setProps({ opened: false })
@@ -785,7 +860,9 @@ export class Input<E extends EventList = Record<string, any>>
    * Выполняет расширяемый шаг hitClearButton для Input.
    */
   protected hitClearButton(event: MouseEvent): boolean {
-    if (!this.props.clearable) return false
+    if (!this.props.clearable) {
+      return false
+    }
     const { x, y } = this.events.getCanvasMousePosition(event)
     const [localX, localY] = this.toLocal(x, y)
     return localX >= this.width - 30 && localX <= this.width - 8 && localY >= 6 && localY <= this.height - 6
@@ -795,7 +872,9 @@ export class Input<E extends EventList = Record<string, any>>
    * Выполняет расширяемый шаг hitRevealButton для Input.
    */
   protected hitRevealButton(event: MouseEvent): boolean {
-    if (this.kindName !== 'password' || !this.props.revealable) return false
+    if (this.kindName !== 'password' || !this.props.revealable) {
+      return false
+    }
     const { x, y } = this.events.getCanvasMousePosition(event)
     const [localX, localY] = this.toLocal(x, y)
     return localX >= this.width - 30 && localX <= this.width - 8 && localY >= 6 && localY <= this.height - 6
@@ -804,7 +883,7 @@ export class Input<E extends EventList = Record<string, any>>
   /**
    * Выполняет расширяемый шаг context для Input.
    */
-  protected context(reason: string, event?: Event): { event?: Event; reason: string; component: InputComponentKind } {
+  protected context(reason: string, event?: Event): { event?: Event, reason: string, component: InputComponentKind } {
     return { event, reason, component: this.kindName }
   }
 
@@ -1016,7 +1095,9 @@ export class SelectInput<E extends EventList = Record<string, any>> extends Inpu
       const state = this.controller.getState()
       const currentIndex = Math.max(0, options.findIndex(option => String(option.value) === state.draft))
       const next = options[Math.max(0, Math.min(options.length - 1, currentIndex + (event.key === 'ArrowDown' ? 1 : -1)))]
-      if (next) this.pickOption(next, event)
+      if (next) {
+        this.pickOption(next, event)
+      }
       event.preventDefault()
       return
     }

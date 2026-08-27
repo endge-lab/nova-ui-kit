@@ -1,4 +1,6 @@
 import type { NovaBounds, NovaComponentSchema, NovaText } from '@endge/nova'
+import type { NovaUiMotionOptions } from '@/domain/domain.types'
+import type { NovaUiSpacing } from '@/shared/layout'
 import type {
   NovaUiBorder,
   NovaUiFontStyle,
@@ -6,8 +8,6 @@ import type {
   NovaUiStyleDisplay,
   NovaUiStyleIdentityProps,
 } from '@/shared/style'
-import type { NovaUiSpacing } from '@/shared/layout'
-import type { NovaUiMotionOptions } from '@/domain/domain.types'
 
 export const TEXT_BLOCK_SCHEMA_TYPE = 'nova-ui.text-block'
 

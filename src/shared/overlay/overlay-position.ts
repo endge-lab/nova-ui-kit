@@ -1,14 +1,14 @@
-import { clamp, finiteNumber } from '@/shared/component'
 import type { NovaUiOverlayAnchor, NovaUiOverlayCollisionOptions, NovaUiOverlayPlacement, NovaUiOverlayRect } from '@/shared/overlay/overlay.types'
+import { clamp, finiteNumber } from '@/shared/component'
 
 export function resolveNovaUiOverlayPosition(input: {
   root: NovaUiOverlayRect
   anchor?: NovaUiOverlayAnchor
-  overlay: { width: number; height: number }
+  overlay: { width: number, height: number }
   placement?: NovaUiOverlayPlacement
   offset?: number
   collision?: NovaUiOverlayCollisionOptions
-}): { x: number; y: number; placement: NovaUiOverlayPlacement } {
+}): { x: number, y: number, placement: NovaUiOverlayPlacement } {
   const placement = input.placement ?? 'bottom-start'
   const offset = finiteNumber(input.offset, 8)
   const anchor = input.anchor?.kind === 'pointer'
@@ -22,7 +22,9 @@ export function resolveNovaUiOverlayPosition(input: {
   if (mode === 'flip') {
     const side = placement.split('-')[0]
     const over = side === 'top' ? y < padding : side === 'bottom' ? y + input.overlay.height > input.root.height - padding : side === 'left' ? x < padding : side === 'right' ? x + input.overlay.width > input.root.width - padding : false
-    if (over) ({ x, y } = preferred(anchor, input.overlay.width, input.overlay.height, flip(placement), offset))
+    if (over) {
+      ({ x, y } = preferred(anchor, input.overlay.width, input.overlay.height, flip(placement), offset))
+    }
   }
   if (mode !== 'none') {
     x = clamp(x, padding, Math.max(padding, input.root.width - input.overlay.width - padding))
@@ -31,13 +33,17 @@ export function resolveNovaUiOverlayPosition(input: {
   return { x, y, placement }
 }
 
-function preferred(anchor: NovaUiOverlayRect, width: number, height: number, placement: NovaUiOverlayPlacement, offset: number): { x: number; y: number } {
-  if (placement === 'center') return { x: anchor.x + (anchor.width - width) / 2, y: anchor.y + (anchor.height - height) / 2 }
+function preferred(anchor: NovaUiOverlayRect, width: number, height: number, placement: NovaUiOverlayPlacement, offset: number): { x: number, y: number } {
+  if (placement === 'center') {
+    return { x: anchor.x + (anchor.width - width) / 2, y: anchor.y + (anchor.height - height) / 2 }
+  }
   const [side, align = 'center'] = placement.split('-')
   let x = side === 'right' ? anchor.x + anchor.width + offset : side === 'left' ? anchor.x - width - offset : anchor.x
   let y = side === 'bottom' ? anchor.y + anchor.height + offset : side === 'top' ? anchor.y - height - offset : anchor.y
-  if (side === 'top' || side === 'bottom') x = align === 'end' ? anchor.x + anchor.width - width : align === 'start' ? anchor.x : anchor.x + (anchor.width - width) / 2
-  else y = align === 'end' ? anchor.y + anchor.height - height : align === 'start' ? anchor.y : anchor.y + (anchor.height - height) / 2
+  if (side === 'top' || side === 'bottom') {
+    x = align === 'end' ? anchor.x + anchor.width - width : align === 'start' ? anchor.x : anchor.x + (anchor.width - width) / 2
+  }
+  else { y = align === 'end' ? anchor.y + anchor.height - height : align === 'start' ? anchor.y : anchor.y + (anchor.height - height) / 2 }
   return { x, y }
 }
 

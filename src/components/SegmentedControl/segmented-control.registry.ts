@@ -1,12 +1,13 @@
 import type { NovaSchemaRegistry } from '@endge/nova'
-import { SegmentedControl } from '@/components/SegmentedControl/SegmentedControl'
+import type { SegmentedControlDescriptor } from '@/components/SegmentedControl/segmented-control.config'
+import type { SegmentedControlSchema } from '@/components/SegmentedControl/segmented-control.types'
 import {
-  SEGMENTED_CONTROL_FIELD_DEFINITIONS,
   createSegmentedControlDescriptor,
   normalizeSegmentedControlProps,
-  type SegmentedControlDescriptor,
+  SEGMENTED_CONTROL_FIELD_DEFINITIONS,
+
 } from '@/components/SegmentedControl/segmented-control.config'
-import type { SegmentedControlSchema } from '@/components/SegmentedControl/segmented-control.types'
+import { SegmentedControl } from '@/components/SegmentedControl/SegmentedControl'
 
 export const SEGMENTED_CONTROL_DESCRIPTOR: SegmentedControlDescriptor = createSegmentedControlDescriptor((context, schema) => {
   const segmentedSchema = schema as SegmentedControlSchema

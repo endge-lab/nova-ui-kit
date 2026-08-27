@@ -1,12 +1,13 @@
 import type { NovaSchemaRegistry } from '@endge/nova'
+import type { SurfaceDescriptor } from '@/components/Surface/surface.config'
+import type { SurfaceSchema } from '@/components/Surface/surface.types'
 import { Surface } from '@/components/Surface/Surface'
 import {
-  SURFACE_FIELD_DEFINITIONS,
   createSurfaceDescriptor,
   normalizeSurfaceProps,
-  type SurfaceDescriptor,
+  SURFACE_FIELD_DEFINITIONS,
+
 } from '@/components/Surface/surface.config'
-import type { SurfaceSchema } from '@/components/Surface/surface.types'
 
 export const SURFACE_DESCRIPTOR: SurfaceDescriptor = createSurfaceDescriptor((context, schema) => {
   const surfaceSchema = schema as SurfaceSchema

@@ -5,19 +5,18 @@ import type {
   NovaComponentSchema,
 } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  NOVA_UI_COMMON_DIRTY_POLICY,
-  NOVA_UI_COMMON_FIELD_DEFINITIONS,
-  commonMeasureBounds,
-  normalizeCommonProps,
-  sizeTokenHeight,
-} from '@/shared/component'
+import type { ButtonApi, ButtonProps, ButtonResolvedProps } from '@/components/Button/button.types'
 import {
   BUTTON_SCHEMA_TYPE,
-  type ButtonApi,
-  type ButtonProps,
-  type ButtonResolvedProps,
+
 } from '@/components/Button/button.types'
+import {
+  commonMeasureBounds,
+  normalizeCommonProps,
+  NOVA_UI_COMMON_DIRTY_POLICY,
+  NOVA_UI_COMMON_FIELD_DEFINITIONS,
+  sizeTokenHeight,
+} from '@/shared/component'
 
 export type ButtonDescriptor = NovaComponentDescriptor<
   ButtonResolvedProps,
@@ -92,7 +91,9 @@ export function createButtonDescriptor(createNode?: ButtonNodeFactory): ButtonDe
     measureBounds: (_context, schema) => commonMeasureBounds(schema, normalizeButtonProps),
   }
 
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 

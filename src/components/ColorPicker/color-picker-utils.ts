@@ -22,7 +22,9 @@ export function clampAlpha(value: number): number {
 
 export function parseHexColor(value: string): NovaUiRgbaColor | null {
   const raw = value.trim().replace(/^#/, '')
-  if (!/^[0-9a-fA-F]{3}$|^[0-9a-fA-F]{6}$|^[0-9a-fA-F]{8}$/.test(raw)) return null
+  if (!/^[0-9a-f]{3}$|^[0-9a-f]{6}$|^[0-9a-f]{8}$/i.test(raw)) {
+    return null
+  }
   const full = raw.length === 3
     ? raw.split('').map(char => `${char}${char}`).join('')
     : raw
@@ -35,14 +37,20 @@ export function parseHexColor(value: string): NovaUiRgbaColor | null {
 
 export function parseRgbaColor(value: string): NovaUiRgbaColor | null {
   const match = value.trim().match(/^rgba?\(([^)]+)\)$/i)
-  if (!match) return null
+  if (!match) {
+    return null
+  }
   const parts = match[1]?.split(',').map(part => part.trim()) ?? []
-  if (parts.length !== 3 && parts.length !== 4) return null
+  if (parts.length !== 3 && parts.length !== 4) {
+    return null
+  }
   const r = Number(parts[0])
   const g = Number(parts[1])
   const b = Number(parts[2])
   const a = parts.length === 4 ? Number(parts[3]) : 1
-  if (![r, g, b, a].every(Number.isFinite)) return null
+  if (![r, g, b, a].every(Number.isFinite)) {
+    return null
+  }
   return {
     r: clampColorChannel(r),
     g: clampColorChannel(g),
@@ -60,7 +68,9 @@ export function formatNovaUiColor(color: NovaUiRgbaColor): string {
   const g = clampColorChannel(color.g)
   const b = clampColorChannel(color.b)
   const a = clampAlpha(color.a)
-  if (a < 1) return `rgba(${r}, ${g}, ${b}, ${a})`
+  if (a < 1) {
+    return `rgba(${r}, ${g}, ${b}, ${a})`
+  }
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`
 }
 

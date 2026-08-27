@@ -1,10 +1,11 @@
-import type { EventList } from '@endge/utils'
 import type { NovaApp, NovaSchema, NovaSurface } from '@endge/nova'
-import { CHIP_NODE_DESCRIPTOR, normalizeChipProps, type ChipDescriptor } from '@/components/Chip/chip.config'
+import type { EventList } from '@endge/utils'
+import type { ChipDescriptor } from '@/components/Chip/chip.config'
 import type { ChipApi, ChipProps, ChipResolvedProps } from '@/components/Chip/chip.types'
+import { CHIP_NODE_DESCRIPTOR, normalizeChipProps } from '@/components/Chip/chip.config'
 import {
-  NovaUiComponentNode,
   buildBoxSchema,
+  NovaUiComponentNode,
   pushIcon,
   pushText,
   resolveComponentTextStyle,
@@ -46,11 +47,15 @@ export class Chip<E extends EventList = Record<string, any>>
   }
 
   press(event?: Event): void {
-    if (!this.props.disabled) this.props.onPress?.(event)
+    if (!this.props.disabled) {
+      this.props.onPress?.(event)
+    }
   }
 
   remove(event?: Event): void {
-    if (!this.props.disabled && this.props.removable) this.props.onRemove?.(event)
+    if (!this.props.disabled && this.props.removable) {
+      this.props.onRemove?.(event)
+    }
   }
 
   render(): void {
@@ -99,22 +104,28 @@ export class Chip<E extends EventList = Record<string, any>>
       this.pressed = false
       this.dirty({ render: true })
     })
-    this.on('mousedown', event => {
+    this.on('mousedown', (event) => {
       this.focus(event)
       this.pressed = true
       this.dirty({ render: true })
       return false
     })
-    this.on('mouseup', event => {
+    this.on('mouseup', (event) => {
       this.pressed = false
-      if (this.removeHit(event)) this.remove(event)
-      else this.press(event)
+      if (this.removeHit(event)) {
+        this.remove(event)
+      }
+      else { this.press(event) }
       this.dirty({ render: true })
       return false
     })
-    this.on('keydown', event => {
-      if (event.key === 'Delete' || event.key === 'Backspace') this.remove(event)
-      else if (event.key === 'Enter' || event.key === ' ') this.press(event)
+    this.on('keydown', (event) => {
+      if (event.key === 'Delete' || event.key === 'Backspace') {
+        this.remove(event)
+      }
+      else if (event.key === 'Enter' || event.key === ' ') {
+        this.press(event)
+      }
     })
   }
 

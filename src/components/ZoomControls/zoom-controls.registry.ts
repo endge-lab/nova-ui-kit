@@ -1,11 +1,12 @@
 import type { NovaSchemaRegistry } from '@endge/nova'
-import { ZoomControls } from '@/components/ZoomControls/ZoomControls'
+import type { ZoomControlsDescriptor } from '@/components/ZoomControls/zoom-controls.config'
+import type { ZoomControlsSchema } from '@/components/ZoomControls/zoom-controls.types'
 import {
   createZoomControlsDescriptor,
   normalizeZoomControlsProps,
-  type ZoomControlsDescriptor,
+
 } from '@/components/ZoomControls/zoom-controls.config'
-import type { ZoomControlsSchema } from '@/components/ZoomControls/zoom-controls.types'
+import { ZoomControls } from '@/components/ZoomControls/ZoomControls'
 
 export const ZOOM_CONTROLS_DESCRIPTOR: ZoomControlsDescriptor = createZoomControlsDescriptor((context, schema) => {
   const zoomSchema = schema as ZoomControlsSchema

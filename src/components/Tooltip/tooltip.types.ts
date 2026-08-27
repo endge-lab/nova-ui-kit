@@ -10,33 +10,33 @@ export type TooltipPointerTrigger = 'hover' | 'click' | false
 export type TooltipKeyboardTrigger = 'focus' | false
 export type TooltipModifier = 'ctrl' | 'meta' | 'shift' | 'alt'
 export type TooltipPointerButton = 'left' | 'middle' | 'right'
-export type TooltipTrigger =
-  | 'hover'
-  | 'focus'
-  | 'click'
-  | 'manual'
-  | {
+export type TooltipTrigger
+  = | 'hover'
+    | 'focus'
+    | 'click'
+    | 'manual'
+    | {
       pointer?: TooltipPointerTrigger
       keyboard?: TooltipKeyboardTrigger
       modifier?: TooltipModifier
       button?: TooltipPointerButton
     }
 
-export type TooltipContent =
-  | string
-  | { text: string }
-  | { markdown: string }
-  | { schema: NovaSchema | (() => NovaSchema) }
+export type TooltipContent
+  = | string
+    | { text: string }
+    | { markdown: string }
+    | { schema: NovaSchema | (() => NovaSchema) }
 
 export type TooltipContentMode = 'text' | 'markdown' | 'schema'
 
-export type TooltipInput =
-  | string
-  | boolean
-  | false
-  | null
-  | undefined
-  | ({
+export type TooltipInput
+  = | string
+    | boolean
+    | false
+    | null
+    | undefined
+    | ({
       type?: string
       value?: unknown
     } & object)

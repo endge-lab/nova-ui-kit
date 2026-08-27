@@ -1,3 +1,4 @@
+import type { NovaUiStyleComponentName } from '@/shared/style'
 import { describe, expect, it } from 'vitest'
 import {
   createEmptyStyleSheet,
@@ -6,7 +7,6 @@ import {
   planNovaUiStyleSheetInvalidation,
   validateNovaUiStyleSheetSource,
 } from '@/shared/style'
-import type { NovaUiStyleComponentName } from '@/shared/style'
 
 class BenchNode {
   readonly descriptor: { name: string }
@@ -36,11 +36,13 @@ class BenchNode {
 
   traverseAll(visitor: (node: unknown) => void): void {
     visitor(this)
-    for (const child of this.children) child.traverseAll(visitor)
+    for (const child of this.children) {
+      child.traverseAll(visitor)
+    }
   }
 }
 
-describe('NovaCSS style subscription performance', () => {
+describe('novaCSS style subscription performance', () => {
   it('prints exact selector invalidation report for 10k nodes', () => {
     const root = new BenchNode('root', 'Root', {})
     for (let index = 0; index < 10_000; index += 1) {

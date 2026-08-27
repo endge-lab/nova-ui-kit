@@ -1,7 +1,8 @@
 import type { NovaComponentCreateContext, NovaComponentDescriptor, NovaComponentNode, NovaComponentSchema } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import { NOVA_UI_COMMON_DIRTY_POLICY, NOVA_UI_COMMON_FIELD_DEFINITIONS, commonMeasureBounds, finiteNumber, normalizeCommonProps } from '@/shared/component'
-import { ACTION_LIST_SCHEMA_TYPE, type ActionListApi, type ActionListProps, type ActionListResolvedProps } from '@/components/ActionList/action-list.types'
+import type { ActionListApi, ActionListProps, ActionListResolvedProps } from '@/components/ActionList/action-list.types'
+import { ACTION_LIST_SCHEMA_TYPE } from '@/components/ActionList/action-list.types'
+import { commonMeasureBounds, finiteNumber, normalizeCommonProps, NOVA_UI_COMMON_DIRTY_POLICY, NOVA_UI_COMMON_FIELD_DEFINITIONS } from '@/shared/component'
 
 export type ActionListDescriptor = NovaComponentDescriptor<ActionListResolvedProps, ActionListApi, Record<string, never>, ActionListProps>
 export type ActionListNodeFactory = <E extends EventList>(context: NovaComponentCreateContext<E>, schema: NovaComponentSchema<ActionListProps>) => NovaComponentNode<ActionListResolvedProps, ActionListApi, Record<string, never>, ActionListProps, E>
@@ -12,7 +13,9 @@ export function normalizeActionListProps(props: ActionListProps = {}): ActionLis
 }
 export function createActionListDescriptor(createNode?: ActionListNodeFactory): ActionListDescriptor {
   const descriptor: ActionListDescriptor = { type: ACTION_LIST_SCHEMA_TYPE, name: 'ActionList', title: 'ActionList', version: '0.1.0', kind: 'node-component', dirtyPolicy: { matrix: NOVA_UI_COMMON_DIRTY_POLICY.matrix, update: [...NOVA_UI_COMMON_DIRTY_POLICY.update, 'items', 'itemHeight'], render: [...NOVA_UI_COMMON_DIRTY_POLICY.render, 'items', 'value', 'activeIndex', 'loop', 'selectable', 'parts', 'onAction', 'onValueChange'] }, fields: ACTION_LIST_FIELD_DEFINITIONS, normalize: schema => normalizeActionListProps(schema.props), measureBounds: (_context, schema) => commonMeasureBounds(schema, normalizeActionListProps) }
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 export const ACTION_LIST_NODE_DESCRIPTOR = createActionListDescriptor()

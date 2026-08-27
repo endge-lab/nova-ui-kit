@@ -1,13 +1,14 @@
 // @vitest-environment jsdom
 
-import { Nova, RaphSchedulerType, RendererType, type NovaApp, type NovaNode } from '@endge/nova'
+import type { NovaApp, NovaNode } from '@endge/nova'
+import { Nova, RaphSchedulerType, RendererType } from '@endge/nova'
 import { afterAll, beforeAll, bench, describe, vi } from 'vitest'
 import { NovaUIKit, registerNovaUIKit } from '@/index'
 
 const apps: Array<NovaApp<Record<string, any>>> = []
 let app: NovaApp<Record<string, any>>
 
-describe('Nova UI Kit FPS meter benchmark', () => {
+describe('nova UI Kit FPS meter benchmark', () => {
   bench('render 1000 fps meter frame updates', () => {
     const node = app.components.require('fps-bench') as unknown as NovaNode<Record<string, any>>
     for (let index = 0; index < 1_000; index += 1) {
@@ -28,7 +29,9 @@ beforeAll(() => {
     configurable: true,
   })
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation((type: string) => {
-    if (type === RendererType.Web2D) return create2DContextStub()
+    if (type === RendererType.Web2D) {
+      return create2DContextStub()
+    }
     return null
   })
   vi.spyOn(HTMLCanvasElement.prototype, 'getBoundingClientRect').mockImplementation(function getRect(this: HTMLCanvasElement) {
@@ -80,7 +83,9 @@ function create2DContextStub(): CanvasRenderingContext2D {
   }
   return new Proxy(state, {
     get(target, prop) {
-      if (!(prop in target)) target[prop] = vi.fn()
+      if (!(prop in target)) {
+        target[prop] = vi.fn()
+      }
       return target[prop]
     },
     set(target, prop, value) {

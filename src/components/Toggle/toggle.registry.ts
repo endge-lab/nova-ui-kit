@@ -1,12 +1,13 @@
 import type { NovaSchemaRegistry } from '@endge/nova'
+import type { ToggleDescriptor } from '@/components/Toggle/toggle.config'
+import type { ToggleSchema } from '@/components/Toggle/toggle.types'
 import { Toggle } from '@/components/Toggle/Toggle'
 import {
-  TOGGLE_FIELD_DEFINITIONS,
   createToggleDescriptor,
   normalizeToggleProps,
-  type ToggleDescriptor,
+  TOGGLE_FIELD_DEFINITIONS,
+
 } from '@/components/Toggle/toggle.config'
-import type { ToggleSchema } from '@/components/Toggle/toggle.types'
 
 export const TOGGLE_DESCRIPTOR: ToggleDescriptor = createToggleDescriptor((context, schema) => {
   const toggleSchema = schema as ToggleSchema

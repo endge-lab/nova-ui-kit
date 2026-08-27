@@ -5,14 +5,15 @@ import type { BadgeProps } from '@/components/Badge/badge.types'
 import type { ButtonProps } from '@/components/Button/button.types'
 import type { CheckboxProps } from '@/components/Checkbox/checkbox.types'
 import type { ChipProps } from '@/components/Chip/chip.types'
-import type { DividerProps } from '@/components/Divider/divider.types'
 import type { DialogProps, DialogsProps } from '@/components/Dialog/dialog.types'
+import type { DividerProps } from '@/components/Divider/divider.types'
 import type { FlexChildLayout, FlexProps } from '@/components/Flex/flex.types'
 import type { GridChildLayout, GridProps } from '@/components/Grid/grid.types'
 import type { ImageProps } from '@/components/Image/image.types'
 import type { InputProps } from '@/components/Input/input.types'
 import type { OverlayProps, OverlaysProps } from '@/components/Overlay/overlay.types'
 import type { PanelProps } from '@/components/Panel/panel.types'
+import type { PopoverProps } from '@/components/Popover/popover.types'
 import type { RootProps } from '@/components/Root/root.types'
 import type { ScrollAreaProps } from '@/components/ScrollArea/scroll-area.types'
 import type { ScrollbarProps } from '@/components/Scrollbar/scrollbar.types'
@@ -22,34 +23,33 @@ import type { SplitPaneProps } from '@/components/SplitPane/split-pane.types'
 import type { SurfaceProps } from '@/components/Surface/surface.types'
 import type { TagProps } from '@/components/Tag/tag.types'
 import type { TextBlockProps } from '@/components/TextBlock/text-block.types'
+import type { ToastProps, ToastRegionProps } from '@/components/Toast/toast.types'
 import type { ToggleProps } from '@/components/Toggle/toggle.types'
 import type { TooltipProps, TooltipsProps } from '@/components/Tooltip/tooltip.types'
-import type { PopoverProps } from '@/components/Popover/popover.types'
-import type { ToastProps, ToastRegionProps } from '@/components/Toast/toast.types'
 
 type NovaDslClassValue = string | Array<string | Record<string, boolean>> | Record<string, boolean>
 type NovaDslLayout = FlexChildLayout | GridChildLayout | Record<string, unknown>
 
 interface NovaDslControlFlowProps {
-  if?: unknown
+  'if'?: unknown
   'else-if'?: unknown
-  else?: boolean | ''
-  for?: string
+  'else'?: boolean | ''
+  'for'?: string
 }
 
 interface NovaDslRuntimeProps extends NovaDslControlFlowProps {
-  id?: string
-  key?: string | number
-  ref?: string
-  refKey?: string
+  'id'?: string
+  'key'?: string | number
+  'ref'?: string
+  'refKey'?: string
   'ref-key'?: string
-  context?: Record<string, unknown>
-  layout?: NovaDslLayout
-  class?: NovaDslClassValue
-  attrs?: Record<string, unknown>
+  'context'?: Record<string, unknown>
+  'layout'?: NovaDslLayout
+  'class'?: NovaDslClassValue
+  'attrs'?: Record<string, unknown>
 }
 
-type NovaDslComponent<TProps> = {
+interface NovaDslComponent<TProps> {
   new (): {
     $props: TProps & NovaDslRuntimeProps
     $slots: {

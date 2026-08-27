@@ -1,17 +1,18 @@
-import { describe, expect, it } from 'vitest'
 import type { NovaApp, NovaNode } from '@endge/nova'
+import type { NovaUiStyleComponentName } from '@/shared/style'
+import { describe, expect, it } from 'vitest'
 import {
-  NovaUiStyleDependencyTracker,
   createEmptyStyleSheet,
   createNovaUiStyleIdentityRegistry,
-  createNovaUiStyleSheetGraph,
   createNovaUiStyleSheetDataPath,
+  createNovaUiStyleSheetGraph,
   createNovaUiStyleTokenDataPath,
+
+  NovaUiStyleDependencyTracker,
   planNovaUiMediaInvalidation,
   planNovaUiStyleSheetInvalidation,
   resolveNovaUiVirtualStyleDeclarations,
   validateNovaUiStyleSheetSource,
-  type NovaUiStyleComponentName,
 } from '@/shared/style'
 
 class TestStyleNode {
@@ -45,11 +46,13 @@ class TestStyleNode {
 
   traverseAll(visitor: (node: unknown) => void): void {
     visitor(this)
-    for (const child of this.children) child.traverseAll(visitor)
+    for (const child of this.children) {
+      child.traverseAll(visitor)
+    }
   }
 }
 
-describe('NovaCSS style subscriptions graph', () => {
+describe('novaCSS style subscriptions graph', () => {
   it('selects exact candidates for id, class, type and attr selector changes', () => {
     const root = new TestStyleNode('root', 'Root')
     const byClass = root.append(new TestStyleNode('class-node', 'TextBlock', { className: 'featured' }))
@@ -142,9 +145,9 @@ describe('NovaCSS style subscriptions graph', () => {
   })
 })
 
-describe('NovaCSS Raph dependency tracker', () => {
+describe('novaCSS Raph dependency tracker', () => {
   it('collapses repeated token reads and removes stale owner subscriptions', () => {
-    const observed: Array<{ path: string; phase?: string }> = []
+    const observed: Array<{ path: string, phase?: string }> = []
     const disposed: Array<string> = []
     const app = { raph: { kernel: { transaction: (cb: () => void) => cb(), get: () => 0, set: () => {} } } } as unknown as NovaApp
     const owner = {

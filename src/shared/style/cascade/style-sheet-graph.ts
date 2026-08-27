@@ -1,19 +1,19 @@
-import {
-  normalizeStyleClasses,
-  readNovaUiStyleIdentityProps,
-} from '@/shared/style/identity/style-identity'
+import type {
+  NovaUiCompiledStyleRule,
+  NovaUiCompiledStyleSheet,
+  NovaUiStylableNode,
+  NovaUiStyleComponentName,
+  NovaUiStyleMediaContext,
+  NovaUiStyleMediaFeature,
+} from '@/shared/style/cascade/style-sheet'
 import {
   NOVA_UI_RESPONSIVE_BREAKPOINTS,
   resolveNovaUiResponsiveVariant,
 } from '@/shared/style/cascade/style-media'
-import type {
-  NovaUiCompiledStyleRule,
-  NovaUiCompiledStyleSheet,
-  NovaUiStyleComponentName,
-  NovaUiStyleMediaContext,
-  NovaUiStyleMediaFeature,
-  NovaUiStylableNode,
-} from '@/shared/style/cascade/style-sheet'
+import {
+  normalizeStyleClasses,
+  readNovaUiStyleIdentityProps,
+} from '@/shared/style/identity/style-identity'
 
 export interface NovaUiStyleIdentityRegistry {
   readonly nodes: Set<NovaUiStylableNode>
@@ -67,8 +67,10 @@ export function createNovaUiStyleIdentityRegistry(root: { traverseAll: (visitor:
     byAttr: new Map(),
   }
 
-  root.traverseAll(node => {
-    if (!isStylableNode(node)) return
+  root.traverseAll((node) => {
+    if (!isStylableNode(node)) {
+      return
+    }
 
     registry.nodes.add(node)
     appendIdentityNode(registry.byId, node.componentId, node)
@@ -78,7 +80,9 @@ export function createNovaUiStyleIdentityRegistry(root: { traverseAll: (visitor:
     for (const className of normalizeStyleClasses(props.className)) {
       appendIdentityNode(registry.byClass, className, node)
       const responsive = resolveNovaUiResponsiveVariant(className)
-      if (responsive) appendIdentityNode(registry.byClass, responsive.className, node)
+      if (responsive) {
+        appendIdentityNode(registry.byClass, responsive.className, node)
+      }
     }
 
     for (const attrName of Object.keys(props.attrs ?? {})) {
@@ -117,7 +121,9 @@ export function planNovaUiStyleSheetInvalidation(
 
   if (changedMediaAtoms.size > 0) {
     for (const rule of next.rules) {
-      if (!rule.media) continue
+      if (!rule.media) {
+        continue
+      }
       collectRuleCandidates(candidates, registry, rule)
     }
   }
@@ -145,7 +151,9 @@ export function planNovaUiMediaInvalidation(
 
   if (changedMediaAtoms.size > 0) {
     for (const rule of graph.rules) {
-      if (!rule.media && rule.rightMostClasses.length === 0) continue
+      if (!rule.media && rule.rightMostClasses.length === 0) {
+        continue
+      }
       collectRuleCandidates(candidates, registry, rule)
     }
   }
@@ -199,10 +207,14 @@ function diffRules(
   const changed = new Set<NovaUiCompiledStyleRule>()
 
   for (const [signature, rule] of next.ruleSignatures) {
-    if (!previous.ruleSignatures.has(signature)) changed.add(rule)
+    if (!previous.ruleSignatures.has(signature)) {
+      changed.add(rule)
+    }
   }
   for (const [signature, rule] of previous.ruleSignatures) {
-    if (!next.ruleSignatures.has(signature)) changed.add(rule)
+    if (!next.ruleSignatures.has(signature)) {
+      changed.add(rule)
+    }
   }
 
   return [...changed]
@@ -231,7 +243,9 @@ function collectRuleCandidates(
   }
 
   if (rule.rightMostClasses.length > 0) {
-    for (const className of rule.rightMostClasses) collectNodes(target, registry.byClass.get(className))
+    for (const className of rule.rightMostClasses) {
+      collectNodes(target, registry.byClass.get(className))
+    }
     collectDescendantsForAncestorSelectors(target, registry, rule)
     return
   }
@@ -243,7 +257,9 @@ function collectRuleCandidates(
   }
 
   if (rightMostAttrs.length > 0) {
-    for (const attrName of rightMostAttrs) collectNodes(target, registry.byAttr.get(attrName))
+    for (const attrName of rightMostAttrs) {
+      collectNodes(target, registry.byAttr.get(attrName))
+    }
     collectDescendantsForAncestorSelectors(target, registry, rule)
     return
   }
@@ -256,15 +272,21 @@ function collectDescendantsForAncestorSelectors(
   registry: NovaUiStyleIdentityRegistry,
   rule: NovaUiCompiledStyleRule,
 ): void {
-  if (rule.selector.parts.length <= 1) return
+  if (rule.selector.parts.length <= 1) {
+    return
+  }
 
   for (let index = 0; index < rule.selector.parts.length - 1; index += 1) {
     const part = rule.selector.parts[index]
     const ancestors = selectPartCandidates(registry, part)
-    if (!ancestors || ancestors.size === 0) continue
+    if (!ancestors || ancestors.size === 0) {
+      continue
+    }
 
     for (const node of registry.nodes) {
-      if (hasAnyAncestor(node, ancestors)) target.add(node)
+      if (hasAnyAncestor(node, ancestors)) {
+        target.add(node)
+      }
     }
   }
 }
@@ -273,18 +295,28 @@ function selectPartCandidates(
   registry: NovaUiStyleIdentityRegistry,
   part: NovaUiCompiledStyleRule['selector']['parts'][number],
 ): Set<NovaUiStylableNode> | null {
-  if (part.id) return registry.byId.get(part.id) ?? null
-  if (part.classes.length > 0) return registry.byClass.get(part.classes[0]) ?? null
-  if (part.type) return registry.byType.get(part.type) ?? null
+  if (part.id) {
+    return registry.byId.get(part.id) ?? null
+  }
+  if (part.classes.length > 0) {
+    return registry.byClass.get(part.classes[0]) ?? null
+  }
+  if (part.type) {
+    return registry.byType.get(part.type) ?? null
+  }
   const attr = Object.keys(part.attrs)[0]
-  if (attr) return registry.byAttr.get(attr) ?? null
+  if (attr) {
+    return registry.byAttr.get(attr) ?? null
+  }
   return registry.nodes
 }
 
 function hasAnyAncestor(node: NovaUiStylableNode, candidates: Set<NovaUiStylableNode>): boolean {
   let parent = node.parent
   while (parent) {
-    if (candidates.has(parent as NovaUiStylableNode)) return true
+    if (candidates.has(parent as NovaUiStylableNode)) {
+      return true
+    }
     parent = parent.parent
   }
   return false
@@ -293,7 +325,9 @@ function hasAnyAncestor(node: NovaUiStylableNode, candidates: Set<NovaUiStylable
 function collectMediaAtoms(rules: Array<NovaUiCompiledStyleRule>): Set<string> {
   const atoms = new Set<string>()
   for (const rule of rules) {
-    for (const feature of rule.media?.features ?? []) atoms.add(mediaFeatureAtom(feature))
+    for (const feature of rule.media?.features ?? []) {
+      atoms.add(mediaFeatureAtom(feature))
+    }
   }
   return atoms
 }
@@ -305,7 +339,9 @@ function collectActiveMediaAtoms(
   const atoms = new Set<string>()
   for (const rule of rules) {
     for (const feature of rule.media?.features ?? []) {
-      if (matchesMediaFeature(feature, context)) atoms.add(mediaFeatureAtom(feature))
+      if (matchesMediaFeature(feature, context)) {
+        atoms.add(mediaFeatureAtom(feature))
+      }
     }
   }
   return atoms
@@ -317,7 +353,9 @@ function collectActiveMediaAndResponsiveAtoms(
 ): Set<string> {
   const atoms = collectActiveMediaAtoms(rules, context)
   for (const [variant, minWidth] of Object.entries(NOVA_UI_RESPONSIVE_BREAKPOINTS)) {
-    if (context.width >= minWidth) atoms.add(`responsive:${variant}`)
+    if (context.width >= minWidth) {
+      atoms.add(`responsive:${variant}`)
+    }
   }
   return atoms
 }
@@ -327,16 +365,30 @@ function mediaFeatureAtom(feature: NovaUiStyleMediaFeature): string {
 }
 
 function matchesMediaFeature(feature: NovaUiStyleMediaFeature, context: NovaUiStyleMediaContext): boolean {
-  if (feature.name === 'min-width') return context.width >= feature.value
-  if (feature.name === 'max-width') return context.width <= feature.value
-  if (feature.name === 'min-height') return context.height >= feature.value
+  if (feature.name === 'min-width') {
+    return context.width >= feature.value
+  }
+  if (feature.name === 'max-width') {
+    return context.width <= feature.value
+  }
+  if (feature.name === 'min-height') {
+    return context.height >= feature.value
+  }
   return context.height <= feature.value
 }
 
 function diffSets<T>(left: Set<T>, right: Set<T>): Set<T> {
   const diff = new Set<T>()
-  for (const item of left) if (!right.has(item)) diff.add(item)
-  for (const item of right) if (!left.has(item)) diff.add(item)
+  for (const item of left) {
+    if (!right.has(item)) {
+      diff.add(item)
+    }
+  }
+  for (const item of right) {
+    if (!left.has(item)) {
+      diff.add(item)
+    }
+  }
   return diff
 }
 
@@ -344,8 +396,12 @@ function collectNodes(
   target: Set<NovaUiStylableNode>,
   source?: Iterable<NovaUiStylableNode>,
 ): void {
-  if (!source) return
-  for (const node of source) target.add(node)
+  if (!source) {
+    return
+  }
+  for (const node of source) {
+    target.add(node)
+  }
 }
 
 function appendIdentityNode<K>(
@@ -364,7 +420,9 @@ function appendIdentityNode<K>(
 
 function resolveComponentName(node: NovaUiStylableNode): NovaUiStyleComponentName {
   const name = node.descriptor.name
-  if (name === 'Root' || name === 'Flex' || name === 'Grid' || name === 'TextBlock') return name
+  if (name === 'Root' || name === 'Flex' || name === 'Grid' || name === 'TextBlock') {
+    return name
+  }
   return node.__type as NovaUiStyleComponentName
 }
 

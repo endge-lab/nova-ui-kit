@@ -1,12 +1,13 @@
 import type { NovaSchemaRegistry } from '@endge/nova'
+import type { CheckboxDescriptor } from '@/components/Checkbox/checkbox.config'
+import type { CheckboxSchema } from '@/components/Checkbox/checkbox.types'
 import { Checkbox } from '@/components/Checkbox/Checkbox'
 import {
   CHECKBOX_FIELD_DEFINITIONS,
+
   createCheckboxDescriptor,
   normalizeCheckboxProps,
-  type CheckboxDescriptor,
 } from '@/components/Checkbox/checkbox.config'
-import type { CheckboxSchema } from '@/components/Checkbox/checkbox.types'
 
 export const CHECKBOX_DESCRIPTOR: CheckboxDescriptor = createCheckboxDescriptor((context, schema) => {
   const checkboxSchema = schema as CheckboxSchema

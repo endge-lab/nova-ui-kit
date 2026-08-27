@@ -1,11 +1,12 @@
 import type { NovaSchemaRegistry } from '@endge/nova'
-import { ThemeSwitch } from '@/components/ThemeSwitch/ThemeSwitch'
+import type { ThemeSwitchDescriptor } from '@/components/ThemeSwitch/theme-switch.config'
+import type { ThemeSwitchSchema } from '@/components/ThemeSwitch/theme-switch.types'
 import {
   createThemeSwitchDescriptor,
   normalizeThemeSwitchProps,
-  type ThemeSwitchDescriptor,
+
 } from '@/components/ThemeSwitch/theme-switch.config'
-import type { ThemeSwitchSchema } from '@/components/ThemeSwitch/theme-switch.types'
+import { ThemeSwitch } from '@/components/ThemeSwitch/ThemeSwitch'
 
 export const THEME_SWITCH_DESCRIPTOR: ThemeSwitchDescriptor = createThemeSwitchDescriptor((context, schema) => {
   const themeSwitchSchema = schema as ThemeSwitchSchema

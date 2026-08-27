@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createProgressRingSchema } from '@/components/ProgressRing/progress-ring.schema'
 
-describe('ProgressRing schema', () => {
+describe('progressRing schema', () => {
   it('builds track and value arcs from percent value', () => {
     const schema = createProgressRingSchema({
       x: 10,

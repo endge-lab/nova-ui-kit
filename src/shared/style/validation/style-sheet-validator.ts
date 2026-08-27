@@ -1,15 +1,5 @@
-import {
-  NovaUiStyleMask,
-  type NovaUiBorder,
-  type NovaUiFontStyle,
-  type NovaUiFontWeight,
-} from '@/shared/style'
 import type { NovaUiSpacing } from '@/shared/layout'
-import {
-  compileStyleSheetIndexes,
-  createEmptyStyleSheet,
-} from '@/shared/style/cascade/style-selector-matcher'
-import { extractNovaUiStyleTokenDependencies } from '@/shared/style/cascade/style-token-resolver'
+import type { NovaUiBorder, NovaUiFontStyle, NovaUiFontWeight } from '@/shared/style'
 import type {
   NovaUiCompiledStyleRule,
   NovaUiStyleComponentName,
@@ -24,6 +14,15 @@ import type {
   NovaUiStyleSelectorPart,
   NovaUiStyleValidationResult,
 } from '@/shared/style/cascade/style-sheet'
+import {
+
+  NovaUiStyleMask,
+} from '@/shared/style'
+import {
+  compileStyleSheetIndexes,
+  createEmptyStyleSheet,
+} from '@/shared/style/cascade/style-selector-matcher'
+import { extractNovaUiStyleTokenDependencies } from '@/shared/style/cascade/style-token-resolver'
 
 const COMPONENT_NAMES: Array<NovaUiStyleComponentName> = [
   'Root',
@@ -102,11 +101,15 @@ export function validateNovaUiStyleSheetSource(source: string): NovaUiStyleValid
 
   for (const parsedRule of parseStyleRules(keyframeResult.source, source, diagnostics)) {
     const declarations = parseDeclarations(parsedRule.body, source, parsedRule.offset, diagnostics)
-    if (!declarations) continue
+    if (!declarations) {
+      continue
+    }
 
     for (const selectorSource of splitSelectorList(parsedRule.selector)) {
       const selector = parseSelector(selectorSource, source, parsedRule.offset, diagnostics)
-      if (!selector) continue
+      if (!selector) {
+        continue
+      }
 
       rules.push({
         selector,
@@ -121,7 +124,9 @@ export function validateNovaUiStyleSheetSource(source: string): NovaUiStyleValid
 
   const ok = !diagnostics.some(item => item.severity === 'error')
   const styleSheet = ok ? compileStyleSheetIndexes(rules, source, keyframeResult.keyframes) : null
-  if (styleSheet) styleSheet.tokenDependencies = extractNovaUiStyleTokenDependencies(source)
+  if (styleSheet) {
+    styleSheet.tokenDependencies = extractNovaUiStyleTokenDependencies(source)
+  }
 
   return {
     ok,
@@ -143,14 +148,16 @@ function extractKeyframes(
   cleanedSource: string,
   originalSource: string,
   diagnostics: Array<NovaUiStyleDiagnostic>,
-): { source: string; keyframes: Map<string, NovaUiStyleKeyframes> } {
+): { source: string, keyframes: Map<string, NovaUiStyleKeyframes> } {
   const keyframes = new Map<string, NovaUiStyleKeyframes>()
   let source = cleanedSource
   let cursor = 0
 
   while (cursor < source.length) {
     const atIndex = source.indexOf('@keyframes', cursor)
-    if (atIndex < 0) break
+    if (atIndex < 0) {
+      break
+    }
 
     const nameStart = skipWhitespace(source, atIndex + '@keyframes'.length)
     const blockStart = source.indexOf('{', nameStart)
@@ -168,7 +175,9 @@ function extractKeyframes(
     }
 
     const frames = parseKeyframeFrames(name, source.slice(blockStart + 1, blockEnd), originalSource, blockStart + 1, diagnostics)
-    if (frames.length > 0) keyframes.set(name, { name, frames })
+    if (frames.length > 0) {
+      keyframes.set(name, { name, frames })
+    }
     source = `${source.slice(0, atIndex)}${' '.repeat(blockEnd + 1 - atIndex)}${source.slice(blockEnd + 1)}`
     cursor = atIndex + 1
   }
@@ -188,11 +197,15 @@ function parseKeyframeFrames(
 
   while (cursor < body.length) {
     cursor = skipWhitespace(body, cursor)
-    if (cursor >= body.length) break
+    if (cursor >= body.length) {
+      break
+    }
 
     const selectorStart = cursor
     const blockStart = findNextTopLevel(body, cursor, ['{'])
-    if (blockStart < 0) break
+    if (blockStart < 0) {
+      break
+    }
     const blockEnd = findMatchingBrace(body, blockStart)
     if (blockEnd < 0) {
       diagnostics.push(createDiagnostic('error', 'invalid-keyframe-frame', `Невалидный frame в @keyframes "${name}".`, source, offset + selectorStart))
@@ -216,9 +229,15 @@ function parseKeyframeFrames(
 }
 
 function parseKeyframeOffset(value: string): number | null {
-  if (value === 'from') return 0
-  if (value === 'to') return 1
-  if (/^\d+(?:\.\d+)?%$/.test(value)) return Math.max(0, Math.min(1, Number(value.slice(0, -1)) / 100))
+  if (value === 'from') {
+    return 0
+  }
+  if (value === 'to') {
+    return 1
+  }
+  if (/^\d+(?:\.\d+)?%$/.test(value)) {
+    return Math.max(0, Math.min(1, Number(value.slice(0, -1)) / 100))
+  }
   return null
 }
 
@@ -232,22 +251,39 @@ function parseKeyframeDeclarations(
 
   for (const rawDeclaration of rawBody.split(';')) {
     const declaration = rawDeclaration.trim()
-    if (!declaration) continue
+    if (!declaration) {
+      continue
+    }
     const separatorIndex = declaration.indexOf(':')
-    if (separatorIndex < 0) continue
+    if (separatorIndex < 0) {
+      continue
+    }
     const key = normalizeStyleDeclarationKey(declaration.slice(0, separatorIndex).trim())
     const value = declaration.slice(separatorIndex + 1).trim()
     const numberValue = parseNumberToken(value)
 
-    if (key === 'opacity' && numberValue !== null) result.opacity = Math.max(0, Math.min(1, numberValue))
-    else if (key === 'translateY' && numberValue !== null) result.translateY = numberValue
-    else if (key === 'translateX' && numberValue !== null) result.translateX = numberValue
+    if (key === 'opacity' && numberValue !== null) {
+      result.opacity = Math.max(0, Math.min(1, numberValue))
+    }
+    else if (key === 'translateY' && numberValue !== null) {
+      result.translateY = numberValue
+    }
+    else if (key === 'translateX' && numberValue !== null) {
+      result.translateX = numberValue
+    }
     else if (key === 'scale' && numberValue !== null) {
       result.scaleX = numberValue
       result.scaleY = numberValue
-    } else if (key === 'scaleX' && numberValue !== null) result.scaleX = numberValue
-    else if (key === 'scaleY' && numberValue !== null) result.scaleY = numberValue
-    else diagnostics.push(createDiagnostic('warning', 'unsupported-keyframe-declaration', `Декларация "${key}" в @keyframes пока не применяется.`, source, offset))
+    }
+    else if (key === 'scaleX' && numberValue !== null) {
+      result.scaleX = numberValue
+    }
+    else if (key === 'scaleY' && numberValue !== null) {
+      result.scaleY = numberValue
+    }
+    else {
+      diagnostics.push(createDiagnostic('warning', 'unsupported-keyframe-declaration', `Декларация "${key}" в @keyframes пока не применяется.`, source, offset))
+    }
   }
 
   return result
@@ -266,7 +302,9 @@ function parseStyleRules(
 
   while (cursor < cleanedSource.length) {
     cursor = skipWhitespace(cleanedSource, cursor)
-    if (cursor >= cleanedSource.length) break
+    if (cursor >= cleanedSource.length) {
+      break
+    }
 
     const preludeStart = cursor
     const blockStart = findNextTopLevel(cleanedSource, cursor, ['{', ';'])
@@ -389,7 +427,7 @@ function parseMediaQuery(
   const features: NovaUiStyleMediaQuery['features'] = []
 
   for (const part of parts) {
-    const match = part.match(/^\(\s*(min-width|max-width|min-height|max-height)\s*:\s*([0-9]+(?:\.[0-9]+)?)(?:px)?\s*\)$/)
+    const match = part.match(/^\(\s*(min-width|max-width|min-height|max-height)\s*:\s*(\d+(?:\.\d+)?)(?:px)?\s*\)$/)
     if (!match) {
       diagnostics.push(createDiagnostic('error', 'invalid-media-feature', `Неподдерживаемое @media условие "${part}".`, source, offset))
       return null
@@ -423,15 +461,17 @@ function mergeMediaQueries(
 
 function splitRuleBody(body: string): {
   declarations: string
-  nested: Array<{ selector: string; body: string; offset: number }>
+  nested: Array<{ selector: string, body: string, offset: number }>
 } {
-  const nested: Array<{ selector: string; body: string; offset: number }> = []
+  const nested: Array<{ selector: string, body: string, offset: number }> = []
   let declarations = ''
   let cursor = 0
 
   while (cursor < body.length) {
     cursor = skipWhitespace(body, cursor)
-    if (cursor >= body.length) break
+    if (cursor >= body.length) {
+      break
+    }
 
     const start = cursor
     const next = findNextTopLevel(body, cursor, ['{', ';'])
@@ -470,7 +510,9 @@ function splitSelectorList(source: string): Array<string> {
 }
 
 function combineSelectors(parentSelectors: Array<string>, selectors: Array<string>): Array<string> {
-  if (parentSelectors.length === 0) return selectors
+  if (parentSelectors.length === 0) {
+    return selectors
+  }
 
   const result: Array<string> = []
   for (const parent of parentSelectors) {
@@ -490,7 +532,9 @@ function splitTopLevel(source: string, separator: string): Array<string> {
   for (const char of source) {
     if (quote) {
       buffer += char
-      if (char === quote) quote = ''
+      if (char === quote) {
+        quote = ''
+      }
       continue
     }
     if (char === '"' || char === '\'') {
@@ -498,8 +542,12 @@ function splitTopLevel(source: string, separator: string): Array<string> {
       buffer += char
       continue
     }
-    if (char === '(' || char === '[') depth += 1
-    if (char === ')' || char === ']') depth -= 1
+    if (char === '(' || char === '[') {
+      depth += 1
+    }
+    if (char === ')' || char === ']') {
+      depth -= 1
+    }
     if (char === separator && depth === 0) {
       result.push(buffer)
       buffer = ''
@@ -514,7 +562,9 @@ function splitTopLevel(source: string, separator: string): Array<string> {
 
 function skipWhitespace(source: string, cursor: number): number {
   let index = cursor
-  while (index < source.length && /\s/.test(source[index])) index += 1
+  while (index < source.length && /\s/.test(source[index])) {
+    index += 1
+  }
   return index
 }
 
@@ -525,16 +575,24 @@ function findNextTopLevel(source: string, cursor: number, chars: Array<string>):
   for (let index = cursor; index < source.length; index += 1) {
     const char = source[index]
     if (quote) {
-      if (char === quote) quote = ''
+      if (char === quote) {
+        quote = ''
+      }
       continue
     }
     if (char === '"' || char === '\'') {
       quote = char
       continue
     }
-    if (char === '(' || char === '[') depth += 1
-    if (char === ')' || char === ']') depth -= 1
-    if (depth === 0 && chars.includes(char)) return index
+    if (char === '(' || char === '[') {
+      depth += 1
+    }
+    if (char === ')' || char === ']') {
+      depth -= 1
+    }
+    if (depth === 0 && chars.includes(char)) {
+      return index
+    }
   }
 
   return -1
@@ -547,17 +605,23 @@ function findMatchingBrace(source: string, openIndex: number): number {
   for (let index = openIndex; index < source.length; index += 1) {
     const char = source[index]
     if (quote) {
-      if (char === quote) quote = ''
+      if (char === quote) {
+        quote = ''
+      }
       continue
     }
     if (char === '"' || char === '\'') {
       quote = char
       continue
     }
-    if (char === '{') depth += 1
+    if (char === '{') {
+      depth += 1
+    }
     if (char === '}') {
       depth -= 1
-      if (depth === 0) return index
+      if (depth === 0) {
+        return index
+      }
     }
   }
 
@@ -623,13 +687,19 @@ function tokenizeSelector(raw: string): Array<string> | null {
 
   for (let index = 0; index < raw.length; index += 1) {
     const char = raw[index]
-    if (char === '[') inAttr = true
-    if (char === ']') inAttr = false
+    if (char === '[') {
+      inAttr = true
+    }
+    if (char === ']') {
+      inAttr = false
+    }
 
     if (!inAttr && char === '>') {
       flushSelectorToken(tokens, buffer)
       buffer = ''
-      if (tokens[tokens.length - 1] === ' ') tokens.pop()
+      if (tokens[tokens.length - 1] === ' ') {
+        tokens.pop()
+      }
       tokens.push('>')
       pendingSpace = false
       continue
@@ -650,23 +720,29 @@ function tokenizeSelector(raw: string): Array<string> | null {
   }
 
   flushSelectorToken(tokens, buffer)
-  if (tokens[0] === ' ' || tokens[tokens.length - 1] === ' ' || tokens[tokens.length - 1] === '>') return null
+  if (tokens[0] === ' ' || tokens[tokens.length - 1] === ' ' || tokens[tokens.length - 1] === '>') {
+    return null
+  }
   return tokens
 }
 
 function flushSelectorToken(tokens: Array<string>, value: string): void {
   const token = value.trim()
-  if (token) tokens.push(token)
+  if (token) {
+    tokens.push(token)
+  }
 }
 
 function parseSelectorPart(raw: string): NovaUiStyleSelectorPart | null {
-  const typeMatch = raw.match(/^[a-zA-Z][\w-]*/)
+  const typeMatch = raw.match(/^[a-z][\w-]*/i)
   let type: NovaUiStyleComponentName | undefined
   let cursor = 0
 
   if (typeMatch) {
     const resolvedType = COMPONENT_NAME_MAP.get(typeMatch[0].toLowerCase())
-    if (!resolvedType) return null
+    if (!resolvedType) {
+      return null
+    }
     type = resolvedType
     cursor = typeMatch[0].length
   }
@@ -689,7 +765,9 @@ function parseSelectorPart(raw: string): NovaUiStyleSelectorPart | null {
 
     const classMatch = rest.match(/^\.((?:\\.|[\w-])*)/)
     if (classMatch) {
-      if (!classMatch[1]) return null
+      if (!classMatch[1]) {
+        return null
+      }
       part.classes.push(unescapeSelectorIdentifier(classMatch[1]))
       cursor += classMatch[0].length
       continue
@@ -728,7 +806,9 @@ function parseDeclarations(
 
   for (const rawDeclaration of rawBody.split(';')) {
     const declaration = rawDeclaration.trim()
-    if (!declaration) continue
+    if (!declaration) {
+      continue
+    }
 
     const separatorIndex = declaration.indexOf(':')
     if (separatorIndex < 0) {
@@ -740,7 +820,9 @@ function parseDeclarations(
     const key = rawKey.startsWith('--') ? rawKey : normalizeStyleDeclarationKey(rawKey)
     const value = declaration.slice(separatorIndex + 1).trim()
     const parsed = parseDeclarationValue(key, value, diagnostics, source, offset, rawKey)
-    if (parsed === null) continue
+    if (parsed === null) {
+      continue
+    }
 
     applyParsedDeclaration(declarations, key, parsed)
     applied += 1
@@ -767,16 +849,36 @@ function parseDeclarationValue(
     return null
   }
 
-  if (key.startsWith('--')) return stripQuotes(value)
-  if (key === 'animation') return parseAnimation(value, diagnostics, source, offset)
-  if (key === 'clip') return parseBoolean(value, diagnostics, source, offset)
-  if (key === 'cursor') return parseCursor(value, diagnostics, source, offset)
-  if (key === 'display') return parseDisplay(value, diagnostics, source, offset)
-  if (key === 'width' || key === 'height' || key === 'flexBasis') return parseLayoutValue(value, diagnostics, source, offset)
-  if (value.startsWith('var(') && NUMERIC_KEYS.has(key)) return value
-  if (NUMERIC_KEYS.has(key)) return parseFiniteNumber(value, diagnostics, source, offset)
-  if (key === 'padding' || key === 'margin') return parseSpacing(value, diagnostics, source, offset)
-  if (STRING_KEYS.has(key)) return stripQuotes(value)
+  if (key.startsWith('--')) {
+    return stripQuotes(value)
+  }
+  if (key === 'animation') {
+    return parseAnimation(value, diagnostics, source, offset)
+  }
+  if (key === 'clip') {
+    return parseBoolean(value, diagnostics, source, offset)
+  }
+  if (key === 'cursor') {
+    return parseCursor(value, diagnostics, source, offset)
+  }
+  if (key === 'display') {
+    return parseDisplay(value, diagnostics, source, offset)
+  }
+  if (key === 'width' || key === 'height' || key === 'flexBasis') {
+    return parseLayoutValue(value, diagnostics, source, offset)
+  }
+  if (value.startsWith('var(') && NUMERIC_KEYS.has(key)) {
+    return value
+  }
+  if (NUMERIC_KEYS.has(key)) {
+    return parseFiniteNumber(value, diagnostics, source, offset)
+  }
+  if (key === 'padding' || key === 'margin') {
+    return parseSpacing(value, diagnostics, source, offset)
+  }
+  if (STRING_KEYS.has(key)) {
+    return stripQuotes(value)
+  }
 
   diagnostics.push(createDiagnostic('warning', 'unknown-declaration', `Неизвестная декларация "${displayKey}" проигнорирована.`, source, offset))
   return null
@@ -784,7 +886,7 @@ function parseDeclarationValue(
 
 function normalizeStyleDeclarationKey(key: string): string {
   return key.includes('-')
-    ? key.replace(/-([a-zA-Z0-9])/g, (_match, char: string) => char.toUpperCase())
+    ? key.replace(/-([a-z0-9])/gi, (_match, char: string) => char.toUpperCase())
     : key
 }
 
@@ -933,8 +1035,10 @@ function parseAnimation(
   for (const part of parts.slice(1)) {
     const time = parseTimeMs(part)
     if (time !== null) {
-      if (animation.duration === undefined) animation.duration = time
-      else animation.delay = time
+      if (animation.duration === undefined) {
+        animation.duration = time
+      }
+      else { animation.delay = time }
       continue
     }
     animation.easing = part as NonNullable<NovaUiStyleDeclarations['animation']>['easing']
@@ -943,8 +1047,12 @@ function parseAnimation(
 }
 
 function parseTimeMs(value: string): number | null {
-  if (/^-?\d+(?:\.\d+)?ms$/.test(value)) return Math.max(0, Number(value.slice(0, -2)))
-  if (/^-?\d+(?:\.\d+)?s$/.test(value)) return Math.max(0, Number(value.slice(0, -1)) * 1000)
+  if (/^-?\d+(?:\.\d+)?ms$/.test(value)) {
+    return Math.max(0, Number(value.slice(0, -2)))
+  }
+  if (/^-?\d+(?:\.\d+)?s$/.test(value)) {
+    return Math.max(0, Number(value.slice(0, -1)) * 1000)
+  }
   return null
 }
 
@@ -954,7 +1062,9 @@ function parseDisplay(
   source: string,
   offset: number,
 ): NovaUiStyleDisplay | null {
-  if (value === 'none' || value === 'normal') return value
+  if (value === 'none' || value === 'normal') {
+    return value
+  }
 
   diagnostics.push(createDiagnostic('error', 'unsupported-display', `display поддерживает только none или normal, получено "${value}".`, source, offset))
   return null
@@ -967,14 +1077,18 @@ function parseSpacing(
   offset: number,
 ): NovaUiSpacing | null {
   const items = value.split(/\s+/).map(item => parseNumberToken(item))
-  if (items.some(item => item === null) || ![1, 2, 4].includes(items.length)) {
+  if (items.includes(null) || ![1, 2, 4].includes(items.length)) {
     diagnostics.push(createDiagnostic('error', 'invalid-spacing', `Невалидный spacing "${value}".`, source, offset))
     return null
   }
 
   const numbers = items as Array<number>
-  if (numbers.length === 1) return numbers[0]
-  if (numbers.length === 2) return { vertical: numbers[0], horizontal: numbers[1] }
+  if (numbers.length === 1) {
+    return numbers[0]
+  }
+  if (numbers.length === 2) {
+    return { vertical: numbers[0], horizontal: numbers[1] }
+  }
 
   return {
     top: numbers[0],
@@ -990,8 +1104,12 @@ function parseLayoutValue(
   source: string,
   offset: number,
 ): number | string | null {
-  if (value === 'auto' || value === 'fill') return value
-  if (/^-?\d+(?:\.\d+)?%$/.test(value)) return value
+  if (value === 'auto' || value === 'fill') {
+    return value
+  }
+  if (/^-?\d+(?:\.\d+)?%$/.test(value)) {
+    return value
+  }
 
   const numberValue = parseNumberToken(value)
   if (numberValue === null) {
@@ -1023,8 +1141,12 @@ function parseBoolean(
   source: string,
   offset: number,
 ): boolean | null {
-  if (value === 'true') return true
-  if (value === 'false') return false
+  if (value === 'true') {
+    return true
+  }
+  if (value === 'false') {
+    return false
+  }
 
   diagnostics.push(createDiagnostic('error', 'invalid-boolean', `Невалидный boolean "${value}".`, source, offset))
   return null
@@ -1093,7 +1215,9 @@ function splitFunctionArgs(source: string): Array<string> {
   for (const char of source) {
     if (quote) {
       buffer += char
-      if (char === quote) quote = ''
+      if (char === quote) {
+        quote = ''
+      }
       continue
     }
     if (char === '"' || char === '\'') {
@@ -1101,8 +1225,12 @@ function splitFunctionArgs(source: string): Array<string> {
       buffer += char
       continue
     }
-    if (char === '{' || char === '[' || char === '(') depth += 1
-    if (char === '}' || char === ']' || char === ')') depth -= 1
+    if (char === '{' || char === '[' || char === '(') {
+      depth += 1
+    }
+    if (char === '}' || char === ']' || char === ')') {
+      depth -= 1
+    }
     if (char === ',' && depth === 0) {
       result.push(buffer.trim())
       buffer = ''
@@ -1111,14 +1239,20 @@ function splitFunctionArgs(source: string): Array<string> {
     buffer += char
   }
 
-  if (buffer.trim()) result.push(buffer.trim())
+  if (buffer.trim()) {
+    result.push(buffer.trim())
+  }
   return result
 }
 
-function parseHotspot(value: string | undefined): { x: number; y: number } | undefined {
-  if (!value) return undefined
+function parseHotspot(value: string | undefined): { x: number, y: number } | undefined {
+  if (!value) {
+    return undefined
+  }
   const [x, y] = value.split(/\s+/).map(item => Number(item))
-  if (!Number.isFinite(x) || !Number.isFinite(y)) return undefined
+  if (!Number.isFinite(x) || !Number.isFinite(y)) {
+    return undefined
+  }
   return { x, y }
 }
 
@@ -1128,11 +1262,14 @@ function parseCursorProps(
   source: string,
   offset: number,
 ): Record<string, unknown> | undefined {
-  if (!value) return undefined
+  if (!value) {
+    return undefined
+  }
   try {
     const parsed = JSON.parse(value)
     return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : undefined
-  } catch {
+  }
+  catch {
     diagnostics.push(createDiagnostic('error', 'invalid-cursor-props', `Невалидные props cursor "${value}".`, source, offset))
     return undefined
   }
@@ -1168,7 +1305,7 @@ function createDiagnostic(
   }
 }
 
-function resolveLineColumn(source: string, index: number): { line: number; column: number } {
+function resolveLineColumn(source: string, index: number): { line: number, column: number } {
   const lineStarts = getLineStarts(source)
   const normalizedIndex = Math.max(0, index)
   let low = 0
@@ -1180,7 +1317,8 @@ function resolveLineColumn(source: string, index: number): { line: number; colum
     if (lineStarts[middle] <= normalizedIndex) {
       lineIndex = middle
       low = middle + 1
-    } else {
+    }
+    else {
       high = middle - 1
     }
   }
@@ -1195,14 +1333,20 @@ const LINE_STARTS_CACHE = new Map<string, Array<number>>()
 
 function getLineStarts(source: string): Array<number> {
   const cached = LINE_STARTS_CACHE.get(source)
-  if (cached) return cached
+  if (cached) {
+    return cached
+  }
 
   const starts = [0]
   for (let index = 0; index < source.length; index += 1) {
-    if (source.charCodeAt(index) === 10) starts.push(index + 1)
+    if (source.charCodeAt(index) === 10) {
+      starts.push(index + 1)
+    }
   }
 
-  if (LINE_STARTS_CACHE.size > 8) LINE_STARTS_CACHE.clear()
+  if (LINE_STARTS_CACHE.size > 8) {
+    LINE_STARTS_CACHE.clear()
+  }
   LINE_STARTS_CACHE.set(source, starts)
   return starts
 }

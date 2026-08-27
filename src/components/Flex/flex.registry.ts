@@ -1,12 +1,13 @@
 import type { NovaSchemaRegistry } from '@endge/nova'
+import type { FlexDescriptor } from '@/components/Flex/flex.config'
+import type { FlexSchema } from '@/components/Flex/flex.types'
 import { Flex } from '@/components/Flex/Flex'
 import {
-  FLEX_FIELD_DEFINITIONS,
   createFlexDescriptor,
+  FLEX_FIELD_DEFINITIONS,
+
   normalizeFlexProps,
-  type FlexDescriptor,
 } from '@/components/Flex/flex.config'
-import type { FlexSchema } from '@/components/Flex/flex.types'
 
 export const FLEX_DESCRIPTOR: FlexDescriptor = createFlexDescriptor((context, schema) => {
   const flexSchema = schema as FlexSchema

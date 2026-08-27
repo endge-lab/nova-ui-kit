@@ -1,4 +1,6 @@
 import type { NovaSchemaRegistry } from '@endge/nova'
+import type { InputDescriptor } from '@/components/Input/input.config'
+import type { InputComponentKind, InputSchema } from '@/components/Input/input.types'
 import {
   Input,
   InputField,
@@ -10,22 +12,21 @@ import {
   TextInput,
 } from '@/components/Input/Input'
 import {
-  INPUT_FIELD_DEFINITIONS,
   createInputDescriptor,
+  INPUT_FIELD_DEFINITIONS,
+
   normalizeInputProps,
-  type InputDescriptor,
 } from '@/components/Input/input.config'
 import {
   INPUT_FIELD_SCHEMA_TYPE,
   INPUT_SCHEMA_TYPE,
+
   NUMBER_INPUT_SCHEMA_TYPE,
   PASSWORD_INPUT_SCHEMA_TYPE,
   SEARCH_INPUT_SCHEMA_TYPE,
   SELECT_INPUT_SCHEMA_TYPE,
   TEXT_AREA_SCHEMA_TYPE,
   TEXT_INPUT_SCHEMA_TYPE,
-  type InputComponentKind,
-  type InputSchema,
 } from '@/components/Input/input.types'
 
 function createDescriptor(
@@ -70,7 +71,9 @@ export const INPUT_DESCRIPTORS: Array<InputDescriptor> = [
 export { INPUT_FIELD_DEFINITIONS }
 
 export function registerInput(registry: { register: (descriptor: InputDescriptor, options?: { override?: boolean }) => void }): void {
-  for (const descriptor of INPUT_DESCRIPTORS) registry.register(descriptor, { override: true })
+  for (const descriptor of INPUT_DESCRIPTORS) {
+    registry.register(descriptor, { override: true })
+  }
 }
 
 export function registerInputSchema(registry: NovaSchemaRegistry): void {

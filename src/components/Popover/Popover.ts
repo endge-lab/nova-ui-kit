@@ -1,8 +1,10 @@
-import { reconcileNovaTemplateChildren, type NovaApp, type NovaNode, type NovaSchema, type NovaSurface } from '@endge/nova'
+import type { NovaApp, NovaNode, NovaSchema, NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import { POPOVER_NODE_DESCRIPTOR, normalizePopoverProps, type PopoverDescriptor } from '@/components/Popover/popover.config'
+import type { PopoverDescriptor } from '@/components/Popover/popover.config'
 import type { PopoverApi, PopoverProps, PopoverResolvedProps, PopoverSchema } from '@/components/Popover/popover.types'
-import { NovaUiComponentNode, buildBoxSchema } from '@/shared/component'
+import { reconcileNovaTemplateChildren } from '@endge/nova'
+import { normalizePopoverProps, POPOVER_NODE_DESCRIPTOR } from '@/components/Popover/popover.config'
+import { buildBoxSchema, NovaUiComponentNode } from '@/shared/component'
 import { applyNodeLayoutRect, createLayoutRect } from '@/shared/layout'
 import { resolveNovaUiOverlayPosition } from '@/shared/overlay/overlay-position'
 
@@ -11,7 +13,7 @@ export class Popover<E extends EventList = Record<string, any>> extends NovaUiCo
   private readonly surfaceRect = createLayoutRect()
   private readonly api: PopoverApi
 
-  constructor(app: NovaApp<E>, surface: NovaSurface<E>, props: PopoverProps = {}, options: { componentId?: string; children?: PopoverSchema['children'] } = {}, descriptor: PopoverDescriptor = POPOVER_NODE_DESCRIPTOR) {
+  constructor(app: NovaApp<E>, surface: NovaSurface<E>, props: PopoverProps = {}, options: { componentId?: string, children?: PopoverSchema['children'] } = {}, descriptor: PopoverDescriptor = POPOVER_NODE_DESCRIPTOR) {
     super(app, surface, descriptor, normalizePopoverProps(props), options)
     this.api = { open: event => this.setOpen(true, event), close: event => this.setOpen(false, event), toggle: event => this.setOpen(!this.props.open, event), setProps: patch => this.setProps(patch), getProps: () => this.props }
     reconcileNovaTemplateChildren(this, this.childNodes, options.children ?? []).nodes.forEach(node => this.childNodes.push(node))
@@ -24,17 +26,23 @@ export class Popover<E extends EventList = Record<string, any>> extends NovaUiCo
 
   update(): void {
     this.resolveRect()
-    for (const child of this.childNodes) applyNodeLayoutRect(child as NovaNode<any>, this.surfaceRect)
+    for (const child of this.childNodes) {
+      applyNodeLayoutRect(child as NovaNode<any>, this.surfaceRect)
+    }
   }
 
   render(): void {
     if (!this.props.open) { this.renderer.schema([]); return }
     this.resolveRect()
     const schema: NovaSchema = []
-    if (this.props.backdrop) schema.push({ type: 'rect', x: 0, y: 0, width: this.width, height: this.height, styles: { background: this.resolveThemeValue('var(--nova-popover-backdrop-background, rgba(15,23,42,0.18))') } })
+    if (this.props.backdrop) {
+      schema.push({ type: 'rect', x: 0, y: 0, width: this.width, height: this.height, styles: { background: this.resolveThemeValue('var(--nova-popover-backdrop-background, rgba(15,23,42,0.18))') } })
+    }
     const surface = buildBoxSchema({ ...this.props, ...(this.props.surface ?? {}) }, this.props.width, this.props.height, { resolveThemeValue: value => this.resolveThemeValue(value) })
     for (const item of surface) { const shape = item as Record<string, any>; shape.x = (shape.x ?? 0) + this.surfaceRect.x; shape.y = (shape.y ?? 0) + this.surfaceRect.y; schema.push(item) }
-    if (this.props.arrow) schema.push({ type: 'rect', x: this.surfaceRect.x + 20, y: this.surfaceRect.y - 5, width: 10, height: 10, styles: { background: this.resolveThemeValue('var(--nova-popover-arrow-background, #ffffff)'), border: { color: 'rgba(0,0,0,0)', width: 0, radius: 2 } } })
+    if (this.props.arrow) {
+      schema.push({ type: 'rect', x: this.surfaceRect.x + 20, y: this.surfaceRect.y - 5, width: 10, height: 10, styles: { background: this.resolveThemeValue('var(--nova-popover-arrow-background, #ffffff)'), border: { color: 'rgba(0,0,0,0)', width: 0, radius: 2 } } })
+    }
     this.renderer.schema(schema)
   }
 
@@ -52,20 +60,31 @@ export class Popover<E extends EventList = Record<string, any>> extends NovaUiCo
     this.onCapture('mousedown', event => this.dismissOutside(event))
     this.on('mousedown', event => this.dismissOutside(event))
     this.on('click', event => this.dismissOutside(event))
-    this.on('keydown', event => { if (this.props.open && this.props.dismiss.escape && event.key === 'Escape') this.setOpen(false, event) })
+    this.on('keydown', (event) => {
+      if (this.props.open && this.props.dismiss.escape && event.key === 'Escape') {
+        this.setOpen(false, event)
+      }
+    })
   }
+
   private dismissOutside(event: MouseEvent): boolean | undefined {
-    if (!this.props.open || !this.props.dismiss.outside) return undefined
-    if (this.isInsideSurface(event)) return undefined
+    if (!this.props.open || !this.props.dismiss.outside) {
+      return undefined
+    }
+    if (this.isInsideSurface(event)) {
+      return undefined
+    }
     this.setOpen(false, event)
     event.stopPropagation()
     return false
   }
+
   private isInsideSurface(event: MouseEvent): boolean {
     const { x, y } = this.events.getCanvasMousePosition(event)
     const [localX, localY] = this.toLocal(x, y)
     return localX >= this.surfaceRect.x && localX <= this.surfaceRect.x + this.surfaceRect.width && localY >= this.surfaceRect.y && localY <= this.surfaceRect.y + this.surfaceRect.height
   }
+
   private resolveRect(): void {
     const pos = resolveNovaUiOverlayPosition({ root: { x: 0, y: 0, width: this.width, height: this.height }, anchor: this.props.anchor, overlay: { width: this.props.width, height: this.props.height }, placement: this.props.placement, offset: this.props.offset, collision: this.props.collision })
     Object.assign(this.surfaceRect, { x: pos.x, y: pos.y, width: this.props.width, height: this.props.height })

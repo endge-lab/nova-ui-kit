@@ -1,7 +1,8 @@
 import type { NovaComponentCreateContext, NovaComponentDescriptor, NovaComponentNode, NovaComponentSchema } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import { NOVA_UI_COMMON_DIRTY_POLICY, NOVA_UI_COMMON_FIELD_DEFINITIONS, clamp, commonMeasureBounds, finiteNumber, normalizeCommonProps } from '@/shared/component'
-import { TOAST_REGION_SCHEMA_TYPE, TOAST_SCHEMA_TYPE, type ToastApi, type ToastProps, type ToastRegionApi, type ToastRegionProps, type ToastRegionResolvedProps, type ToastResolvedProps, type ToastTone } from '@/components/Toast/toast.types'
+import type { ToastApi, ToastProps, ToastRegionApi, ToastRegionProps, ToastRegionResolvedProps, ToastResolvedProps, ToastTone } from '@/components/Toast/toast.types'
+import { TOAST_REGION_SCHEMA_TYPE, TOAST_SCHEMA_TYPE } from '@/components/Toast/toast.types'
+import { clamp, commonMeasureBounds, finiteNumber, normalizeCommonProps, NOVA_UI_COMMON_DIRTY_POLICY, NOVA_UI_COMMON_FIELD_DEFINITIONS } from '@/shared/component'
 
 export type ToastDescriptor = NovaComponentDescriptor<ToastResolvedProps, ToastApi, Record<string, never>, ToastProps>
 export type ToastRegionDescriptor = NovaComponentDescriptor<ToastRegionResolvedProps, ToastRegionApi, Record<string, never>, ToastRegionProps>
@@ -21,20 +22,32 @@ export function normalizeToastRegionProps(props: ToastRegionProps = {}): ToastRe
 
 export function createToastDescriptor(createNode?: ToastNodeFactory): ToastDescriptor {
   const descriptor: ToastDescriptor = { type: TOAST_SCHEMA_TYPE, name: 'Toast', title: 'Toast', version: '0.1.0', kind: 'node-component', dirtyPolicy: { matrix: NOVA_UI_COMMON_DIRTY_POLICY.matrix, update: [...NOVA_UI_COMMON_DIRTY_POLICY.update, 'title', 'message', 'icon', 'actionLabel'], render: [...NOVA_UI_COMMON_DIRTY_POLICY.render, 'tone', 'progress', 'closeButton', 'parts', 'onAction', 'onClose'] }, fields: TOAST_FIELD_DEFINITIONS, normalize: schema => normalizeToastProps(schema.props), measureBounds: (_context, schema) => commonMeasureBounds(schema, normalizeToastProps) }
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 export function createToastRegionDescriptor(createNode?: ToastRegionNodeFactory): ToastRegionDescriptor {
   const descriptor: ToastRegionDescriptor = { type: TOAST_REGION_SCHEMA_TYPE, name: 'ToastRegion', title: 'ToastRegion', version: '0.1.0', kind: 'node-component', dirtyPolicy: { matrix: NOVA_UI_COMMON_DIRTY_POLICY.matrix, update: [...NOVA_UI_COMMON_DIRTY_POLICY.update, 'items', 'gap', 'limit', 'placement'], render: [...NOVA_UI_COMMON_DIRTY_POLICY.render, 'newestFirst', 'autoDismiss', 'pauseOnHover', 'parts', 'onDismiss', 'onAction'] }, fields: TOAST_REGION_FIELD_DEFINITIONS, normalize: schema => normalizeToastRegionProps(schema.props), measureBounds: (_context, schema) => commonMeasureBounds(schema, normalizeToastRegionProps) }
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 export const TOAST_NODE_DESCRIPTOR = createToastDescriptor()
 export const TOAST_REGION_NODE_DESCRIPTOR = createToastRegionDescriptor()
-export function toastPalette(tone: ToastTone): { background: string; border: string; color: string } {
-  if (tone === 'success') return { background: 'var(--nova-toast-success-background, #ecfdf5)', border: 'var(--nova-toast-success-border-color, #bbf7d0)', color: 'var(--nova-toast-success-color, #047857)' }
-  if (tone === 'warning') return { background: 'var(--nova-toast-warning-background, #fffbeb)', border: 'var(--nova-toast-warning-border-color, #fde68a)', color: 'var(--nova-toast-warning-color, #b45309)' }
-  if (tone === 'danger') return { background: 'var(--nova-toast-danger-background, #fef2f2)', border: 'var(--nova-toast-danger-border-color, #fecaca)', color: 'var(--nova-toast-danger-color, #b91c1c)' }
-  if (tone === 'info') return { background: 'var(--nova-toast-info-background, #eff6ff)', border: 'var(--nova-toast-info-border-color, #bfdbfe)', color: 'var(--nova-toast-info-color, #1d4ed8)' }
+export function toastPalette(tone: ToastTone): { background: string, border: string, color: string } {
+  if (tone === 'success') {
+    return { background: 'var(--nova-toast-success-background, #ecfdf5)', border: 'var(--nova-toast-success-border-color, #bbf7d0)', color: 'var(--nova-toast-success-color, #047857)' }
+  }
+  if (tone === 'warning') {
+    return { background: 'var(--nova-toast-warning-background, #fffbeb)', border: 'var(--nova-toast-warning-border-color, #fde68a)', color: 'var(--nova-toast-warning-color, #b45309)' }
+  }
+  if (tone === 'danger') {
+    return { background: 'var(--nova-toast-danger-background, #fef2f2)', border: 'var(--nova-toast-danger-border-color, #fecaca)', color: 'var(--nova-toast-danger-color, #b91c1c)' }
+  }
+  if (tone === 'info') {
+    return { background: 'var(--nova-toast-info-background, #eff6ff)', border: 'var(--nova-toast-info-border-color, #bfdbfe)', color: 'var(--nova-toast-info-color, #1d4ed8)' }
+  }
   return { background: 'var(--nova-toast-background, #ffffff)', border: 'var(--nova-toast-border-color, #cbd5e1)', color: 'var(--nova-toast-color, #172033)' }
 }

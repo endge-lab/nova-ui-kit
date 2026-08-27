@@ -1,5 +1,5 @@
-export * from '@/components/TextBlock/TextBlock'
 export * from '@/components/TextBlock/text-block.config'
 export * from '@/components/TextBlock/text-block.registry'
 export * from '@/components/TextBlock/text-block.schema'
 export * from '@/components/TextBlock/text-block.types'
+export * from '@/components/TextBlock/TextBlock'

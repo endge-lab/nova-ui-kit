@@ -5,11 +5,10 @@ import type {
   NovaComponentSchema,
 } from '@endge/nova'
 import type { EventList } from '@endge/utils'
+import type { FlexApi, FlexProps, FlexResolvedProps } from '@/components/Flex/flex.types'
 import {
   FLEX_SCHEMA_TYPE,
-  type FlexApi,
-  type FlexProps,
-  type FlexResolvedProps,
+
 } from '@/components/Flex/flex.types'
 import { resolveNovaUiPosition } from '@/shared/layout'
 
@@ -134,7 +133,9 @@ export function createFlexDescriptor(createNode?: FlexNodeFactory): FlexDescript
     },
   }
 
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 

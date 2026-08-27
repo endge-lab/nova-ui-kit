@@ -5,18 +5,17 @@ import type {
   NovaComponentSchema,
 } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  NOVA_UI_COMMON_DIRTY_POLICY,
-  NOVA_UI_COMMON_FIELD_DEFINITIONS,
-  commonMeasureBounds,
-  normalizeCommonProps,
-} from '@/shared/component'
+import type { OverlaysApi, OverlaysProps, OverlaysResolvedProps } from '@/components/Overlay/overlay.types'
 import {
   OVERLAYS_SCHEMA_TYPE,
-  type OverlaysApi,
-  type OverlaysProps,
-  type OverlaysResolvedProps,
+
 } from '@/components/Overlay/overlay.types'
+import {
+  commonMeasureBounds,
+  normalizeCommonProps,
+  NOVA_UI_COMMON_DIRTY_POLICY,
+  NOVA_UI_COMMON_FIELD_DEFINITIONS,
+} from '@/shared/component'
 
 export type OverlaysDescriptor = NovaComponentDescriptor<
   OverlaysResolvedProps,
@@ -66,7 +65,9 @@ export function createOverlaysDescriptor(createNode?: OverlaysNodeFactory): Over
     measureBounds: (_context, schema) => commonMeasureBounds(schema, normalizeOverlaysProps),
   }
 
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 

@@ -1,16 +1,16 @@
 import { describe, expect, it } from 'vitest'
 import {
-  NovaUiStyleMask,
   borderRadiusToRendererValue,
   diffInheritedTextStyle,
   inheritedTextStyleMask,
   mergeStyleContext,
   normalizeBorderRadius,
+  NovaUiStyleMask,
   styleContextChangedMask,
   validateNovaUiStyleSheetSource,
 } from '@/shared/style'
 
-describe('Nova UI style primitives', () => {
+describe('nova UI style primitives', () => {
   it('normalizes border radius number and corner object', () => {
     expect(normalizeBorderRadius(12)).toBe(12)
     expect(normalizeBorderRadius({

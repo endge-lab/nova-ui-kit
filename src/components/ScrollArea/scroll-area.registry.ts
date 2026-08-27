@@ -1,12 +1,13 @@
 import type { NovaSchemaRegistry } from '@endge/nova'
-import { ScrollArea } from '@/components/ScrollArea/ScrollArea'
+import type { ScrollAreaDescriptor } from '@/components/ScrollArea/scroll-area.config'
+import type { ScrollAreaSchema } from '@/components/ScrollArea/scroll-area.types'
 import {
-  SCROLL_AREA_FIELD_DEFINITIONS,
   createScrollAreaDescriptor,
   normalizeScrollAreaProps,
-  type ScrollAreaDescriptor,
+  SCROLL_AREA_FIELD_DEFINITIONS,
+
 } from '@/components/ScrollArea/scroll-area.config'
-import type { ScrollAreaSchema } from '@/components/ScrollArea/scroll-area.types'
+import { ScrollArea } from '@/components/ScrollArea/ScrollArea'
 
 export const SCROLL_AREA_DESCRIPTOR: ScrollAreaDescriptor = createScrollAreaDescriptor((context, schema) => {
   const scrollAreaSchema = schema as ScrollAreaSchema

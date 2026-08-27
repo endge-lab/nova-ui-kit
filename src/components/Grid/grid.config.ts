@@ -5,11 +5,10 @@ import type {
   NovaComponentSchema,
 } from '@endge/nova'
 import type { EventList } from '@endge/utils'
+import type { GridApi, GridProps, GridResolvedProps } from '@/components/Grid/grid.types'
 import {
   GRID_SCHEMA_TYPE,
-  type GridApi,
-  type GridProps,
-  type GridResolvedProps,
+
 } from '@/components/Grid/grid.types'
 import { resolveNovaUiPosition } from '@/shared/layout'
 
@@ -143,7 +142,9 @@ export function createGridDescriptor(createNode?: GridNodeFactory): GridDescript
     },
   }
 
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 

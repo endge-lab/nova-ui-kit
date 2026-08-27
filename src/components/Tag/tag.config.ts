@@ -1,19 +1,17 @@
 import type { NovaComponentCreateContext, NovaComponentDescriptor, NovaComponentNode, NovaComponentSchema } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  NOVA_UI_COMMON_DIRTY_POLICY,
-  NOVA_UI_COMMON_FIELD_DEFINITIONS,
-  commonMeasureBounds,
-  normalizeCommonProps,
-  sizeTokenHeight,
-} from '@/shared/component'
+import type { TagApi, TagProps, TagResolvedProps, TagTone } from '@/components/Tag/tag.types'
 import {
   TAG_SCHEMA_TYPE,
-  type TagApi,
-  type TagProps,
-  type TagResolvedProps,
-  type TagTone,
+
 } from '@/components/Tag/tag.types'
+import {
+  commonMeasureBounds,
+  normalizeCommonProps,
+  NOVA_UI_COMMON_DIRTY_POLICY,
+  NOVA_UI_COMMON_FIELD_DEFINITIONS,
+  sizeTokenHeight,
+} from '@/shared/component'
 
 export type TagDescriptor = NovaComponentDescriptor<TagResolvedProps, TagApi, Record<string, never>, TagProps>
 
@@ -60,7 +58,9 @@ export function createTagDescriptor(createNode?: TagNodeFactory): TagDescriptor 
     normalize: schema => normalizeTagProps(schema.props),
     measureBounds: (_context, schema) => commonMeasureBounds(schema, normalizeTagProps),
   }
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 

@@ -1,4 +1,3 @@
-import { NovaComponentNode, createNovaSyncPort } from '@endge/nova'
 import type {
   NovaApp,
   NovaAssetRef,
@@ -8,55 +7,47 @@ import type {
   NovaCursorDeclaration,
   NovaSchema,
   NovaSoundCueInput,
-  NovaSyncPortMap,
   NovaSurface,
+  NovaSyncPortMap,
 } from '@endge/nova'
 import type { EventList } from '@endge/utils'
+import type { TooltipInput } from '@/components/Tooltip/tooltip.types'
 import type { NovaUiMotionOptions } from '@/domain/domain.types'
+import type { NovaUiInset, NovaUiLayoutRect, NovaUiLayoutTarget, NovaUiPosition, NovaUiSpacing } from '@/shared/layout'
+import type { NovaUiBorder, NovaUiFontStyle, NovaUiFontWeight, NovaUiInheritedTextStyle, NovaUiStyleContext, NovaUiStyleDisplay, NovaUiStyleIdentityProps, NovaUiStyleReceiveResult, NovaUiStyleTarget } from '@/shared/style'
+import { createNovaSyncPort, NovaComponentNode } from '@endge/nova'
 import {
-  NOVA_UI_LAYOUT_TARGET,
   applyNodeLayoutRect,
   copyRect,
   createLayoutRect,
+  NOVA_UI_LAYOUT_TARGET,
+
   rectEquals,
   relayoutNovaUiLayoutAncestors,
   resolveNovaUiPosition,
   resolveSpacing,
-  type NovaUiInset,
-  type NovaUiLayoutRect,
-  type NovaUiLayoutTarget,
-  type NovaUiPosition,
-  type NovaUiSpacing,
 } from '@/shared/layout'
 import {
-  EMPTY_STYLE_CONTEXT,
-  NOVA_UI_STYLE_TARGET,
-  NovaUiStyleMask,
   borderRadiusToRendererValue,
   bumpNovaUiStyleSheetVersion,
+  EMPTY_STYLE_CONTEXT,
   mergeStyleContext,
-  type NovaUiBorder,
-  type NovaUiFontStyle,
-  type NovaUiFontWeight,
-  type NovaUiInheritedTextStyle,
-  type NovaUiStyleContext,
-  type NovaUiStyleDisplay,
-  type NovaUiStyleIdentityProps,
-  type NovaUiStyleReceiveResult,
-  type NovaUiStyleTarget,
+  NOVA_UI_STYLE_TARGET,
+
+  NovaUiStyleMask,
+
 } from '@/shared/style'
 import {
   ensureNovaUIKitThemes,
   resolveNovaUiThemeValue,
 } from '@/shared/style/nova-ui-kit-theme'
-import type { TooltipInput } from '@/components/Tooltip/tooltip.types'
 
 export type NovaUiComponentSize = 'sm' | 'md' | 'lg'
 export type NovaUiOrientation = 'horizontal' | 'vertical'
 export type NovaUiIconSource = CanvasImageSource | string | NovaAssetRef<'icon' | 'image'> | undefined | null
 export type NovaUiSoundEventName = 'hover' | 'press' | 'change' | 'disabledPress'
 export type NovaUiSoundMap = Partial<Record<NovaUiSoundEventName, NovaSoundCueInput>>
-export type NovaUiLegacyPointPosition = { x?: number; y?: number }
+export interface NovaUiLegacyPointPosition { x?: number, y?: number }
 
 export interface NovaUiCommonProps extends NovaUiMotionOptions, NovaUiStyleIdentityProps {
   x?: number
@@ -299,9 +290,13 @@ export function createStateAttrs(
     ...(props.attrs ?? {}),
   }
 
-  if (props.disabled) attrs.disabled = true
+  if (props.disabled) {
+    attrs.disabled = true
+  }
   for (const [key, value] of Object.entries(state)) {
-    if (value !== undefined) attrs[key] = value
+    if (value !== undefined) {
+      attrs[key] = value
+    }
   }
   return attrs
 }
@@ -312,10 +307,18 @@ export function resolveInteractionBackground(
   resolveThemeValue?: (value: string | undefined) => string | undefined,
 ): string | undefined {
   const resolveValue = resolveThemeValue ?? ((value: string | undefined) => value)
-  if (props.disabled) return resolveValue(props.background)
-  if (state.pressed && props.pressedBackground) return resolveValue(props.pressedBackground)
-  if (state.active && props.activeBackground) return resolveValue(props.activeBackground)
-  if (state.hovered && props.hoverBackground) return resolveValue(props.hoverBackground)
+  if (props.disabled) {
+    return resolveValue(props.background)
+  }
+  if (state.pressed && props.pressedBackground) {
+    return resolveValue(props.pressedBackground)
+  }
+  if (state.active && props.activeBackground) {
+    return resolveValue(props.activeBackground)
+  }
+  if (state.hovered && props.hoverBackground) {
+    return resolveValue(props.hoverBackground)
+  }
   return resolveValue(props.background)
 }
 
@@ -381,7 +384,9 @@ export function applyChildRect(
   child: unknown,
   rect: NovaUiLayoutRect,
 ): boolean {
-  if (!child || typeof child !== 'object') return false
+  if (!child || typeof child !== 'object') {
+    return false
+  }
   return applyNodeLayoutRect(child as Parameters<typeof applyNodeLayoutRect>[0], rect)
 }
 
@@ -473,7 +478,7 @@ export abstract class NovaUiComponentNode<
     const ports = super.getSyncPorts()
     const geometryPort = (name: 'x' | 'y' | 'width' | 'height') => createNovaSyncPort<number>({
       read: () => this.layoutRect[name],
-      write: value => {
+      write: (value) => {
         this.setProps({ [name]: value } as Partial<TProps>)
         this.applyResolvedRect({
           ...this.layoutRect,
@@ -490,7 +495,7 @@ export abstract class NovaUiComponentNode<
       height: geometryPort('height'),
       layoutRect: createNovaSyncPort<NovaUiLayoutRect>({
         read: () => ({ ...this.layoutRect }),
-        write: rect => {
+        write: (rect) => {
           this.setProps({
             x: rect.x,
             y: rect.y,
@@ -507,13 +512,13 @@ export abstract class NovaUiComponentNode<
       }),
       active: createNovaSyncPort<boolean>({
         read: () => this.active,
-        write: value => {
+        write: (value) => {
           this.active = value
         },
       }),
       visible: createNovaSyncPort<boolean>({
         read: () => this.visible,
-        write: value => {
+        write: (value) => {
           this.visible = value
         },
       }),
@@ -548,7 +553,9 @@ export abstract class NovaUiComponentNode<
       },
     })
     this.applyCommonDisplayState()
-    if (changedKeys.includes('display')) this.markLayoutAncestorsDirty()
+    if (changedKeys.includes('display')) {
+      this.markLayoutAncestorsDirty()
+    }
     if (changedKeys.includes('position') || changedKeys.includes('inset') || changedKeys.includes('zIndex')) {
       this.markLayoutAncestorsDirty()
     }
@@ -594,7 +601,9 @@ export abstract class NovaUiComponentNode<
    * Применяет подготовленное состояние NovaUiComponentNode.
    */
   protected applyResolvedRect(rect: NovaUiLayoutRect): boolean {
-    if (rectEquals(this.layoutRect, rect)) return false
+    if (rectEquals(this.layoutRect, rect)) {
+      return false
+    }
 
     const sizeChanged = this.layoutRect.width !== rect.width || this.layoutRect.height !== rect.height
     copyRect(this.layoutRect, rect)
@@ -643,7 +652,9 @@ export function finiteNumber(value: number | undefined, fallback: number): numbe
 }
 
 export function finiteOptionalNumber(value: number | undefined, fallback?: number): number | undefined {
-  if (typeof value === 'number' && Number.isFinite(value)) return value
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value
+  }
   return fallback
 }
 
@@ -660,7 +671,9 @@ export function clamp01(value: number): number {
 }
 
 export function roundToStep(value: number, min: number, step: number): number {
-  if (step <= 0) return value
+  if (step <= 0) {
+    return value
+  }
   return min + Math.round((value - min) / step) * step
 }
 

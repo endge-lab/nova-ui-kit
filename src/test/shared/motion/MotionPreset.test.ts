@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { isNovaUiMotionEnabled, resolveNovaUiMotionOptions } from '@/shared/motion'
 
-describe('Nova UI motion presets', () => {
+describe('nova UI motion presets', () => {
   it('resolves default preset options', () => {
     expect(resolveNovaUiMotionOptions('fadeIn')).toMatchObject({
       duration: 180,

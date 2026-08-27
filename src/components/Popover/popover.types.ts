@@ -1,6 +1,6 @@
 import type { NovaComponentSchema } from '@endge/nova'
-import type { NovaUiCommonProps, NovaUiCommonResolvedProps } from '@/shared/component'
 import type { NovaUiPartStyleOptions } from '@/domain/domain.types'
+import type { NovaUiCommonProps, NovaUiCommonResolvedProps } from '@/shared/component'
 import type { NovaUiOverlayAnchor, NovaUiOverlayCollisionOptions, NovaUiOverlayDismissMode, NovaUiOverlayPlacement } from '@/shared/overlay/overlay.types'
 
 export const POPOVER_SCHEMA_TYPE = 'nova-ui.popover'
@@ -24,7 +24,7 @@ export interface PopoverResolvedProps extends NovaUiCommonResolvedProps, NovaUiP
   placement: NovaUiOverlayPlacement
   offset: number
   collision: Required<NovaUiOverlayCollisionOptions>
-  dismiss: { outside: boolean; escape: boolean }
+  dismiss: { outside: boolean, escape: boolean }
   arrow: boolean
   backdrop: boolean
   surface?: Partial<NovaUiCommonProps>

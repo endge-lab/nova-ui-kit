@@ -7,22 +7,20 @@ import type {
   NovaSchemaItem,
 } from '@endge/nova'
 import type { EventList } from '@endge/utils'
+import type { TooltipApi, TooltipContent, TooltipProps, TooltipResolvedProps } from '@/components/Tooltip/tooltip.types'
 import {
-  NOVA_UI_COMMON_DIRTY_POLICY,
-  NOVA_UI_COMMON_FIELD_DEFINITIONS,
+  TOOLTIP_SCHEMA_TYPE,
+
+} from '@/components/Tooltip/tooltip.types'
+import {
   commonMeasureBounds,
   finiteNumber,
   normalizeCommonProps,
+  NOVA_UI_COMMON_DIRTY_POLICY,
+  NOVA_UI_COMMON_FIELD_DEFINITIONS,
 } from '@/shared/component'
 import { resolveSpacing } from '@/shared/layout'
 import { borderRadiusToRendererValue } from '@/shared/style'
-import {
-  TOOLTIP_SCHEMA_TYPE,
-  type TooltipContent,
-  type TooltipApi,
-  type TooltipProps,
-  type TooltipResolvedProps,
-} from '@/components/Tooltip/tooltip.types'
 
 export type TooltipDescriptor = NovaComponentDescriptor<TooltipResolvedProps, TooltipApi, Record<string, never>, TooltipProps>
 
@@ -124,7 +122,7 @@ export function createTooltipDescriptor(createNode?: TooltipNodeFactory): Toolti
     dirtyPolicy: {
       matrix: NOVA_UI_COMMON_DIRTY_POLICY.matrix,
       update: [...NOVA_UI_COMMON_DIRTY_POLICY.update, 'content', 'placement', 'followCursor'],
-    render: [
+      render: [
         ...NOVA_UI_COMMON_DIRTY_POLICY.render,
         'delay',
         'hideDelay',
@@ -145,7 +143,9 @@ export function createTooltipDescriptor(createNode?: TooltipNodeFactory): Toolti
     normalize: schema => normalizeTooltipProps(schema.props),
     measureBounds: (_context, schema) => commonMeasureBounds(schema, normalizeTooltipProps),
   }
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 
@@ -153,7 +153,9 @@ export const TOOLTIP_NODE_DESCRIPTOR = createTooltipDescriptor()
 
 export function createTooltipSchema(props: TooltipProps): NovaSchema {
   const resolved = normalizeTooltipProps(props)
-  if (!resolved.open || !resolved.content) return []
+  if (!resolved.open || !resolved.content) {
+    return []
+  }
 
   const padding = resolveSpacing(resolved.padding)
   const measuredContentSchema = createTooltipContentSchema(resolved)
@@ -206,32 +208,54 @@ export function createTooltipSchema(props: TooltipProps): NovaSchema {
 }
 
 function normalizeTooltipContent(content: TooltipContent | null | undefined): TooltipContent | null {
-  if (typeof content === 'string') return content ? content : null
-  if (!content) return null
-  if ('text' in content && !content.text) return null
-  if ('markdown' in content && !content.markdown) return null
+  if (typeof content === 'string') {
+    return content || null
+  }
+  if (!content) {
+    return null
+  }
+  if ('text' in content && !content.text) {
+    return null
+  }
+  if ('markdown' in content && !content.markdown) {
+    return null
+  }
 
   return content
 }
 
 function resolveTooltipContentType(content: TooltipContent | null | undefined): string {
-  if (typeof content === 'string') return content ? 'text' : 'empty'
-  if (!content) return 'empty'
-  if ('markdown' in content) return 'markdown'
-  if ('schema' in content) return 'schema'
+  if (typeof content === 'string') {
+    return content ? 'text' : 'empty'
+  }
+  if (!content) {
+    return 'empty'
+  }
+  if ('markdown' in content) {
+    return 'markdown'
+  }
+  if ('schema' in content) {
+    return 'schema'
+  }
   return 'text'
 }
 
 function mergeClassNames(base: string, value?: string | Array<string>): string | Array<string> {
-  if (!value) return base
-  if (Array.isArray(value)) return [base, ...value.filter(Boolean)]
+  if (!value) {
+    return base
+  }
+  if (Array.isArray(value)) {
+    return [base, ...value.filter(Boolean)]
+  }
 
   return value.includes(base) ? value : `${base} ${value}`
 }
 
 function createTooltipContentSchema(props: TooltipResolvedProps): NovaSchema {
   const content = props.content
-  if (!content) return []
+  if (!content) {
+    return []
+  }
 
   const padding = resolveSpacing(props.padding)
   const width = Math.max(1, props.width - padding.left - padding.right)
@@ -288,7 +312,7 @@ function createTooltipContentSchema(props: TooltipResolvedProps): NovaSchema {
   return schema.slice() as NovaSchema
 }
 
-function measureTooltipContent(schema: NovaSchema, props: TooltipResolvedProps): { width: number; height: number } {
+function measureTooltipContent(schema: NovaSchema, props: TooltipResolvedProps): { width: number, height: number } {
   let width = 0
   let height = 0
 
@@ -318,7 +342,7 @@ function resolveTooltipRect(
   props: TooltipResolvedProps,
   width: number,
   height: number,
-): { x: number; y: number; width: number; height: number } {
+): { x: number, y: number, width: number, height: number } {
   const gap = 8
   let x = props.x
   let y = props.y
@@ -326,16 +350,20 @@ function resolveTooltipRect(
   if (props.placement === 'top') {
     x = props.x + (props.width - width) / 2
     y = props.y - height - gap
-  } else if (props.placement === 'bottom') {
+  }
+  else if (props.placement === 'bottom') {
     x = props.x + (props.width - width) / 2
     y = props.y + props.height + gap
-  } else if (props.placement === 'left') {
+  }
+  else if (props.placement === 'left') {
     x = props.x - width - gap
     y = props.y + (props.height - height) / 2
-  } else if (props.placement === 'right') {
+  }
+  else if (props.placement === 'right') {
     x = props.x + props.width + gap
     y = props.y + (props.height - height) / 2
-  } else {
+  }
+  else {
     x = props.x + gap
     y = props.y + gap
   }

@@ -1,10 +1,6 @@
 import type { NovaApp, NovaSchema, NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  SCROLLBAR_NODE_DESCRIPTOR,
-  normalizeScrollbarProps,
-  type ScrollbarDescriptor,
-} from '@/components/Scrollbar/scrollbar.config'
+import type { ScrollbarDescriptor } from '@/components/Scrollbar/scrollbar.config'
 import type {
   ScrollbarApi,
   ScrollbarProps,
@@ -16,8 +12,13 @@ import {
   createNovaScrollbarSchema,
 } from '@/components/Scrollbar/scrollbar-geometry'
 import {
-  NovaUiComponentNode,
+  normalizeScrollbarProps,
+  SCROLLBAR_NODE_DESCRIPTOR,
+
+} from '@/components/Scrollbar/scrollbar.config'
+import {
   clamp,
+  NovaUiComponentNode,
 } from '@/shared/component'
 
 /**
@@ -68,9 +69,13 @@ export class Scrollbar<E extends EventList = Record<string, any>>
    * Обновляет значение состояния Scrollbar.
    */
   setValue(value: number, event?: Event): void {
-    if (this.props.disabled) return
+    if (this.props.disabled) {
+      return
+    }
     const next = normalizeScrollbarProps({ ...this.props, value }).value
-    if (next === this.props.value) return
+    if (next === this.props.value) {
+      return
+    }
     this.setProps({ value: next })
     this.props.onChange?.(next, event)
   }
@@ -137,7 +142,9 @@ export class Scrollbar<E extends EventList = Record<string, any>>
    */
   private setupEvents(): void {
     this.on('mouseenter', () => {
-      if (this.props.disabled) return
+      if (this.props.disabled) {
+        return
+      }
       this.hovered = true
       this.dirty({ render: true })
     })
@@ -145,19 +152,25 @@ export class Scrollbar<E extends EventList = Record<string, any>>
       this.hovered = false
       this.dirty({ render: true })
     })
-    this.on('mousedown', event => {
-      if (this.props.disabled) return false
+    this.on('mousedown', (event) => {
+      if (this.props.disabled) {
+        return false
+      }
       this.dragging = true
       this.setValue(this.valueFromEvent(event), event)
       return false
     })
-    this.on('dragmove', event => {
-      if (!this.dragging) return false
+    this.on('dragmove', (event) => {
+      if (!this.dragging) {
+        return false
+      }
       this.setValue(this.valueFromEvent(event), event)
       return false
     })
-    this.on('dragend', event => {
-      if (!this.dragging) return false
+    this.on('dragend', (event) => {
+      if (!this.dragging) {
+        return false
+      }
       this.dragging = false
       this.setValue(this.valueFromEvent(event), event)
       this.dirty({ render: true })

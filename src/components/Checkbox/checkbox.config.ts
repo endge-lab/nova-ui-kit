@@ -1,17 +1,16 @@
 import type { NovaComponentCreateContext, NovaComponentDescriptor, NovaComponentNode, NovaComponentSchema } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  NOVA_UI_COMMON_DIRTY_POLICY,
-  NOVA_UI_COMMON_FIELD_DEFINITIONS,
-  commonMeasureBounds,
-  normalizeCommonProps,
-} from '@/shared/component'
+import type { CheckboxApi, CheckboxProps, CheckboxResolvedProps } from '@/components/Checkbox/checkbox.types'
 import {
   CHECKBOX_SCHEMA_TYPE,
-  type CheckboxApi,
-  type CheckboxProps,
-  type CheckboxResolvedProps,
+
 } from '@/components/Checkbox/checkbox.types'
+import {
+  commonMeasureBounds,
+  normalizeCommonProps,
+  NOVA_UI_COMMON_DIRTY_POLICY,
+  NOVA_UI_COMMON_FIELD_DEFINITIONS,
+} from '@/shared/component'
 
 export type CheckboxDescriptor = NovaComponentDescriptor<CheckboxResolvedProps, CheckboxApi, Record<string, never>, CheckboxProps>
 
@@ -66,7 +65,9 @@ export function createCheckboxDescriptor(createNode?: CheckboxNodeFactory): Chec
     normalize: schema => normalizeCheckboxProps(schema.props),
     measureBounds: (_context, schema) => commonMeasureBounds(schema, normalizeCheckboxProps),
   }
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 

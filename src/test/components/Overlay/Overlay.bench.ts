@@ -1,14 +1,16 @@
 // @vitest-environment jsdom
 
-import { Nova, RaphSchedulerType, RendererType, type NovaApp } from '@endge/nova'
-import { afterAll, beforeAll, bench, describe, vi } from 'vitest'
-import { NovaUIKit, registerNovaUIKit, type RootApi } from '@/index'
+import type { NovaApp } from '@endge/nova'
 import type { Root } from '@/components/Root/Root'
+import type { RootApi } from '@/index'
+import { Nova, RaphSchedulerType, RendererType } from '@endge/nova'
+import { afterAll, beforeAll, bench, describe, vi } from 'vitest'
+import { NovaUIKit, registerNovaUIKit } from '@/index'
 
 const apps: Array<NovaApp<Record<string, any>>> = []
 let root: Root<Record<string, any>>
 
-describe('Nova UI Kit overlay registry benchmark', () => {
+describe('nova UI Kit overlay registry benchmark', () => {
   bench('open/update/close 1000 lightweight overlays', () => {
     const api = root.getApi() as RootApi
     for (let index = 0; index < 1_000; index += 1) {
@@ -43,7 +45,9 @@ beforeAll(() => {
     configurable: true,
   })
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation((type: string) => {
-    if (type === RendererType.Web2D) return create2DContextStub()
+    if (type === RendererType.Web2D) {
+      return create2DContextStub()
+    }
     return null
   })
   vi.spyOn(HTMLCanvasElement.prototype, 'getBoundingClientRect').mockImplementation(function getRect(this: HTMLCanvasElement) {
@@ -111,7 +115,9 @@ function create2DContextStub(): CanvasRenderingContext2D {
   }
   return new Proxy(state, {
     get(target, prop) {
-      if (!(prop in target)) target[prop] = vi.fn()
+      if (!(prop in target)) {
+        target[prop] = vi.fn()
+      }
       return target[prop]
     },
     set(target, prop, value) {

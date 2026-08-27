@@ -29,7 +29,9 @@ const layoutIntentByNode = new WeakMap<object, NovaUiLayoutIntent>()
 
 /** Сохраняет computed layout-намерение для node без расширения публичных props. */
 export function setNovaUiNodeLayoutIntent(node: unknown, intent: NovaUiLayoutIntent | undefined): void {
-  if (!node || typeof node !== 'object') return
+  if (!node || typeof node !== 'object') {
+    return
+  }
   if (!intent || Object.keys(intent).length === 0) {
     layoutIntentByNode.delete(node)
     return
@@ -50,7 +52,9 @@ export function mergeNovaUiLayoutIntents<TLayout extends NovaUiLayoutIntent>(
   ...items: Array<NovaUiLayoutIntent | undefined>
 ): TLayout {
   return items.reduce<NovaUiLayoutIntent>((result, item) => {
-    if (!item) return result
+    if (!item) {
+      return result
+    }
     return {
       ...result,
       ...item,
@@ -60,7 +64,9 @@ export function mergeNovaUiLayoutIntents<TLayout extends NovaUiLayoutIntent>(
 
 /** Возвращает текущие props node без привязки к конкретному компоненту. */
 export function readNovaUiNodeProps(node: unknown): Record<string, unknown> {
-  if (!node || typeof node !== 'object') return {}
+  if (!node || typeof node !== 'object') {
+    return {}
+  }
 
   if ('getProps' in node && typeof (node as { getProps?: unknown }).getProps === 'function') {
     return ((node as NovaNode<any> & { getProps: () => Record<string, unknown> }).getProps?.() ?? {}) as Record<string, unknown>

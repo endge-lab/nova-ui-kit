@@ -1,35 +1,33 @@
-import { describe, expect, it } from 'vitest'
 import type { NovaNode } from '@endge/nova'
+import type { NovaUiLayoutRect } from '@/shared/layout'
+import type { NovaUiCompiledStyleSheet, NovaUiStylableNode, NovaUiStyleContext, NovaUiStyleReceiveResult, NovaUiStyleTarget, NovaUiStyleTokenResolver } from '@/shared/style'
+import { describe, expect, it } from 'vitest'
 import { normalizeFlexProps } from '@/components/Flex/flex.config'
 import {
-  FlexLayoutEngine,
   createFlexChildEntry,
+  FlexLayoutEngine,
 } from '@/components/Flex/FlexLayoutEngine'
 import { normalizeGridProps } from '@/components/Grid/grid.config'
 import {
-  GridLayoutEngine,
   createGridChildEntry,
+  GridLayoutEngine,
 } from '@/components/Grid/GridLayoutEngine'
-import {
-  NOVA_UI_STYLE_TARGET,
-  NovaUiStyleMask,
-  matchStyleRules,
-  getNovaUiStyleMediaSignature,
-  resolveNovaUiStyleSheetTokens,
-  validateNovaUiStyleSheetSource,
-  type NovaUiCompiledStyleSheet,
-  type NovaUiStyleContext,
-  type NovaUiStyleReceiveResult,
-  type NovaUiStyleTarget,
-  type NovaUiStyleTokenResolver,
-  type NovaUiStylableNode,
-} from '@/shared/style'
 import {
   copyRect,
   isNovaUiLayoutDisplayed,
+
   rectEquals,
-  type NovaUiLayoutRect,
 } from '@/shared/layout'
+import {
+  getNovaUiStyleMediaSignature,
+  matchStyleRules,
+  NOVA_UI_STYLE_TARGET,
+
+  NovaUiStyleMask,
+
+  resolveNovaUiStyleSheetTokens,
+  validateNovaUiStyleSheetSource,
+} from '@/shared/style'
 
 interface BenchStats {
   scenario: string
@@ -150,9 +148,9 @@ const TEXT_LAYOUT_MASK = (
 
 const BENCH_ITERATIONS = 6
 
-describe('Nova UI style propagation performance', () => {
+describe('nova UI style propagation performance', () => {
   it('benchmarks stylesheet compile hot path', () => {
-    const results = [100, 1_000].map(size => {
+    const results = [100, 1_000].map((size) => {
       const source = createBenchmarkStyleSource(size)
       return measureBench(`stylesheet compile ${size}`, size, () => {
         const result = validateNovaUiStyleSheetSource(source)
@@ -213,11 +211,13 @@ describe('Nova UI style propagation performance', () => {
   it('benchmarks selector matching for indexed rules', () => {
     const source = createBenchmarkStyleSource(1_000)
     const sheet = validateNovaUiStyleSheetSource(source).styleSheet!
-    const results = [1_000, 5_000, 10_000].map(size => {
+    const results = [1_000, 5_000, 10_000].map((size) => {
       const nodes = createBenchmarkStyleNodes(size)
       return measureBench(`selector matching ${size}`, size, () => {
         let matches = 0
-        for (const node of nodes) matches += matchStyleRules(node, sheet).length
+        for (const node of nodes) {
+          matches += matchStyleRules(node, sheet).length
+        }
         return {
           renderCount: matches,
           updateCount: 0,
@@ -243,7 +243,9 @@ describe('Nova UI style propagation performance', () => {
       let matches = 0
       for (const node of nodes) {
         const rules = matchStyleRules(node, sheet)
-        if (rules[0]?.declarations.cursor !== undefined) matches += 1
+        if (rules[0]?.declarations.cursor !== undefined) {
+          matches += 1
+        }
       }
       return {
         renderCount: matches,
@@ -265,7 +267,9 @@ describe('Nova UI style propagation performance', () => {
     const result = measureBench('selector color render-only 10000', size, () => {
       let renderCount = 0
       for (const node of nodes) {
-        if (matchStyleRules(node, sheet).length > 0) renderCount += 1
+        if (matchStyleRules(node, sheet).length > 0) {
+          renderCount += 1
+        }
       }
       return {
         renderCount,
@@ -337,7 +341,7 @@ describe('Nova UI style propagation performance', () => {
   })
 
   it('benchmarks render-only inherited color propagation', () => {
-    const results = [1_000, 5_000, 10_000].map(size => {
+    const results = [1_000, 5_000, 10_000].map((size) => {
       const targets = Array.from({ length: size }, () => new BenchTextTarget())
       const root = new BenchContainerTarget(targets)
       return measureBench(`style color render-only ${size}`, size, () => {
@@ -356,7 +360,7 @@ describe('Nova UI style propagation performance', () => {
   })
 
   it('benchmarks layout-affecting inherited font propagation', () => {
-    const results = [1_000, 5_000].map(size => {
+    const results = [1_000, 5_000].map((size) => {
       const targets = Array.from({ length: size }, () => new BenchTextTarget())
       const root = new BenchContainerTarget(targets)
       return measureBench(`font layout-affecting ${size}`, size, () => {
@@ -411,9 +415,13 @@ describe('Nova UI style propagation performance', () => {
 
     const root = new BenchContainerTarget(branches)
     const result = measureBench('subtree skip 10000', branchCount * branchSize, () => {
-      for (const targets of branchTargets) resetBenchTargets(targets)
+      for (const targets of branchTargets) {
+        resetBenchTargets(targets)
+      }
       resetBenchContainer(root)
-      for (const branch of branches) resetBenchContainer(branch)
+      for (const branch of branches) {
+        resetBenchContainer(branch)
+      }
 
       root.receiveStyleContext(createContext('#334455'), NovaUiStyleMask.Color)
       const branchStats = branches.reduce((acc, branch) => {
@@ -547,7 +555,7 @@ function createContext(color: string, fontSize?: number): NovaUiStyleContext {
 function measureBench(
   scenario: string,
   size: number,
-  run: () => { renderCount: number; updateCount: number; skippedCount: number },
+  run: () => { renderCount: number, updateCount: number, skippedCount: number },
 ): BenchStats {
   const times: Array<number> = []
   let stats = { renderCount: 0, updateCount: 0, skippedCount: 0 }
@@ -573,7 +581,7 @@ function measureBench(
   }
 }
 
-function collectStats(targets: Array<BenchTextTarget>, root: BenchContainerTarget): { renderCount: number; updateCount: number; skippedCount: number } {
+function collectStats(targets: Array<BenchTextTarget>, root: BenchContainerTarget): { renderCount: number, updateCount: number, skippedCount: number } {
   return targets.reduce((acc, target) => {
     acc.renderCount += target.renderCount
     acc.updateCount += target.updateCount
@@ -591,7 +599,9 @@ function resetBenchTargets(targets: Array<BenchTextTarget>, root?: BenchContaine
     target.updateCount = 0
     target.receiveCount = 0
   }
-  if (root) resetBenchContainer(root)
+  if (root) {
+    resetBenchContainer(root)
+  }
 }
 
 function resetBenchContainer(container: BenchContainerTarget): void {
@@ -623,7 +633,9 @@ function applyEntryRects(entries: Array<{ nextRect: NovaUiLayoutRect }>, prevRec
 
   for (let index = 0; index < entries.length; index += 1) {
     const nextRect = entries[index].nextRect
-    if (rectEquals(nextRect, prevRects[index])) continue
+    if (rectEquals(nextRect, prevRects[index])) {
+      continue
+    }
     copyRect(prevRects[index], nextRect)
     changed += 1
   }
@@ -635,7 +647,9 @@ function countUnchangedEntryRects(entries: Array<{ nextRect: NovaUiLayoutRect }>
   let unchanged = 0
 
   for (let index = 0; index < entries.length; index += 1) {
-    if (rectEquals(entries[index].nextRect, prevRects[index])) unchanged += 1
+    if (rectEquals(entries[index].nextRect, prevRects[index])) {
+      unchanged += 1
+    }
   }
 
   return unchanged
@@ -647,10 +661,18 @@ function roundMs(value: number): number {
 
 function rateBench(averageMs: number, size: number): BenchStats['rating'] {
   const perThousand = averageMs / Math.max(1, size / 1000)
-  if (perThousand <= 0.05) return 'идеально'
-  if (perThousand <= 0.15) return 'отлично'
-  if (perThousand <= 0.5) return 'хорошо'
-  if (perThousand <= 1.5) return 'приемлемо'
+  if (perThousand <= 0.05) {
+    return 'идеально'
+  }
+  if (perThousand <= 0.15) {
+    return 'отлично'
+  }
+  if (perThousand <= 0.5) {
+    return 'хорошо'
+  }
+  if (perThousand <= 1.5) {
+    return 'приемлемо'
+  }
   return 'плохо'
 }
 

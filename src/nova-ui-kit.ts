@@ -1,11 +1,4 @@
 import { ACTION_LIST_SCHEMA_TYPE } from '@/components/ActionList/action-list.types'
-import { BADGE_SCHEMA_TYPE } from '@/components/Badge/badge.types'
-import { BUTTON_SCHEMA_TYPE } from '@/components/Button/button.types'
-import { CHECKBOX_SCHEMA_TYPE } from '@/components/Checkbox/checkbox.types'
-import { CHIP_SCHEMA_TYPE } from '@/components/Chip/chip.types'
-import { COLOR_PICKER_SCHEMA_TYPE } from '@/components/ColorPicker/color-picker.types'
-import { DIVIDER_SCHEMA_TYPE } from '@/components/Divider/divider.types'
-import { DIALOG_SCHEMA_TYPE, DIALOGS_SCHEMA_TYPE } from '@/components/Dialog/dialog.types'
 import {
   ACCORDION_SCHEMA_TYPE,
   BLOCK_UI_SCHEMA_TYPE,
@@ -30,9 +23,17 @@ import {
   TABS_SCHEMA_TYPE,
   TOGGLE_SWITCH_SCHEMA_TYPE,
 } from '@/components/Advanced/advanced.types'
+import { BADGE_SCHEMA_TYPE } from '@/components/Badge/badge.types'
+import { BUTTON_SCHEMA_TYPE } from '@/components/Button/button.types'
+import { CHECKBOX_SCHEMA_TYPE } from '@/components/Checkbox/checkbox.types'
+import { CHIP_SCHEMA_TYPE } from '@/components/Chip/chip.types'
+import { COLOR_PICKER_SCHEMA_TYPE } from '@/components/ColorPicker/color-picker.types'
+import { DIALOG_SCHEMA_TYPE, DIALOGS_SCHEMA_TYPE } from '@/components/Dialog/dialog.types'
+import { DIVIDER_SCHEMA_TYPE } from '@/components/Divider/divider.types'
 import { FLEX_SCHEMA_TYPE } from '@/components/Flex/flex.types'
 import { FPS_METER_SCHEMA_TYPE } from '@/components/FpsMeter/fps-meter.types'
 import { GRID_SCHEMA_TYPE } from '@/components/Grid/grid.types'
+import { IMAGE_SCHEMA_TYPE } from '@/components/Image/image.types'
 import {
   INPUT_FIELD_SCHEMA_TYPE,
   INPUT_SCHEMA_TYPE,
@@ -43,7 +44,6 @@ import {
   TEXT_AREA_SCHEMA_TYPE,
   TEXT_INPUT_SCHEMA_TYPE,
 } from '@/components/Input/input.types'
-import { IMAGE_SCHEMA_TYPE } from '@/components/Image/image.types'
 import { OVERLAY_SCHEMA_TYPE, OVERLAYS_SCHEMA_TYPE } from '@/components/Overlay/overlay.types'
 import { PANEL_SCHEMA_TYPE } from '@/components/Panel/panel.types'
 import { POPOVER_SCHEMA_TYPE } from '@/components/Popover/popover.types'
@@ -58,11 +58,11 @@ import { SURFACE_SCHEMA_TYPE } from '@/components/Surface/surface.types'
 import { TAG_SCHEMA_TYPE } from '@/components/Tag/tag.types'
 import { TEXT_BLOCK_SCHEMA_TYPE } from '@/components/TextBlock/text-block.types'
 import { THEME_SWITCH_SCHEMA_TYPE } from '@/components/ThemeSwitch/theme-switch.types'
-import { ZOOM_CONTROLS_SCHEMA_TYPE } from '@/components/ZoomControls/zoom-controls.types'
+import { TOAST_REGION_SCHEMA_TYPE, TOAST_SCHEMA_TYPE } from '@/components/Toast/toast.types'
 import { TOGGLE_SCHEMA_TYPE } from '@/components/Toggle/toggle.types'
 import { createTooltipSchema } from '@/components/Tooltip/tooltip.config'
 import { TOOLTIP_SCHEMA_TYPE, TOOLTIPS_SCHEMA_TYPE } from '@/components/Tooltip/tooltip.types'
-import { TOAST_REGION_SCHEMA_TYPE, TOAST_SCHEMA_TYPE } from '@/components/Toast/toast.types'
+import { ZOOM_CONTROLS_SCHEMA_TYPE } from '@/components/ZoomControls/zoom-controls.types'
 
 /** Группировка schema type для более читаемого UI Kit DSL. */
 export const NovaUIKit = {

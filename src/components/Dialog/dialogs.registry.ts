@@ -1,10 +1,11 @@
 import type { NovaSchemaRegistry } from '@endge/nova'
+import type { DialogsSchema } from '@/components/Dialog/dialog.types'
+import type { DialogsDescriptor } from '@/components/Dialog/dialogs.config'
 import { Dialogs } from '@/components/Dialog/Dialogs'
 import {
   createDialogsDescriptor,
-  type DialogsDescriptor,
+
 } from '@/components/Dialog/dialogs.config'
-import type { DialogsSchema } from '@/components/Dialog/dialog.types'
 
 export const DIALOGS_DESCRIPTOR: DialogsDescriptor = createDialogsDescriptor((context, schema) => {
   const dialogsSchema = schema as DialogsSchema

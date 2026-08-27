@@ -1,24 +1,24 @@
-import { type NovaNode } from '@endge/nova'
-import { NovaUiStyleMask } from '@/shared/style/style-context'
-import {
-  normalizeStyleClasses,
-  readNovaUiStyleIdentityProps,
-} from '@/shared/style/identity/style-identity'
-import {
-  NOVA_UI_RESPONSIVE_VARIANT_RANK,
-  isNovaUiResponsiveVariantActive,
-  matchesNovaUiMediaQuery,
-  resolveNovaUiResponsiveVariant,
-} from '@/shared/style/cascade/style-media'
+import type { NovaNode } from '@endge/nova'
 import type {
   NovaUiCompiledStyleRule,
   NovaUiCompiledStyleSheet,
+  NovaUiStylableNode,
   NovaUiStyleComponentName,
   NovaUiStyleDeclarations,
   NovaUiStyleMediaContext,
   NovaUiStyleSelectorPart,
-  NovaUiStylableNode,
 } from '@/shared/style/cascade/style-sheet'
+import {
+  isNovaUiResponsiveVariantActive,
+  matchesNovaUiMediaQuery,
+  NOVA_UI_RESPONSIVE_VARIANT_RANK,
+  resolveNovaUiResponsiveVariant,
+} from '@/shared/style/cascade/style-media'
+import {
+  normalizeStyleClasses,
+  readNovaUiStyleIdentityProps,
+} from '@/shared/style/identity/style-identity'
+import { NovaUiStyleMask } from '@/shared/style/style-context'
 
 export interface NovaUiVirtualStylePrimitiveIdentity {
   type: NovaUiStyleComponentName
@@ -46,7 +46,9 @@ export function matchNovaUiVirtualStyleRules(
   mediaContext?: NovaUiStyleMediaContext,
   options: NovaUiVirtualStyleMatchOptions = {},
 ): Array<NovaUiCompiledStyleRule> {
-  if (styleSheet.rules.length === 0) return []
+  if (styleSheet.rules.length === 0) {
+    return []
+  }
 
   const identity = readVirtualStyleIdentity(primitive, mediaContext)
   const candidates: Array<NovaUiCompiledStyleRule> = []
@@ -54,7 +56,9 @@ export function matchNovaUiVirtualStyleRules(
 
   collectCandidates(candidates, seen, styleSheet.universal)
   collectCandidates(candidates, seen, styleSheet.byType.get(identity.type))
-  if (identity.id) collectCandidates(candidates, seen, styleSheet.byId.get(identity.id))
+  if (identity.id) {
+    collectCandidates(candidates, seen, styleSheet.byId.get(identity.id))
+  }
   for (const className of identity.classes) {
     collectCandidates(candidates, seen, styleSheet.byClass.get(className))
   }
@@ -62,13 +66,19 @@ export function matchNovaUiVirtualStyleRules(
     collectCandidates(candidates, seen, styleSheet.byAttr.get(attrName))
   }
 
-  const matched: Array<{ rule: NovaUiCompiledStyleRule; variantRank: number }> = []
+  const matched: Array<{ rule: NovaUiCompiledStyleRule, variantRank: number }> = []
   for (const rule of candidates) {
-    if (rule.selector.parts[rule.selector.parts.length - 1]?.pseudos.length) continue
-    if (!matchesNovaUiMediaQuery(rule.media, mediaContext)) continue
+    if (rule.selector.parts[rule.selector.parts.length - 1]?.pseudos.length) {
+      continue
+    }
+    if (!matchesNovaUiMediaQuery(rule.media, mediaContext)) {
+      continue
+    }
 
     const variantRank = virtualSelectorMatchRank(identity, rule, mediaContext, options)
-    if (variantRank < 0) continue
+    if (variantRank < 0) {
+      continue
+    }
     matched.push({ rule, variantRank })
   }
 
@@ -99,7 +109,9 @@ function virtualSelectorMatchRank(
 ): number {
   let partIndex = rule.selector.parts.length - 1
   let variantRank = matchVirtualIdentityPartRank(identity, rule.selector.parts[partIndex]!)
-  if (variantRank < 0) return -1
+  if (variantRank < 0) {
+    return -1
+  }
   partIndex -= 1
 
   let current: NovaNode<any> | null = options.owner ?? null
@@ -109,9 +121,13 @@ function virtualSelectorMatchRank(
 
     if (combinator === 'child') {
       const parent = findNearestStylableOwner(current)
-      if (!parent) return -1
+      if (!parent) {
+        return -1
+      }
       const partRank = matchNodePartRank(parent, part, mediaContext)
-      if (partRank < 0) return -1
+      if (partRank < 0) {
+        return -1
+      }
       variantRank = Math.max(variantRank, partRank)
       current = parent.parent instanceof Object ? parent.parent as NovaNode<any> : null
       partIndex -= 1
@@ -119,7 +135,9 @@ function virtualSelectorMatchRank(
     }
 
     const ancestor = findOwnerChainMatching(current, part, mediaContext)
-    if (!ancestor.node) return -1
+    if (!ancestor.node) {
+      return -1
+    }
     variantRank = Math.max(variantRank, ancestor.rank)
     current = ancestor.node.parent instanceof Object ? ancestor.node.parent as NovaNode<any> : null
     partIndex -= 1
@@ -131,7 +149,9 @@ function virtualSelectorMatchRank(
 function findNearestStylableOwner(node: NovaNode<any> | null): NovaNode<any> | null {
   let current = node
   while (current) {
-    if (isStylableNode(current)) return current
+    if (isStylableNode(current)) {
+      return current
+    }
     current = current.parent instanceof Object ? current.parent as NovaNode<any> : null
   }
   return null
@@ -141,12 +161,14 @@ function findOwnerChainMatching(
   node: NovaNode<any> | null,
   part: NovaUiStyleSelectorPart,
   mediaContext?: NovaUiStyleMediaContext,
-): { node: NovaNode<any> | null; rank: number } {
+): { node: NovaNode<any> | null, rank: number } {
   let current = node
 
   while (current) {
     const rank = matchNodePartRank(current, part, mediaContext)
-    if (rank >= 0) return { node: current, rank }
+    if (rank >= 0) {
+      return { node: current, rank }
+    }
     current = current.parent instanceof Object ? current.parent as NovaNode<any> : null
   }
 
@@ -158,7 +180,9 @@ function matchNodePartRank(
   part: NovaUiStyleSelectorPart,
   mediaContext?: NovaUiStyleMediaContext,
 ): number {
-  if (!isStylableNode(node)) return -1
+  if (!isStylableNode(node)) {
+    return -1
+  }
   return matchVirtualIdentityPartRank(readNodeStyleIdentity(node, mediaContext), part)
 }
 
@@ -173,7 +197,9 @@ function readVirtualStyleIdentity(
     registerClassRank(classRanks, className, NOVA_UI_RESPONSIVE_VARIANT_RANK.base)
 
     const responsive = resolveNovaUiResponsiveVariant(className)
-    if (!responsive || !isNovaUiResponsiveVariantActive(responsive.variant, mediaContext)) continue
+    if (!responsive || !isNovaUiResponsiveVariantActive(responsive.variant, mediaContext)) {
+      continue
+    }
 
     registerClassRank(
       classRanks,
@@ -203,7 +229,9 @@ function readNodeStyleIdentity(
     registerClassRank(classRanks, className, NOVA_UI_RESPONSIVE_VARIANT_RANK.base)
 
     const responsive = resolveNovaUiResponsiveVariant(className)
-    if (!responsive || !isNovaUiResponsiveVariantActive(responsive.variant, mediaContext)) continue
+    if (!responsive || !isNovaUiResponsiveVariantActive(responsive.variant, mediaContext)) {
+      continue
+    }
 
     registerClassRank(
       classRanks,
@@ -222,21 +250,30 @@ function readNodeStyleIdentity(
 }
 
 function matchVirtualIdentityPartRank(identity: VirtualStyleIdentity, part: NovaUiStyleSelectorPart): number {
-  if (part.type && identity.type !== part.type) return -1
-  if (part.id && identity.id !== part.id) return -1
+  if (part.type && identity.type !== part.type) {
+    return -1
+  }
+  if (part.id && identity.id !== part.id) {
+    return -1
+  }
 
   let variantRank = 0
   for (const className of part.classes) {
     const classRank = identity.classRanks.get(className)
-    if (classRank === undefined) return -1
+    if (classRank === undefined) {
+      return -1
+    }
     variantRank = Math.max(variantRank, classRank)
   }
 
   for (const [name, expected] of Object.entries(part.attrs)) {
     const actual = identity.attrs[name]
     if (expected === true) {
-      if (actual === undefined) return -1
-    } else if (String(actual) !== expected) {
+      if (actual === undefined) {
+        return -1
+      }
+    }
+    else if (String(actual) !== expected) {
       return -1
     }
   }
@@ -246,7 +283,9 @@ function matchVirtualIdentityPartRank(identity: VirtualStyleIdentity, part: Nova
 
 function resolveNodeComponentName(node: NovaUiStylableNode): NovaUiStyleComponentName {
   const name = node.descriptor.name
-  if (name === 'Root' || name === 'Flex' || name === 'Grid' || name === 'TextBlock') return name
+  if (name === 'Root' || name === 'Flex' || name === 'Grid' || name === 'TextBlock') {
+    return name
+  }
 
   return node.__type as NovaUiStyleComponentName
 }
@@ -284,8 +323,12 @@ function mergeVirtualRuleDeclarations(rules: ReadonlyArray<NovaUiCompiledStyleRu
       ...target.visual,
       ...source.visual,
     }
-    if (source.cursor !== undefined) target.cursor = source.cursor
-    if (source.animation !== undefined) target.animation = source.animation
+    if (source.cursor !== undefined) {
+      target.cursor = source.cursor
+    }
+    if (source.animation !== undefined) {
+      target.animation = source.animation
+    }
     target.mask |= source.mask
     return target
   }, { mask: NovaUiStyleMask.None })
@@ -300,10 +343,14 @@ function collectCandidates(
   seen: Set<NovaUiCompiledStyleRule>,
   source?: ReadonlyArray<NovaUiCompiledStyleRule>,
 ): void {
-  if (!source) return
+  if (!source) {
+    return
+  }
 
   for (const rule of source) {
-    if (seen.has(rule)) continue
+    if (seen.has(rule)) {
+      continue
+    }
     seen.add(rule)
     target.push(rule)
   }

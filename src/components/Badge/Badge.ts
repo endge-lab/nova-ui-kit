@@ -1,27 +1,28 @@
-import type { EventList } from '@endge/utils'
 import type { NovaApp, NovaSchema, NovaSurface } from '@endge/nova'
-import {
-  BADGE_NODE_DESCRIPTOR,
-  normalizeBadgeProps,
-  type BadgeDescriptor,
-} from '@/components/Badge/badge.config'
+import type { EventList } from '@endge/utils'
+import type { BadgeDescriptor } from '@/components/Badge/badge.config'
 import type {
   BadgeApi,
   BadgeProps,
   BadgeResolvedProps,
   BadgeTone,
 } from '@/components/Badge/badge.types'
+import type { NovaUiOverlayRect } from '@/shared/overlay'
 import {
-  NovaUiComponentNode,
+  BADGE_NODE_DESCRIPTOR,
+
+  normalizeBadgeProps,
+} from '@/components/Badge/badge.config'
+import {
   buildBoxSchema,
   finiteNumber,
-  resolveComponentTextStyle,
+  NovaUiComponentNode,
   pushIcon,
   pushText,
+  resolveComponentTextStyle,
   sizeTokenPadding,
 } from '@/shared/component'
 import { createLayoutRect } from '@/shared/layout'
-import type { NovaUiOverlayRect } from '@/shared/overlay'
 
 /**
  * Отображает компактный счетчик, статус или точечный индикатор поверх canvas UI.
@@ -115,7 +116,9 @@ export class Badge<E extends EventList = Record<string, any>>
    * Возвращает текстовое значение для бейджа.
    */
   private displayText(): string {
-    if (this.props.text) return this.props.text
+    if (this.props.text) {
+      return this.props.text
+    }
     if (typeof this.props.value === 'number') {
       return this.props.value > this.props.max ? `${this.props.max}+` : String(this.props.value)
     }
@@ -139,10 +142,12 @@ export class Badge<E extends EventList = Record<string, any>>
     if (side === 'center') {
       x = anchor.x + (anchor.width - width) / 2
       y = anchor.y + (anchor.height - height) / 2
-    } else if (side === 'top' || side === 'bottom') {
+    }
+    else if (side === 'top' || side === 'bottom') {
       x = this.resolveHorizontalAnchor(anchor, width, align as BadgeResolvedProps['placement'])
       y = side === 'top' ? anchor.y : anchor.y + anchor.height - height
-    } else {
+    }
+    else {
       x = side === 'left' ? anchor.x : anchor.x + anchor.width - width
       y = this.resolveVerticalAnchor(anchor, height, align as BadgeResolvedProps['placement'])
     }
@@ -155,8 +160,12 @@ export class Badge<E extends EventList = Record<string, any>>
 
   private resolveAnchor(): NovaUiOverlayRect {
     const anchor = this.props.anchor
-    if (!anchor || anchor.kind === 'root') return { x: 0, y: 0, width: this.width, height: this.height }
-    if (anchor.kind === 'pointer') return { x: finiteNumber(anchor.x, 0), y: finiteNumber(anchor.y, 0), width: 0, height: 0 }
+    if (!anchor || anchor.kind === 'root') {
+      return { x: 0, y: 0, width: this.width, height: this.height }
+    }
+    if (anchor.kind === 'pointer') {
+      return { x: finiteNumber(anchor.x, 0), y: finiteNumber(anchor.y, 0), width: 0, height: 0 }
+    }
     return {
       x: finiteNumber(anchor.x, 0),
       y: finiteNumber(anchor.y, 0),
@@ -166,14 +175,22 @@ export class Badge<E extends EventList = Record<string, any>>
   }
 
   private resolveHorizontalAnchor(anchor: NovaUiOverlayRect, width: number, align: string): number {
-    if (align === 'start') return anchor.x
-    if (align === 'end') return anchor.x + anchor.width - width
+    if (align === 'start') {
+      return anchor.x
+    }
+    if (align === 'end') {
+      return anchor.x + anchor.width - width
+    }
     return anchor.x + (anchor.width - width) / 2
   }
 
   private resolveVerticalAnchor(anchor: NovaUiOverlayRect, height: number, align: string): number {
-    if (align === 'start') return anchor.y
-    if (align === 'end') return anchor.y + anchor.height - height
+    if (align === 'start') {
+      return anchor.y
+    }
+    if (align === 'end') {
+      return anchor.y + anchor.height - height
+    }
     return anchor.y + (anchor.height - height) / 2
   }
 }

@@ -1,12 +1,13 @@
 import type { NovaSchemaRegistry } from '@endge/nova'
+import type { GridDescriptor } from '@/components/Grid/grid.config'
+import type { GridSchema } from '@/components/Grid/grid.types'
 import { Grid } from '@/components/Grid/Grid'
 import {
-  GRID_FIELD_DEFINITIONS,
   createGridDescriptor,
+  GRID_FIELD_DEFINITIONS,
+
   normalizeGridProps,
-  type GridDescriptor,
 } from '@/components/Grid/grid.config'
-import type { GridSchema } from '@/components/Grid/grid.types'
 
 export const GRID_DESCRIPTOR: GridDescriptor = createGridDescriptor((context, schema) => {
   const gridSchema = schema as GridSchema

@@ -1,11 +1,11 @@
-import { describe, expect, it } from 'vitest'
 import type { NovaNode } from '@endge/nova'
+import type { FlexChildLayout } from '@/components/Flex/flex.types'
+import { describe, expect, it } from 'vitest'
 import { normalizeFlexProps } from '@/components/Flex/flex.config'
 import {
-  FlexLayoutEngine,
   createFlexChildEntry,
+  FlexLayoutEngine,
 } from '@/components/Flex/FlexLayoutEngine'
-import type { FlexChildLayout } from '@/components/Flex/flex.types'
 import { NOVA_UI_LAYOUT_TARGET } from '@/shared/layout'
 
 function createNode(width = 0, height = 0): NovaNode<any> {
@@ -31,7 +31,7 @@ function createMeasuredEntry(id: string, layout: FlexChildLayout, width: number,
   return createFlexChildEntry(id, node, layout)
 }
 
-describe('FlexLayoutEngine', () => {
+describe('flexLayoutEngine', () => {
   it('resolves child width 100 percent against inner width', () => {
     const engine = new FlexLayoutEngine()
     const entry = createEntry('full', { width: '100%', height: 40 })

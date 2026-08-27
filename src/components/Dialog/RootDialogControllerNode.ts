@@ -1,17 +1,5 @@
-import {
-  NovaNode,
-  reconcileNovaTemplateChildren,
-  type NovaApp,
-  type NovaElementSchema,
-  type NovaSurface,
-} from '@endge/nova'
+import type { NovaApp, NovaElementSchema, NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import { DIALOG_SCHEMA_TYPE } from '@/components/Dialog/dialog.types'
-import { normalizeDialogProps } from '@/components/Dialog/dialog.config'
-import {
-  NOVA_UI_ROOT_TARGET,
-  type NovaUiRootTarget,
-} from '@/components/Root/root-target'
 import type {
   DialogDefinition,
   DialogInput,
@@ -20,6 +8,19 @@ import type {
   DialogResolvedProps,
   DialogSlotContext,
 } from '@/components/Dialog/dialog.types'
+import type { NovaUiRootTarget } from '@/components/Root/root-target'
+import {
+
+  NovaNode,
+
+  reconcileNovaTemplateChildren,
+} from '@endge/nova'
+import { normalizeDialogProps } from '@/components/Dialog/dialog.config'
+import { DIALOG_SCHEMA_TYPE } from '@/components/Dialog/dialog.types'
+import {
+  NOVA_UI_ROOT_TARGET,
+
+} from '@/components/Root/root-target'
 import { SURFACE_SCHEMA_TYPE } from '@/components/Surface/surface.types'
 import { TEXT_BLOCK_SCHEMA_TYPE } from '@/components/TextBlock/text-block.types'
 
@@ -90,7 +91,9 @@ export class RootDialogControllerNode<E extends EventList = Record<string, any>>
 
   /** Проксирует Root API для UI Kit компонентов внутри dialog portal. */
   getApi(): ReturnType<NovaUiRootTarget['getApi']> {
-    if (!this.ownerRoot) throw new Error('[Nova UI Kit] Dialog portal is not attached to Root')
+    if (!this.ownerRoot) {
+      throw new Error('[Nova UI Kit] Dialog portal is not attached to Root')
+    }
     return this.ownerRoot.getApi()
   }
 
@@ -126,8 +129,10 @@ export class RootDialogControllerNode<E extends EventList = Record<string, any>>
     const existingIndex = this.activeDialogs.findIndex(dialog => dialog.id === id)
     const active = this.createActiveDialog(id, type, normalized)
 
-    if (existingIndex >= 0) this.activeDialogs.splice(existingIndex, 1, active)
-    else this.activeDialogs.push(active)
+    if (existingIndex >= 0) {
+      this.activeDialogs.splice(existingIndex, 1, active)
+    }
+    else { this.activeDialogs.push(active) }
 
     this.scheduleDirty()
     return id
@@ -138,7 +143,9 @@ export class RootDialogControllerNode<E extends EventList = Record<string, any>>
     const index = id
       ? this.activeDialogs.findIndex(dialog => dialog.id === id)
       : this.activeDialogs.length - 1
-    if (index < 0) return
+    if (index < 0) {
+      return
+    }
 
     const [dialog] = this.activeDialogs.splice(index, 1)
     this.notifyDialogOpenChange(dialog, false, event)
@@ -147,16 +154,22 @@ export class RootDialogControllerNode<E extends EventList = Record<string, any>>
 
   /** Закрывает все открытые диалоги. */
   closeDialogs(event?: Event): void {
-    if (this.activeDialogs.length === 0) return
+    if (this.activeDialogs.length === 0) {
+      return
+    }
     const dialogs = this.activeDialogs.splice(0)
-    for (const dialog of dialogs) this.notifyDialogOpenChange(dialog, false, event)
+    for (const dialog of dialogs) {
+      this.notifyDialogOpenChange(dialog, false, event)
+    }
     this.scheduleDirty()
   }
 
   /** Обновляет props/payload открытого диалога. */
   updateDialog(id: string, patch: DialogProps & Record<string, unknown>): void {
     const index = this.activeDialogs.findIndex(dialog => dialog.id === id)
-    if (index < 0) return
+    if (index < 0) {
+      return
+    }
 
     const current = this.activeDialogs[index]
     const nextPayload = { ...current.payload, ...patch, id, type: current.type }
@@ -187,7 +200,9 @@ export class RootDialogControllerNode<E extends EventList = Record<string, any>>
         width: this.width,
         height: this.height,
       })
-      if (changed) child.dirty({ matrix: true, update: true, render: true })
+      if (changed) {
+        child.dirty({ matrix: true, update: true, render: true })
+      }
     }
   }
 
@@ -236,20 +251,22 @@ export class RootDialogControllerNode<E extends EventList = Record<string, any>>
     const userOpenChange = props.onOpenChange
     const schemas: Array<NovaElementSchema<any>> = []
 
-    if (props.backdrop) schemas.push({
-      type: SURFACE_SCHEMA_TYPE,
-      id: `nova-root-dialog-${dialog.id}-backdrop`,
-      key: `${dialog.id}:backdrop`,
-      props: {
-        x: 0,
-        y: 0,
-        width: this.width,
-        height: this.height,
-        background: 'var(--nova-dialog-backdrop-background, rgba(15,23,42,0.38))',
-        border: { width: 0 },
-        padding: 0,
-      },
-    })
+    if (props.backdrop) {
+      schemas.push({
+        type: SURFACE_SCHEMA_TYPE,
+        id: `nova-root-dialog-${dialog.id}-backdrop`,
+        key: `${dialog.id}:backdrop`,
+        props: {
+          x: 0,
+          y: 0,
+          width: this.width,
+          height: this.height,
+          background: 'var(--nova-dialog-backdrop-background, rgba(15,23,42,0.38))',
+          border: { width: 0 },
+          padding: 0,
+        },
+      })
+    }
 
     schemas.push({
       type: DIALOG_SCHEMA_TYPE,
@@ -259,8 +276,10 @@ export class RootDialogControllerNode<E extends EventList = Record<string, any>>
       props: {
         ...props,
         onOpenChange: (open: boolean, event?: Event) => {
-          if (!open) this.closeDialog(dialog.id, event)
-          else userOpenChange?.(open, event)
+          if (!open) {
+            this.closeDialog(dialog.id, event)
+          }
+          else { userOpenChange?.(open, event) }
         },
       },
       children: body,
@@ -315,7 +334,9 @@ export class RootDialogControllerNode<E extends EventList = Record<string, any>>
 
   /** Коалесцирует invalidation для серийных API-вызовов в одном scheduler turn. */
   private scheduleDirty(): void {
-    if (this.dirtyScheduled) return
+    if (this.dirtyScheduled) {
+      return
+    }
     this.dirtyScheduled = true
     this.dirty({ update: true, render: true })
   }
@@ -337,7 +358,9 @@ function normalizeDialogInput(input: DialogInput, payload: Record<string, unknow
 }
 
 function createDefaultDialogBody(slot: DialogSlotContext): Array<NovaElementSchema<any>> {
-  if (slot.value === undefined || slot.value === null || slot.value === '') return []
+  if (slot.value === undefined || slot.value === null || slot.value === '') {
+    return []
+  }
   return [
     {
       type: TEXT_BLOCK_SCHEMA_TYPE,

@@ -1,17 +1,19 @@
 import type { NovaApp, NovaSchema, NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  CHECKBOX_NODE_DESCRIPTOR,
-  normalizeCheckboxProps,
-  type CheckboxDescriptor,
-} from '@/components/Checkbox/checkbox.config'
+import type { CheckboxDescriptor } from '@/components/Checkbox/checkbox.config'
 import type { CheckboxApi, CheckboxProps, CheckboxResolvedProps } from '@/components/Checkbox/checkbox.types'
 import {
-  NovaUiComponentNode,
+  CHECKBOX_NODE_DESCRIPTOR,
+
+  normalizeCheckboxProps,
+} from '@/components/Checkbox/checkbox.config'
+import {
   buildBoxSchema,
+  NovaUiComponentNode,
+  pushText,
   resolveComponentTextStyle,
   resolveInteractionBackground,
- pushText } from '@/shared/component'
+} from '@/shared/component'
 
 /**
  * Описывает ответственность Checkbox в архитектуре проекта.
@@ -91,14 +93,17 @@ export class Checkbox<E extends EventList = Record<string, any>>
     }
 
     schema.push(...buildBoxSchema(boxProps, boxSize, boxSize, { resolveThemeValue: value => this.resolveThemeValue(value) }))
-    if (schema[0]) Object.assign(schema[0], { x: 0, y: boxY })
+    if (schema[0]) {
+      Object.assign(schema[0], { x: 0, y: boxY })
+    }
 
     if (this.props.checked) {
       schema.push(
         { type: 'line', x1: 4, y1: boxY + boxSize / 2, x2: 7, y2: boxY + boxSize - 5, styles: { color: '#ffffff', width: 2 } },
         { type: 'line', x1: 7, y1: boxY + boxSize - 5, x2: boxSize - 4, y2: boxY + 5, styles: { color: '#ffffff', width: 2 } },
       )
-    } else if (this.props.indeterminate) {
+    }
+    else if (this.props.indeterminate) {
       schema.push({ type: 'line', x1: 4, y1: boxY + boxSize / 2, x2: boxSize - 4, y2: boxY + boxSize / 2, styles: { color: '#ffffff', width: 2 } })
     }
 
@@ -120,7 +125,9 @@ export class Checkbox<E extends EventList = Record<string, any>>
    */
   private setupEvents(): void {
     this.on('mouseenter', () => {
-      if (this.props.disabled) return
+      if (this.props.disabled) {
+        return
+      }
       this.hovered = true
       this.playUiSound('hover')
       this.dirty({ render: true })
@@ -130,7 +137,7 @@ export class Checkbox<E extends EventList = Record<string, any>>
       this.pressed = false
       this.dirty({ render: true })
     })
-    this.on('mousedown', event => {
+    this.on('mousedown', (event) => {
       if (this.props.disabled) {
         this.playUiSound('disabledPress')
         return false
@@ -140,15 +147,19 @@ export class Checkbox<E extends EventList = Record<string, any>>
       this.dirty({ render: true })
       return false
     })
-    this.on('mouseup', event => {
-      if (!this.pressed) return false
+    this.on('mouseup', (event) => {
+      if (!this.pressed) {
+        return false
+      }
       this.pressed = false
       this.toggle(event)
       this.dirty({ render: true })
       return false
     })
-    this.on('keydown', event => {
-      if (event.key === ' ' || event.key === 'Enter') this.toggle(event)
+    this.on('keydown', (event) => {
+      if (event.key === ' ' || event.key === 'Enter') {
+        this.toggle(event)
+      }
     })
   }
 }

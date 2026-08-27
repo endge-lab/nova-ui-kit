@@ -1,18 +1,17 @@
 import type { NovaComponentCreateContext, NovaComponentDescriptor, NovaComponentNode, NovaComponentSchema } from '@endge/nova'
 import type { EventList } from '@endge/utils'
+import type { SplitPaneApi, SplitPaneProps, SplitPaneResolvedProps } from '@/components/SplitPane/split-pane.types'
 import {
-  NOVA_UI_COMMON_DIRTY_POLICY,
-  NOVA_UI_COMMON_FIELD_DEFINITIONS,
+  SPLIT_PANE_SCHEMA_TYPE,
+
+} from '@/components/SplitPane/split-pane.types'
+import {
   commonMeasureBounds,
   finiteNumber,
   normalizeCommonProps,
+  NOVA_UI_COMMON_DIRTY_POLICY,
+  NOVA_UI_COMMON_FIELD_DEFINITIONS,
 } from '@/shared/component'
-import {
-  SPLIT_PANE_SCHEMA_TYPE,
-  type SplitPaneApi,
-  type SplitPaneProps,
-  type SplitPaneResolvedProps,
-} from '@/components/SplitPane/split-pane.types'
 
 export type SplitPaneDescriptor = NovaComponentDescriptor<SplitPaneResolvedProps, SplitPaneApi, Record<string, never>, SplitPaneProps>
 
@@ -78,7 +77,9 @@ export function createSplitPaneDescriptor(createNode?: SplitPaneNodeFactory): Sp
     normalize: schema => normalizeSplitPaneProps(schema.props),
     measureBounds: (_context, schema) => commonMeasureBounds(schema, normalizeSplitPaneProps),
   }
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 

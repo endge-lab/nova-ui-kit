@@ -1,7 +1,8 @@
 import type { NovaSchemaRegistry } from '@endge/nova'
-import { Dialog } from '@/components/Dialog/Dialog'
-import { DIALOG_FIELD_DEFINITIONS, createDialogDescriptor, normalizeDialogProps, type DialogDescriptor } from '@/components/Dialog/dialog.config'
+import type { DialogDescriptor } from '@/components/Dialog/dialog.config'
 import type { DialogSchema } from '@/components/Dialog/dialog.types'
+import { Dialog } from '@/components/Dialog/Dialog'
+import { createDialogDescriptor, DIALOG_FIELD_DEFINITIONS, normalizeDialogProps } from '@/components/Dialog/dialog.config'
 
 export const DIALOG_DESCRIPTOR: DialogDescriptor = createDialogDescriptor((context, schema) => {
   const dialogSchema = schema as DialogSchema
@@ -18,5 +19,9 @@ export const DIALOG_DESCRIPTOR: DialogDescriptor = createDialogDescriptor((conte
   )
 })
 export { DIALOG_FIELD_DEFINITIONS }
-export function registerDialog(registry: { register: (descriptor: DialogDescriptor, options?: { override?: boolean }) => void }): void { registry.register(DIALOG_DESCRIPTOR, { override: true }) }
-export function registerDialogSchema(registry: NovaSchemaRegistry): void { registerDialog(registry) }
+export function registerDialog(registry: { register: (descriptor: DialogDescriptor, options?: { override?: boolean }) => void }): void {
+  registry.register(DIALOG_DESCRIPTOR, { override: true })
+}
+export function registerDialogSchema(registry: NovaSchemaRegistry): void {
+  registerDialog(registry)
+}

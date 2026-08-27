@@ -1,9 +1,9 @@
-import { compileStyleSheetIndexes } from '@/shared/style/cascade/style-selector-matcher'
-import { NovaUiStyleMask } from '@/shared/style/style-context'
 import type {
   NovaUiCompiledStyleRule,
   NovaUiCompiledStyleSheet,
 } from '@/shared/style/cascade/style-sheet'
+import { compileStyleSheetIndexes } from '@/shared/style/cascade/style-selector-matcher'
+import { NovaUiStyleMask } from '@/shared/style/style-context'
 
 const NOVA_UI_BUILT_IN_UTILITY_SOURCE = `
 .hidden {
@@ -34,7 +34,9 @@ const NOVA_UI_BUILT_IN_UTILITY_SOURCE = `
 let cachedBuiltInStyleSheet: NovaUiCompiledStyleSheet | null = null
 
 export function getNovaUiBuiltInUtilityStyleSheet(): NovaUiCompiledStyleSheet {
-  if (cachedBuiltInStyleSheet) return cachedBuiltInStyleSheet
+  if (cachedBuiltInStyleSheet) {
+    return cachedBuiltInStyleSheet
+  }
 
   cachedBuiltInStyleSheet = compileStyleSheetIndexes(createBuiltInUtilityRules(), NOVA_UI_BUILT_IN_UTILITY_SOURCE, new Map([
     ['fade-slide-in', {

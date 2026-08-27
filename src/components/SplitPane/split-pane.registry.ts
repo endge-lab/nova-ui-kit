@@ -1,12 +1,13 @@
 import type { NovaSchemaRegistry } from '@endge/nova'
-import { SplitPane } from '@/components/SplitPane/SplitPane'
+import type { SplitPaneDescriptor } from '@/components/SplitPane/split-pane.config'
+import type { SplitPaneSchema } from '@/components/SplitPane/split-pane.types'
 import {
-  SPLIT_PANE_FIELD_DEFINITIONS,
   createSplitPaneDescriptor,
   normalizeSplitPaneProps,
-  type SplitPaneDescriptor,
+  SPLIT_PANE_FIELD_DEFINITIONS,
+
 } from '@/components/SplitPane/split-pane.config'
-import type { SplitPaneSchema } from '@/components/SplitPane/split-pane.types'
+import { SplitPane } from '@/components/SplitPane/SplitPane'
 
 export const SPLIT_PANE_DESCRIPTOR: SplitPaneDescriptor = createSplitPaneDescriptor((context, schema) => {
   const splitPaneSchema = schema as SplitPaneSchema

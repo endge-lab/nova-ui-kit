@@ -1,16 +1,18 @@
 import type { NovaApp, NovaSchema, NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  TOGGLE_NODE_DESCRIPTOR,
-  normalizeToggleProps,
-  type ToggleDescriptor,
-} from '@/components/Toggle/toggle.config'
+import type { ToggleDescriptor } from '@/components/Toggle/toggle.config'
 import type { ToggleApi, ToggleProps, ToggleResolvedProps } from '@/components/Toggle/toggle.types'
 import {
-  NovaUiComponentNode,
+  normalizeToggleProps,
+  TOGGLE_NODE_DESCRIPTOR,
+
+} from '@/components/Toggle/toggle.config'
+import {
   buildBoxSchema,
+  NovaUiComponentNode,
+  pushText,
   resolveComponentTextStyle,
- pushText } from '@/shared/component'
+} from '@/shared/component'
 
 /**
  * Описывает ответственность Toggle в архитектуре проекта.
@@ -121,14 +123,16 @@ export class Toggle<E extends EventList = Record<string, any>>
    */
   private setupEvents(): void {
     this.on('mouseenter', () => {
-      if (this.props.disabled) return
+      if (this.props.disabled) {
+        return
+      }
       this.playUiSound('hover')
     })
     this.on('mouseleave', () => {
       this.pressed = false
       this.dirty({ render: true })
     })
-    this.on('mousedown', event => {
+    this.on('mousedown', (event) => {
       if (this.props.disabled) {
         this.playUiSound('disabledPress')
         return false
@@ -138,15 +142,19 @@ export class Toggle<E extends EventList = Record<string, any>>
       this.dirty({ render: true })
       return false
     })
-    this.on('mouseup', event => {
-      if (!this.pressed) return false
+    this.on('mouseup', (event) => {
+      if (!this.pressed) {
+        return false
+      }
       this.pressed = false
       this.toggle(event)
       this.dirty({ render: true })
       return false
     })
-    this.on('keydown', event => {
-      if (event.key === ' ' || event.key === 'Enter') this.toggle(event)
+    this.on('keydown', (event) => {
+      if (event.key === ' ' || event.key === 'Enter') {
+        this.toggle(event)
+      }
     })
   }
 }

@@ -1,16 +1,20 @@
 import type { NovaApp, NovaSchema, NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  TAG_NODE_DESCRIPTOR,
-  normalizeTagProps,
-  type TagDescriptor,
-} from '@/components/Tag/tag.config'
+import type { TagDescriptor } from '@/components/Tag/tag.config'
 import type { TagApi, TagProps, TagResolvedProps, TagTone } from '@/components/Tag/tag.types'
 import {
-  NovaUiComponentNode,
+  normalizeTagProps,
+  TAG_NODE_DESCRIPTOR,
+
+} from '@/components/Tag/tag.config'
+import {
   buildBoxSchema,
+  NovaUiComponentNode,
+  pushIcon,
+  pushText,
   resolveComponentTextStyle,
- pushIcon, pushText, sizeTokenPadding } from '@/shared/component'
+  sizeTokenPadding,
+} from '@/shared/component'
 
 /**
  * Описывает ответственность Tag в архитектуре проекта.

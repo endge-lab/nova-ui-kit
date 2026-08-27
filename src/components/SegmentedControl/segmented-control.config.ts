@@ -1,18 +1,17 @@
 import type { NovaComponentCreateContext, NovaComponentDescriptor, NovaComponentNode, NovaComponentSchema } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  NOVA_UI_COMMON_DIRTY_POLICY,
-  NOVA_UI_COMMON_FIELD_DEFINITIONS,
-  commonMeasureBounds,
-  normalizeCommonProps,
-  sizeTokenHeight,
-} from '@/shared/component'
+import type { SegmentedControlApi, SegmentedControlProps, SegmentedControlResolvedProps } from '@/components/SegmentedControl/segmented-control.types'
 import {
   SEGMENTED_CONTROL_SCHEMA_TYPE,
-  type SegmentedControlApi,
-  type SegmentedControlProps,
-  type SegmentedControlResolvedProps,
+
 } from '@/components/SegmentedControl/segmented-control.types'
+import {
+  commonMeasureBounds,
+  normalizeCommonProps,
+  NOVA_UI_COMMON_DIRTY_POLICY,
+  NOVA_UI_COMMON_FIELD_DEFINITIONS,
+  sizeTokenHeight,
+} from '@/shared/component'
 
 export type SegmentedControlDescriptor = NovaComponentDescriptor<SegmentedControlResolvedProps, SegmentedControlApi, Record<string, never>, SegmentedControlProps>
 
@@ -69,7 +68,9 @@ export function createSegmentedControlDescriptor(createNode?: SegmentedControlNo
     normalize: schema => normalizeSegmentedControlProps(schema.props),
     measureBounds: (_context, schema) => commonMeasureBounds(schema, normalizeSegmentedControlProps),
   }
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 

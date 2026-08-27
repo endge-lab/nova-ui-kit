@@ -1,18 +1,6 @@
-import {
-  NovaTemplateRuntime,
-  reconcileNovaTemplateChildren,
-  type NovaApp,
-  type NovaNode,
-  type NovaSurface,
-  type NovaTemplateChildSchema,
-  type NovaTemplateSlots,
-} from '@endge/nova'
+import type { NovaApp, NovaNode, NovaSurface, NovaTemplateChildSchema, NovaTemplateSlots } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  SCROLL_AREA_NODE_DESCRIPTOR,
-  normalizeScrollAreaProps,
-  type ScrollAreaDescriptor,
-} from '@/components/ScrollArea/scroll-area.config'
+import type { ScrollAreaDescriptor } from '@/components/ScrollArea/scroll-area.config'
 import type {
   ScrollAreaApi,
   ScrollAreaChildSchema,
@@ -26,15 +14,29 @@ import type {
   ScrollAreaState,
   ScrollAreaVisualState,
 } from '@/components/ScrollArea/scroll-area.types'
-import { SCROLLBAR_SCHEMA_TYPE, type ScrollbarApi } from '@/components/Scrollbar/scrollbar.types'
+import type { ScrollbarApi } from '@/components/Scrollbar/scrollbar.types'
+import type { NovaUiEventPoint, NovaUiRectPart } from '@/shared/component'
+import type { NovaUiLayoutRect } from '@/shared/layout'
 import {
-  NovaUiComponentNode,
+
+  NovaTemplateRuntime,
+
+  reconcileNovaTemplateChildren,
+} from '@endge/nova'
+import {
+  normalizeScrollAreaProps,
+  SCROLL_AREA_NODE_DESCRIPTOR,
+
+} from '@/components/ScrollArea/scroll-area.config'
+import { SCROLLBAR_SCHEMA_TYPE } from '@/components/Scrollbar/scrollbar.types'
+import {
   buildBoxSchema,
   clamp,
+  hitTestRectPart,
+  NovaUiComponentNode,
+  toLocalEventPoint,
 } from '@/shared/component'
 import { applyNodeLayoutRect } from '@/shared/layout'
-import type { NovaUiLayoutRect } from '@/shared/layout'
-import { hitTestRectPart, toLocalEventPoint, type NovaUiEventPoint, type NovaUiRectPart } from '@/shared/component'
 
 type ScrollbarOrientation = 'horizontal' | 'vertical'
 type ScrollAreaFallbackPartKey = 'horizontal-thumb' | 'horizontal-track' | 'vertical-thumb' | 'vertical-track'
@@ -79,7 +81,7 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     app: NovaApp<E>,
     surface: NovaSurface<E>,
     props: ScrollAreaProps = {},
-    options: { componentId?: string; children?: Array<ScrollAreaChildSchema>; slots?: NovaTemplateSlots } = {},
+    options: { componentId?: string, children?: Array<ScrollAreaChildSchema>, slots?: NovaTemplateSlots } = {},
     descriptor: ScrollAreaDescriptor = SCROLL_AREA_NODE_DESCRIPTOR,
   ) {
     super(app, surface, descriptor, normalizeScrollAreaProps(props), options)
@@ -139,7 +141,9 @@ export class ScrollArea<E extends EventList = Record<string, any>>
   scrollTo(x: number, y: number, event?: Event): void {
     const nextX = clamp(Number.isFinite(x) ? x : 0, 0, Math.max(0, this.props.contentWidth - this.props.width))
     const nextY = clamp(Number.isFinite(y) ? y : 0, 0, Math.max(0, this.props.contentHeight - this.props.height))
-    if (nextX === this.props.scrollX && nextY === this.props.scrollY) return
+    if (nextX === this.props.scrollX && nextY === this.props.scrollY) {
+      return
+    }
     this.emitScrollStart(event)
     this.markScrollbarsActive(false)
     this.props.scrollX = nextX
@@ -196,7 +200,9 @@ export class ScrollArea<E extends EventList = Record<string, any>>
    */
   render(): void {
     const schema = buildBoxSchema(this.props, this.width, this.height, { resolveThemeValue: value => this.resolveThemeValue(value) })
-    if (schema.length > 0) this.renderer.schema(schema)
+    if (schema.length > 0) {
+      this.renderer.schema(schema)
+    }
     this.renderer.clip(0, 0, this.width, this.height)
   }
 
@@ -207,8 +213,12 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     this.props = normalizeScrollAreaProps(this.props)
     this.options({ interactive: !this.props.disabled })
     this.applyCommonPropsChanged(changedKeys)
-    if (this.hasStructuralScrollbarChanges(changedKeys)) this.ensureScrollbars()
-    else if (!this.shouldDeferScrollbarSync(changedKeys)) this.syncScrollbars()
+    if (this.hasStructuralScrollbarChanges(changedKeys)) {
+      this.ensureScrollbars()
+    }
+    else if (!this.shouldDeferScrollbarSync(changedKeys)) {
+      this.syncScrollbars()
+    }
     this.dirty({ update: true, render: true })
   }
 
@@ -217,7 +227,9 @@ export class ScrollArea<E extends EventList = Record<string, any>>
    */
   private setupEvents(): void {
     this.on('mouseenter', () => {
-      if (this.props.disabled) return
+      if (this.props.disabled) {
+        return
+      }
       this.visualState.hovered = true
       this.markScrollbarsActive()
     })
@@ -225,8 +237,10 @@ export class ScrollArea<E extends EventList = Record<string, any>>
       this.visualState.hovered = false
       this.scheduleScrollbarIdle()
     })
-    this.on('wheel', event => {
-      if (this.props.disabled) return false
+    this.on('wheel', (event) => {
+      if (this.props.disabled) {
+        return false
+      }
       event.preventDefault()
       const multiplier = this.props.wheelMultiplier
       const dx = this.props.axis === 'y' ? 0 : event.deltaX * multiplier
@@ -238,8 +252,10 @@ export class ScrollArea<E extends EventList = Record<string, any>>
       )
       return false
     })
-    this.on('click', event => {
-      if (this.props.disabled) return
+    this.on('click', (event) => {
+      if (this.props.disabled) {
+        return
+      }
       this.emitFallbackPartClick(event)
     })
   }
@@ -260,7 +276,8 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     if (this.hasCustomScrollbar('vertical')) {
       this.verticalScrollbar?.remove()
       this.verticalScrollbar = null
-    } else if (!this.verticalScrollbar) {
+    }
+    else if (!this.verticalScrollbar) {
       this.verticalScrollbar = this.nova.schema.createChild(this, {
         type: SCROLLBAR_SCHEMA_TYPE,
         id: `${this.componentId}-scrollbar-y`,
@@ -273,7 +290,8 @@ export class ScrollArea<E extends EventList = Record<string, any>>
     if (this.hasCustomScrollbar('horizontal')) {
       this.horizontalScrollbar?.remove()
       this.horizontalScrollbar = null
-    } else if (!this.horizontalScrollbar) {
+    }
+    else if (!this.horizontalScrollbar) {
       this.horizontalScrollbar = this.nova.schema.createChild(this, {
         type: SCROLLBAR_SCHEMA_TYPE,
         id: `${this.componentId}-scrollbar-x`,
@@ -414,8 +432,12 @@ export class ScrollArea<E extends EventList = Record<string, any>>
    * Нормализует и возвращает итоговое значение ScrollArea.
    */
   private resolveScrollbarOpacity(hasVisibleScrollbar: boolean): number {
-    if (!hasVisibleScrollbar) return 0
-    if (this.props.scrollbarVisibility !== 'active') return 1
+    if (!hasVisibleScrollbar) {
+      return 0
+    }
+    if (this.props.scrollbarVisibility !== 'active') {
+      return 1
+    }
     return this.visualState.opacity
   }
 
@@ -423,7 +445,9 @@ export class ScrollArea<E extends EventList = Record<string, any>>
    * Выполняет внутренний шаг markScrollbarsActive для ScrollArea.
    */
   private markScrollbarsActive(sync = true): void {
-    if (this.props.scrollbarVisibility !== 'active') return
+    if (this.props.scrollbarVisibility !== 'active') {
+      return
+    }
     this.lastScrollbarActivityAt = Date.now()
     if (!this.visualState.scrolling || this.visualState.idle || this.visualState.opacity !== 1) {
       this.visualState = {
@@ -433,7 +457,9 @@ export class ScrollArea<E extends EventList = Record<string, any>>
         opacity: 1,
       }
     }
-    if (sync) this.syncScrollbars()
+    if (sync) {
+      this.syncScrollbars()
+    }
     this.scheduleScrollbarIdle()
   }
 
@@ -469,7 +495,9 @@ export class ScrollArea<E extends EventList = Record<string, any>>
    * Принудительно завершает накопленные изменения ScrollArea.
    */
   private flushDeferredScrollSync(): void {
-    if (this.lifecycleState === 'destroyed') return
+    if (this.lifecycleState === 'destroyed') {
+      return
+    }
     this.scrollSyncPending = false
     if (this.flushedScrollVersion !== this.scrollVersion) {
       this.dirty({ update: true, render: true })
@@ -480,8 +508,12 @@ export class ScrollArea<E extends EventList = Record<string, any>>
    * Планирует отложенное выполнение ScrollArea.
    */
   private scheduleScrollbarIdle(): void {
-    if (this.props.scrollbarVisibility !== 'active') return
-    if (this.idleTimer !== 0) return
+    if (this.props.scrollbarVisibility !== 'active') {
+      return
+    }
+    if (this.idleTimer !== 0) {
+      return
+    }
     this.idleTimer = window.setTimeout(() => this.flushScrollbarIdle(), this.props.scrollbarIdleDelay)
   }
 
@@ -496,7 +528,9 @@ export class ScrollArea<E extends EventList = Record<string, any>>
       this.idleTimer = window.setTimeout(() => this.flushScrollbarIdle(), remaining)
       return
     }
-    if (this.visualState.hovered || this.visualState.dragging) return
+    if (this.visualState.hovered || this.visualState.dragging) {
+      return
+    }
     this.visualState = {
       ...this.visualState,
       scrolling: false,
@@ -599,13 +633,17 @@ export class ScrollArea<E extends EventList = Record<string, any>>
       thumbRect,
       trackRect,
       actions: {
-        scrollTo: value => {
-          if (vertical) this.scrollTo(this.props.scrollX, value)
-          else this.scrollTo(value, this.props.scrollY)
+        scrollTo: (value) => {
+          if (vertical) {
+            this.scrollTo(this.props.scrollX, value)
+          }
+          else { this.scrollTo(value, this.props.scrollY) }
         },
-        scrollBy: delta => {
-          if (vertical) this.scrollTo(this.props.scrollX, this.props.scrollY + delta)
-          else this.scrollTo(this.props.scrollX + delta, this.props.scrollY)
+        scrollBy: (delta) => {
+          if (vertical) {
+            this.scrollTo(this.props.scrollX, this.props.scrollY + delta)
+          }
+          else { this.scrollTo(this.props.scrollX + delta, this.props.scrollY) }
         },
       },
     }
@@ -615,7 +653,9 @@ export class ScrollArea<E extends EventList = Record<string, any>>
    * Публикует событие во внутренний event bus ScrollArea.
    */
   private emitScrollStart(event?: Event): void {
-    if (this.scrollLifecycleActive) return
+    if (this.scrollLifecycleActive) {
+      return
+    }
     this.scrollLifecycleActive = true
     this.props.onScrollStart?.(this.getScrollState(), event)
   }
@@ -636,15 +676,21 @@ export class ScrollArea<E extends EventList = Record<string, any>>
    * Публикует событие во внутренний event bus ScrollArea.
    */
   private emitFallbackPartClick(event: MouseEvent): void {
-    if (this.fallbackParts.length === 0) return
+    if (this.fallbackParts.length === 0) {
+      return
+    }
     const part = hitTestRectPart(this.fallbackParts, toLocalEventPoint(this, event, this.partEventPoint))
-    if (!part) return
+    if (!part) {
+      return
+    }
     const orientation: ScrollAreaOrientation = part.startsWith('vertical') ? 'vertical' : 'horizontal'
     const semanticPart: ScrollAreaPartName = part.endsWith('thumb') ? 'thumb' : 'track'
     const context = this.createPartEventContext(semanticPart, orientation)
     this.props.onScrollbarClick?.({ ...context, part: 'scrollbar' }, event)
-    if (semanticPart === 'thumb') this.props.onThumbClick?.(context, event)
-    else this.props.onTrackClick?.(context, event)
+    if (semanticPart === 'thumb') {
+      this.props.onThumbClick?.(context, event)
+    }
+    else { this.props.onTrackClick?.(context, event) }
   }
 
   /**
@@ -697,7 +743,9 @@ export class ScrollArea<E extends EventList = Record<string, any>>
    * Очищает накопленное состояние ScrollArea.
    */
   private clearSlotRuntimes(): void {
-    for (const runtime of this.slotRuntimes.values()) runtime.dispose()
+    for (const runtime of this.slotRuntimes.values()) {
+      runtime.dispose()
+    }
     this.slotRuntimes.clear()
   }
 

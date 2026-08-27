@@ -5,21 +5,18 @@ import type {
   NovaComponentSchema,
 } from '@endge/nova'
 import type { EventList } from '@endge/utils'
+import type { DividerApi, DividerLineStyle, DividerOrientation, DividerProps, DividerResolvedProps } from '@/components/Divider/divider.types'
 import {
-  NOVA_UI_COMMON_DIRTY_POLICY,
-  NOVA_UI_COMMON_FIELD_DEFINITIONS,
+  DIVIDER_SCHEMA_TYPE,
+
+} from '@/components/Divider/divider.types'
+import {
   commonMeasureBounds,
   finiteNumber,
   normalizeCommonProps,
+  NOVA_UI_COMMON_DIRTY_POLICY,
+  NOVA_UI_COMMON_FIELD_DEFINITIONS,
 } from '@/shared/component/component-props'
-import {
-  DIVIDER_SCHEMA_TYPE,
-  type DividerApi,
-  type DividerLineStyle,
-  type DividerOrientation,
-  type DividerProps,
-  type DividerResolvedProps,
-} from '@/components/Divider/divider.types'
 
 export type DividerDescriptor = NovaComponentDescriptor<
   DividerResolvedProps,
@@ -78,7 +75,9 @@ export function createDividerDescriptor(createNode?: DividerNodeFactory): Divide
     measureBounds: (_context, schema) => commonMeasureBounds(schema, normalizeDividerProps),
   }
 
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 
@@ -89,7 +88,9 @@ function normalizeOrientation(value: DividerProps['orientation']): DividerOrient
 }
 
 function normalizeLineStyle(value: DividerProps['lineStyle']): DividerLineStyle {
-  if (value === 'dashed' || value === 'dotted' || value === 'double') return value
+  if (value === 'dashed' || value === 'dotted' || value === 'double') {
+    return value
+  }
   return 'solid'
 }
 
@@ -98,7 +99,9 @@ function normalizeThickness(value: DividerProps['thickness']): number {
 }
 
 function normalizeDashPattern(value: DividerProps['dashPattern']): Array<number> | undefined {
-  if (!Array.isArray(value)) return undefined
+  if (!Array.isArray(value)) {
+    return undefined
+  }
   const normalized = value
     .map(item => finiteNumber(item, 0))
     .filter(item => item > 0)

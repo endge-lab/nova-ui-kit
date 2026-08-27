@@ -1,22 +1,6 @@
-import {
-  NovaComponentNode,
-  reconcileNovaTemplateChildren,
-  type NovaApp,
-  type NovaNode,
-  type NovaSurface,
-} from '@endge/nova'
+import type { NovaApp, NovaNode, NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  GRID_NODE_DESCRIPTOR,
-  normalizeGridProps,
-  type GridDescriptor,
-} from '@/components/Grid/grid.config'
-import {
-  GridLayoutEngine,
-  compileGridChildLayout,
-  createGridChildEntry,
-  type GridChildEntry,
-} from '@/components/Grid/GridLayoutEngine'
+import type { GridDescriptor } from '@/components/Grid/grid.config'
 import type {
   GridApi,
   GridChildLayout,
@@ -24,41 +8,59 @@ import type {
   GridProps,
   GridResolvedProps,
 } from '@/components/Grid/grid.types'
+import type { GridChildEntry } from '@/components/Grid/GridLayoutEngine'
+import type { NovaUiLayoutRect, NovaUiLayoutTarget } from '@/shared/layout'
+import type { NovaUiStyleContext, NovaUiStyleReceiveResult, NovaUiStyleTarget } from '@/shared/style'
 import {
-  NOVA_UI_LAYOUT_TARGET,
+
+  NovaComponentNode,
+
+  reconcileNovaTemplateChildren,
+} from '@endge/nova'
+import {
+  GRID_NODE_DESCRIPTOR,
+
+  normalizeGridProps,
+} from '@/components/Grid/grid.config'
+import {
+  compileGridChildLayout,
+  createGridChildEntry,
+
+  GridLayoutEngine,
+} from '@/components/Grid/GridLayoutEngine'
+import {
   applyNodeLayoutRect,
   applyNovaUiLayoutZIndex,
   copyRect,
   createLayoutRect,
   getNovaUiNodeLayoutIntent,
-  isNovaUiOutOfFlowPosition,
   isNovaUiLayoutDisplayed,
+  isNovaUiOutOfFlowPosition,
   mergeNovaUiLayoutIntents,
+  NOVA_UI_LAYOUT_TARGET,
+
   readNovaUiNodeProps,
   rectEquals,
   relayoutNovaUiLayoutAncestors,
   resolveNovaUiPositionedLayout,
   resolveNovaUiPositionedRect,
   resolveSpacing,
-  type NovaUiLayoutRect,
-  type NovaUiLayoutTarget,
 } from '@/shared/layout'
+import { resolveNovaUiMotionOptions } from '@/shared/motion'
 import {
-  EMPTY_STYLE_CONTEXT,
-  NOVA_UI_STYLE_TARGET,
-  NovaUiStyleMask,
   borderRadiusToRendererValue,
+  EMPTY_STYLE_CONTEXT,
   inheritedTextStyleMask,
   isNovaUiStyleTarget,
   mergeStyleContext,
   mergeStyleReceiveResult,
-  styleContextChangedMask,
-  type NovaUiStyleContext,
-  type NovaUiStyleReceiveResult,
-  type NovaUiStyleTarget,
+  NOVA_UI_STYLE_TARGET,
+
+  NovaUiStyleMask,
+
   resolveNovaUiClassLayoutIntent,
+  styleContextChangedMask,
 } from '@/shared/style'
-import { resolveNovaUiMotionOptions } from '@/shared/motion'
 
 /** Сеточный layout-компонент с fixed и responsive режимом колонок. */
 export class Grid<E extends EventList = Record<string, any>>
@@ -87,7 +89,7 @@ export class Grid<E extends EventList = Record<string, any>>
     app: NovaApp<E>,
     surface: NovaSurface<E>,
     props: GridProps = {},
-    options: { componentId?: string; children?: Array<GridChildSchema> } = {},
+    options: { componentId?: string, children?: Array<GridChildSchema> } = {},
     descriptor: GridDescriptor = GRID_NODE_DESCRIPTOR,
   ) {
     const resolvedProps = normalizeGridProps(props)
@@ -148,11 +150,13 @@ export class Grid<E extends EventList = Record<string, any>>
     this.effectiveStyleContext = mergeStyleContext(context, this.props.style)
     const changedMask = styleContextChangedMask(previousContext, this.effectiveStyleContext)
 
-    if (changedMask === NovaUiStyleMask.None) {return {
-      update: false,
-      render: false,
-      layout: false,
-    }}
+    if (changedMask === NovaUiStyleMask.None) {
+      return {
+        update: false,
+        render: false,
+        layout: false,
+      }
+    }
 
     const result = this.propagateStyleContext(changedMask)
     if (result.layout) {
@@ -172,8 +176,12 @@ export class Grid<E extends EventList = Record<string, any>>
 
   /** Пересчитывает сетку только если изменились размеры, props или children. */
   update(): void {
-    if (!this.layoutDirty) return
-    if (!this.externalLayout) this.applyResolvedRect(this.resolveStandaloneRect())
+    if (!this.layoutDirty) {
+      return
+    }
+    if (!this.externalLayout) {
+      this.applyResolvedRect(this.resolveStandaloneRect())
+    }
 
     const layoutEntries = this.childEntries.filter(entry => isNovaUiLayoutDisplayed(entry.node))
     const flowEntries: Array<GridChildEntry> = []
@@ -184,8 +192,10 @@ export class Grid<E extends EventList = Record<string, any>>
       const layout = resolveGridChildLayout(entry.node, entry.rawLayout)
       layoutsById.set(entry.id, layout)
       entry.compiledLayout = compileGridChildLayout(layout)
-      if (isNovaUiOutOfFlowPosition(layout.position)) positionedEntries.push(entry)
-      else flowEntries.push(entry)
+      if (isNovaUiOutOfFlowPosition(layout.position)) {
+        positionedEntries.push(entry)
+      }
+      else { flowEntries.push(entry) }
     }
 
     const result = this.engine.compute({
@@ -260,7 +270,9 @@ export class Grid<E extends EventList = Record<string, any>>
       this.renderer.clip(0, 0, this.width, this.height)
     }
 
-    if (schema.length > 0) this.renderer.schema(schema)
+    if (schema.length > 0) {
+      this.renderer.schema(schema)
+    }
   }
 
   /** Заменяет managed children и пересчитывает layout одним dirty pass. */
@@ -288,7 +300,9 @@ export class Grid<E extends EventList = Record<string, any>>
   /** Меняет layout-намерение ребенка без пересоздания node. */
   setChildLayout(id: string, layout: GridChildLayout): void {
     const entry = this.childEntriesById.get(id)
-    if (!entry) return
+    if (!entry) {
+      return
+    }
 
     entry.rawLayout = layout
     entry.compiledLayout = compileGridChildLayout(layout)
@@ -316,9 +330,15 @@ export class Grid<E extends EventList = Record<string, any>>
     this.props = normalizeGridProps(this.props)
     this.applyDisplayState()
     this.options({ zIndex: this.props.zIndex })
-    if (changedKeys.includes('display')) this.markLayoutAncestorsDirty()
-    if (changedKeys.includes('position') || changedKeys.includes('inset') || changedKeys.includes('zIndex')) this.markLayoutAncestorsDirty()
-    if (hasGridLayoutChanges(changedKeys)) this.layoutDirty = true
+    if (changedKeys.includes('display')) {
+      this.markLayoutAncestorsDirty()
+    }
+    if (changedKeys.includes('position') || changedKeys.includes('inset') || changedKeys.includes('zIndex')) {
+      this.markLayoutAncestorsDirty()
+    }
+    if (hasGridLayoutChanges(changedKeys)) {
+      this.layoutDirty = true
+    }
     if (!this.externalLayout && hasGridGeometryChanges(changedKeys)) {
       this.applyResolvedRect({
         x: this.props.x,
@@ -335,7 +355,9 @@ export class Grid<E extends EventList = Record<string, any>>
       this.recomputeSubtreeStyleMask()
       if (changedMask !== NovaUiStyleMask.None) {
         const result = this.propagateStyleContext(changedMask)
-        if (result.layout) this.layoutDirty = true
+        if (result.layout) {
+          this.layoutDirty = true
+        }
       }
     }
   }
@@ -344,7 +366,9 @@ export class Grid<E extends EventList = Record<string, any>>
    * Применяет подготовленное состояние Grid.
    */
   private applyResolvedRect(rect: NovaUiLayoutRect): boolean {
-    if (rectEquals(this.ownRect, rect)) return false
+    if (rectEquals(this.ownRect, rect)) {
+      return false
+    }
 
     copyRect(this.ownRect, rect)
     super.options({
@@ -371,10 +395,14 @@ export class Grid<E extends EventList = Record<string, any>>
 
     for (const entry of this.childEntries) {
       const node = entry.node
-      if (!isNovaUiStyleTarget(node)) continue
+      if (!isNovaUiStyleTarget(node)) {
+        continue
+      }
 
       const childMask = node.getSubtreeStyleMask()
-      if ((changedMask & childMask) === 0) continue
+      if ((changedMask & childMask) === 0) {
+        continue
+      }
 
       mergeStyleReceiveResult(
         result,
@@ -427,7 +455,9 @@ export class Grid<E extends EventList = Record<string, any>>
     applyNovaUiLayoutZIndex(entry.node as NovaNode<any>, layout.zIndex)
     copyRect(entry.prevRect, rect)
     this.rectsById.set(entry.id, entry.prevRect)
-    if (changed) entry.node.dirty({ update: true, render: true })
+    if (changed) {
+      entry.node.dirty({ update: true, render: true })
+    }
   }
 
   private resolveStandaloneRect(): NovaUiLayoutRect {
@@ -437,7 +467,9 @@ export class Grid<E extends EventList = Record<string, any>>
       width: this.props.width,
       height: this.props.height,
     }
-    if (this.props.position === 'static') return fallback
+    if (this.props.position === 'static') {
+      return fallback
+    }
     return resolveNovaUiPositionedRect(
       { x: 0, y: 0, width: this.surface.width, height: this.surface.height },
       fallback,

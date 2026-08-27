@@ -1,9 +1,10 @@
 import type { NovaSchemaRegistry } from '@endge/nova'
-import { TextBlock } from '@/components/TextBlock/TextBlock'
+import type { TextBlockDescriptor } from '@/components/TextBlock/text-block.config'
 import {
   createTextBlockDescriptor,
-  type TextBlockDescriptor,
+
 } from '@/components/TextBlock/text-block.config'
+import { TextBlock } from '@/components/TextBlock/TextBlock'
 
 export const TEXT_BLOCK_DESCRIPTOR: TextBlockDescriptor = createTextBlockDescriptor((context, schema) => new TextBlock(
   context.app,

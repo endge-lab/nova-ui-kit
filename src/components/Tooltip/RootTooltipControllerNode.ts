@@ -1,18 +1,6 @@
-import {
-  NovaNode,
-  reconcileNovaTemplateChildren,
-  type NovaApp,
-  type NovaElementSchema,
-  type NovaSchema,
-  type NovaSurface,
-} from '@endge/nova'
+import type { NovaApp, NovaElementSchema, NovaSchema, NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import { SURFACE_SCHEMA_TYPE } from '@/components/Surface/surface.types'
-import { createTooltipSchema, normalizeTooltipProps } from '@/components/Tooltip/tooltip.config'
-import {
-  NOVA_UI_ROOT_TARGET,
-  type NovaUiRootTarget,
-} from '@/components/Root/root-target'
+import type { NovaUiRootTarget } from '@/components/Root/root-target'
 import type {
   NovaTooltipTargetResolver,
   TooltipDefinition,
@@ -23,6 +11,18 @@ import type {
   TooltipTargetResolution,
 } from '@/components/Tooltip/tooltip.types'
 import type { NovaUiLayoutRect } from '@/shared/layout'
+import {
+
+  NovaNode,
+
+  reconcileNovaTemplateChildren,
+} from '@endge/nova'
+import {
+  NOVA_UI_ROOT_TARGET,
+
+} from '@/components/Root/root-target'
+import { SURFACE_SCHEMA_TYPE } from '@/components/Surface/surface.types'
+import { createTooltipSchema, normalizeTooltipProps } from '@/components/Tooltip/tooltip.config'
 
 interface RegisteredTooltipSource {
   sourceId: string
@@ -99,7 +99,9 @@ export class RootTooltipControllerNode<E extends EventList = Record<string, any>
 
   /** Проксирует Root API для UI Kit компонентов внутри tooltip portal. */
   getApi(): ReturnType<NovaUiRootTarget['getApi']> {
-    if (!this.ownerRoot) throw new Error('[Nova UI Kit] Tooltip portal is not attached to Root')
+    if (!this.ownerRoot) {
+      throw new Error('[Nova UI Kit] Tooltip portal is not attached to Root')
+    }
     return this.ownerRoot.getApi()
   }
 
@@ -214,7 +216,9 @@ export class RootTooltipControllerNode<E extends EventList = Record<string, any>
     }
     window.clearTimeout(this.openTimer)
     window.clearTimeout(this.hideTimer)
-    if (!this.activeTooltip && !this.activeTargetKey) return
+    if (!this.activeTooltip && !this.activeTargetKey) {
+      return
+    }
     this.activeTooltip = null
     this.activeTargetKey = ''
     this.reconcileChildren([])
@@ -289,27 +293,39 @@ export class RootTooltipControllerNode<E extends EventList = Record<string, any>
     y: number,
     event: MouseEvent,
   ): TooltipTargetResolution | null {
-    if (!target || this.containsControllerNode(target)) return null
+    if (!target || this.containsControllerNode(target)) {
+      return null
+    }
 
     const visited = new Set<NovaNode<E>>()
     let current: NovaNode<E> | undefined = target
     while (current) {
-      if (visited.has(current)) return null
+      if (visited.has(current)) {
+        return null
+      }
       visited.add(current)
-      if (this.containsControllerNode(current)) return null
+      if (this.containsControllerNode(current)) {
+        return null
+      }
 
       const resolver = current as NovaNode<E> & Partial<NovaTooltipTargetResolver>
       const resolved = resolver.resolveNovaTooltipTarget?.({ x, y, event })
-      if (resolved?.tooltip) return resolved
+      if (resolved?.tooltip) {
+        return resolved
+      }
 
       const props = readNodeProps(current)
       const tooltip = props?.tooltip as TooltipInput
-      if (tooltip) return { tooltip, targetProps: props }
+      if (tooltip) {
+        return { tooltip, targetProps: props }
+      }
 
       current = current.parent as NovaNode<E> | undefined
     }
 
-    if (!this.containsRootNode(target)) return null
+    if (!this.containsRootNode(target)) {
+      return null
+    }
     return null
   }
 
@@ -317,7 +333,9 @@ export class RootTooltipControllerNode<E extends EventList = Record<string, any>
   private containsControllerNode(node: NovaNode<E>): boolean {
     let current: NovaNode<E> | undefined = node
     while (current) {
-      if (current === this) return true
+      if (current === this) {
+        return true
+      }
       current = current.parent as NovaNode<E> | undefined
     }
     return false
@@ -328,7 +346,9 @@ export class RootTooltipControllerNode<E extends EventList = Record<string, any>
     const root = this.ownerRoot
     let current: NovaNode<E> | undefined = node
     while (current) {
-      if (current === root) return true
+      if (current === root) {
+        return true
+      }
       current = current.parent as NovaNode<E> | undefined
     }
     return false
@@ -337,7 +357,9 @@ export class RootTooltipControllerNode<E extends EventList = Record<string, any>
   /** Планирует закрытие active tooltip. */
   private scheduleClose(): void {
     window.clearTimeout(this.openTimer)
-    if (!this.activeTooltip) return
+    if (!this.activeTooltip) {
+      return
+    }
     const hideDelay = this.activeTooltip.props.hideDelay
     window.clearTimeout(this.hideTimer)
     this.hideTimer = window.setTimeout(() => {
@@ -356,9 +378,13 @@ export class RootTooltipControllerNode<E extends EventList = Record<string, any>
   }
 }
 
-function normalizeTooltipInput(input: TooltipInput): (Record<string, unknown> & { type?: string; value?: unknown }) | null {
-  if (typeof input === 'string') return input ? { type: 'default', value: input } : null
-  if (!input || typeof input === 'boolean') return null
+function normalizeTooltipInput(input: TooltipInput): (Record<string, unknown> & { type?: string, value?: unknown }) | null {
+  if (typeof input === 'string') {
+    return input ? { type: 'default', value: input } : null
+  }
+  if (!input || typeof input === 'boolean') {
+    return null
+  }
   const payload = input as Record<string, unknown>
   return {
     ...payload,
@@ -372,11 +398,17 @@ function resolveTooltipContent(
   definition?: TooltipDefinition,
 ): TooltipProps['content'] {
   const explicitContent = input.content as TooltipProps['content'] | undefined
-  if (explicitContent) return explicitContent
+  if (explicitContent) {
+    return explicitContent
+  }
   const mode = input.contentMode ?? definition?.props?.contentMode ?? definition?.props?.content
   const value = input.value ?? input.text ?? input.title ?? ''
-  if (mode === 'markdown') return { markdown: String(value) }
-  if (mode === 'schema' && Array.isArray(value)) return { schema: value as NovaSchema }
+  if (mode === 'markdown') {
+    return { markdown: String(value) }
+  }
+  if (mode === 'schema' && Array.isArray(value)) {
+    return { schema: value as NovaSchema }
+  }
   return { text: String(value || type) }
 }
 
@@ -410,12 +442,16 @@ function readNodeProps(node: NovaNode<any> | null): Record<string, unknown> | un
 }
 
 function nodeTargetId(node: NovaNode<any> | null): string {
-  if (!node) return ''
+  if (!node) {
+    return ''
+  }
   return (node as NovaNode<any> & { componentId?: string }).componentId ?? node.id
 }
 
 function nodeWorldRect(node: NovaNode<any> | null): NovaUiLayoutRect | null {
-  if (!node) return null
+  if (!node) {
+    return null
+  }
   const bounds = node.getWorldBounds()
   return {
     x: bounds.x,
@@ -448,14 +484,18 @@ function resolveTooltipRect(
   let x = anchor.x + (anchor.width - width) / 2
   let y = anchor.y - height - gap
 
-  if (props.placement === 'bottom') y = anchor.y + anchor.height + gap
+  if (props.placement === 'bottom') {
+    y = anchor.y + anchor.height + gap
+  }
   else if (props.placement === 'left') {
     x = anchor.x - width - gap
     y = anchor.y + (anchor.height - height) / 2
-  } else if (props.placement === 'right') {
+  }
+  else if (props.placement === 'right') {
     x = anchor.x + anchor.width + gap
     y = anchor.y + (anchor.height - height) / 2
-  } else if (props.placement === 'cursor') {
+  }
+  else if (props.placement === 'cursor') {
     x = anchor.x + gap
     y = anchor.y + gap
   }
@@ -485,7 +525,9 @@ function shiftSchemaInsideBounds(schema: NovaSchema, width: number, height: numb
   }
   const dx = Math.max(0, padding - minX) + Math.min(0, width - padding - maxX)
   const dy = Math.max(0, padding - minY) + Math.min(0, height - padding - maxY)
-  if (dx === 0 && dy === 0) return
+  if (dx === 0 && dy === 0) {
+    return
+  }
   for (const item of schema) {
     const shape = item as Record<string, any>
     shape.x = (shape.x ?? 0) + dx

@@ -2,13 +2,14 @@ import type { NovaSchema } from '@endge/nova'
 import type {
   ButtonResolvedProps,
 } from '@/components/Button/button.types'
+import type { NovaUiInteractionState } from '@/shared/component/component-props'
+import type { NovaUiStyleContext } from '@/shared/style'
 import {
   buildBoxSchema,
+
   resolveComponentTextStyle,
   resolveInteractionBackground,
-  type NovaUiInteractionState,
 } from '@/shared/component/component-props'
-import type { NovaUiStyleContext } from '@/shared/style'
 import {
   pushIcon,
   pushText,
@@ -41,16 +42,19 @@ export function buildButtonSchema(
   if (props.iconPlacement === 'only') {
     const onlyIconSize = Math.max(0, Math.min(iconSize, contentWidth, contentHeight, width, height))
     pushIcon(schema, props.icon, (width - onlyIconSize) / 2, (height - onlyIconSize) / 2, onlyIconSize, iconOpacity)
-  } else if (props.iconPlacement === 'right') {
+  }
+  else if (props.iconPlacement === 'right') {
     const iconX = width - padding.horizontal - iconSize
     pushText(schema, props.text, padding.horizontal, padding.vertical, Math.max(0, contentWidth - (hasIcon ? iconSize + padding.gap : 0)), contentHeight, textStyle, { align: props.textAlign })
     pushIcon(schema, props.icon, iconX, (height - iconSize) / 2, iconSize, iconOpacity)
-  } else if (props.iconPlacement === 'top' || props.iconPlacement === 'bottom') {
+  }
+  else if (props.iconPlacement === 'top' || props.iconPlacement === 'bottom') {
     const iconY = props.iconPlacement === 'top' ? padding.vertical : height - padding.vertical - iconSize
     const textY = props.iconPlacement === 'top' ? iconY + iconSize + padding.gap : padding.vertical
     pushIcon(schema, props.icon, (width - iconSize) / 2, iconY, iconSize, iconOpacity)
     pushText(schema, props.text, padding.horizontal, textY, contentWidth, Math.max(0, contentHeight - (hasIcon ? iconSize + padding.gap : 0)), textStyle, { align: props.textAlign })
-  } else {
+  }
+  else {
     const iconX = padding.horizontal
     const textX = hasIcon ? iconX + iconSize + padding.gap : padding.horizontal
     const trailingWidth = hasTrailingIcon ? iconSize + padding.gap : 0

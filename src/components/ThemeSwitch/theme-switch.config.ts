@@ -5,13 +5,12 @@ import type {
   NovaComponentSchema,
 } from '@endge/nova'
 import type { EventList } from '@endge/utils'
+import type { ThemeSwitchApi, ThemeSwitchProps, ThemeSwitchResolvedProps } from '@/components/ThemeSwitch/theme-switch.types'
+import { normalizeThemeSwitchThemes } from '@/components/ThemeSwitch/theme-switch-assets'
 import {
   THEME_SWITCH_SCHEMA_TYPE,
-  type ThemeSwitchApi,
-  type ThemeSwitchProps,
-  type ThemeSwitchResolvedProps,
+
 } from '@/components/ThemeSwitch/theme-switch.types'
-import { normalizeThemeSwitchThemes } from '@/components/ThemeSwitch/theme-switch-assets'
 import { resolveNovaUiPosition } from '@/shared/layout'
 
 export type ThemeSwitchDescriptor = NovaComponentDescriptor<
@@ -82,7 +81,9 @@ export function createThemeSwitchDescriptor(createNode?: ThemeSwitchNodeFactory)
     },
   }
 
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 

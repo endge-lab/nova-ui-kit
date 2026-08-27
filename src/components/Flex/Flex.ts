@@ -1,22 +1,6 @@
-import {
-  NovaComponentNode,
-  reconcileNovaTemplateChildren,
-  type NovaApp,
-  type NovaNode,
-  type NovaSurface,
-} from '@endge/nova'
+import type { NovaApp, NovaNode, NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  FLEX_NODE_DESCRIPTOR,
-  normalizeFlexProps,
-  type FlexDescriptor,
-} from '@/components/Flex/flex.config'
-import {
-  FlexLayoutEngine,
-  compileFlexChildLayout,
-  createFlexChildEntry,
-  type FlexChildEntry,
-} from '@/components/Flex/FlexLayoutEngine'
+import type { FlexDescriptor } from '@/components/Flex/flex.config'
 import type {
   FlexApi,
   FlexChildLayout,
@@ -24,44 +8,60 @@ import type {
   FlexProps,
   FlexResolvedProps,
 } from '@/components/Flex/flex.types'
+import type { FlexChildEntry } from '@/components/Flex/FlexLayoutEngine'
+import type { NovaUiLayoutConstraints, NovaUiLayoutMeasure, NovaUiLayoutRect, NovaUiLayoutTarget } from '@/shared/layout'
+import type { NovaUiStyleContext, NovaUiStyleReceiveResult, NovaUiStyleTarget } from '@/shared/style'
 import {
-  NOVA_UI_LAYOUT_TARGET,
+
+  NovaComponentNode,
+
+  reconcileNovaTemplateChildren,
+} from '@endge/nova'
+import {
+  FLEX_NODE_DESCRIPTOR,
+
+  normalizeFlexProps,
+} from '@/components/Flex/flex.config'
+import {
+  compileFlexChildLayout,
+  createFlexChildEntry,
+
+  FlexLayoutEngine,
+} from '@/components/Flex/FlexLayoutEngine'
+import {
   applyNodeLayoutRect,
   applyNovaUiLayoutZIndex,
   copyRect,
   createLayoutRect,
   getNovaUiNodeLayoutIntent,
-  isNovaUiOutOfFlowPosition,
-  isNovaUiLayoutTarget,
   isNovaUiLayoutDisplayed,
+  isNovaUiLayoutTarget,
+  isNovaUiOutOfFlowPosition,
   mergeNovaUiLayoutIntents,
+  NOVA_UI_LAYOUT_TARGET,
+
   readNovaUiNodeProps,
   rectEquals,
   relayoutNovaUiLayoutAncestors,
   resolveNovaUiPositionedLayout,
   resolveNovaUiPositionedRect,
   resolveSpacing,
-  type NovaUiLayoutRect,
-  type NovaUiLayoutConstraints,
-  type NovaUiLayoutMeasure,
-  type NovaUiLayoutTarget,
 } from '@/shared/layout'
+import { resolveNovaUiMotionOptions } from '@/shared/motion'
 import {
-  EMPTY_STYLE_CONTEXT,
-  NOVA_UI_STYLE_TARGET,
-  NovaUiStyleMask,
   borderRadiusToRendererValue,
+  EMPTY_STYLE_CONTEXT,
   inheritedTextStyleMask,
   isNovaUiStyleTarget,
   mergeStyleContext,
   mergeStyleReceiveResult,
-  styleContextChangedMask,
-  type NovaUiStyleContext,
-  type NovaUiStyleReceiveResult,
-  type NovaUiStyleTarget,
+  NOVA_UI_STYLE_TARGET,
+
+  NovaUiStyleMask,
+
   resolveNovaUiClassLayoutIntent,
+  styleContextChangedMask,
 } from '@/shared/style'
-import { resolveNovaUiMotionOptions } from '@/shared/motion'
 
 /** Layout-компонент, который резолвит adaptive values и назначает rect детям. */
 export class Flex<E extends EventList = Record<string, any>>
@@ -89,7 +89,7 @@ export class Flex<E extends EventList = Record<string, any>>
     app: NovaApp<E>,
     surface: NovaSurface<E>,
     props: FlexProps = {},
-    options: { componentId?: string; children?: Array<FlexChildSchema> } = {},
+    options: { componentId?: string, children?: Array<FlexChildSchema> } = {},
     descriptor: FlexDescriptor = FLEX_NODE_DESCRIPTOR,
   ) {
     const resolvedProps = normalizeFlexProps(props)
@@ -153,7 +153,9 @@ export class Flex<E extends EventList = Record<string, any>>
   applyLayoutRect(rect: NovaUiLayoutRect): boolean {
     this.externalLayout = true
     const changed = this.applyResolvedRect(rect)
-    if (this.layoutReady && this.layoutDirty) this.update()
+    if (this.layoutReady && this.layoutDirty) {
+      this.update()
+    }
     return changed
   }
 
@@ -169,11 +171,13 @@ export class Flex<E extends EventList = Record<string, any>>
     this.effectiveStyleContext = mergeStyleContext(context, this.props.style)
     const changedMask = styleContextChangedMask(previousContext, this.effectiveStyleContext)
 
-    if (changedMask === NovaUiStyleMask.None) {return {
-      update: false,
-      render: false,
-      layout: false,
-    }}
+    if (changedMask === NovaUiStyleMask.None) {
+      return {
+        update: false,
+        render: false,
+        layout: false,
+      }
+    }
 
     const result = this.propagateStyleContext(changedMask)
     if (result.layout) {
@@ -195,7 +199,9 @@ export class Flex<E extends EventList = Record<string, any>>
    * Применяет подготовленное состояние Flex.
    */
   private applyResolvedRect(rect: NovaUiLayoutRect): boolean {
-    if (rectEquals(this.ownRect, rect)) return false
+    if (rectEquals(this.ownRect, rect)) {
+      return false
+    }
 
     copyRect(this.ownRect, rect)
     super.options({
@@ -212,8 +218,12 @@ export class Flex<E extends EventList = Record<string, any>>
 
   /** Пересчитывает layout только если изменились размеры, props или children. */
   update(): void {
-    if (!this.layoutDirty) return
-    if (!this.externalLayout) this.applyResolvedRect(this.resolveStandaloneRect())
+    if (!this.layoutDirty) {
+      return
+    }
+    if (!this.externalLayout) {
+      this.applyResolvedRect(this.resolveStandaloneRect())
+    }
 
     const layoutEntries = this.childEntries.filter(entry => isNovaUiLayoutDisplayed(entry.node))
     const flowEntries: Array<FlexChildEntry> = []
@@ -224,8 +234,10 @@ export class Flex<E extends EventList = Record<string, any>>
       const layout = resolveFlexChildLayout(entry.node, entry.rawLayout)
       layoutsById.set(entry.id, layout)
       entry.compiledLayout = compileFlexChildLayout(layout)
-      if (isNovaUiOutOfFlowPosition(layout.position)) positionedEntries.push(entry)
-      else flowEntries.push(entry)
+      if (isNovaUiOutOfFlowPosition(layout.position)) {
+        positionedEntries.push(entry)
+      }
+      else { flowEntries.push(entry) }
     }
 
     this.engine.compute({
@@ -299,7 +311,9 @@ export class Flex<E extends EventList = Record<string, any>>
       this.renderer.clip(0, 0, this.width, this.height)
     }
 
-    if (schema.length > 0) this.renderer.schema(schema)
+    if (schema.length > 0) {
+      this.renderer.schema(schema)
+    }
   }
 
   /** Заменяет managed children и пересчитывает layout одним dirty pass. */
@@ -322,14 +336,18 @@ export class Flex<E extends EventList = Record<string, any>>
     this.recomputeSubtreeStyleMask()
     this.propagateStyleContext(NovaUiStyleMask.AllText)
     this.layoutDirty = true
-    if (this.layoutReady && !this.externalLayout) this.update()
+    if (this.layoutReady && !this.externalLayout) {
+      this.update()
+    }
     this.dirty({ update: true, render: true })
   }
 
   /** Меняет layout-намерение ребенка без пересоздания node. */
   setChildLayout(id: string, layout: FlexChildLayout): void {
     const entry = this.childEntriesById.get(id)
-    if (!entry) return
+    if (!entry) {
+      return
+    }
 
     entry.rawLayout = layout
     entry.compiledLayout = compileFlexChildLayout(layout)
@@ -357,9 +375,15 @@ export class Flex<E extends EventList = Record<string, any>>
     this.props = normalizeFlexProps(this.props)
     this.applyDisplayState()
     this.options({ zIndex: this.props.zIndex })
-    if (_changedKeys.includes('display')) this.markLayoutAncestorsDirty()
-    if (_changedKeys.includes('position') || _changedKeys.includes('inset') || _changedKeys.includes('zIndex')) this.markLayoutAncestorsDirty()
-    if (hasFlexLayoutChanges(_changedKeys)) this.layoutDirty = true
+    if (_changedKeys.includes('display')) {
+      this.markLayoutAncestorsDirty()
+    }
+    if (_changedKeys.includes('position') || _changedKeys.includes('inset') || _changedKeys.includes('zIndex')) {
+      this.markLayoutAncestorsDirty()
+    }
+    if (hasFlexLayoutChanges(_changedKeys)) {
+      this.layoutDirty = true
+    }
     if (!this.externalLayout && hasFlexGeometryChanges(_changedKeys)) {
       this.applyResolvedRect({
         x: this.props.x,
@@ -376,7 +400,9 @@ export class Flex<E extends EventList = Record<string, any>>
       this.recomputeSubtreeStyleMask()
       if (changedMask !== NovaUiStyleMask.None) {
         const result = this.propagateStyleContext(changedMask)
-        if (result.layout) this.layoutDirty = true
+        if (result.layout) {
+          this.layoutDirty = true
+        }
       }
     }
   }
@@ -393,10 +419,14 @@ export class Flex<E extends EventList = Record<string, any>>
 
     for (const entry of this.childEntries) {
       const node = entry.node
-      if (!isNovaUiStyleTarget(node)) continue
+      if (!isNovaUiStyleTarget(node)) {
+        continue
+      }
 
       const childMask = node.getSubtreeStyleMask()
-      if ((changedMask & childMask) === 0) continue
+      if ((changedMask & childMask) === 0) {
+        continue
+      }
 
       mergeStyleReceiveResult(
         result,
@@ -449,7 +479,9 @@ export class Flex<E extends EventList = Record<string, any>>
     applyNovaUiLayoutZIndex(entry.node as NovaNode<any>, layout.zIndex)
     copyRect(entry.prevRect, rect)
     this.rectsById.set(entry.id, entry.prevRect)
-    if (changed) entry.node.dirty({ update: true, render: true })
+    if (changed) {
+      entry.node.dirty({ update: true, render: true })
+    }
   }
 
   private resolveStandaloneRect(): NovaUiLayoutRect {
@@ -460,7 +492,9 @@ export class Flex<E extends EventList = Record<string, any>>
       width: this.props.width > 0 ? this.props.width : preferred.width,
       height: this.props.height > 0 ? this.props.height : preferred.height,
     }
-    if (this.props.position === 'static') return fallback
+    if (this.props.position === 'static') {
+      return fallback
+    }
     return resolveNovaUiPositionedRect(
       { x: 0, y: 0, width: this.surface.width, height: this.surface.height },
       fallback,
@@ -469,12 +503,16 @@ export class Flex<E extends EventList = Record<string, any>>
     )
   }
 
-  private measurePreferredSize(): { width: number; height: number } {
-    const entries = this.childEntries.filter(entry => {
-      if (!isNovaUiLayoutDisplayed(entry.node)) return false
+  private measurePreferredSize(): { width: number, height: number } {
+    const entries = this.childEntries.filter((entry) => {
+      if (!isNovaUiLayoutDisplayed(entry.node)) {
+        return false
+      }
       return !isNovaUiOutOfFlowPosition(resolveFlexChildLayout(entry.node, entry.rawLayout).position)
     })
-    if (entries.length === 0) return { width: Math.max(0, this.props.width), height: Math.max(0, this.props.height) }
+    if (entries.length === 0) {
+      return { width: Math.max(0, this.props.width), height: Math.max(0, this.props.height) }
+    }
 
     const padding = resolveSpacing(this.props.padding)
     const isRow = this.props.direction === 'row'
@@ -502,7 +540,7 @@ function hasFlexGeometryChanges(keys: Array<keyof FlexResolvedProps>): boolean {
   return keys.includes('x') || keys.includes('y') || keys.includes('width') || keys.includes('height') || keys.includes('position') || keys.includes('inset')
 }
 
-function measureFlexChild(entry: FlexChildEntry, layout: FlexChildLayout): { width: number; height: number } {
+function measureFlexChild(entry: FlexChildEntry, layout: FlexChildLayout): { width: number, height: number } {
   const layoutWidth = typeof layout.width === 'number' && Number.isFinite(layout.width) ? layout.width : undefined
   const layoutHeight = typeof layout.height === 'number' && Number.isFinite(layout.height) ? layout.height : undefined
   const props = readNovaUiNodeProps(entry.node)

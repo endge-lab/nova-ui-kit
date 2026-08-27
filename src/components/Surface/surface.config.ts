@@ -5,19 +5,18 @@ import type {
   NovaComponentSchema,
 } from '@endge/nova'
 import type { EventList } from '@endge/utils'
+import type { SurfaceApi, SurfaceProps, SurfaceResolvedProps } from '@/components/Surface/surface.types'
 import {
-  NOVA_UI_COMMON_DIRTY_POLICY,
-  NOVA_UI_COMMON_FIELD_DEFINITIONS,
+  SURFACE_SCHEMA_TYPE,
+
+} from '@/components/Surface/surface.types'
+import {
   commonMeasureBounds,
   finiteNumber,
   normalizeCommonProps,
+  NOVA_UI_COMMON_DIRTY_POLICY,
+  NOVA_UI_COMMON_FIELD_DEFINITIONS,
 } from '@/shared/component/component-props'
-import {
-  SURFACE_SCHEMA_TYPE,
-  type SurfaceApi,
-  type SurfaceProps,
-  type SurfaceResolvedProps,
-} from '@/components/Surface/surface.types'
 
 export type SurfaceDescriptor = NovaComponentDescriptor<
   SurfaceResolvedProps,
@@ -67,7 +66,9 @@ export function createSurfaceDescriptor(createNode?: SurfaceNodeFactory): Surfac
     measureBounds: (_context, schema) => commonMeasureBounds(schema, normalizeSurfaceProps),
   }
 
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 

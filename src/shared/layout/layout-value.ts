@@ -1,9 +1,9 @@
 /** Значение размера из schema до вычисления пикселей. */
-export type NovaUiLayoutValue =
-  | number
-  | `${number}%`
-  | 'auto'
-  | 'fill'
+export type NovaUiLayoutValue
+  = | number
+    | `${number}%`
+    | 'auto'
+    | 'fill'
 
 /** Быстрый тип значения для layout hot path. */
 export const enum NovaUiLayoutValueKind {

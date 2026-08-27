@@ -5,20 +5,18 @@ import type {
   NovaComponentSchema,
 } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  NOVA_UI_COMMON_DIRTY_POLICY,
-  NOVA_UI_COMMON_FIELD_DEFINITIONS,
-  commonMeasureBounds,
-  normalizeCommonProps,
-  sizeTokenHeight,
-} from '@/shared/component'
+import type { InputApi, InputComponentKind, InputProps, InputResolvedProps } from '@/components/Input/input.types'
 import {
   INPUT_SCHEMA_TYPE,
-  type InputApi,
-  type InputComponentKind,
-  type InputProps,
-  type InputResolvedProps,
+
 } from '@/components/Input/input.types'
+import {
+  commonMeasureBounds,
+  normalizeCommonProps,
+  NOVA_UI_COMMON_DIRTY_POLICY,
+  NOVA_UI_COMMON_FIELD_DEFINITIONS,
+  sizeTokenHeight,
+} from '@/shared/component'
 
 export type InputDescriptor = NovaComponentDescriptor<
   InputResolvedProps,
@@ -196,7 +194,9 @@ export function createInputDescriptor(
     measureBounds: (_context, schema) => commonMeasureBounds(schema, props => normalizeInputProps(props, kind)),
   }
 
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 

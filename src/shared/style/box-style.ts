@@ -37,7 +37,9 @@ export interface NovaUiBoxStyleProps {
 
 /** Нормализует border для render hot path. */
 export function normalizeBorder(border?: NovaUiBorder): NovaUiResolvedBorder | undefined {
-  if (!border) return undefined
+  if (!border) {
+    return undefined
+  }
 
   return {
     color: border.color,
@@ -48,8 +50,12 @@ export function normalizeBorder(border?: NovaUiBorder): NovaUiResolvedBorder | u
 
 /** Нормализует radius в число или объект с четырьмя углами. */
 export function normalizeBorderRadius(radius: NovaUiBorder['radius']): number | NovaUiResolvedBorderRadius {
-  if (typeof radius === 'number') return finiteStyleNumber(radius)
-  if (!radius) return 0
+  if (typeof radius === 'number') {
+    return finiteStyleNumber(radius)
+  }
+  if (!radius) {
+    return 0
+  }
 
   return {
     topLeft: finiteStyleNumber(radius.topLeft),
@@ -62,7 +68,9 @@ export function normalizeBorderRadius(radius: NovaUiBorder['radius']): number | 
 /** Преобразует radius к текущему renderer-формату Nova. */
 export function borderRadiusToRendererValue(radius: NovaUiBorder['radius']): number {
   const normalized = normalizeBorderRadius(radius)
-  if (typeof normalized === 'number') return normalized
+  if (typeof normalized === 'number') {
+    return normalized
+  }
 
   return Math.max(
     normalized.topLeft,

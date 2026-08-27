@@ -1,7 +1,8 @@
 import type { NovaComponentCreateContext, NovaComponentDescriptor, NovaComponentNode, NovaComponentSchema } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import { NOVA_UI_COMMON_DIRTY_POLICY, NOVA_UI_COMMON_FIELD_DEFINITIONS, clamp, commonMeasureBounds, finiteNumber, normalizeCommonProps } from '@/shared/component'
-import { DIALOG_SCHEMA_TYPE, type DialogApi, type DialogProps, type DialogResolvedProps } from '@/components/Dialog/dialog.types'
+import type { DialogApi, DialogProps, DialogResolvedProps } from '@/components/Dialog/dialog.types'
+import { DIALOG_SCHEMA_TYPE } from '@/components/Dialog/dialog.types'
+import { clamp, commonMeasureBounds, finiteNumber, normalizeCommonProps, NOVA_UI_COMMON_DIRTY_POLICY, NOVA_UI_COMMON_FIELD_DEFINITIONS } from '@/shared/component'
 
 export type DialogDescriptor = NovaComponentDescriptor<DialogResolvedProps, DialogApi, Record<string, never>, DialogProps>
 export type DialogNodeFactory = <E extends EventList>(context: NovaComponentCreateContext<E>, schema: NovaComponentSchema<DialogProps>) => NovaComponentNode<DialogResolvedProps, DialogApi, Record<string, never>, DialogProps, E>
@@ -39,7 +40,9 @@ export function normalizeDialogProps(props: DialogProps = {}): DialogResolvedPro
 
 export function createDialogDescriptor(createNode?: DialogNodeFactory): DialogDescriptor {
   const descriptor: DialogDescriptor = { type: DIALOG_SCHEMA_TYPE, name: 'Dialog', title: 'Dialog', version: '0.1.0', kind: 'node-component', dirtyPolicy: { matrix: NOVA_UI_COMMON_DIRTY_POLICY.matrix, update: [...NOVA_UI_COMMON_DIRTY_POLICY.update, 'open', 'position', 'placement', 'scale', 'header', 'footer'], render: [...NOVA_UI_COMMON_DIRTY_POLICY.render, 'modal', 'backdrop', 'title', 'description', 'dismiss', 'closeButton', 'draggable', 'resizable', 'parts', 'onOpenChange', 'onMove', 'onResize'] }, fields: DIALOG_FIELD_DEFINITIONS, normalize: schema => normalizeDialogProps(schema.props), measureBounds: (_context, schema) => commonMeasureBounds(schema, normalizeDialogProps) }
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 

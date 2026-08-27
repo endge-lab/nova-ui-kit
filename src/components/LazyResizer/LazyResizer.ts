@@ -1,7 +1,7 @@
-import { NovaNode } from '@endge/nova'
-import type { NovaApp , NovaSurface , NovaSchemaItem } from '@endge/nova'
-import type { EventList , Side } from '@endge/utils'
+import type { NovaApp, NovaSchemaItem, NovaSurface } from '@endge/nova'
+import type { EventList, Side } from '@endge/utils'
 import type { LazyResizerOptions } from '@/domain/domain.types'
+import { NovaNode } from '@endge/nova'
 import { resolveNovaUiMotionOptions } from '@/shared/motion'
 
 /**
@@ -105,7 +105,7 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
    * Обновляет значение состояния LazyResizer.
    */
   private setupEvents(): void {
-    this.on('dragstart', (e, meta: { startX: number; startY: number }) => {
+    this.on('dragstart', (e, meta: { startX: number, startY: number }) => {
       e.stopPropagation()
 
       if ((this._direction === 'top' || this._direction === 'bottom') && this.height < this._minSize) {
@@ -139,7 +139,9 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
           break
       }
 
-      if (!isNearLine) return false
+      if (!isNearLine) {
+        return false
+      }
 
       this._initialX = this.x
       this._initialY = this.y
@@ -147,7 +149,9 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
       this._initialHeight = this.height
 
       this._onChangeStart(e)
-      if (e.defaultPrevented) return false
+      if (e.defaultPrevented) {
+        return false
+      }
 
       this._isDragging = true
       this.animateDragOverlay(1)
@@ -156,48 +160,62 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
     })
 
     this.on('dragmove', (e, dx, dy) => {
-      if (!this._isDragging) return false
+      if (!this._isDragging) {
+        return false
+      }
       const delta = this._direction === 'left' || this._direction === 'right' ? dx : dy
 
       switch (this._direction) {
         case 'left': {
           const newWidth = this.width - delta
           const newX = this.x + delta
-          if (newWidth < this._minSize || newWidth > this._maxSize) return false
+          if (newWidth < this._minSize || newWidth > this._maxSize) {
+            return false
+          }
           this.x = newX
           this.width = newWidth
           break
         }
         case 'right': {
           const newWidth = this.width + delta
-          if (newWidth < this._minSize || newWidth > this._maxSize) return false
+          if (newWidth < this._minSize || newWidth > this._maxSize) {
+            return false
+          }
           this.width = newWidth
           break
         }
         case 'top': {
           const newHeight = this.height - delta
           const newY = this.y + delta
-          if (newHeight < this._minSize || newHeight > this._maxSize) return false
+          if (newHeight < this._minSize || newHeight > this._maxSize) {
+            return false
+          }
           this.y = newY
           this.height = newHeight
           break
         }
         case 'bottom': {
           const newHeight = this.height + delta
-          if (newHeight < this._minSize || newHeight > this._maxSize) return false
+          if (newHeight < this._minSize || newHeight > this._maxSize) {
+            return false
+          }
           this.height = newHeight
           break
         }
       }
 
       this._onChangeMove(e, delta)
-      if (e.defaultPrevented) return false
+      if (e.defaultPrevented) {
+        return false
+      }
       this.dirty({ render: true })
       return false
     })
 
     const dragEnd = (e: MouseEvent) => {
-      if (!this._isDragging) return false
+      if (!this._isDragging) {
+        return false
+      }
 
       let isValid = true
 
@@ -205,25 +223,33 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
         case 'left': {
           const newWidth = this.width
           const delta = this._initialWidth - newWidth
-          if (delta > 0 && newWidth < this._minSize) isValid = false
+          if (delta > 0 && newWidth < this._minSize) {
+            isValid = false
+          }
           break
         }
         case 'right': {
           const newWidth = this.width
           const delta = newWidth - this._initialWidth
-          if (delta > 0 && newWidth > this._maxSize) isValid = false
+          if (delta > 0 && newWidth > this._maxSize) {
+            isValid = false
+          }
           break
         }
         case 'top': {
           const newHeight = this.height
           const delta = this._initialHeight - newHeight
-          if (delta > 0 && newHeight < this._minSize) isValid = false
+          if (delta > 0 && newHeight < this._minSize) {
+            isValid = false
+          }
           break
         }
         case 'bottom': {
           const newHeight = this.height
           const delta = newHeight - this._initialHeight
-          if (delta > 0 && newHeight > this._maxSize) isValid = false
+          if (delta > 0 && newHeight > this._maxSize) {
+            isValid = false
+          }
           break
         }
       }
@@ -237,7 +263,9 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
 
       const newSize = this._direction === 'left' || this._direction === 'right' ? this.width : this.height
       this._onChangeEnd(e, newSize + this._lineWidthHover)
-      if (e.defaultPrevented) return false
+      if (e.defaultPrevented) {
+        return false
+      }
 
       this._isDragging = false
       this.animateDragOverlay(0)
@@ -270,7 +298,9 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
           break
       }
 
-      if (this._isHover === isNearLine) return false
+      if (this._isHover === isNearLine) {
+        return false
+      }
 
       this._isHover = isNearLine
       this.animateHoverLine(isNearLine)
@@ -279,7 +309,9 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
     })
 
     this.on('mouseleave', () => {
-      if (!this._isHover) return false
+      if (!this._isHover) {
+        return false
+      }
 
       this._isHover = false
       this.animateHoverLine(false)
@@ -292,7 +324,9 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
    * Сбрасывает состояние к базовым значениям LazyResizer.
    */
   private resetState(): void {
-    if (!this._isDragging) return
+    if (!this._isDragging) {
+      return
+    }
     this.x = this._initialX
     this.y = this._initialY
     this.width = this._initialWidth

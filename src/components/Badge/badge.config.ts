@@ -5,20 +5,18 @@ import type {
   NovaComponentSchema,
 } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import {
-  NOVA_UI_COMMON_DIRTY_POLICY,
-  NOVA_UI_COMMON_FIELD_DEFINITIONS,
-  commonMeasureBounds,
-  normalizeCommonProps,
-  sizeTokenHeight,
-} from '@/shared/component'
+import type { BadgeApi, BadgeProps, BadgeResolvedProps, BadgeTone } from '@/components/Badge/badge.types'
 import {
   BADGE_SCHEMA_TYPE,
-  type BadgeApi,
-  type BadgeProps,
-  type BadgeResolvedProps,
-  type BadgeTone,
+
 } from '@/components/Badge/badge.types'
+import {
+  commonMeasureBounds,
+  normalizeCommonProps,
+  NOVA_UI_COMMON_DIRTY_POLICY,
+  NOVA_UI_COMMON_FIELD_DEFINITIONS,
+  sizeTokenHeight,
+} from '@/shared/component'
 
 export type BadgeDescriptor = NovaComponentDescriptor<
   BadgeResolvedProps,
@@ -85,7 +83,9 @@ export function createBadgeDescriptor(createNode?: BadgeNodeFactory): BadgeDescr
     measureBounds: (_context, schema) => commonMeasureBounds(schema, normalizeBadgeProps),
   }
 
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 
@@ -107,11 +107,19 @@ function resolveBadgeDefaults(tone: BadgeTone, size: BadgeResolvedProps['size'],
   }
 }
 
-function badgePalette(tone: BadgeTone): { background: string; border: string; color: string } {
-  if (tone === 'success') return { background: 'var(--nova-badge-success-background, #dcfce7)', border: 'var(--nova-badge-success-border-color, #86efac)', color: 'var(--nova-badge-success-color, #166534)' }
-  if (tone === 'warning') return { background: 'var(--nova-badge-warning-background, #fef3c7)', border: 'var(--nova-badge-warning-border-color, #fcd34d)', color: 'var(--nova-badge-warning-color, #92400e)' }
-  if (tone === 'danger') return { background: 'var(--nova-badge-danger-background, #fee2e2)', border: 'var(--nova-badge-danger-border-color, #fca5a5)', color: 'var(--nova-badge-danger-color, #991b1b)' }
-  if (tone === 'neutral') return { background: 'var(--nova-badge-background, #f1f5f9)', border: 'var(--nova-badge-border-color, #cbd5e1)', color: 'var(--nova-badge-color, #334155)' }
+function badgePalette(tone: BadgeTone): { background: string, border: string, color: string } {
+  if (tone === 'success') {
+    return { background: 'var(--nova-badge-success-background, #dcfce7)', border: 'var(--nova-badge-success-border-color, #86efac)', color: 'var(--nova-badge-success-color, #166534)' }
+  }
+  if (tone === 'warning') {
+    return { background: 'var(--nova-badge-warning-background, #fef3c7)', border: 'var(--nova-badge-warning-border-color, #fcd34d)', color: 'var(--nova-badge-warning-color, #92400e)' }
+  }
+  if (tone === 'danger') {
+    return { background: 'var(--nova-badge-danger-background, #fee2e2)', border: 'var(--nova-badge-danger-border-color, #fca5a5)', color: 'var(--nova-badge-danger-color, #991b1b)' }
+  }
+  if (tone === 'neutral') {
+    return { background: 'var(--nova-badge-background, #f1f5f9)', border: 'var(--nova-badge-border-color, #cbd5e1)', color: 'var(--nova-badge-color, #334155)' }
+  }
   return { background: 'var(--nova-badge-info-background, #dbeafe)', border: 'var(--nova-badge-info-border-color, #93c5fd)', color: 'var(--nova-badge-info-color, #1d4ed8)' }
 }
 

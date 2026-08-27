@@ -154,8 +154,8 @@ export interface InputApi {
     validationMessage?: string
     inputEngine: NovaInputEngine
   }
-  getSelection: () => { start: number; end: number }
-  getCaretRect: () => { x: number; y: number; width: number; height: number }
+  getSelection: () => { start: number, end: number }
+  getCaretRect: () => { x: number, y: number, width: number, height: number }
   setProps: (patch: InputProps) => void
   getProps: () => Readonly<InputResolvedProps>
 }

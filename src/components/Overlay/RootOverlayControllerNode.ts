@@ -1,18 +1,5 @@
-import {
-  NovaNode,
-  reconcileNovaTemplateChildren,
-  type NovaApp,
-  type NovaElementSchema,
-  type NovaSurface,
-} from '@endge/nova'
+import type { NovaApp, NovaElementSchema, NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import { TEXT_BLOCK_SCHEMA_TYPE } from '@/components/TextBlock/text-block.types'
-import { OVERLAY_SCHEMA_TYPE } from '@/components/Overlay/overlay.types'
-import { normalizeOverlayProps } from '@/components/Overlay/overlay.config'
-import {
-  NOVA_UI_ROOT_TARGET,
-  type NovaUiRootTarget,
-} from '@/components/Root/root-target'
 import type {
   OverlayDefinition,
   OverlayInput,
@@ -21,6 +8,20 @@ import type {
   OverlayResolvedProps,
   OverlaySlotContext,
 } from '@/components/Overlay/overlay.types'
+import type { NovaUiRootTarget } from '@/components/Root/root-target'
+import {
+
+  NovaNode,
+
+  reconcileNovaTemplateChildren,
+} from '@endge/nova'
+import { normalizeOverlayProps } from '@/components/Overlay/overlay.config'
+import { OVERLAY_SCHEMA_TYPE } from '@/components/Overlay/overlay.types'
+import {
+  NOVA_UI_ROOT_TARGET,
+
+} from '@/components/Root/root-target'
+import { TEXT_BLOCK_SCHEMA_TYPE } from '@/components/TextBlock/text-block.types'
 import { applyNodeLayoutRect } from '@/shared/layout'
 
 interface RegisteredOverlaySource {
@@ -92,7 +93,9 @@ export class RootOverlayControllerNode<E extends EventList = Record<string, any>
 
   /** Проксирует Root API для UI Kit компонентов внутри overlay portal. */
   getApi(): ReturnType<NovaUiRootTarget['getApi']> {
-    if (!this.ownerRoot) throw new Error('[Nova UI Kit] Overlay portal is not attached to Root')
+    if (!this.ownerRoot) {
+      throw new Error('[Nova UI Kit] Overlay portal is not attached to Root')
+    }
     return this.ownerRoot.getApi()
   }
 
@@ -128,8 +131,10 @@ export class RootOverlayControllerNode<E extends EventList = Record<string, any>
     const existingIndex = this.activeOverlays.findIndex(overlay => overlay.id === id)
     const active = this.createActiveOverlay(id, type, normalized)
 
-    if (existingIndex >= 0) this.activeOverlays.splice(existingIndex, 1, active)
-    else this.activeOverlays.push(active)
+    if (existingIndex >= 0) {
+      this.activeOverlays.splice(existingIndex, 1, active)
+    }
+    else { this.activeOverlays.push(active) }
 
     this.scheduleDirty()
     return id
@@ -140,7 +145,9 @@ export class RootOverlayControllerNode<E extends EventList = Record<string, any>
     const index = id
       ? this.activeOverlays.findIndex(overlay => overlay.id === id)
       : this.activeOverlays.length - 1
-    if (index < 0) return
+    if (index < 0) {
+      return
+    }
 
     const [overlay] = this.activeOverlays.splice(index, 1)
     this.notifyOverlayOpenChange(overlay, false, event)
@@ -149,16 +156,22 @@ export class RootOverlayControllerNode<E extends EventList = Record<string, any>
 
   /** Закрывает все открытые overlays. */
   closeOverlays(event?: Event): void {
-    if (this.activeOverlays.length === 0) return
+    if (this.activeOverlays.length === 0) {
+      return
+    }
     const overlays = this.activeOverlays.splice(0)
-    for (const overlay of overlays) this.notifyOverlayOpenChange(overlay, false, event)
+    for (const overlay of overlays) {
+      this.notifyOverlayOpenChange(overlay, false, event)
+    }
     this.scheduleDirty()
   }
 
   /** Обновляет props/payload открытого overlay. */
   updateOverlay(id: string, patch: OverlayProps & Record<string, unknown>): void {
     const index = this.activeOverlays.findIndex(overlay => overlay.id === id)
-    if (index < 0) return
+    if (index < 0) {
+      return
+    }
 
     const current = this.activeOverlays[index]
     const nextPayload = { ...current.payload, ...patch, id, type: current.type }
@@ -239,8 +252,10 @@ export class RootOverlayControllerNode<E extends EventList = Record<string, any>
       props: {
         ...props,
         onOpenChange: (open: boolean, event?: Event) => {
-          if (!open) this.closeOverlay(overlay.id, event)
-          else userOpenChange?.(open, event)
+          if (!open) {
+            this.closeOverlay(overlay.id, event)
+          }
+          else { userOpenChange?.(open, event) }
         },
       },
       children: body,
@@ -296,7 +311,9 @@ export class RootOverlayControllerNode<E extends EventList = Record<string, any>
 
   /** Коалесцирует invalidation для серийных API-вызовов в одном scheduler turn. */
   private scheduleDirty(): void {
-    if (this.dirtyScheduled) return
+    if (this.dirtyScheduled) {
+      return
+    }
     this.dirtyScheduled = true
     this.dirty({ update: true, render: true })
   }

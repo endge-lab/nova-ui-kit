@@ -1,8 +1,9 @@
 import type { NovaComponentSchema, NovaElementSchema } from '@endge/nova'
+import type { NovaUiMotionOptions } from '@/domain/domain.types'
 import type {
+  NovaUiInset,
   NovaUiLayoutRect,
   NovaUiLayoutValue,
-  NovaUiInset,
   NovaUiPosition,
   NovaUiSpacing,
 } from '@/shared/layout'
@@ -12,7 +13,6 @@ import type {
   NovaUiStyleDisplay,
   NovaUiStyleIdentityProps,
 } from '@/shared/style'
-import type { NovaUiMotionOptions } from '@/domain/domain.types'
 
 /** Schema type для адаптивного flex-layout компонента. */
 export const FLEX_SCHEMA_TYPE = 'nova-ui.flex'

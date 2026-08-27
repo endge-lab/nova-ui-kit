@@ -1,5 +1,4 @@
 import type { NovaApp } from '@endge/nova'
-import { compileStyleSheetIndexes, createEmptyStyleSheet } from '@/shared/style/cascade/style-selector-matcher'
 import type {
   NovaUiCompiledStyleRule,
   NovaUiCompiledStyleSheet,
@@ -8,6 +7,7 @@ import type {
   NovaUiStyleSheetAsset,
   NovaUiStyleThemeDefinition,
 } from '@/shared/style/cascade/style-sheet'
+import { compileStyleSheetIndexes, createEmptyStyleSheet } from '@/shared/style/cascade/style-selector-matcher'
 
 interface NovaUiGlobalStyleState {
   entries: Map<symbol, NovaUiStyleSheetAsset>
@@ -29,7 +29,9 @@ export function registerNovaUiGlobalStyleSheet(
   invalidateGlobalStyleState(state)
 
   return () => {
-    if (!state.entries.delete(id)) return
+    if (!state.entries.delete(id)) {
+      return
+    }
     invalidateGlobalStyleState(state)
   }
 }
@@ -46,7 +48,9 @@ export function subscribeNovaUiGlobalStyleSheets(app: NovaApp<any>, listener: ()
 /** Возвращает объединенный global stylesheet asset для NovaApp. */
 export function getNovaUiGlobalStyleSheet(app: NovaApp<any>): NovaUiStyleSheetAsset {
   const state = resolveGlobalStyleState(app)
-  if (state.cached) return state.cached
+  if (state.cached) {
+    return state.cached
+  }
 
   const assets = [...state.entries.values()]
   const styleSheets = assets
@@ -75,7 +79,9 @@ export function mergeNovaUiStyleSheets(
   styleSheets: ReadonlyArray<NovaUiCompiledStyleSheet>,
   source = '',
 ): NovaUiCompiledStyleSheet {
-  if (styleSheets.length === 0) return createEmptyStyleSheet(source)
+  if (styleSheets.length === 0) {
+    return createEmptyStyleSheet(source)
+  }
 
   let order = 0
   const rules: Array<NovaUiCompiledStyleRule> = []
@@ -83,8 +89,12 @@ export function mergeNovaUiStyleSheets(
   const keyframes = new Map<string, NovaUiStyleKeyframes>()
 
   for (const sheet of styleSheets) {
-    for (const dependency of sheet.tokenDependencies ?? []) tokenDependencies.add(dependency)
-    for (const [name, frames] of sheet.keyframes) keyframes.set(name, frames)
+    for (const dependency of sheet.tokenDependencies ?? []) {
+      tokenDependencies.add(dependency)
+    }
+    for (const [name, frames] of sheet.keyframes) {
+      keyframes.set(name, frames)
+    }
     for (const rule of sheet.rules) {
       rules.push({
         ...rule,
@@ -105,8 +115,10 @@ export function mergeNovaUiStyleThemes(
   const grouped = new Map<string, Array<NovaUiStyleThemeDefinition>>()
   for (const theme of themes) {
     const list = grouped.get(theme.id)
-    if (list) list.push(theme)
-    else grouped.set(theme.id, [theme])
+    if (list) {
+      list.push(theme)
+    }
+    else { grouped.set(theme.id, [theme]) }
   }
 
   return [...grouped.entries()].map(([id, entries]) => {
@@ -157,5 +169,7 @@ function resolveGlobalStyleState(app: NovaApp<any>): NovaUiGlobalStyleState {
 function invalidateGlobalStyleState(state: NovaUiGlobalStyleState): void {
   state.version += 1
   state.cached = null
-  for (const listener of state.listeners) listener()
+  for (const listener of state.listeners) {
+    listener()
+  }
 }

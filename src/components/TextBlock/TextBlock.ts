@@ -1,52 +1,45 @@
-import {
-  NovaComponentNode,
-  type NovaApp,
-  type NovaSurface,
-} from '@endge/nova'
+import type { NovaApp, NovaSurface } from '@endge/nova'
 import type { EventList } from '@endge/utils'
+import type { TextBlockDescriptor } from '@/components/TextBlock/text-block.config'
+import type { TextBlockApi, TextBlockLayout, TextBlockMeasureFn, TextBlockProps, TextBlockResolvedProps } from '@/components/TextBlock/text-block.types'
+import type { NovaUiLayoutConstraints, NovaUiLayoutMeasure, NovaUiLayoutRect, NovaUiLayoutTarget } from '@/shared/layout'
+import type { NovaUiInheritedTextStyle, NovaUiStyleContext, NovaUiStyleReceiveResult, NovaUiStyleTarget } from '@/shared/style'
 import {
-  TEXT_BLOCK_NODE_DESCRIPTOR,
-  type TextBlockDescriptor,
-} from '@/components/TextBlock/text-block.config'
-import { buildTextBlockSchema } from '@/components/TextBlock/text-block.schema'
+
+  NovaComponentNode,
+
+} from '@endge/nova'
 import { layoutTextBlock, normalizeTextBlockProps } from '@/components/TextBlock/text-block-layout'
 import {
-  type TextBlockApi,
-  type TextBlockLayout,
-  type TextBlockMeasureFn,
-  type TextBlockProps,
-  type TextBlockResolvedProps,
-} from '@/components/TextBlock/text-block.types'
+  TEXT_BLOCK_NODE_DESCRIPTOR,
+
+} from '@/components/TextBlock/text-block.config'
+import { buildTextBlockSchema } from '@/components/TextBlock/text-block.schema'
 import {
-  NOVA_UI_LAYOUT_TARGET,
-  TextMeasureCache,
   clampLayoutNumber,
   copyRect,
   createLayoutRect,
   measureNovaUiTextWidth,
+  NOVA_UI_LAYOUT_TARGET,
+
   rectEquals,
   relayoutNovaUiLayoutAncestors,
-  type NovaUiLayoutConstraints,
-  type NovaUiLayoutMeasure,
-  type NovaUiLayoutRect,
-  type NovaUiLayoutTarget,
+  TextMeasureCache,
 } from '@/shared/layout'
+import { isNovaUiMotionEnabled, resolveNovaUiMotionOptions } from '@/shared/motion'
 import {
-  EMPTY_STYLE_CONTEXT,
-  NOVA_UI_STYLE_TARGET,
-  NovaUiStyleMask,
   diffInheritedTextStyle,
+  EMPTY_STYLE_CONTEXT,
   inheritedTextStyleMask,
-  type NovaUiInheritedTextStyle,
-  type NovaUiStyleContext,
-  type NovaUiStyleReceiveResult,
-  type NovaUiStyleTarget,
+  NOVA_UI_STYLE_TARGET,
+
+  NovaUiStyleMask,
+
 } from '@/shared/style'
 import {
   ensureNovaUIKitThemes,
   resolveNovaUiThemeValue,
 } from '@/shared/style/nova-ui-kit-theme'
-import { isNovaUiMotionEnabled, resolveNovaUiMotionOptions } from '@/shared/motion'
 
 const TEXT_BLOCK_LAYOUT_STYLE_MASK = (
   NovaUiStyleMask.FontFamily
@@ -172,11 +165,13 @@ export class TextBlock<E extends EventList = Record<string, any>>
     const affectedMask = changedMask & this.getSubtreeStyleMask()
     const effectiveChangedMask = diffInheritedTextStyle(previousStyle, nextStyle, affectedMask)
 
-    if (effectiveChangedMask === NovaUiStyleMask.None) {return {
-      update: false,
-      render: false,
-      layout: false,
-    }}
+    if (effectiveChangedMask === NovaUiStyleMask.None) {
+      return {
+        update: false,
+        render: false,
+        layout: false,
+      }
+    }
 
     this.effectiveTextStyle = nextStyle
 
@@ -266,7 +261,9 @@ export class TextBlock<E extends EventList = Record<string, any>>
     )
     const styleChangedMask = diffInheritedTextStyle(previousStyle, this.effectiveTextStyle)
     this.applyDisplayState()
-    if (changedKeys.includes('display')) this.markLayoutAncestorsDirty()
+    if (changedKeys.includes('display')) {
+      this.markLayoutAncestorsDirty()
+    }
     if (hasTextBlockLayoutChanges(changedKeys) || (styleChangedMask & TEXT_BLOCK_LAYOUT_STYLE_MASK) !== 0) {
       this._layout = null
     }
@@ -305,7 +302,9 @@ export class TextBlock<E extends EventList = Record<string, any>>
    * Применяет подготовленное состояние TextBlock.
    */
   private applyResolvedRect(rect: NovaUiLayoutRect): boolean {
-    if (rectEquals(this.layoutRect, rect)) return false
+    if (rectEquals(this.layoutRect, rect)) {
+      return false
+    }
 
     const sizeChanged = this.layoutRect.width !== rect.width || this.layoutRect.height !== rect.height
     copyRect(this.layoutRect, rect)
@@ -315,7 +314,9 @@ export class TextBlock<E extends EventList = Record<string, any>>
       width: rect.width,
       height: rect.height,
     })
-    if (sizeChanged) this._layout = null
+    if (sizeChanged) {
+      this._layout = null
+    }
     this.dirty({ matrix: true, update: sizeChanged, render: true })
     return true
   }
@@ -324,7 +325,9 @@ export class TextBlock<E extends EventList = Record<string, any>>
    * Выполняет внутренний шаг ensureLayout для TextBlock.
    */
   private ensureLayout(): TextBlockLayout {
-    if (!this._layout) this._layout = this.computeLayout()
+    if (!this._layout) {
+      this._layout = this.computeLayout()
+    }
     return this._layout
   }
 
@@ -426,12 +429,24 @@ function hasTextBlockLayoutChanges(keys: Array<keyof TextBlockResolvedProps>): b
 function textBlockTopLevelStyleMask(props: TextBlockProps | Partial<TextBlockResolvedProps>): NovaUiStyleMask {
   let mask = NovaUiStyleMask.None
 
-  if (props.color !== undefined) mask |= NovaUiStyleMask.Color
-  if (props.fontFamily !== undefined) mask |= NovaUiStyleMask.FontFamily
-  if (props.fontSize !== undefined) mask |= NovaUiStyleMask.FontSize
-  if (props.fontWeight !== undefined) mask |= NovaUiStyleMask.FontWeight
-  if (props.fontStyle !== undefined) mask |= NovaUiStyleMask.FontStyle
-  if (props.lineHeight !== undefined) mask |= NovaUiStyleMask.LineHeight
+  if (props.color !== undefined) {
+    mask |= NovaUiStyleMask.Color
+  }
+  if (props.fontFamily !== undefined) {
+    mask |= NovaUiStyleMask.FontFamily
+  }
+  if (props.fontSize !== undefined) {
+    mask |= NovaUiStyleMask.FontSize
+  }
+  if (props.fontWeight !== undefined) {
+    mask |= NovaUiStyleMask.FontWeight
+  }
+  if (props.fontStyle !== undefined) {
+    mask |= NovaUiStyleMask.FontStyle
+  }
+  if (props.lineHeight !== undefined) {
+    mask |= NovaUiStyleMask.LineHeight
+  }
 
   return mask
 }
@@ -496,6 +511,8 @@ function resolveStyleValue<T>(
   localStyleValue: T | undefined,
   inheritedValue: T | undefined,
 ): T {
-  if ((explicitTopLevelMask & keyMask) !== 0) return explicitValue
+  if ((explicitTopLevelMask & keyMask) !== 0) {
+    return explicitValue
+  }
   return localStyleValue ?? inheritedValue ?? explicitValue
 }

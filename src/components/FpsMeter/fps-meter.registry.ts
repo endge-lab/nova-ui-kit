@@ -1,11 +1,12 @@
 import type { NovaSchemaRegistry } from '@endge/nova'
-import { FpsMeter } from '@/components/FpsMeter/FpsMeter'
+import type { FpsMeterDescriptor } from '@/components/FpsMeter/fps-meter.config'
+import type { FpsMeterSchema } from '@/components/FpsMeter/fps-meter.types'
 import {
   createFpsMeterDescriptor,
+
   normalizeFpsMeterProps,
-  type FpsMeterDescriptor,
 } from '@/components/FpsMeter/fps-meter.config'
-import type { FpsMeterSchema } from '@/components/FpsMeter/fps-meter.types'
+import { FpsMeter } from '@/components/FpsMeter/FpsMeter'
 
 export const FPS_METER_DESCRIPTOR: FpsMeterDescriptor = createFpsMeterDescriptor((context, schema) => {
   const fpsSchema = schema as FpsMeterSchema

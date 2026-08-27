@@ -1,7 +1,8 @@
 import type { NovaComponentCreateContext, NovaComponentDescriptor, NovaComponentNode, NovaComponentSchema } from '@endge/nova'
 import type { EventList } from '@endge/utils'
-import { NOVA_UI_COMMON_DIRTY_POLICY, NOVA_UI_COMMON_FIELD_DEFINITIONS, commonMeasureBounds, finiteNumber, normalizeCommonProps } from '@/shared/component'
-import { POPOVER_SCHEMA_TYPE, type PopoverApi, type PopoverProps, type PopoverResolvedProps } from '@/components/Popover/popover.types'
+import type { PopoverApi, PopoverProps, PopoverResolvedProps } from '@/components/Popover/popover.types'
+import { POPOVER_SCHEMA_TYPE } from '@/components/Popover/popover.types'
+import { commonMeasureBounds, finiteNumber, normalizeCommonProps, NOVA_UI_COMMON_DIRTY_POLICY, NOVA_UI_COMMON_FIELD_DEFINITIONS } from '@/shared/component'
 
 export type PopoverDescriptor = NovaComponentDescriptor<PopoverResolvedProps, PopoverApi, Record<string, never>, PopoverProps>
 export type PopoverNodeFactory = <E extends EventList>(context: NovaComponentCreateContext<E>, schema: NovaComponentSchema<PopoverProps>) => NovaComponentNode<PopoverResolvedProps, PopoverApi, Record<string, never>, PopoverProps, E>
@@ -41,7 +42,9 @@ export function normalizePopoverProps(props: PopoverProps = {}): PopoverResolved
 
 export function createPopoverDescriptor(createNode?: PopoverNodeFactory): PopoverDescriptor {
   const descriptor: PopoverDescriptor = { type: POPOVER_SCHEMA_TYPE, name: 'Popover', title: 'Popover', version: '0.1.0', kind: 'node-component', dirtyPolicy: { matrix: NOVA_UI_COMMON_DIRTY_POLICY.matrix, update: [...NOVA_UI_COMMON_DIRTY_POLICY.update, 'open', 'anchor', 'placement', 'offset', 'collision'], render: [...NOVA_UI_COMMON_DIRTY_POLICY.render, 'dismiss', 'arrow', 'backdrop', 'surface', 'parts', 'onOpenChange'] }, fields: POPOVER_FIELD_DEFINITIONS, normalize: schema => normalizePopoverProps(schema.props), measureBounds: (_context, schema) => commonMeasureBounds(schema, normalizePopoverProps) }
-  if (createNode) descriptor.createNode = createNode
+  if (createNode) {
+    descriptor.createNode = createNode
+  }
   return descriptor
 }
 
