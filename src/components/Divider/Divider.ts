@@ -23,7 +23,7 @@ import { resolveSpacing } from '@/shared/layout'
  */
 export class Divider<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<DividerResolvedProps, DividerApi, DividerProps, E> {
-  private readonly api: DividerApi
+  private readonly _api: DividerApi
 
   /**
    * Создает экземпляр Divider и подготавливает публичный API.
@@ -36,7 +36,7 @@ export class Divider<E extends EventList = Record<string, any>>
     descriptor: DividerDescriptor = DIVIDER_NODE_DESCRIPTOR,
   ) {
     super(app, surface, descriptor, normalizeDividerProps(props), options)
-    this.api = {
+    this._api = {
       setOrientation: orientation => this.setProps({ orientation }),
       setLineStyle: lineStyle => this.setProps({ lineStyle }),
       setProps: patch => this.setProps(patch),
@@ -55,7 +55,7 @@ export class Divider<E extends EventList = Record<string, any>>
    * Возвращает публичный API Divider.
    */
   override getApi(): DividerApi {
-    return this.api
+    return this._api
   }
 
   /**
@@ -69,16 +69,16 @@ export class Divider<E extends EventList = Record<string, any>>
     const contentY = margin.top + padding.top
     const contentWidth = Math.max(0, this.width - margin.left - margin.right - padding.left - padding.right)
     const contentHeight = Math.max(0, this.height - margin.top - margin.bottom - padding.top - padding.bottom)
-    const thickness = this.resolveThickness()
+    const thickness = this._resolveThickness()
     const color = this.props.border?.color ?? resolveComponentTextStyle(this.props, this.inheritedStyleContext, { color: '#cbd5e1' }).color
     const opacity = this.props.disabled ? this.props.disabledOpacity : this.props.opacity
-    const dashPattern = this.resolveDashPattern(thickness)
+    const dashPattern = this._resolveDashPattern(thickness)
 
     if (this.props.orientation === 'vertical') {
-      this.pushVerticalLine(schema, contentX + contentWidth / 2, contentY, contentHeight, thickness, color, opacity, dashPattern)
+      this._pushVerticalLine(schema, contentX + contentWidth / 2, contentY, contentHeight, thickness, color, opacity, dashPattern)
     }
     else {
-      this.pushHorizontalLine(schema, contentX, contentY + contentHeight / 2, contentWidth, thickness, color, opacity, dashPattern)
+      this._pushHorizontalLine(schema, contentX, contentY + contentHeight / 2, contentWidth, thickness, color, opacity, dashPattern)
     }
 
     this.renderer.schema(schema)
@@ -93,11 +93,11 @@ export class Divider<E extends EventList = Record<string, any>>
     this.dirty({ update: true, render: true })
   }
 
-  private resolveThickness(): number {
+  private _resolveThickness(): number {
     return Math.max(0, finiteNumber(this.props.thickness ?? this.props.border?.width, 1))
   }
 
-  private resolveDashPattern(thickness: number): Array<number> | undefined {
+  private _resolveDashPattern(thickness: number): Array<number> | undefined {
     if (this.props.dashPattern?.length) {
       return this.props.dashPattern
     }
@@ -110,7 +110,7 @@ export class Divider<E extends EventList = Record<string, any>>
     return undefined
   }
 
-  private pushHorizontalLine(
+  private _pushHorizontalLine(
     schema: NovaSchema,
     x: number,
     y: number,
@@ -134,7 +134,7 @@ export class Divider<E extends EventList = Record<string, any>>
     schema.push({ type: 'line', x1: x, y1: y + offset, x2: x + width, y2: y + offset, styles: { color, width: lineWidth, opacity } })
   }
 
-  private pushVerticalLine(
+  private _pushVerticalLine(
     schema: NovaSchema,
     x: number,
     y: number,

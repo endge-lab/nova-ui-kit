@@ -36,10 +36,10 @@ interface SplitPaneLazyResizeState {
  */
 export class SplitPane<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<SplitPaneResolvedProps, SplitPaneApi, SplitPaneProps, E> {
-  private readonly panes: Array<NovaNode<E>> = []
-  private resizerNode: RowResizer<E> | ColResizer<E> | null = null
-  private lazyResize: SplitPaneLazyResizeState | null = null
-  private readonly api: SplitPaneApi
+  private readonly _panes: Array<NovaNode<E>> = []
+  private _resizerNode: RowResizer<E> | ColResizer<E> | null = null
+  private _lazyResize: SplitPaneLazyResizeState | null = null
+  private readonly _api: SplitPaneApi
 
   /**
    * Создает экземпляр SplitPane и подготавливает базовое состояние.
@@ -52,16 +52,16 @@ export class SplitPane<E extends EventList = Record<string, any>>
     descriptor: SplitPaneDescriptor = SPLIT_PANE_NODE_DESCRIPTOR,
   ) {
     super(app, surface, descriptor, normalizeSplitPaneProps(props), options)
-    this.api = {
+    this._api = {
       setSizes: sizes => this.setProps({ sizes }),
       collapse: pane => this.setProps({ collapsedPane: pane }),
       expand: () => this.setProps({ collapsedPane: null }),
       setProps: patch => this.setProps(patch),
-      relayout: () => this.relayout(),
+      relayout: () => this._relayout(),
       getProps: () => this.props,
     }
     this.setChildren(options.children ?? [])
-    this.syncResizer()
+    this._syncResizer()
   }
 
   /**
@@ -75,7 +75,7 @@ export class SplitPane<E extends EventList = Record<string, any>>
    * Возвращает значение состояния SplitPane.
    */
   override getApi(): SplitPaneApi {
-    return this.api
+    return this._api
   }
 
   /**
@@ -83,10 +83,10 @@ export class SplitPane<E extends EventList = Record<string, any>>
    */
   setChildren(children: Array<SplitPaneChildSchema>): void {
     const nextSchemas = children.slice(0, 2)
-    const reconciled = reconcileNovaTemplateChildren(this, this.panes, nextSchemas)
-    this.panes.length = 0
-    this.panes.push(...reconciled.nodes)
-    this.syncResizer()
+    const reconciled = reconcileNovaTemplateChildren(this, this._panes, nextSchemas)
+    this._panes.length = 0
+    this._panes.push(...reconciled.nodes)
+    this._syncResizer()
     this.dirty({ update: true, render: true })
   }
 
@@ -94,21 +94,21 @@ export class SplitPane<E extends EventList = Record<string, any>>
    * Обновляет runtime-состояние SplitPane.
    */
   update(): void {
-    const activePanes = this.resolveActivePanes()
-    this.syncPaneParticipation(activePanes)
+    const activePanes = this._resolveActivePanes()
+    this._syncPaneParticipation(activePanes)
 
     if (activePanes.length < 2) {
-      this.syncResizer()
-      this.applyPaneRect(activePanes[0], { x: 0, y: 0, width: this.width, height: this.height })
+      this._syncResizer()
+      this._applyPaneRect(activePanes[0], { x: 0, y: 0, width: this.width, height: this.height })
       return
     }
 
-    this.syncResizer()
-    const { first, second } = this.resolveRects()
-    const { resizer } = this.resolveRects(this.lazyResize?.sizes[0])
-    this.applyPaneRect(activePanes[0], first)
-    this.applyPaneRect(activePanes[1], second)
-    this.resizerNode?.options({
+    this._syncResizer()
+    const { first, second } = this._resolveRects()
+    const { resizer } = this._resolveRects(this._lazyResize?.sizes[0])
+    this._applyPaneRect(activePanes[0], first)
+    this._applyPaneRect(activePanes[1], second)
+    this._resizerNode?.options({
       ...resizer,
       color: this.resolveThemeValue(this.props.resizer.color) ?? this.props.resizer.color,
       lineWidth: this.props.resizer.lineWidth,
@@ -122,7 +122,7 @@ export class SplitPane<E extends EventList = Record<string, any>>
   /**
    * Применяет подготовленное состояние SplitPane.
    */
-  private applyPaneRect(pane: NovaNode<E> | undefined, rect: { x: number, y: number, width: number, height: number }): void {
+  private _applyPaneRect(pane: NovaNode<E> | undefined, rect: { x: number, y: number, width: number, height: number }): void {
     if (!pane) {
       return
     }
@@ -135,11 +135,11 @@ export class SplitPane<E extends EventList = Record<string, any>>
   /**
    * Синхронизирует runtime-участие panes с layout-участием.
    */
-  private syncPaneParticipation(activePanes: Array<NovaNode<E>>): void {
+  private _syncPaneParticipation(activePanes: Array<NovaNode<E>>): void {
     const activePaneSet = new Set(activePanes)
     const emptyRect = { x: 0, y: 0, width: 0, height: 0 }
 
-    for (const pane of this.panes) {
+    for (const pane of this._panes) {
       const active = activePaneSet.has(pane)
       if (pane.visible !== active) {
         pane.visible = active
@@ -150,7 +150,7 @@ export class SplitPane<E extends EventList = Record<string, any>>
         pane.dirty({ update: true })
       }
       if (!active) {
-        this.applyPaneRect(pane, emptyRect)
+        this._applyPaneRect(pane, emptyRect)
       }
     }
   }
@@ -176,109 +176,109 @@ export class SplitPane<E extends EventList = Record<string, any>>
     this.props = normalizeSplitPaneProps(this.props)
     this.applyCommonPropsChanged(changedKeys)
     if (previousDirection !== this.props.direction) {
-      this.lazyResize = null
-      this.disposeResizer()
+      this._lazyResize = null
+      this._disposeResizer()
     }
-    this.syncResizer()
+    this._syncResizer()
     this.dirty({ update: true, render: true })
   }
 
   /**
    * Пересчитывает panes после изменения display у дочерних node.
    */
-  private relayout(): void {
-    this.syncResizer()
+  private _relayout(): void {
+    this._syncResizer()
     this.dirty({ update: true, render: true })
   }
 
   /**
    * Синхронизирует наличие resizer с количеством активных pane.
    */
-  private syncResizer(): void {
-    if (this.resolveActivePanes().length < 2) {
-      this.disposeResizer()
+  private _syncResizer(): void {
+    if (this._resolveActivePanes().length < 2) {
+      this._disposeResizer()
       return
     }
 
-    if (this.resizerNode) {
+    if (this._resizerNode) {
       return
     }
-    this.resizerNode = this.props.direction === 'horizontal'
+    this._resizerNode = this.props.direction === 'horizontal'
       ? new ColResizer<E>(this.nova, this.surface, this.resolveThemeValue(this.props.resizer.color) ?? this.props.resizer.color, this.props.resizer.lineWidth)
       : new RowResizer<E>(this.nova, this.surface, this.resolveThemeValue(this.props.resizer.color) ?? this.props.resizer.color, this.props.resizer.lineWidth)
-    this.addChild(this.resizerNode)
-    this.resizerNode
-      .onChangeStart(event => this.startResize(event))
+    this.addChild(this._resizerNode)
+    this._resizerNode
+      .onChangeStart(event => this._startResize(event))
       .onChangeMove((event, delta) => {
-        const payload = this.resizeBy(delta, event)
+        const payload = this._resizeBy(delta, event)
         this.props.onResize?.(payload)
       })
-      .onChangeEnd(event => this.endResize(event))
+      .onChangeEnd(event => this._endResize(event))
   }
 
   /**
    * Удаляет resizer, когда SplitPane работает как single-pane контейнер.
    */
-  private disposeResizer(): void {
-    this.resizerNode?.remove()
-    this.resizerNode = null
+  private _disposeResizer(): void {
+    this._resizerNode?.remove()
+    this._resizerNode = null
   }
 
   /**
    * Возвращает panes, которые участвуют в split layout.
    */
-  private resolveActivePanes(): Array<NovaNode<E>> {
-    return this.panes.filter(pane => isNovaUiLayoutDisplayed(pane)).slice(0, 2)
+  private _resolveActivePanes(): Array<NovaNode<E>> {
+    return this._panes.filter(pane => isNovaUiLayoutDisplayed(pane)).slice(0, 2)
   }
 
   /**
    * Обновляет размеры runtime-представления SplitPane.
    */
-  private resizeBy(delta: number, event: MouseEvent): SplitPaneResizePayload {
+  private _resizeBy(delta: number, event: MouseEvent): SplitPaneResizePayload {
     const total = this.props.direction === 'horizontal' ? this.width : this.height
-    const [first] = this.lazyResize?.sizes ?? this.resolvePixelSizes(total)
-    const nextFirst = this.clampFirstSize(first + delta, total)
+    const [first] = this._lazyResize?.sizes ?? this._resolvePixelSizes(total)
+    const nextFirst = this._clampFirstSize(first + delta, total)
     const nextSecond = total - nextFirst
 
     if (this.props.resizeMode === 'lazy') {
-      this.lazyResize = {
+      this._lazyResize = {
         sizes: [nextFirst, nextSecond],
-        startFirstSize: this.lazyResize?.startFirstSize ?? first,
+        startFirstSize: this._lazyResize?.startFirstSize ?? first,
       }
-      const effectiveDelta = nextFirst - this.lazyResize.startFirstSize
+      const effectiveDelta = nextFirst - this._lazyResize.startFirstSize
       this.dirty({ update: true, render: true })
-      return this.createResizePayload(effectiveDelta, event, nextFirst)
+      return this._createResizePayload(effectiveDelta, event, nextFirst)
     }
 
     this.setProps({ sizes: [nextFirst, nextSecond] })
-    return this.createResizePayload(delta, event)
+    return this._createResizePayload(delta, event)
   }
 
   /**
    * Запускает resize и подготавливает preview-состояние для lazy режима.
    */
-  private startResize(event: MouseEvent): void {
+  private _startResize(event: MouseEvent): void {
     if (this.props.resizeMode === 'lazy') {
       const total = this.props.direction === 'horizontal' ? this.width : this.height
-      const sizes = this.resolvePixelSizes(total)
-      this.lazyResize = { sizes, startFirstSize: sizes[0] }
+      const sizes = this._resolvePixelSizes(total)
+      this._lazyResize = { sizes, startFirstSize: sizes[0] }
     }
-    this.props.onResizeStart?.(this.createResizePayload(0, event, this.lazyResize?.sizes[0]))
+    this.props.onResizeStart?.(this._createResizePayload(0, event, this._lazyResize?.sizes[0]))
   }
 
   /**
    * Завершает resize и коммитит lazy preview в реальные sizes.
    */
-  private endResize(event: MouseEvent): void {
-    const lazyResize = this.lazyResize
+  private _endResize(event: MouseEvent): void {
+    const lazyResize = this._lazyResize
     if (!lazyResize) {
-      this.props.onResizeEnd?.(this.createResizePayload(0, event))
+      this.props.onResizeEnd?.(this._createResizePayload(0, event))
       return
     }
 
     const effectiveDelta = lazyResize.sizes[0] - lazyResize.startFirstSize
-    const payload = this.createResizePayload(effectiveDelta, event, lazyResize.sizes[0])
-    this.lazyResize = null
+    const payload = this._createResizePayload(effectiveDelta, event, lazyResize.sizes[0])
+    this._lazyResize = null
     this.setProps({ sizes: lazyResize.sizes })
     this.props.onResizeEnd?.(payload)
   }
@@ -286,8 +286,8 @@ export class SplitPane<E extends EventList = Record<string, any>>
   /**
    * Создает runtime-сущность SplitPane.
    */
-  private createResizePayload(delta: number, event: MouseEvent, firstSize?: number): SplitPaneResizePayload {
-    const { first, second, resizer } = this.resolveRects(firstSize)
+  private _createResizePayload(delta: number, event: MouseEvent, firstSize?: number): SplitPaneResizePayload {
+    const { first, second, resizer } = this._resolveRects(firstSize)
     return {
       width: this.props.direction === 'horizontal' ? resizer.x : this.width,
       height: this.props.direction === 'vertical' ? resizer.y : this.height,
@@ -301,14 +301,14 @@ export class SplitPane<E extends EventList = Record<string, any>>
   /**
    * Нормализует и возвращает итоговое значение SplitPane.
    */
-  private resolveRects(firstSizeOverride?: number): {
+  private _resolveRects(firstSizeOverride?: number): {
     first: { x: number, y: number, width: number, height: number }
     second: { x: number, y: number, width: number, height: number }
     resizer: { x: number, y: number, width: number, height: number }
   } {
     const horizontal = this.props.direction === 'horizontal'
     const total = horizontal ? this.width : this.height
-    const [resolvedFirstSize] = this.resolvePixelSizes(total)
+    const [resolvedFirstSize] = this._resolvePixelSizes(total)
     const firstSize = firstSizeOverride ?? resolvedFirstSize
     const hitSize = this.props.resizer.hitSize
     if (horizontal) {
@@ -328,7 +328,7 @@ export class SplitPane<E extends EventList = Record<string, any>>
   /**
    * Нормализует и возвращает итоговое значение SplitPane.
    */
-  private resolvePixelSizes(total: number): [number, number] {
+  private _resolvePixelSizes(total: number): [number, number] {
     if (this.props.collapsedPane === 'first') {
       return [0, total]
     }
@@ -339,14 +339,14 @@ export class SplitPane<E extends EventList = Record<string, any>>
     const [rawFirst, rawSecond] = this.props.sizes
     const ratioMode = rawFirst <= 1 && rawSecond <= 1
     const first = ratioMode ? total * rawFirst : rawFirst
-    const clampedFirst = this.clampFirstSize(first, total)
+    const clampedFirst = this._clampFirstSize(first, total)
     return [clampedFirst, Math.max(0, total - clampedFirst)]
   }
 
   /**
    * Ограничивает первую pane допустимыми min/max размерами.
    */
-  private clampFirstSize(first: number, total: number): number {
+  private _clampFirstSize(first: number, total: number): number {
     const minFirst = this.props.minSizes[0]
     const minSecond = this.props.minSizes[1]
     const maxFirst = Math.min(this.props.maxSizes[0], total - minSecond)

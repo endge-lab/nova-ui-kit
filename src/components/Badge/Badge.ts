@@ -29,8 +29,8 @@ import { createLayoutRect } from '@/shared/layout'
  */
 export class Badge<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<BadgeResolvedProps, BadgeApi, BadgeProps, E> {
-  private readonly api: BadgeApi
-  private readonly visualRect = createLayoutRect()
+  private readonly _api: BadgeApi
+  private readonly _visualRect = createLayoutRect()
 
   /**
    * Создает экземпляр Badge и подготавливает публичный API.
@@ -43,7 +43,7 @@ export class Badge<E extends EventList = Record<string, any>>
     descriptor: BadgeDescriptor = BADGE_NODE_DESCRIPTOR,
   ) {
     super(app, surface, descriptor, normalizeBadgeProps(props), options)
-    this.api = {
+    this._api = {
       setText: text => this.setProps({ text }),
       setValue: value => this.setProps({ value }),
       setTone: tone => this.setProps({ tone }),
@@ -63,41 +63,41 @@ export class Badge<E extends EventList = Record<string, any>>
    * Возвращает публичный API Badge.
    */
   override getApi(): BadgeApi {
-    return this.api
+    return this._api
   }
 
   /**
    * Обновляет визуальный rect для anchored badge.
    */
   update(): void {
-    this.resolveVisualRect()
-    this.setLocalRenderBounds(this.visualRect)
+    this._resolveVisualRect()
+    this.setLocalRenderBounds(this._visualRect)
   }
 
   /**
    * Рисует бейдж.
    */
   render(): void {
-    this.resolveVisualRect()
-    const schema: NovaSchema = buildBoxSchema(this.props, this.visualRect.width, this.visualRect.height, { resolveThemeValue: value => this.resolveThemeValue(value) })
+    this._resolveVisualRect()
+    const schema: NovaSchema = buildBoxSchema(this.props, this._visualRect.width, this._visualRect.height, { resolveThemeValue: value => this.resolveThemeValue(value) })
 
     if (!this.props.dot) {
       const textStyle = resolveComponentTextStyle(this.props, this.inheritedStyleContext, {}, value => this.resolveThemeValue(value))
       const padding = sizeTokenPadding(this.props.size)
       const iconSize = Math.max(10, padding.icon - 2)
-      const text = this.displayText()
+      const text = this._displayText()
       const textX = this.props.icon ? padding.horizontal + iconSize + padding.gap : 0
-      const textWidth = this.props.icon ? Math.max(0, this.visualRect.width - textX - padding.horizontal) : this.visualRect.width
+      const textWidth = this.props.icon ? Math.max(0, this._visualRect.width - textX - padding.horizontal) : this._visualRect.width
 
-      pushIcon(schema, this.props.icon, padding.horizontal, (this.visualRect.height - iconSize) / 2, iconSize)
-      pushText(schema, text, textX, 0, textWidth, this.visualRect.height, textStyle, { align: 'center' })
+      pushIcon(schema, this.props.icon, padding.horizontal, (this._visualRect.height - iconSize) / 2, iconSize)
+      pushText(schema, text, textX, 0, textWidth, this._visualRect.height, textStyle, { align: 'center' })
     }
 
-    if (this.visualRect.x || this.visualRect.y) {
+    if (this._visualRect.x || this._visualRect.y) {
       for (const item of schema) {
         const shape = item as Record<string, any>
-        shape.x = (shape.x ?? 0) + this.visualRect.x
-        shape.y = (shape.y ?? 0) + this.visualRect.y
+        shape.x = (shape.x ?? 0) + this._visualRect.x
+        shape.y = (shape.y ?? 0) + this._visualRect.y
       }
     }
 
@@ -115,7 +115,7 @@ export class Badge<E extends EventList = Record<string, any>>
   /**
    * Возвращает текстовое значение для бейджа.
    */
-  private displayText(): string {
+  private _displayText(): string {
     if (this.props.text) {
       return this.props.text
     }
@@ -128,10 +128,10 @@ export class Badge<E extends EventList = Record<string, any>>
   /**
    * Возвращает visual rect badge внутри layout rect.
    */
-  private resolveVisualRect(): void {
+  private _resolveVisualRect(): void {
     const width = this.props.anchor ? this.props.width : this.width
     const height = this.props.anchor ? this.props.height : this.height
-    const anchor = this.resolveAnchor()
+    const anchor = this._resolveAnchor()
     const placement = this.props.placement
     const side = placement === 'center' ? 'center' : placement.split('-')[0]
     const align = placement === 'center' ? 'center' : placement.split('-')[1] ?? 'center'
@@ -144,21 +144,21 @@ export class Badge<E extends EventList = Record<string, any>>
       y = anchor.y + (anchor.height - height) / 2
     }
     else if (side === 'top' || side === 'bottom') {
-      x = this.resolveHorizontalAnchor(anchor, width, align as BadgeResolvedProps['placement'])
+      x = this._resolveHorizontalAnchor(anchor, width, align as BadgeResolvedProps['placement'])
       y = side === 'top' ? anchor.y : anchor.y + anchor.height - height
     }
     else {
       x = side === 'left' ? anchor.x : anchor.x + anchor.width - width
-      y = this.resolveVerticalAnchor(anchor, height, align as BadgeResolvedProps['placement'])
+      y = this._resolveVerticalAnchor(anchor, height, align as BadgeResolvedProps['placement'])
     }
 
-    this.visualRect.x = x + this.props.offsetX
-    this.visualRect.y = y + this.props.offsetY
-    this.visualRect.width = Math.max(0, width)
-    this.visualRect.height = Math.max(0, height)
+    this._visualRect.x = x + this.props.offsetX
+    this._visualRect.y = y + this.props.offsetY
+    this._visualRect.width = Math.max(0, width)
+    this._visualRect.height = Math.max(0, height)
   }
 
-  private resolveAnchor(): NovaUiOverlayRect {
+  private _resolveAnchor(): NovaUiOverlayRect {
     const anchor = this.props.anchor
     if (!anchor || anchor.kind === 'root') {
       return { x: 0, y: 0, width: this.width, height: this.height }
@@ -174,7 +174,7 @@ export class Badge<E extends EventList = Record<string, any>>
     }
   }
 
-  private resolveHorizontalAnchor(anchor: NovaUiOverlayRect, width: number, align: string): number {
+  private _resolveHorizontalAnchor(anchor: NovaUiOverlayRect, width: number, align: string): number {
     if (align === 'start') {
       return anchor.x
     }
@@ -184,7 +184,7 @@ export class Badge<E extends EventList = Record<string, any>>
     return anchor.x + (anchor.width - width) / 2
   }
 
-  private resolveVerticalAnchor(anchor: NovaUiOverlayRect, height: number, align: string): number {
+  private _resolveVerticalAnchor(anchor: NovaUiOverlayRect, height: number, align: string): number {
     if (align === 'start') {
       return anchor.y
     }

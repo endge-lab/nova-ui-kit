@@ -26,10 +26,10 @@ type ZoomControlsPart = 'minus' | 'plus' | null
 /** Отрисовывает generic zoom controls для canvas-like продуктов. */
 export class ZoomControls<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<ZoomControlsResolvedProps, ZoomControlsApi, ZoomControlsProps, E> {
-  private hoveredPart: ZoomControlsPart = null
-  private pressedPart: ZoomControlsPart = null
-  private readonly eventPoint: NovaUiEventPoint = { x: 0, y: 0 }
-  private readonly api: ZoomControlsApi
+  private _hoveredPart: ZoomControlsPart = null
+  private _pressedPart: ZoomControlsPart = null
+  private readonly _eventPoint: NovaUiEventPoint = { x: 0, y: 0 }
+  private readonly _api: ZoomControlsApi
 
   /** Создает zoom controls и связывает pointer events с изменением value. */
   constructor(
@@ -40,15 +40,15 @@ export class ZoomControls<E extends EventList = Record<string, any>>
     descriptor: ZoomControlsDescriptor = ZOOM_CONTROLS_NODE_DESCRIPTOR,
   ) {
     super(app, surface, descriptor, normalizeZoomControlsProps(props), options)
-    this.api = {
-      zoomIn: () => this.zoomBy(1),
-      zoomOut: () => this.zoomBy(-1),
-      setValue: value => this.setZoomValue(value),
+    this._api = {
+      zoomIn: () => this._zoomBy(1),
+      zoomOut: () => this._zoomBy(-1),
+      setValue: value => this._setZoomValue(value),
       setProps: patch => this.setProps(patch),
       getProps: () => this.props,
     }
     this.options({ interactive: !this.props.disabled })
-    this.setupEvents()
+    this._setupEvents()
   }
 
   /** Обновляет props с нормализацией zoom value. */
@@ -58,26 +58,26 @@ export class ZoomControls<E extends EventList = Record<string, any>>
 
   /** Возвращает публичный API zoom controls. */
   override getApi(): ZoomControlsApi {
-    return this.api
+    return this._api
   }
 
   /** Отрисовывает сегменты zoom controls. */
   render(): void {
     const schema: NovaSchema = buildBoxSchema(this.props, this.width, this.height, { resolveThemeValue: value => this.resolveThemeValue(value) })
-    const minus = this.minusRect()
-    const plus = this.plusRect()
-    const label = this.labelRect()
+    const minus = this._minusRect()
+    const plus = this._plusRect()
+    const label = this._labelRect()
     const textStyle = resolveComponentTextStyle(this.props, this.inheritedStyleContext, { fontSize: 13, fontWeight: '700' }, value => this.resolveThemeValue(value))
-    this.pushButtonSegment(schema, minus, this.props.minusLabel, this.segmentState('minus'))
+    this._pushButtonSegment(schema, minus, this.props.minusLabel, this._segmentState('minus'))
     if (this.props.showValue && label.width > 0) {
-      pushText(schema, this.formatValue(), label.x, label.y, label.width, label.height, {
+      pushText(schema, this._formatValue(), label.x, label.y, label.width, label.height, {
         ...textStyle,
         color: this.resolveThemeValue(this.props.color ?? 'var(--nova-zoom-controls-value-color, #344054)') ?? textStyle.color,
         fontSize: 11,
         fontWeight: '700',
       }, { align: 'center' })
     }
-    this.pushButtonSegment(schema, plus, this.props.plusLabel, this.segmentState('plus'))
+    this._pushButtonSegment(schema, plus, this.props.plusLabel, this._segmentState('plus'))
     this.renderer.schema(schema)
   }
 
@@ -88,49 +88,49 @@ export class ZoomControls<E extends EventList = Record<string, any>>
     this.applyCommonPropsChanged(changedKeys)
   }
 
-  private setupEvents(): void {
+  private _setupEvents(): void {
     this.on('mousemove', (event) => {
       if (this.props.disabled) {
         return
       }
-      const next = this.resolvePart(event)
-      if (next === this.hoveredPart) {
+      const next = this._resolvePart(event)
+      if (next === this._hoveredPart) {
         return
       }
-      this.hoveredPart = next
+      this._hoveredPart = next
       this.dirty({ render: true })
     })
     this.on('mouseleave', () => {
-      this.hoveredPart = null
-      this.pressedPart = null
+      this._hoveredPart = null
+      this._pressedPart = null
       this.dirty({ render: true })
     })
     this.on('mousedown', (event) => {
       if (this.props.disabled) {
         return false
       }
-      const part = this.resolvePart(event)
+      const part = this._resolvePart(event)
       if (!part) {
         return false
       }
       this.focus(event)
-      this.pressedPart = part
-      this.zoomBy(part === 'plus' ? 1 : -1)
+      this._pressedPart = part
+      this._zoomBy(part === 'plus' ? 1 : -1)
       this.dirty({ render: true })
       return false
     })
     this.on('mouseup', () => {
-      this.pressedPart = null
+      this._pressedPart = null
       this.dirty({ render: true })
       return false
     })
   }
 
-  private zoomBy(direction: -1 | 1): void {
-    this.setZoomValue(this.props.value + this.props.step * direction)
+  private _zoomBy(direction: -1 | 1): void {
+    this._setZoomValue(this.props.value + this.props.step * direction)
   }
 
-  private setZoomValue(value: number): void {
+  private _setZoomValue(value: number): void {
     const next = clamp(value, this.props.minZoom, this.props.maxZoom)
     if (next === this.props.value) {
       return
@@ -139,43 +139,43 @@ export class ZoomControls<E extends EventList = Record<string, any>>
     this.props.onChange?.(next)
   }
 
-  private resolvePart(event: MouseEvent): ZoomControlsPart {
-    const point = toLocalEventPoint(this, event, this.eventPoint)
+  private _resolvePart(event: MouseEvent): ZoomControlsPart {
+    const point = toLocalEventPoint(this, event, this._eventPoint)
     if (point.y < 0 || point.y > this.height) {
       return null
     }
-    if (point.x >= this.minusRect().x && point.x <= this.minusRect().x + this.minusRect().width) {
+    if (point.x >= this._minusRect().x && point.x <= this._minusRect().x + this._minusRect().width) {
       return 'minus'
     }
-    if (point.x >= this.plusRect().x && point.x <= this.plusRect().x + this.plusRect().width) {
+    if (point.x >= this._plusRect().x && point.x <= this._plusRect().x + this._plusRect().width) {
       return 'plus'
     }
     return null
   }
 
-  private minusRect(): { x: number, y: number, width: number, height: number } {
+  private _minusRect(): { x: number, y: number, width: number, height: number } {
     return { x: 0, y: 0, width: 36, height: this.height }
   }
 
-  private labelRect(): { x: number, y: number, width: number, height: number } {
+  private _labelRect(): { x: number, y: number, width: number, height: number } {
     return { x: 36, y: 0, width: this.props.showValue ? Math.max(0, this.width - 72) : 0, height: this.height }
   }
 
-  private plusRect(): { x: number, y: number, width: number, height: number } {
+  private _plusRect(): { x: number, y: number, width: number, height: number } {
     return { x: this.width - 36, y: 0, width: 36, height: this.height }
   }
 
-  private segmentState(part: Exclude<ZoomControlsPart, null>): 'pressed' | 'hovered' | 'default' {
-    if (this.pressedPart === part) {
+  private _segmentState(part: Exclude<ZoomControlsPart, null>): 'pressed' | 'hovered' | 'default' {
+    if (this._pressedPart === part) {
       return 'pressed'
     }
-    if (this.hoveredPart === part) {
+    if (this._hoveredPart === part) {
       return 'hovered'
     }
     return 'default'
   }
 
-  private pushButtonSegment(
+  private _pushButtonSegment(
     schema: NovaSchema,
     rect: { x: number, y: number, width: number, height: number },
     label: string,
@@ -196,7 +196,7 @@ export class ZoomControls<E extends EventList = Record<string, any>>
     }, { align: 'center' })
   }
 
-  private formatValue(): string {
+  private _formatValue(): string {
     return this.props.formatValue?.(this.props.value) ?? `${Math.round(this.props.value * 100)}%`
   }
 }

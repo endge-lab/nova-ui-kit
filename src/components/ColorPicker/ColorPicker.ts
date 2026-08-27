@@ -64,15 +64,15 @@ const FIELD_HEIGHT = 28
  */
 export class ColorPicker<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<ColorPickerResolvedProps, ColorPickerApi, ColorPickerProps, E> {
-  private readonly api: ColorPickerApi
-  private hoveredId: string | null = null
-  private pressedId: string | null = null
-  private activeField: ColorPickerFieldId | null = null
-  private invalidField: ColorPickerFieldId | null = null
-  private dragging: 'sv' | 'hue' | 'alpha' | null = null
-  private hsva: NovaUiHsvaColor
-  private hexDraft: string
-  private rgbaDraft: Record<'r' | 'g' | 'b' | 'a', string>
+  private readonly _api: ColorPickerApi
+  private _hoveredId: string | null = null
+  private _pressedId: string | null = null
+  private _activeField: ColorPickerFieldId | null = null
+  private _invalidField: ColorPickerFieldId | null = null
+  private _dragging: 'sv' | 'hue' | 'alpha' | null = null
+  private _hsva: NovaUiHsvaColor
+  private _hexDraft: string
+  private _rgbaDraft: Record<'r' | 'g' | 'b' | 'a', string>
 
   /**
    * Создает ColorPicker и синхронизирует внутренние draft-поля с текущим цветом.
@@ -86,18 +86,18 @@ export class ColorPicker<E extends EventList = Record<string, any>>
   ) {
     super(app, surface, descriptor, normalizeColorPickerProps(props), options)
     const rgba = parseNovaUiColor(this.props.value) ?? { r: 255, g: 255, b: 255, a: 1 }
-    this.hsva = rgbaToHsva(rgba)
-    this.hexDraft = formatHexColor(rgba, true)
-    this.rgbaDraft = createRgbaDraft(rgba)
-    this.api = {
-      setValue: (value, event) => this.setValue(value, { source: 'custom', event }, false),
-      setCustomOpen: (open, event) => this.setCustomOpen(open, event),
+    this._hsva = rgbaToHsva(rgba)
+    this._hexDraft = formatHexColor(rgba, true)
+    this._rgbaDraft = createRgbaDraft(rgba)
+    this._api = {
+      setValue: (value, event) => this._setValue(value, { source: 'custom', event }, false),
+      setCustomOpen: (open, event) => this._setCustomOpen(open, event),
       getValue: () => this.props.value,
       setProps: patch => this.setProps(patch),
       getProps: () => this.props,
     }
     this.options({ interactive: !this.props.disabled })
-    this.setupEvents()
+    this._setupEvents()
   }
 
   /**
@@ -111,7 +111,7 @@ export class ColorPicker<E extends EventList = Record<string, any>>
    * Возвращает публичный API ColorPicker.
    */
   override getApi(): ColorPickerApi {
-    return this.api
+    return this._api
   }
 
   /**
@@ -121,10 +121,10 @@ export class ColorPicker<E extends EventList = Record<string, any>>
     const schema: NovaSchema = buildBoxSchema(this.props, this.width, this.height, {
       resolveThemeValue: value => this.resolveThemeValue(value),
     })
-    this.appendPresets(schema)
-    this.appendCustomButton(schema)
+    this._appendPresets(schema)
+    this._appendCustomButton(schema)
     if (this.props.customOpen) {
-      this.appendCustomControls(schema)
+      this._appendCustomControls(schema)
     }
     this.renderer.schema(schema)
   }
@@ -141,7 +141,7 @@ export class ColorPicker<E extends EventList = Record<string, any>>
       })
     }
     if (changedKeys.includes('value')) {
-      this.syncDraftFromValue()
+      this._syncDraftFromValue()
     }
     this.options({ interactive: !this.props.disabled })
     this.applyCommonPropsChanged(changedKeys)
@@ -150,7 +150,7 @@ export class ColorPicker<E extends EventList = Record<string, any>>
   /**
    * Рендерит сетку предустановленных цветов.
    */
-  private appendPresets(schema: NovaSchema): void {
+  private _appendPresets(schema: NovaSchema): void {
     const startX = 0
     const startY = 0
     this.props.presets.forEach((preset, index) => {
@@ -160,7 +160,7 @@ export class ColorPicker<E extends EventList = Record<string, any>>
       const y = startY + row * (PRESET_SIZE + PRESET_GAP)
       const id = `preset:${preset.id}`
       const active = normalizeNovaUiColor(preset.value) === this.props.value
-      if (this.hoveredId === id || active) {
+      if (this._hoveredId === id || active) {
         schema.push({
           type: 'rect',
           x: x - 7,
@@ -190,9 +190,9 @@ export class ColorPicker<E extends EventList = Record<string, any>>
   /**
    * Рендерит кнопку раскрытия custom-блока.
    */
-  private appendCustomButton(schema: NovaSchema): void {
-    const pressed = this.pressedId === 'custom-button'
-    const hovered = this.hoveredId === 'custom-button'
+  private _appendCustomButton(schema: NovaSchema): void {
+    const pressed = this._pressedId === 'custom-button'
+    const hovered = this._hoveredId === 'custom-button'
     schema.push({
       type: 'rect',
       x: 0,
@@ -226,23 +226,23 @@ export class ColorPicker<E extends EventList = Record<string, any>>
   /**
    * Рендерит custom palette, format switch и поля ввода.
    */
-  private appendCustomControls(schema: NovaSchema): void {
-    this.appendPickerArea(schema, 0, CUSTOM_TOP)
-    this.appendStrip(schema, 'hue', 0, CUSTOM_TOP + PICKER_HEIGHT + 10)
+  private _appendCustomControls(schema: NovaSchema): void {
+    this._appendPickerArea(schema, 0, CUSTOM_TOP)
+    this._appendStrip(schema, 'hue', 0, CUSTOM_TOP + PICKER_HEIGHT + 10)
     if (this.props.allowAlpha) {
-      this.appendStrip(schema, 'alpha', 0, CUSTOM_TOP + PICKER_HEIGHT + 32)
+      this._appendStrip(schema, 'alpha', 0, CUSTOM_TOP + PICKER_HEIGHT + 32)
     }
-    this.appendFormatSwitch(schema, 0, CUSTOM_TOP + PICKER_HEIGHT + 56)
+    this._appendFormatSwitch(schema, 0, CUSTOM_TOP + PICKER_HEIGHT + 56)
     if (this.props.format === 'hex') {
-      this.appendHexField(schema, 0, CUSTOM_TOP + PICKER_HEIGHT + 94)
+      this._appendHexField(schema, 0, CUSTOM_TOP + PICKER_HEIGHT + 94)
     }
-    else { this.appendRgbaFields(schema, 0, CUSTOM_TOP + PICKER_HEIGHT + 94) }
+    else { this._appendRgbaFields(schema, 0, CUSTOM_TOP + PICKER_HEIGHT + 94) }
   }
 
   /**
    * Рендерит двумерную область saturation/value.
    */
-  private appendPickerArea(schema: NovaSchema, x: number, y: number): void {
+  private _appendPickerArea(schema: NovaSchema, x: number, y: number): void {
     const cellWidth = PICKER_WIDTH / PICKER_COLUMNS
     const cellHeight = PICKER_HEIGHT / PICKER_ROWS
     for (let row = 0; row < PICKER_ROWS; row += 1) {
@@ -255,10 +255,10 @@ export class ColorPicker<E extends EventList = Record<string, any>>
           height: cellHeight + 0.5,
           styles: {
             background: formatNovaUiColor(hsvaToRgba({
-              h: this.hsva.h,
+              h: this._hsva.h,
               s: col / (PICKER_COLUMNS - 1),
               v: 1 - row / (PICKER_ROWS - 1),
-              a: this.hsva.a,
+              a: this._hsva.a,
             })),
             border: { color: 'rgba(0,0,0,0)', width: 0 },
           },
@@ -271,13 +271,13 @@ export class ColorPicker<E extends EventList = Record<string, any>>
   /**
    * Рендерит hue или alpha strip.
    */
-  private appendStrip(schema: NovaSchema, kind: 'hue' | 'alpha', x: number, y: number): void {
+  private _appendStrip(schema: NovaSchema, kind: 'hue' | 'alpha', x: number, y: number): void {
     const segments = kind === 'hue' ? 24 : 16
     const segmentWidth = PICKER_WIDTH / segments
     for (let index = 0; index < segments; index += 1) {
       const color = kind === 'hue'
         ? formatNovaUiColor(hsvaToRgba({ h: (index / segments) * 360, s: 1, v: 1, a: 1 }))
-        : formatNovaUiColor(hsvaToRgba({ ...this.hsva, a: index / (segments - 1) }))
+        : formatNovaUiColor(hsvaToRgba({ ...this._hsva, a: index / (segments - 1) }))
       schema.push({
         type: 'rect',
         x: x + index * segmentWidth,
@@ -293,7 +293,7 @@ export class ColorPicker<E extends EventList = Record<string, any>>
   /**
    * Рендерит переключатель формата ввода.
    */
-  private appendFormatSwitch(schema: NovaSchema, x: number, y: number): void {
+  private _appendFormatSwitch(schema: NovaSchema, x: number, y: number): void {
     const width = 118
     const height = 28
     schema.push({
@@ -339,20 +339,20 @@ export class ColorPicker<E extends EventList = Record<string, any>>
   /**
    * Рендерит HEX-поле ввода.
    */
-  private appendHexField(schema: NovaSchema, x: number, y: number): void {
-    this.appendField(schema, 'hex', x, y, PICKER_WIDTH, this.hexDraft, 'HEX')
+  private _appendHexField(schema: NovaSchema, x: number, y: number): void {
+    this._appendField(schema, 'hex', x, y, PICKER_WIDTH, this._hexDraft, 'HEX')
   }
 
   /**
    * Рендерит RGBA-поля ввода.
    */
-  private appendRgbaFields(schema: NovaSchema, x: number, y: number): void {
+  private _appendRgbaFields(schema: NovaSchema, x: number, y: number): void {
     const gap = 8
     const widths = [46, 46, 46, 70]
     let cursor = x
     ;(['r', 'g', 'b', 'a'] as Array<ColorPickerFieldId>).forEach((field, index) => {
       const width = widths[index] ?? 46
-      this.appendField(schema, field, cursor, y, width, this.rgbaDraft[field as keyof typeof this.rgbaDraft] ?? '', field.toUpperCase())
+      this._appendField(schema, field, cursor, y, width, this._rgbaDraft[field as keyof typeof this._rgbaDraft] ?? '', field.toUpperCase())
       cursor += width + gap
     })
   }
@@ -360,9 +360,9 @@ export class ColorPicker<E extends EventList = Record<string, any>>
   /**
    * Рендерит одно текстовое поле.
    */
-  private appendField(schema: NovaSchema, field: ColorPickerFieldId, x: number, y: number, width: number, value: string, label: string): void {
-    const active = this.activeField === field
-    const invalid = this.invalidField === field
+  private _appendField(schema: NovaSchema, field: ColorPickerFieldId, x: number, y: number, width: number, value: string, label: string): void {
+    const active = this._activeField === field
+    const invalid = this._invalidField === field
     schema.push({
       type: 'rect',
       x,
@@ -398,22 +398,22 @@ export class ColorPicker<E extends EventList = Record<string, any>>
   /**
    * Настраивает события pointer и keyboard.
    */
-  private setupEvents(): void {
+  private _setupEvents(): void {
     this.on('mousemove', (event) => {
-      if (this.dragging) {
-        this.updateCustomColorFromEvent(this.dragging, event)
+      if (this._dragging) {
+        this._updateCustomColorFromEvent(this._dragging, event)
         return false
       }
-      const hit = this.hitTestEvent(event)
-      if (hit.id === this.hoveredId) {
+      const hit = this._hitTestEvent(event)
+      if (hit.id === this._hoveredId) {
         return
       }
-      this.hoveredId = hit.id
+      this._hoveredId = hit.id
       this.dirty({ render: true })
     })
     this.on('mouseleave', () => {
-      this.hoveredId = null
-      this.pressedId = null
+      this._hoveredId = null
+      this._pressedId = null
       this.dirty({ render: true })
     })
     this.on('mousedown', (event) => {
@@ -421,34 +421,34 @@ export class ColorPicker<E extends EventList = Record<string, any>>
         return false
       }
       this.focus(event)
-      const hit = this.hitTestEvent(event)
-      this.pressedId = hit.id
-      this.handleHit(hit, event)
+      const hit = this._hitTestEvent(event)
+      this._pressedId = hit.id
+      this._handleHit(hit, event)
       this.dirty({ render: true })
       return false
     })
     this.on('mouseup', () => {
-      this.pressedId = null
-      this.dragging = null
+      this._pressedId = null
+      this._dragging = null
       this.dirty({ render: true })
       return false
     })
     this.on('dragmove', (event) => {
-      if (!this.dragging) {
+      if (!this._dragging) {
         return false
       }
-      this.updateCustomColorFromEvent(this.dragging, event)
+      this._updateCustomColorFromEvent(this._dragging, event)
       return false
     })
     this.on('dragend', () => {
-      this.dragging = null
+      this._dragging = null
       return false
     })
     this.on('keydown', (event) => {
-      if (!this.activeField) {
+      if (!this._activeField) {
         return
       }
-      this.handleFieldKey(event)
+      this._handleFieldKey(event)
       return false
     })
   }
@@ -456,16 +456,16 @@ export class ColorPicker<E extends EventList = Record<string, any>>
   /**
    * Выполняет действие по найденной интерактивной зоне.
    */
-  private handleHit(hit: ColorPickerHit, event: MouseEvent): void {
+  private _handleHit(hit: ColorPickerHit, event: MouseEvent): void {
     if (hit.kind !== 'field') {
-      this.activeField = null
+      this._activeField = null
     }
     if (hit.kind === 'preset' && hit.preset) {
-      this.setValue(hit.preset.value, { source: 'preset', preset: hit.preset, event }, true)
+      this._setValue(hit.preset.value, { source: 'preset', preset: hit.preset, event }, true)
       return
     }
     if (hit.kind === 'custom-button') {
-      this.setCustomOpen(!this.props.customOpen, event)
+      this._setCustomOpen(!this.props.customOpen, event)
       return
     }
     if (hit.kind === 'format' && hit.format) {
@@ -473,106 +473,106 @@ export class ColorPicker<E extends EventList = Record<string, any>>
       return
     }
     if (hit.kind === 'field' && hit.field) {
-      this.activeField = hit.field
+      this._activeField = hit.field
       return
     }
     if (hit.kind === 'sv' || hit.kind === 'hue' || hit.kind === 'alpha') {
-      this.dragging = hit.kind
-      this.updateCustomColorFromEvent(hit.kind, event)
+      this._dragging = hit.kind
+      this._updateCustomColorFromEvent(hit.kind, event)
     }
   }
 
   /**
    * Обновляет custom color по координате pointer.
    */
-  private updateCustomColorFromEvent(kind: 'sv' | 'hue' | 'alpha', event: MouseEvent): void {
+  private _updateCustomColorFromEvent(kind: 'sv' | 'hue' | 'alpha', event: MouseEvent): void {
     const { x, y } = this.events.getCanvasMousePosition(event)
     const [localX, localY] = this.toLocal(x, y)
     if (kind === 'sv') {
-      this.hsva.s = clamp01(localX / PICKER_WIDTH)
-      this.hsva.v = clamp01(1 - (localY - CUSTOM_TOP) / PICKER_HEIGHT)
+      this._hsva.s = clamp01(localX / PICKER_WIDTH)
+      this._hsva.v = clamp01(1 - (localY - CUSTOM_TOP) / PICKER_HEIGHT)
     }
     if (kind === 'hue') {
       const hueY = CUSTOM_TOP + PICKER_HEIGHT + 10
-      this.hsva.h = clamp01(localX / PICKER_WIDTH) * 360
+      this._hsva.h = clamp01(localX / PICKER_WIDTH) * 360
       if (localY < hueY - 8 || localY > hueY + STRIP_HEIGHT + 8) {
         return
       }
     }
     if (kind === 'alpha' && this.props.allowAlpha) {
-      this.hsva.a = clampAlpha(localX / PICKER_WIDTH)
+      this._hsva.a = clampAlpha(localX / PICKER_WIDTH)
     }
-    this.setValue(formatNovaUiColor(hsvaToRgba(this.hsva)), { source: 'custom', event }, true)
+    this._setValue(formatNovaUiColor(hsvaToRgba(this._hsva)), { source: 'custom', event }, true)
   }
 
   /**
    * Обрабатывает ввод символов в активное поле.
    */
-  private handleFieldKey(event: KeyboardEvent): void {
-    if (!this.activeField) {
+  private _handleFieldKey(event: KeyboardEvent): void {
+    if (!this._activeField) {
       return
     }
     if (event.key === 'Escape') {
-      this.activeField = null
-      this.invalidField = null
+      this._activeField = null
+      this._invalidField = null
       this.dirty({ render: true })
       return
     }
     if (event.key === 'Enter') {
-      this.applyDraftField(event)
+      this._applyDraftField(event)
       return
     }
     if (event.key === 'Backspace') {
-      this.updateActiveDraft(value => value.slice(0, -1), event)
+      this._updateActiveDraft(value => value.slice(0, -1), event)
       return
     }
     if (event.key.length !== 1) {
       return
     }
-    const allowed = this.activeField === 'hex' ? /^[#0-9a-f]$/i.test(event.key) : /^[0-9.]$/.test(event.key)
+    const allowed = this._activeField === 'hex' ? /^[#0-9a-f]$/i.test(event.key) : /^[0-9.]$/.test(event.key)
     if (!allowed) {
       return
     }
-    this.updateActiveDraft(value => `${value}${event.key}`, event)
+    this._updateActiveDraft(value => `${value}${event.key}`, event)
   }
 
   /**
    * Обновляет draft активного поля и применяет валидное значение.
    */
-  private updateActiveDraft(mutator: (value: string) => string, event: KeyboardEvent): void {
-    if (!this.activeField) {
+  private _updateActiveDraft(mutator: (value: string) => string, event: KeyboardEvent): void {
+    if (!this._activeField) {
       return
     }
-    if (this.activeField === 'hex') {
-      this.hexDraft = mutator(this.hexDraft)
+    if (this._activeField === 'hex') {
+      this._hexDraft = mutator(this._hexDraft)
     }
-    else { this.rgbaDraft[this.activeField] = mutator(this.rgbaDraft[this.activeField]) }
-    this.applyDraftField(event)
+    else { this._rgbaDraft[this._activeField] = mutator(this._rgbaDraft[this._activeField]) }
+    this._applyDraftField(event)
   }
 
   /**
    * Применяет текущий draft, если он валиден.
    */
-  private applyDraftField(event?: Event): void {
-    if (!this.activeField) {
+  private _applyDraftField(event?: Event): void {
+    if (!this._activeField) {
       return
     }
-    const rgba = this.activeField === 'hex'
-      ? parseHexColor(this.hexDraft)
-      : parseRgbaDraft(this.rgbaDraft)
+    const rgba = this._activeField === 'hex'
+      ? parseHexColor(this._hexDraft)
+      : parseRgbaDraft(this._rgbaDraft)
     if (!rgba) {
-      this.invalidField = this.activeField
+      this._invalidField = this._activeField
       this.dirty({ render: true })
       return
     }
-    this.invalidField = null
-    this.setValue(formatNovaUiColor(rgba), { source: 'input', event }, true)
+    this._invalidField = null
+    this._setValue(formatNovaUiColor(rgba), { source: 'input', event }, true)
   }
 
   /**
    * Обновляет значение компонента и вызывает callbacks.
    */
-  private setValue(value: string, context: ColorPickerValueContext, commit: boolean): void {
+  private _setValue(value: string, context: ColorPickerValueContext, commit: boolean): void {
     const next = normalizeNovaUiColor(value, this.props.value)
     if (next !== this.props.value) {
       this.setProps({ value: next })
@@ -586,7 +586,7 @@ export class ColorPicker<E extends EventList = Record<string, any>>
   /**
    * Переключает раскрытие custom-блока.
    */
-  private setCustomOpen(open: boolean, event?: Event): void {
+  private _setCustomOpen(open: boolean, event?: Event): void {
     if (open === this.props.customOpen) {
       return
     }
@@ -597,17 +597,17 @@ export class ColorPicker<E extends EventList = Record<string, any>>
   /**
    * Синхронизирует draft-поля и HSV-состояние из текущего value.
    */
-  private syncDraftFromValue(): void {
+  private _syncDraftFromValue(): void {
     const rgba = parseNovaUiColor(this.props.value) ?? { r: 255, g: 255, b: 255, a: 1 }
-    this.hsva = rgbaToHsva(rgba)
-    this.hexDraft = formatHexColor(rgba, true)
-    this.rgbaDraft = createRgbaDraft(rgba)
+    this._hsva = rgbaToHsva(rgba)
+    this._hexDraft = formatHexColor(rgba, true)
+    this._rgbaDraft = createRgbaDraft(rgba)
   }
 
   /**
    * Находит интерактивную зону под pointer.
    */
-  private hitTestEvent(event: MouseEvent): ColorPickerHit {
+  private _hitTestEvent(event: MouseEvent): ColorPickerHit {
     const { x, y } = this.events.getCanvasMousePosition(event)
     const [localX, localY] = this.toLocal(x, y)
     for (let index = 0; index < this.props.presets.length; index += 1) {
@@ -649,7 +649,7 @@ export class ColorPicker<E extends EventList = Record<string, any>>
       return { id: 'field:hex', kind: 'field', field: 'hex' }
     }
     if (this.props.format === 'rgba' && localY >= fieldY && localY <= fieldY + FIELD_HEIGHT) {
-      const fields = this.resolveRgbaFieldRects()
+      const fields = this._resolveRgbaFieldRects()
       for (const field of fields) {
         if (localX >= field.x && localX <= field.x + field.width) {
           return { id: `field:${field.id}`, kind: 'field', field: field.id }
@@ -662,7 +662,7 @@ export class ColorPicker<E extends EventList = Record<string, any>>
   /**
    * Возвращает геометрию RGBA-полей.
    */
-  private resolveRgbaFieldRects(): Array<{ id: ColorPickerFieldId, x: number, width: number }> {
+  private _resolveRgbaFieldRects(): Array<{ id: ColorPickerFieldId, x: number, width: number }> {
     const gap = 8
     const widths = [46, 46, 46, 70]
     let cursor = 0

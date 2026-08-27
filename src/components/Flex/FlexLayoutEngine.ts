@@ -101,8 +101,8 @@ export function compileFlexChildLayout(layout: FlexChildLayout = {}): CompiledFl
 
 /** Считает rect детей Flex без создания Nova nodes и без render side effects. */
 export class FlexLayoutEngine {
-  private readonly sortedEntries: Array<FlexChildEntry> = []
-  private readonly lines: Array<FlexLine> = []
+  private readonly _sortedEntries: Array<FlexChildEntry> = []
+  private readonly _lines: Array<FlexLine> = []
 
   /**
    * Вычисляет производное значение FlexLayoutEngine.
@@ -118,16 +118,16 @@ export class FlexLayoutEngine {
     const mainGap = isRow ? props.columnGap : props.rowGap
     const crossGap = isRow ? props.rowGap : props.columnGap
 
-    this.prepareSortedEntries(context.entries)
-    this.collectLines({
-      entries: this.sortedEntries,
+    this._prepareSortedEntries(context.entries)
+    this._collectLines({
+      entries: this._sortedEntries,
       props,
       isRow,
       mainSize,
       crossSize,
       mainGap,
     })
-    this.placeLines({
+    this._placeLines({
       props,
       padding,
       isRow,
@@ -141,15 +141,15 @@ export class FlexLayoutEngine {
   /**
    * Подготавливает данные к использованию FlexLayoutEngine.
    */
-  private prepareSortedEntries(entries: Array<FlexChildEntry>): void {
-    this.sortedEntries.length = 0
+  private _prepareSortedEntries(entries: Array<FlexChildEntry>): void {
+    this._sortedEntries.length = 0
     if (isAlreadyOrdered(entries)) {
-      this.sortedEntries.push(...entries)
+      this._sortedEntries.push(...entries)
       return
     }
 
-    this.sortedEntries.push(...entries)
-    this.sortedEntries.sort((a, b) => {
+    this._sortedEntries.push(...entries)
+    this._sortedEntries.sort((a, b) => {
       const orderDiff = a.compiledLayout.order - b.compiledLayout.order
       if (orderDiff !== 0) {
         return orderDiff
@@ -161,7 +161,7 @@ export class FlexLayoutEngine {
   /**
    * Выполняет внутренний шаг collectLines для FlexLayoutEngine.
    */
-  private collectLines(context: {
+  private _collectLines(context: {
     entries: Array<FlexChildEntry>
     props: FlexResolvedProps
     isRow: boolean
@@ -169,17 +169,17 @@ export class FlexLayoutEngine {
     crossSize: number
     mainGap: number
   }): void {
-    this.lines.length = 0
+    this._lines.length = 0
     let line = createLine()
 
     for (const entry of context.entries) {
-      const item = this.measureItem(entry, context.mainSize, context.crossSize, context.isRow, context.props.alignItems)
+      const item = this._measureItem(entry, context.mainSize, context.crossSize, context.isRow, context.props.alignItems)
       const nextMain = line.items.length === 0
         ? item.outerMain
         : line.main + context.mainGap + item.outerMain
 
       if (context.props.wrap === 'wrap' && line.items.length > 0 && nextMain > context.mainSize) {
-        this.lines.push(line)
+        this._lines.push(line)
         line = createLine()
       }
 
@@ -191,14 +191,14 @@ export class FlexLayoutEngine {
     }
 
     if (line.items.length > 0) {
-      this.lines.push(line)
+      this._lines.push(line)
     }
   }
 
   /**
    * Измеряет layout или runtime-метрики FlexLayoutEngine.
    */
-  private measureItem(
+  private _measureItem(
     entry: FlexChildEntry,
     mainSize: number,
     crossSize: number,
@@ -210,9 +210,9 @@ export class FlexLayoutEngine {
     const props = readNovaUiNodeProps(entry.node)
     const widthFallback = typeof props.width === 'number' && Number.isFinite(props.width) ? props.width : entry.node.width
     const heightFallback = typeof props.height === 'number' && Number.isFinite(props.height) ? props.height : entry.node.height
-    const measured = this.measureAutoItem(entry, mainSize, crossSize, isRow)
-    const rawMain = this.resolveMain(layout, mainSize, isRow, widthFallback, heightFallback, measured)
-    const rawCross = this.resolveCross(layout, crossSize, isRow, widthFallback, heightFallback, measured)
+    const measured = this._measureAutoItem(entry, mainSize, crossSize, isRow)
+    const rawMain = this._resolveMain(layout, mainSize, isRow, widthFallback, heightFallback, measured)
+    const rawCross = this._resolveCross(layout, crossSize, isRow, widthFallback, heightFallback, measured)
     const minMain = isRow ? layout.minWidth : layout.minHeight
     const maxMain = isRow ? layout.maxWidth : layout.maxHeight
     const minCross = isRow ? layout.minHeight : layout.minWidth
@@ -245,7 +245,7 @@ export class FlexLayoutEngine {
   /**
    * Нормализует и возвращает итоговое значение FlexLayoutEngine.
    */
-  private resolveMain(
+  private _resolveMain(
     layout: CompiledFlexChildLayout,
     available: number,
     isRow: boolean,
@@ -267,7 +267,7 @@ export class FlexLayoutEngine {
   /**
    * Нормализует и возвращает итоговое значение FlexLayoutEngine.
    */
-  private resolveCross(
+  private _resolveCross(
     layout: CompiledFlexChildLayout,
     available: number,
     isRow: boolean,
@@ -285,7 +285,7 @@ export class FlexLayoutEngine {
   /**
    * Измеряет layout или runtime-метрики FlexLayoutEngine.
    */
-  private measureAutoItem(entry: FlexChildEntry, mainSize: number, crossSize: number, isRow: boolean): { width: number, height: number } | undefined {
+  private _measureAutoItem(entry: FlexChildEntry, mainSize: number, crossSize: number, isRow: boolean): { width: number, height: number } | undefined {
     const layout = entry.compiledLayout
     const mainValue = isRow ? layout.width : layout.height
     const crossValue = isRow ? layout.height : layout.width
@@ -310,7 +310,7 @@ export class FlexLayoutEngine {
   /**
    * Выполняет внутренний шаг placeLines для FlexLayoutEngine.
    */
-  private placeLines(context: {
+  private _placeLines(context: {
     props: FlexResolvedProps
     padding: NovaUiResolvedSpacing
     isRow: boolean
@@ -321,13 +321,13 @@ export class FlexLayoutEngine {
   }): void {
     let crossCursor = context.isRow ? context.padding.top : context.padding.left
 
-    for (const line of this.lines) {
-      this.resolveLineMainSizes(line, context.mainSize)
+    for (const line of this._lines) {
+      this._resolveLineMainSizes(line, context.mainSize)
       if (context.props.wrap === 'nowrap') {
         line.cross = Math.max(line.cross, context.crossSize)
       }
-      this.resolveLineCrossSizes(line, context.props.alignItems)
-      this.placeLine(line, context, crossCursor)
+      this._resolveLineCrossSizes(line, context.props.alignItems)
+      this._placeLine(line, context, crossCursor)
       crossCursor += line.cross + context.crossGap
     }
   }
@@ -335,7 +335,7 @@ export class FlexLayoutEngine {
   /**
    * Нормализует и возвращает итоговое значение FlexLayoutEngine.
    */
-  private resolveLineMainSizes(line: FlexLine, mainSize: number): void {
+  private _resolveLineMainSizes(line: FlexLine, mainSize: number): void {
     const free = mainSize - line.main
 
     if (free > 0 && line.totalGrow > 0) {
@@ -365,7 +365,7 @@ export class FlexLayoutEngine {
   /**
    * Нормализует и возвращает итоговое значение FlexLayoutEngine.
    */
-  private resolveLineCrossSizes(line: FlexLine, parentAlign: FlexAlign): void {
+  private _resolveLineCrossSizes(line: FlexLine, parentAlign: FlexAlign): void {
     for (const item of line.items) {
       const align = item.alignSelf ?? parentAlign
       if (align !== 'stretch') {
@@ -383,7 +383,7 @@ export class FlexLayoutEngine {
   /**
    * Выполняет внутренний шаг placeLine для FlexLayoutEngine.
    */
-  private placeLine(
+  private _placeLine(
     line: FlexLine,
     context: {
       props: FlexResolvedProps
@@ -399,14 +399,14 @@ export class FlexLayoutEngine {
       sum + item.targetMain + item.margin.mainStart + item.margin.mainEnd
     ), baseGapTotal)
     const freeMain = Math.max(0, context.mainSize - usedMain)
-    const gap = this.resolveJustifiedGap(context.props.justifyContent, context.mainGap, freeMain, line.items.length)
-    let mainCursor = this.resolveJustifiedStart(context.props.justifyContent, freeMain)
+    const gap = this._resolveJustifiedGap(context.props.justifyContent, context.mainGap, freeMain, line.items.length)
+    let mainCursor = this._resolveJustifiedStart(context.props.justifyContent, freeMain)
 
     for (const item of line.items) {
       mainCursor += item.margin.mainStart
 
       const align = item.alignSelf ?? context.props.alignItems
-      const crossOffset = this.resolveCrossOffset(align, line.cross, item.targetCross, item.margin)
+      const crossOffset = this._resolveCrossOffset(align, line.cross, item.targetCross, item.margin)
       const rect = item.entry.nextRect
 
       if (context.isRow) {
@@ -429,7 +429,7 @@ export class FlexLayoutEngine {
   /**
    * Нормализует и возвращает итоговое значение FlexLayoutEngine.
    */
-  private resolveJustifiedStart(justify: FlexResolvedProps['justifyContent'], freeMain: number): number {
+  private _resolveJustifiedStart(justify: FlexResolvedProps['justifyContent'], freeMain: number): number {
     if (justify === 'center') {
       return freeMain / 2
     }
@@ -442,7 +442,7 @@ export class FlexLayoutEngine {
   /**
    * Нормализует и возвращает итоговое значение FlexLayoutEngine.
    */
-  private resolveJustifiedGap(
+  private _resolveJustifiedGap(
     justify: FlexResolvedProps['justifyContent'],
     baseGap: number,
     freeMain: number,
@@ -457,7 +457,7 @@ export class FlexLayoutEngine {
   /**
    * Нормализует и возвращает итоговое значение FlexLayoutEngine.
    */
-  private resolveCrossOffset(
+  private _resolveCrossOffset(
     align: FlexAlign,
     lineCross: number,
     itemCross: number,

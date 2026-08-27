@@ -21,7 +21,7 @@ import {
  */
 export class Tag<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<TagResolvedProps, TagApi, TagProps, E> {
-  private readonly api: TagApi
+  private readonly _api: TagApi
 
   /**
    * Создает экземпляр Tag и подготавливает базовое состояние.
@@ -34,7 +34,7 @@ export class Tag<E extends EventList = Record<string, any>>
     descriptor: TagDescriptor = TAG_NODE_DESCRIPTOR,
   ) {
     super(app, surface, descriptor, normalizeTagProps(props), options)
-    this.api = {
+    this._api = {
       setText: text => this.setProps({ text }),
       setTone: tone => this.setProps({ tone }),
       setProps: patch => this.setProps(patch),
@@ -53,7 +53,7 @@ export class Tag<E extends EventList = Record<string, any>>
    * Возвращает значение состояния Tag.
    */
   override getApi(): TagApi {
-    return this.api
+    return this._api
   }
 
   /**

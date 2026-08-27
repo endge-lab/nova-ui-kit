@@ -29,9 +29,9 @@ export class FpsMeter<E extends EventList = Record<string, any>>
   extends NovaComponentNode<FpsMeterResolvedProps, FpsMeterApi, Record<string, never>, FpsMeterProps, E> {
   readonly [NOVA_UI_LAYOUT_TARGET] = true as const
 
-  private readonly api: FpsMeterApi
-  private intervalId: ReturnType<typeof setInterval> | undefined
-  private externalLayout = false
+  private readonly _api: FpsMeterApi
+  private _intervalId: ReturnType<typeof setInterval> | undefined
+  private _externalLayout = false
 
   constructor(
     app: NovaApp<E>,
@@ -43,12 +43,12 @@ export class FpsMeter<E extends EventList = Record<string, any>>
     ensureNovaUIKitThemes(app)
     super(app, surface, descriptor, normalizeFpsMeterProps(props), options)
     this.addDisposer(app.theme.observe(this, { phase: 'render' }))
-    this.api = {
+    this._api = {
       setVisible: visible => this.setProps({ visible }),
       setProps: patch => this.setProps(patch),
       getProps: () => this.props,
     }
-    this.applyPlacement()
+    this._applyPlacement()
   }
 
   override setProps(patch: FpsMeterProps): this {
@@ -56,18 +56,18 @@ export class FpsMeter<E extends EventList = Record<string, any>>
   }
 
   override getApi(): FpsMeterApi {
-    return this.api
+    return this._api
   }
 
   update(): void {
-    if (!this.externalLayout) {
-      this.applyPlacement()
+    if (!this._externalLayout) {
+      this._applyPlacement()
     }
   }
 
   /** Принимает rect от UI Kit layout-контейнера. */
   applyLayoutRect(rect: NovaUiLayoutRect): boolean {
-    this.externalLayout = true
+    this._externalLayout = true
     const sizeChanged = this.width !== rect.width || this.height !== rect.height
     const changed = this.x !== rect.x
       || this.y !== rect.y
@@ -131,26 +131,26 @@ export class FpsMeter<E extends EventList = Record<string, any>>
   protected override onMount(): void {
     super.onMount()
     this.nova.metrics.start()
-    this.intervalId = setInterval(() => this.dirty({ render: true }), 250)
+    this._intervalId = setInterval(() => this.dirty({ render: true }), 250)
   }
 
   protected override onUnmount(): void {
-    if (this.intervalId) {
-      clearInterval(this.intervalId)
+    if (this._intervalId) {
+      clearInterval(this._intervalId)
     }
-    this.intervalId = undefined
+    this._intervalId = undefined
     super.onUnmount()
   }
 
   protected override onPropsChanged(): void {
     this.props = normalizeFpsMeterProps(this.props)
     this.options({ interactive: false, zIndex: this.props.zIndex })
-    if (!this.externalLayout) {
-      this.applyPlacement()
+    if (!this._externalLayout) {
+      this._applyPlacement()
     }
   }
 
-  private applyPlacement(): void {
+  private _applyPlacement(): void {
     const rect = resolveOverlayRect(this.surface.width, this.surface.height, this.props)
     const nextX = rect.x ?? this.x
     const nextY = rect.y ?? this.y

@@ -43,13 +43,13 @@ export class RowResizer<E extends EventList> extends NovaNode<E> {
     this._lineWidth = lineWidth
     this._hitSize = Math.max(6, lineWidth)
     this.options({ width: 0, height: this._hitSize })
-    this.setupEvents()
+    this._setupEvents()
   }
 
   /**
    * Обновляет значение состояния RowResizer.
    */
-  private setupEvents(): void {
+  private _setupEvents(): void {
     this.on('dragstart', (e) => {
       if (this._disabled) {
         return false

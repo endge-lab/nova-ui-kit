@@ -71,20 +71,20 @@ const DEFAULT_TOOLTIP_PROPS: TooltipProps = {
 export class RootTooltipControllerNode<E extends EventList = Record<string, any>> extends NovaNode<E> {
   readonly [NOVA_UI_ROOT_TARGET] = true as const
 
-  private readonly sources = new Map<string, RegisteredTooltipSource>()
-  private readonly definitions = new Map<string, TooltipDefinition>()
-  private readonly managedChildren: Array<NovaNode<E>> = []
-  private activeTooltip: ActiveTooltip | null = null
-  private activeTargetKey = ''
-  private openTimer = 0
-  private hideTimer = 0
-  private mutedUntil = 0
+  private readonly _sources = new Map<string, RegisteredTooltipSource>()
+  private readonly _definitions = new Map<string, TooltipDefinition>()
+  private readonly _managedChildren: Array<NovaNode<E>> = []
+  private _activeTooltip: ActiveTooltip | null = null
+  private _activeTargetKey = ''
+  private _openTimer = 0
+  private _hideTimer = 0
+  private _mutedUntil = 0
 
   /** Создает controller-node и размещает его поверх Root. */
   constructor(
     app: NovaApp<E>,
     surface: NovaSurface<E>,
-    private readonly ownerRoot?: NovaNode<E> & NovaUiRootTarget,
+    private readonly _ownerRoot?: NovaNode<E> & NovaUiRootTarget,
   ) {
     super(app, surface)
     this.options({
@@ -99,15 +99,15 @@ export class RootTooltipControllerNode<E extends EventList = Record<string, any>
 
   /** Проксирует Root API для UI Kit компонентов внутри tooltip portal. */
   getApi(): ReturnType<NovaUiRootTarget['getApi']> {
-    if (!this.ownerRoot) {
+    if (!this._ownerRoot) {
       throw new Error('[Nova UI Kit] Tooltip portal is not attached to Root')
     }
-    return this.ownerRoot.getApi()
+    return this._ownerRoot.getApi()
   }
 
   /** Проксирует style cascade refresh для UI Kit компонентов внутри tooltip portal. */
   refreshStyleCascade(): void {
-    this.ownerRoot?.refreshStyleCascade()
+    this._ownerRoot?.refreshStyleCascade()
   }
 
   /** Синхронизирует размер controller с Root. */
@@ -117,45 +117,45 @@ export class RootTooltipControllerNode<E extends EventList = Record<string, any>
 
   /** Регистрирует definitions из одного Tooltips source. */
   registerDefinitions(sourceId: string, definitions: Array<TooltipDefinition>): void {
-    this.sources.set(sourceId, { sourceId, definitions })
-    this.rebuildDefinitions()
+    this._sources.set(sourceId, { sourceId, definitions })
+    this._rebuildDefinitions()
   }
 
   /** Удаляет definitions одного Tooltips source. */
   unregisterDefinitions(sourceId: string): void {
-    this.sources.delete(sourceId)
-    this.rebuildDefinitions()
+    this._sources.delete(sourceId)
+    this._rebuildDefinitions()
   }
 
   /** Обрабатывает pointer move на уровне Root capture path. */
   handlePointerMove(event: MouseEvent): void {
-    if (Date.now() < this.mutedUntil) {
+    if (Date.now() < this._mutedUntil) {
       this.closeNow()
       return
     }
 
     const { x, y } = this.nova.events.getCanvasMousePosition(event)
     const target = this.nova.events.hitTest(x, y)
-    const resolution = this.resolveTargetTooltip(target, x, y, event)
+    const resolution = this._resolveTargetTooltip(target, x, y, event)
     if (!resolution || !resolution.tooltip) {
-      this.scheduleClose()
+      this._scheduleClose()
       return
     }
 
     const normalized = normalizeTooltipInput(resolution.tooltip)
     if (!normalized) {
-      this.scheduleClose()
+      this._scheduleClose()
       return
     }
 
     const anchor = resolution.rect ?? nodeWorldRect(target)
     if (!anchor) {
-      this.scheduleClose()
+      this._scheduleClose()
       return
     }
 
     const type = normalized.type ?? 'default'
-    const definition = this.definitions.get(type) ?? this.definitions.get('default')
+    const definition = this._definitions.get(type) ?? this._definitions.get('default')
     const props = normalizeTooltipProps({
       ...DEFAULT_TOOLTIP_PROPS,
       ...(definition?.props ?? {}),
@@ -175,25 +175,25 @@ export class RootTooltipControllerNode<E extends EventList = Record<string, any>
     ].join(':')
     const slotContext = createSlotContext(type, normalized, target, resolution, anchor, x, y)
 
-    if (this.activeTargetKey === targetKey && this.activeTooltip) {
-      this.activeTooltip = {
+    if (this._activeTargetKey === targetKey && this._activeTooltip) {
+      this._activeTooltip = {
         key: targetKey,
         props,
         slot: definition?.slot,
         slotContext,
         anchor,
       }
-      if (this.activeTooltip.props.followCursor || this.activeTooltip.props.placement === 'cursor') {
+      if (this._activeTooltip.props.followCursor || this._activeTooltip.props.placement === 'cursor') {
         this.dirty({ render: true, update: true })
       }
       return
     }
 
-    window.clearTimeout(this.hideTimer)
-    window.clearTimeout(this.openTimer)
-    this.activeTargetKey = targetKey
-    this.openTimer = window.setTimeout(() => {
-      this.activeTooltip = {
+    window.clearTimeout(this._hideTimer)
+    window.clearTimeout(this._openTimer)
+    this._activeTargetKey = targetKey
+    this._openTimer = window.setTimeout(() => {
+      this._activeTooltip = {
         key: targetKey,
         props,
         slot: definition?.slot,
@@ -206,48 +206,48 @@ export class RootTooltipControllerNode<E extends EventList = Record<string, any>
 
   /** Закрывает tooltip при уходе pointer с canvas. */
   handlePointerLeave(): void {
-    this.scheduleClose()
+    this._scheduleClose()
   }
 
   /** Закрывает активный tooltip без задержки. */
   closeNow(options: { suppressMs?: number } = {}): void {
     if (options.suppressMs && options.suppressMs > 0) {
-      this.mutedUntil = Math.max(this.mutedUntil, Date.now() + options.suppressMs)
+      this._mutedUntil = Math.max(this._mutedUntil, Date.now() + options.suppressMs)
     }
-    window.clearTimeout(this.openTimer)
-    window.clearTimeout(this.hideTimer)
-    if (!this.activeTooltip && !this.activeTargetKey) {
+    window.clearTimeout(this._openTimer)
+    window.clearTimeout(this._hideTimer)
+    if (!this._activeTooltip && !this._activeTargetKey) {
       return
     }
-    this.activeTooltip = null
-    this.activeTargetKey = ''
-    this.reconcileChildren([])
+    this._activeTooltip = null
+    this._activeTargetKey = ''
+    this._reconcileChildren([])
     this.dirty({ update: true, render: true })
   }
 
   /** Обновляет custom slot child tree. */
   update(): void {
-    if (!this.activeTooltip?.slot) {
-      this.reconcileChildren([])
+    if (!this._activeTooltip?.slot) {
+      this._reconcileChildren([])
       return
     }
 
-    const rect = resolveTooltipRect(this.activeTooltip.props, this.activeTooltip.anchor, this.width, this.height)
-    const children = this.activeTooltip.slot(this.activeTooltip.slotContext)
-    this.reconcileChildren([
+    const rect = resolveTooltipRect(this._activeTooltip.props, this._activeTooltip.anchor, this.width, this.height)
+    const children = this._activeTooltip.slot(this._activeTooltip.slotContext)
+    this._reconcileChildren([
       {
         type: SURFACE_SCHEMA_TYPE,
         id: 'nova-root-tooltip-surface',
         props: {
-          ...surfacePropsFromTooltip(this.activeTooltip.props),
+          ...surfacePropsFromTooltip(this._activeTooltip.props),
           x: rect.x,
           y: rect.y,
           width: rect.width,
           height: rect.height,
-          className: this.activeTooltip.props.className,
+          className: this._activeTooltip.props.className,
           attrs: {
-            ...(this.activeTooltip.props.attrs ?? {}),
-            type: this.activeTooltip.props.type,
+            ...(this._activeTooltip.props.attrs ?? {}),
+            type: this._activeTooltip.props.type,
           },
         },
         children,
@@ -257,7 +257,7 @@ export class RootTooltipControllerNode<E extends EventList = Record<string, any>
 
   /** Рисует simple tooltip schema для definitions без custom slot. */
   render(): void {
-    const active = this.activeTooltip
+    const active = this._activeTooltip
     if (!active || active.slot) {
       this.renderer.schema([])
       return
@@ -277,23 +277,23 @@ export class RootTooltipControllerNode<E extends EventList = Record<string, any>
   }
 
   /** Пересобирает итоговую map с учетом порядка source registration. */
-  private rebuildDefinitions(): void {
-    this.definitions.clear()
-    for (const source of this.sources.values()) {
+  private _rebuildDefinitions(): void {
+    this._definitions.clear()
+    for (const source of this._sources.values()) {
       for (const definition of source.definitions) {
-        this.definitions.set(definition.type || 'default', definition)
+        this._definitions.set(definition.type || 'default', definition)
       }
     }
   }
 
   /** Находит tooltip payload у target node или у его внутреннего virtual target resolver. */
-  private resolveTargetTooltip(
+  private _resolveTargetTooltip(
     target: NovaNode<E> | null,
     x: number,
     y: number,
     event: MouseEvent,
   ): TooltipTargetResolution | null {
-    if (!target || this.containsControllerNode(target)) {
+    if (!target || this._containsControllerNode(target)) {
       return null
     }
 
@@ -304,7 +304,7 @@ export class RootTooltipControllerNode<E extends EventList = Record<string, any>
         return null
       }
       visited.add(current)
-      if (this.containsControllerNode(current)) {
+      if (this._containsControllerNode(current)) {
         return null
       }
 
@@ -323,14 +323,14 @@ export class RootTooltipControllerNode<E extends EventList = Record<string, any>
       current = current.parent as NovaNode<E> | undefined
     }
 
-    if (!this.containsRootNode(target)) {
+    if (!this._containsRootNode(target)) {
       return null
     }
     return null
   }
 
   /** Проверяет, относится ли node к overlay subtree самого controller. */
-  private containsControllerNode(node: NovaNode<E>): boolean {
+  private _containsControllerNode(node: NovaNode<E>): boolean {
     let current: NovaNode<E> | undefined = node
     while (current) {
       if (current === this) {
@@ -342,8 +342,8 @@ export class RootTooltipControllerNode<E extends EventList = Record<string, any>
   }
 
   /** Проверяет, принадлежит ли target тому же Root tree, что и controller. */
-  private containsRootNode(node: NovaNode<E>): boolean {
-    const root = this.ownerRoot
+  private _containsRootNode(node: NovaNode<E>): boolean {
+    const root = this._ownerRoot
     let current: NovaNode<E> | undefined = node
     while (current) {
       if (current === root) {
@@ -355,26 +355,26 @@ export class RootTooltipControllerNode<E extends EventList = Record<string, any>
   }
 
   /** Планирует закрытие active tooltip. */
-  private scheduleClose(): void {
-    window.clearTimeout(this.openTimer)
-    if (!this.activeTooltip) {
+  private _scheduleClose(): void {
+    window.clearTimeout(this._openTimer)
+    if (!this._activeTooltip) {
       return
     }
-    const hideDelay = this.activeTooltip.props.hideDelay
-    window.clearTimeout(this.hideTimer)
-    this.hideTimer = window.setTimeout(() => {
-      this.activeTooltip = null
-      this.activeTargetKey = ''
-      this.reconcileChildren([])
+    const hideDelay = this._activeTooltip.props.hideDelay
+    window.clearTimeout(this._hideTimer)
+    this._hideTimer = window.setTimeout(() => {
+      this._activeTooltip = null
+      this._activeTargetKey = ''
+      this._reconcileChildren([])
       this.dirty({ update: true, render: true })
     }, hideDelay)
   }
 
   /** Патчит active slot subtree без накопления детей. */
-  private reconcileChildren(children: Array<NovaElementSchema<any>>): void {
-    const reconciled = reconcileNovaTemplateChildren(this, this.managedChildren, children)
-    this.managedChildren.length = 0
-    this.managedChildren.push(...reconciled.nodes)
+  private _reconcileChildren(children: Array<NovaElementSchema<any>>): void {
+    const reconciled = reconcileNovaTemplateChildren(this, this._managedChildren, children)
+    this._managedChildren.length = 0
+    this._managedChildren.push(...reconciled.nodes)
   }
 }
 

@@ -102,36 +102,36 @@ export class Root<E extends EventList = Record<string, any>>
   readonly [NOVA_UI_LAYOUT_TARGET] = true as const
   readonly [NOVA_UI_ROOT_TARGET] = true as const
 
-  private readonly ownRect = createLayoutRect()
-  private readonly childRect = createLayoutRect()
-  private readonly managedChildren: Array<NovaNode<E>> = []
-  private readonly appliedCascade = new WeakMap<NovaUiStylableNode, AppliedCascadeState>()
-  private readonly appliedAnimations = new WeakMap<NovaUiStylableNode, { signature: string, playback: NovaMotionPlayback }>()
-  private readonly appliedAnimationSignatures = new Map<string, string>()
-  private readonly api: RootApi
-  private layoutDirty = true
-  private externalLayout = false
-  private styleSheet: NovaUiCompiledStyleSheet = createEmptyStyleSheet()
-  private styleSheetGraph: NovaUiStyleSheetGraph | null = null
-  private localStyleSheetAsset: NovaUiStyleSheetAsset | null = null
-  private localRawStyleSheet: NovaUiCompiledStyleSheet = createEmptyStyleSheet()
-  private rawStyleSheet: NovaUiCompiledStyleSheet = createEmptyStyleSheet()
-  private validation: NovaUiStyleValidationResult = createEmptyStyleSheetValidationResult()
-  private effectiveStyleContext = EMPTY_STYLE_CONTEXT
-  private tokenResolver: NovaUiStyleTokenResolver | null = null
-  private resolvedTokenVersion: number | null = null
-  private readonly resolvedTokenValues = new Map<string, string>()
-  private readonly styleCandidateFallbackThreshold = 2_048
-  private activeThemeId: string | null = null
-  private mediaSignature = ''
-  private mediaContext: NovaUiStyleMediaContext = { width: 0, height: 0 }
-  private tooltipController: RootTooltipControllerNode<E> | null = null
-  private dialogController: RootDialogControllerNode<E> | null = null
-  private overlayController: RootOverlayControllerNode<E> | null = null
-  private tooltipSurface: NovaSurface<E> | null = null
-  private dialogSurface: NovaSurface<E> | null = null
-  private overlaySurface: NovaSurface<E> | null = null
-  private readonly disposeGlobalStylesSubscription: () => void
+  private readonly _ownRect = createLayoutRect()
+  private readonly _childRect = createLayoutRect()
+  private readonly _managedChildren: Array<NovaNode<E>> = []
+  private readonly _appliedCascade = new WeakMap<NovaUiStylableNode, AppliedCascadeState>()
+  private readonly _appliedAnimations = new WeakMap<NovaUiStylableNode, { signature: string, playback: NovaMotionPlayback }>()
+  private readonly _appliedAnimationSignatures = new Map<string, string>()
+  private readonly _api: RootApi
+  private _layoutDirty = true
+  private _externalLayout = false
+  private _styleSheet: NovaUiCompiledStyleSheet = createEmptyStyleSheet()
+  private _styleSheetGraph: NovaUiStyleSheetGraph | null = null
+  private _localStyleSheetAsset: NovaUiStyleSheetAsset | null = null
+  private _localRawStyleSheet: NovaUiCompiledStyleSheet = createEmptyStyleSheet()
+  private _rawStyleSheet: NovaUiCompiledStyleSheet = createEmptyStyleSheet()
+  private _validation: NovaUiStyleValidationResult = createEmptyStyleSheetValidationResult()
+  private _effectiveStyleContext = EMPTY_STYLE_CONTEXT
+  private _tokenResolver: NovaUiStyleTokenResolver | null = null
+  private _resolvedTokenVersion: number | null = null
+  private readonly _resolvedTokenValues = new Map<string, string>()
+  private readonly _styleCandidateFallbackThreshold = 2_048
+  private _activeThemeId: string | null = null
+  private _mediaSignature = ''
+  private _mediaContext: NovaUiStyleMediaContext = { width: 0, height: 0 }
+  private _tooltipController: RootTooltipControllerNode<E> | null = null
+  private _dialogController: RootDialogControllerNode<E> | null = null
+  private _overlayController: RootOverlayControllerNode<E> | null = null
+  private _tooltipSurface: NovaSurface<E> | null = null
+  private _dialogSurface: NovaSurface<E> | null = null
+  private _overlaySurface: NovaSurface<E> | null = null
+  private readonly _disposeGlobalStylesSubscription: () => void
 
   /**
    * Создает экземпляр Root и подготавливает базовое состояние.
@@ -148,8 +148,8 @@ export class Root<E extends EventList = Record<string, any>>
     super(app, surface, descriptor, resolvedProps, options)
     this.__type = 'Root'
     this.layoutReady = false
-    this.applyDisplayState()
-    this.api = {
+    this._applyDisplayState()
+    this._api = {
       setStyleSheetSource: source => this.setStyleSheetSource(source),
       setStyleSheetAsset: asset => this.setStyleSheetAsset(asset),
       resetStyleSheet: () => this.resetStyleSheet(),
@@ -157,14 +157,14 @@ export class Root<E extends EventList = Record<string, any>>
       setStyleTokenResolver: resolver => this.setStyleTokenResolver(resolver),
       validateStyleSheet: source => validateNovaUiStyleSheetSource(source),
       setChildren: children => this.setChildren(children),
-      getValidation: () => this.validation,
-      getDiagnostics: () => this.validation.diagnostics,
+      getValidation: () => this._validation,
+      getDiagnostics: () => this._validation.diagnostics,
       getStyleSheetSource: () => this.getStyleSheetSource(),
-      getCompiledStyleSheet: () => this.styleSheet,
-      getStyleMediaContext: () => this.getMediaContext(),
+      getCompiledStyleSheet: () => this._styleSheet,
+      getStyleMediaContext: () => this._getMediaContext(),
       inspectStyleNode: node => this.inspectStyleNode(node),
       relayout: () => this.relayout(),
-      getChildRect: () => this.childRect,
+      getChildRect: () => this._childRect,
       registerTooltipDefinitions: (sourceId, definitions) => this.registerTooltipDefinitions(sourceId, definitions),
       unregisterTooltipDefinitions: sourceId => this.unregisterTooltipDefinitions(sourceId),
       closeTooltip: options => this.closeTooltip(options),
@@ -183,12 +183,12 @@ export class Root<E extends EventList = Record<string, any>>
       updateOverlay: (id, patch) => this.updateOverlay(id, patch),
       getOpenOverlayIds: () => this.getOpenOverlayIds(),
     }
-    this.tokenResolver = app.theme.createTokenResolver()
+    this._tokenResolver = app.theme.createTokenResolver()
     this.addDisposer(app.theme.observe(this, { phase: 'update' }))
-    this.disposeGlobalStylesSubscription = subscribeNovaUiGlobalStyleSheets(app, () => {
-      this.refreshCombinedStyleSheet()
+    this._disposeGlobalStylesSubscription = subscribeNovaUiGlobalStyleSheets(app, () => {
+      this._refreshCombinedStyleSheet()
     })
-    this.applyResolvedRect({
+    this._applyResolvedRect({
       x: resolvedProps.x,
       y: resolvedProps.y,
       width: resolvedProps.width,
@@ -198,10 +198,10 @@ export class Root<E extends EventList = Record<string, any>>
       cursor: resolvedProps.cursor ?? null,
       cursorContext: resolvedProps.cursorContext ?? null,
     })
-    this.effectiveStyleContext = mergeStyleContext(EMPTY_STYLE_CONTEXT, resolvedProps.style)
+    this._effectiveStyleContext = mergeStyleContext(EMPTY_STYLE_CONTEXT, resolvedProps.style)
     this.setStyleSheetSource(resolvedProps.styleSheet)
     const handleTooltipPointerMove = (event: MouseEvent) => this.handleTooltipPointerMove(event)
-    const handleTooltipPointerLeave = () => this.tooltipController?.handlePointerLeave()
+    const handleTooltipPointerLeave = () => this._tooltipController?.handlePointerLeave()
     this.nova.canvas.element.addEventListener('mousemove', handleTooltipPointerMove)
     this.nova.canvas.element.addEventListener('mouseleave', handleTooltipPointerLeave)
     this.addDisposer(() => {
@@ -224,13 +224,13 @@ export class Root<E extends EventList = Record<string, any>>
    * Возвращает значение состояния Root.
    */
   override getApi(): RootApi {
-    return this.api
+    return this._api
   }
 
   /** Принимает итоговый rect от внешнего runtime и запускает пересчет Root children. */
   applyLayoutRect(rect: NovaUiLayoutRect): boolean {
-    this.externalLayout = true
-    const changed = this.applyResolvedRect(rect)
+    this._externalLayout = true
+    const changed = this._applyResolvedRect(rect)
     if (changed && this.layoutReady) {
       this.update()
     }
@@ -248,52 +248,52 @@ export class Root<E extends EventList = Record<string, any>>
       ? validateNovaUiStyleSheetSource(source)
       : createEmptyStyleSheetValidationResult(source)
 
-    this.validation = validation
-    this.localRawStyleSheet = validation.ok && validation.styleSheet
+    this._validation = validation
+    this._localRawStyleSheet = validation.ok && validation.styleSheet
       ? validation.styleSheet
       : createEmptyStyleSheet(source)
-    this.localStyleSheetAsset = null
+    this._localStyleSheetAsset = null
     this.props.styleSheet = source
-    this.refreshCombinedStyleSheet()
+    this._refreshCombinedStyleSheet()
   }
 
   /** Применяет precompiled stylesheet asset без повторного parse source. */
   setStyleSheetAsset(asset: NovaUiStyleSheetAsset): void {
-    this.validation = {
+    this._validation = {
       ok: asset.ok,
       styleSheet: asset.styleSheet,
       diagnostics: asset.diagnostics,
     }
-    this.localRawStyleSheet = asset.ok && asset.styleSheet
+    this._localRawStyleSheet = asset.ok && asset.styleSheet
       ? asset.styleSheet
       : createEmptyStyleSheet(asset.source)
-    this.localStyleSheetAsset = asset
+    this._localStyleSheetAsset = asset
     this.props.styleSheet = asset
-    this.refreshCombinedStyleSheet()
+    this._refreshCombinedStyleSheet()
   }
 
   /** Обновляет token-resolved stylesheet после смены темы или token context. */
   refreshStyleTokens(): void {
-    const changedTokens = this.collectChangedResolvedTokens()
-    this.styleSheet = this.resolveStyleSheetTokens(this.rawStyleSheet)
+    const changedTokens = this._collectChangedResolvedTokens()
+    this._styleSheet = this._resolveStyleSheetTokens(this._rawStyleSheet)
     if (changedTokens.length > 0) {
       bumpNovaUiStyleTokenVersions(this.nova, changedTokens)
     }
     if (changedTokens.length > 0) {
       bumpNovaUiStyleSheetVersion(this.nova)
     }
-    this.applyPlannedCascade()
+    this._applyPlannedCascade()
   }
 
   /** Пере-применяет selector cascade после изменения вложенного template дерева. */
   refreshStyleCascade(): void {
-    this.applyCascade()
+    this._applyCascade()
   }
 
   /** Задает resolver theme/CSS tokens для Nova stylesheet. */
   setStyleTokenResolver(resolver: NovaUiStyleTokenResolver | null): void {
-    this.tokenResolver = resolver
-    this.resolvedTokenVersion = null
+    this._tokenResolver = resolver
+    this._resolvedTokenVersion = null
     this.refreshStyleTokens()
   }
 
@@ -304,7 +304,7 @@ export class Root<E extends EventList = Record<string, any>>
 
   /** Возвращает source активного stylesheet для debug-инспектора. */
   getStyleSheetSource(): string {
-    return this.rawStyleSheet.source ?? ''
+    return this._rawStyleSheet.source ?? ''
   }
 
   /** Возвращает trace selector cascade для выбранной UI Kit node. */
@@ -317,8 +317,8 @@ export class Root<E extends EventList = Record<string, any>>
       return null
     }
 
-    const rules = matchStyleRules(target, this.styleSheet, this.getMediaContext())
-    const state = this.resolveAppliedState(target)
+    const rules = matchStyleRules(target, this._styleSheet, this._getMediaContext())
+    const state = this._resolveAppliedState(target)
 
     return {
       rootComponentId: this.componentId,
@@ -338,18 +338,18 @@ export class Root<E extends EventList = Record<string, any>>
       baselineProps: { ...state.baseline },
       currentProps: { ...target.getProps() },
       appliedKeys: [...state.keys],
-      diagnostics: this.validation.diagnostics.map(item => ({ ...item })),
+      diagnostics: this._validation.diagnostics.map(item => ({ ...item })),
     }
   }
 
   /** Заменяет managed children и применяет layout/style одним проходом. */
   setChildren(children: Array<RootChildSchema>): void {
-    const reconciled = reconcileNovaTemplateChildren(this, this.managedChildren, children)
-    this.managedChildren.length = 0
-    this.managedChildren.push(...reconciled.nodes)
+    const reconciled = reconcileNovaTemplateChildren(this, this._managedChildren, children)
+    this._managedChildren.length = 0
+    this._managedChildren.push(...reconciled.nodes)
 
-    this.layoutDirty = true
-    this.applyCascade()
+    this._layoutDirty = true
+    this._applyCascade()
     if (this.layoutReady) {
       this.update()
     }
@@ -358,110 +358,110 @@ export class Root<E extends EventList = Record<string, any>>
 
   /** Принудительно помечает Root layout грязным без изменения props. */
   relayout(): void {
-    this.layoutDirty = true
+    this._layoutDirty = true
     this.dirty({ update: true, render: true })
   }
 
   /** Регистрирует tooltip definitions из дочернего Tooltips source. */
   registerTooltipDefinitions(sourceId: string, definitions: Array<TooltipDefinition>): void {
-    this.ensureTooltipController().registerDefinitions(sourceId, definitions)
+    this._ensureTooltipController().registerDefinitions(sourceId, definitions)
   }
 
   /** Удаляет tooltip definitions дочернего Tooltips source. */
   unregisterTooltipDefinitions(sourceId: string): void {
-    this.tooltipController?.unregisterDefinitions(sourceId)
+    this._tooltipController?.unregisterDefinitions(sourceId)
   }
 
   /** Закрывает активный tooltip без ожидания pointer leave. */
   closeTooltip(options: { suppressMs?: number } = {}): void {
-    this.tooltipController?.closeNow(options)
+    this._tooltipController?.closeNow(options)
   }
 
   /** Регистрирует dialog definitions из дочернего Dialogs source. */
   registerDialogDefinitions(sourceId: string, definitions: Array<DialogDefinition>): void {
-    this.ensureDialogController().registerDefinitions(sourceId, definitions)
+    this._ensureDialogController().registerDefinitions(sourceId, definitions)
   }
 
   /** Удаляет dialog definitions дочернего Dialogs source. */
   unregisterDialogDefinitions(sourceId: string): void {
-    this.dialogController?.unregisterDefinitions(sourceId)
+    this._dialogController?.unregisterDefinitions(sourceId)
   }
 
   /** Открывает registry dialog через единый overlay-controller. */
   openDialog(input: DialogInput, payload?: Record<string, unknown>): string {
-    return this.ensureDialogController().openDialog(input, payload)
+    return this._ensureDialogController().openDialog(input, payload)
   }
 
   /** Закрывает registry dialog по id или верхний dialog. */
   closeDialog(id?: string, event?: Event): void {
-    this.dialogController?.closeDialog(id, event)
+    this._dialogController?.closeDialog(id, event)
   }
 
   /** Закрывает все registry dialogs текущего Root. */
   closeDialogs(event?: Event): void {
-    this.dialogController?.closeDialogs(event)
+    this._dialogController?.closeDialogs(event)
   }
 
   /** Обновляет открытый registry dialog без пересоздания controller. */
   updateDialog(id: string, patch: DialogProps & Record<string, unknown>): void {
-    this.dialogController?.updateDialog(id, patch)
+    this._dialogController?.updateDialog(id, patch)
   }
 
   /** Возвращает ids открытых registry dialogs. */
   getOpenDialogIds(): Array<string> {
-    return this.dialogController?.getOpenDialogIds() ?? []
+    return this._dialogController?.getOpenDialogIds() ?? []
   }
 
   /** Регистрирует overlay definitions из дочернего Overlays source. */
   registerOverlayDefinitions(sourceId: string, definitions: Array<OverlayDefinition>): void {
-    this.ensureOverlayController().registerDefinitions(sourceId, definitions)
+    this._ensureOverlayController().registerDefinitions(sourceId, definitions)
   }
 
   /** Удаляет overlay definitions дочернего Overlays source. */
   unregisterOverlayDefinitions(sourceId: string): void {
-    this.overlayController?.unregisterDefinitions(sourceId)
+    this._overlayController?.unregisterDefinitions(sourceId)
   }
 
   /** Открывает registry overlay через единый overlay-controller. */
   openOverlay(input: OverlayInput, payload?: Record<string, unknown>): string {
-    return this.ensureOverlayController().openOverlay(input, payload)
+    return this._ensureOverlayController().openOverlay(input, payload)
   }
 
   /** Закрывает registry overlay по id или верхний overlay. */
   closeOverlay(id?: string, event?: Event): void {
-    this.overlayController?.closeOverlay(id, event)
+    this._overlayController?.closeOverlay(id, event)
   }
 
   /** Закрывает все registry overlays текущего Root. */
   closeOverlays(event?: Event): void {
-    this.overlayController?.closeOverlays(event)
+    this._overlayController?.closeOverlays(event)
   }
 
   /** Обновляет открытый registry overlay без пересоздания controller. */
   updateOverlay(id: string, patch: OverlayProps & Record<string, unknown>): void {
-    this.overlayController?.updateOverlay(id, patch)
+    this._overlayController?.updateOverlay(id, patch)
   }
 
   /** Возвращает ids открытых registry overlays. */
   getOpenOverlayIds(): Array<string> {
-    return this.overlayController?.getOpenOverlayIds() ?? []
+    return this._overlayController?.getOpenOverlayIds() ?? []
   }
 
   /** Делегирует pointer tracking controller-у, создавая его только для tooltip targets. */
   handleTooltipPointerMove(event: MouseEvent): void {
-    if (!this.tooltipController && !this.hasTooltipTargetAt(event)) {
+    if (!this._tooltipController && !this._hasTooltipTargetAt(event)) {
       return
     }
-    this.ensureTooltipController().handlePointerMove(event)
+    this._ensureTooltipController().handlePointerMove(event)
   }
 
   /**
    * Обновляет runtime-состояние Root.
    */
   update(): void {
-    this.refreshStyleTokensIfNeeded()
-    this.refreshMediaCascadeIfNeeded()
-    if (!this.layoutDirty) {
+    this._refreshStyleTokensIfNeeded()
+    this._refreshMediaCascadeIfNeeded()
+    if (!this._layoutDirty) {
       return
     }
 
@@ -473,12 +473,12 @@ export class Root<E extends EventList = Record<string, any>>
       height: Math.max(0, this.height - padding.top - padding.bottom),
     }
 
-    if (!rectEquals(this.childRect, nextRect)) {
-      copyRect(this.childRect, nextRect)
+    if (!rectEquals(this._childRect, nextRect)) {
+      copyRect(this._childRect, nextRect)
     }
 
     if (this.width > 0 && this.height > 0) {
-      for (const child of this.managedChildren) {
+      for (const child of this._managedChildren) {
         if (!isNovaUiLayoutDisplayed(child)) {
           continue
         }
@@ -488,12 +488,12 @@ export class Root<E extends EventList = Record<string, any>>
           : undefined
         const rect = isNovaUiOutOfFlowPosition(layout.position)
           ? resolveNovaUiPositionedRect(
-              this.childRect,
+              this._childRect,
               { x: child.x, y: child.y, width: measured?.width ?? child.width, height: measured?.height ?? child.height },
               layout,
               child,
             )
-          : this.childRect
+          : this._childRect
         const changed = applyNodeLayoutRect(child, rect)
         if (changed) {
           child.dirty({ update: true, render: true })
@@ -501,10 +501,10 @@ export class Root<E extends EventList = Record<string, any>>
       }
     }
 
-    this.tooltipController?.syncRootRect(this.width, this.height)
-    this.dialogController?.syncRootRect(this.width, this.height)
-    this.syncPortalSurfaces()
-    this.layoutDirty = false
+    this._tooltipController?.syncRootRect(this.width, this.height)
+    this._dialogController?.syncRootRect(this.width, this.height)
+    this._syncPortalSurfaces()
+    this._layoutDirty = false
   }
 
   /**
@@ -554,12 +554,12 @@ export class Root<E extends EventList = Record<string, any>>
    */
   protected override onPropsChanged(changedKeys: Array<keyof RootResolvedProps>): void {
     this.props = normalizeRootProps(this.props)
-    this.applyDisplayState()
+    this._applyDisplayState()
     if (hasRootLayoutChanges(changedKeys)) {
-      this.layoutDirty = true
+      this._layoutDirty = true
     }
-    if (!this.externalLayout && hasRootGeometryChanges(changedKeys)) {
-      this.applyResolvedRect({
+    if (!this._externalLayout && hasRootGeometryChanges(changedKeys)) {
+      this._applyResolvedRect({
         x: this.props.x,
         y: this.props.y,
         width: this.props.width,
@@ -573,9 +573,9 @@ export class Root<E extends EventList = Record<string, any>>
       bumpNovaUiStyleSheetVersion(this.nova)
     }
     if (changedKeys.includes('style')) {
-      const previous = this.effectiveStyleContext
-      this.effectiveStyleContext = mergeStyleContext(EMPTY_STYLE_CONTEXT, this.props.style)
-      this.propagateStyleContext(styleContextChangedMask(previous, this.effectiveStyleContext))
+      const previous = this._effectiveStyleContext
+      this._effectiveStyleContext = mergeStyleContext(EMPTY_STYLE_CONTEXT, this.props.style)
+      this._propagateStyleContext(styleContextChangedMask(previous, this._effectiveStyleContext))
     }
     if (changedKeys.includes('cursor') || changedKeys.includes('cursorContext')) {
       this.options({
@@ -588,12 +588,12 @@ export class Root<E extends EventList = Record<string, any>>
   /**
    * Применяет подготовленное состояние Root.
    */
-  private applyResolvedRect(rect: NovaUiLayoutRect): boolean {
-    if (rectEquals(this.ownRect, rect)) {
+  private _applyResolvedRect(rect: NovaUiLayoutRect): boolean {
+    if (rectEquals(this._ownRect, rect)) {
       return false
     }
 
-    copyRect(this.ownRect, rect)
+    copyRect(this._ownRect, rect)
     super.options({
       x: rect.x,
       y: rect.y,
@@ -602,55 +602,55 @@ export class Root<E extends EventList = Record<string, any>>
       cursor: this.props.cursor ?? null,
       cursorContext: this.props.cursorContext ?? null,
     })
-    this.tooltipController?.syncRootRect(rect.width, rect.height)
-    this.overlayController?.syncRootRect(rect.width, rect.height)
-    this.dialogController?.syncRootRect(rect.width, rect.height)
-    this.syncPortalSurfaces()
-    this.layoutDirty = true
+    this._tooltipController?.syncRootRect(rect.width, rect.height)
+    this._overlayController?.syncRootRect(rect.width, rect.height)
+    this._dialogController?.syncRootRect(rect.width, rect.height)
+    this._syncPortalSurfaces()
+    this._layoutDirty = true
     this.dirty({ update: true, matrix: true, render: true })
     return true
   }
 
   /** Создает единственный controller tooltip-ов для текущего Root. */
-  private ensureTooltipController(): RootTooltipControllerNode<E> {
-    if (!this.tooltipController) {
-      const surface = this.ensurePortalSurface('tooltip', 50_000)
-      this.tooltipController = new RootTooltipControllerNode(this.nova, surface, this)
-      surface.addChild(this.tooltipController)
-      this.tooltipController.syncRootRect(this.width, this.height)
+  private _ensureTooltipController(): RootTooltipControllerNode<E> {
+    if (!this._tooltipController) {
+      const surface = this._ensurePortalSurface('tooltip', 50_000)
+      this._tooltipController = new RootTooltipControllerNode(this.nova, surface, this)
+      surface.addChild(this._tooltipController)
+      this._tooltipController.syncRootRect(this.width, this.height)
     }
-    return this.tooltipController
+    return this._tooltipController
   }
 
   /** Создает единственный controller диалогов для текущего Root. */
-  private ensureDialogController(): RootDialogControllerNode<E> {
-    if (!this.dialogController) {
-      const surface = this.ensurePortalSurface('dialog', 30_000)
-      this.dialogController = new RootDialogControllerNode(this.nova, surface, this)
-      surface.addChild(this.dialogController)
-      this.dialogController.syncRootRect(this.width, this.height)
+  private _ensureDialogController(): RootDialogControllerNode<E> {
+    if (!this._dialogController) {
+      const surface = this._ensurePortalSurface('dialog', 30_000)
+      this._dialogController = new RootDialogControllerNode(this.nova, surface, this)
+      surface.addChild(this._dialogController)
+      this._dialogController.syncRootRect(this.width, this.height)
     }
-    return this.dialogController
+    return this._dialogController
   }
 
   /** Создает единственный controller overlays для текущего Root. */
-  private ensureOverlayController(): RootOverlayControllerNode<E> {
-    if (!this.overlayController) {
-      const surface = this.ensurePortalSurface('overlay', 40_000)
-      this.overlayController = new RootOverlayControllerNode(this.nova, surface, this)
-      surface.addChild(this.overlayController)
-      this.overlayController.syncRootRect(this.width, this.height)
+  private _ensureOverlayController(): RootOverlayControllerNode<E> {
+    if (!this._overlayController) {
+      const surface = this._ensurePortalSurface('overlay', 40_000)
+      this._overlayController = new RootOverlayControllerNode(this.nova, surface, this)
+      surface.addChild(this._overlayController)
+      this._overlayController.syncRootRect(this.width, this.height)
     }
-    return this.overlayController
+    return this._overlayController
   }
 
   /** Создает отдельный top-level surface для portal-контроллеров. */
-  private ensurePortalSurface(kind: 'dialog' | 'overlay' | 'tooltip', zIndex: number): NovaSurface<E> {
+  private _ensurePortalSurface(kind: 'dialog' | 'overlay' | 'tooltip', zIndex: number): NovaSurface<E> {
     const current = kind === 'dialog'
-      ? this.dialogSurface
+      ? this._dialogSurface
       : kind === 'overlay'
-        ? this.overlaySurface
-        : this.tooltipSurface
+        ? this._overlaySurface
+        : this._tooltipSurface
     if (current) {
       current.options({ width: this.width, height: this.height, zIndex, interactive: false })
       return current
@@ -665,29 +665,29 @@ export class Root<E extends EventList = Record<string, any>>
     })
 
     if (kind === 'dialog') {
-      this.dialogSurface = surface
+      this._dialogSurface = surface
     }
     else if (kind === 'overlay') {
-      this.overlaySurface = surface
+      this._overlaySurface = surface
     }
-    else { this.tooltipSurface = surface }
+    else { this._tooltipSurface = surface }
 
     return surface
   }
 
   /** Синхронизирует portal-surfaces с размером Root. */
-  private syncPortalSurfaces(): void {
-    this.dialogSurface?.options({ width: this.width, height: this.height })
-    this.overlaySurface?.options({ width: this.width, height: this.height })
-    this.tooltipSurface?.options({ width: this.width, height: this.height })
+  private _syncPortalSurfaces(): void {
+    this._dialogSurface?.options({ width: this.width, height: this.height })
+    this._overlaySurface?.options({ width: this.width, height: this.height })
+    this._tooltipSurface?.options({ width: this.width, height: this.height })
   }
 
   /** Проверяет наличие tooltip target до создания overlay controller. */
-  private hasTooltipTargetAt(event: MouseEvent): boolean {
+  private _hasTooltipTargetAt(event: MouseEvent): boolean {
     const { x, y } = this.nova.events.getCanvasMousePosition(event)
     const target = this.nova.events.hitTest(x, y)
 
-    if (!target || target === this || target === this.tooltipController) {
+    if (!target || target === this || target === this._tooltipController) {
       return false
     }
 
@@ -698,7 +698,7 @@ export class Root<E extends EventList = Record<string, any>>
         return false
       }
       visited.add(current)
-      if (current === this || current === this.tooltipController) {
+      if (current === this || current === this._tooltipController) {
         return false
       }
 
@@ -725,46 +725,46 @@ export class Root<E extends EventList = Record<string, any>>
   /**
    * Синхронизирует актуальное состояние Root.
    */
-  private refreshCombinedStyleSheet(): void {
+  private _refreshCombinedStyleSheet(): void {
     const globalAsset = getNovaUiGlobalStyleSheet(this.nova)
     const builtInStyleSheet = getNovaUiBuiltInUtilityStyleSheet()
     const activeThemeId = this.nova.theme.active()
     const globalThemeStyleSheet = resolveActiveNovaUiThemeStyleSheet(globalAsset, activeThemeId)
-    const localThemeStyleSheet = resolveActiveNovaUiThemeStyleSheet(this.localStyleSheetAsset, activeThemeId)
+    const localThemeStyleSheet = resolveActiveNovaUiThemeStyleSheet(this._localStyleSheetAsset, activeThemeId)
     const styleSheets = [
       builtInStyleSheet,
       globalAsset.styleSheet,
       globalThemeStyleSheet,
-      this.localRawStyleSheet,
+      this._localRawStyleSheet,
       localThemeStyleSheet,
     ].filter((sheet): sheet is NovaUiCompiledStyleSheet => !!sheet)
 
-    this.rawStyleSheet = mergeNovaUiStyleSheets(styleSheets, [
+    this._rawStyleSheet = mergeNovaUiStyleSheets(styleSheets, [
       builtInStyleSheet.source,
       globalAsset.source,
       globalThemeStyleSheet?.source,
-      this.localRawStyleSheet.source,
+      this._localRawStyleSheet.source,
       localThemeStyleSheet?.source,
     ].filter(Boolean).join('\n'))
-    this.activeThemeId = activeThemeId
-    this.collectChangedResolvedTokens()
-    this.styleSheet = this.resolveStyleSheetTokens(this.rawStyleSheet)
+    this._activeThemeId = activeThemeId
+    this._collectChangedResolvedTokens()
+    this._styleSheet = this._resolveStyleSheetTokens(this._rawStyleSheet)
     bumpNovaUiStyleSheetVersion(this.nova)
-    this.applyPlannedCascade()
+    this._applyPlannedCascade()
   }
 
   /**
    * Синхронизирует актуальное состояние Root.
    */
-  private refreshStyleTokensIfNeeded(): void {
-    const version = this.tokenResolver?.version ?? null
+  private _refreshStyleTokensIfNeeded(): void {
+    const version = this._tokenResolver?.version ?? null
     const activeThemeId = this.nova.theme.active()
-    if (activeThemeId !== this.activeThemeId) {
-      this.refreshCombinedStyleSheet()
+    if (activeThemeId !== this._activeThemeId) {
+      this._refreshCombinedStyleSheet()
       return
     }
 
-    if (version === this.resolvedTokenVersion) {
+    if (version === this._resolvedTokenVersion) {
       return
     }
 
@@ -774,62 +774,62 @@ export class Root<E extends EventList = Record<string, any>>
   /**
    * Нормализует и возвращает итоговое значение Root.
    */
-  private resolveStyleSheetTokens(sheet: NovaUiCompiledStyleSheet): NovaUiCompiledStyleSheet {
-    this.resolvedTokenVersion = this.tokenResolver?.version ?? null
-    return resolveNovaUiStyleSheetTokens(sheet, this.tokenResolver)
+  private _resolveStyleSheetTokens(sheet: NovaUiCompiledStyleSheet): NovaUiCompiledStyleSheet {
+    this._resolvedTokenVersion = this._tokenResolver?.version ?? null
+    return resolveNovaUiStyleSheetTokens(sheet, this._tokenResolver)
   }
 
   /**
    * Применяет подготовленное состояние Root.
    */
-  private applyCascade(): void {
-    this.mediaSignature = getNovaUiStyleMediaSignature(this.styleSheet, this.getMediaContext())
-    this.mediaContext = this.getMediaContext()
+  private _applyCascade(): void {
+    this._mediaSignature = getNovaUiStyleMediaSignature(this._styleSheet, this._getMediaContext())
+    this._mediaContext = this._getMediaContext()
     this.traverseAll((node) => {
       if (isStylableNode(node)) {
-        this.applyCascadeToNode(node)
+        this._applyCascadeToNode(node)
       }
     })
 
-    const previous = this.effectiveStyleContext
-    this.effectiveStyleContext = mergeStyleContext(EMPTY_STYLE_CONTEXT, this.props.style)
-    this.propagateStyleContext(styleContextChangedMask(previous, this.effectiveStyleContext) || NovaUiStyleMask.AllText)
-    this.layoutDirty = true
+    const previous = this._effectiveStyleContext
+    this._effectiveStyleContext = mergeStyleContext(EMPTY_STYLE_CONTEXT, this.props.style)
+    this._propagateStyleContext(styleContextChangedMask(previous, this._effectiveStyleContext) || NovaUiStyleMask.AllText)
+    this._layoutDirty = true
     this.dirty({ update: true, render: true })
   }
 
   /**
    * Применяет selector cascade через indexed invalidation plan.
    */
-  private applyPlannedCascade(): void {
+  private _applyPlannedCascade(): void {
     const registry = createNovaUiStyleIdentityRegistry(this)
-    const nextGraph = createNovaUiStyleSheetGraph(this.styleSheet)
-    const plan = planNovaUiStyleSheetInvalidation(this.styleSheetGraph, nextGraph, registry, {
-      candidateFallbackThreshold: this.styleCandidateFallbackThreshold,
+    const nextGraph = createNovaUiStyleSheetGraph(this._styleSheet)
+    const plan = planNovaUiStyleSheetInvalidation(this._styleSheetGraph, nextGraph, registry, {
+      candidateFallbackThreshold: this._styleCandidateFallbackThreshold,
     })
-    this.styleSheetGraph = nextGraph
-    this.applyCascadePlan(plan)
+    this._styleSheetGraph = nextGraph
+    this._applyCascadePlan(plan)
   }
 
   /**
    * Применяет selector cascade только для candidates или включает safe full fallback.
    */
-  private applyCascadePlan(plan: NovaUiStyleInvalidationPlan): void {
+  private _applyCascadePlan(plan: NovaUiStyleInvalidationPlan): void {
     if (plan.fallback) {
-      this.applyCascade()
+      this._applyCascade()
       return
     }
 
-    this.mediaSignature = getNovaUiStyleMediaSignature(this.styleSheet, this.getMediaContext())
-    this.mediaContext = this.getMediaContext()
+    this._mediaSignature = getNovaUiStyleMediaSignature(this._styleSheet, this._getMediaContext())
+    this._mediaContext = this._getMediaContext()
     for (const node of plan.candidates) {
-      this.applyCascadeToNode(node)
+      this._applyCascadeToNode(node)
     }
 
-    const previous = this.effectiveStyleContext
-    this.effectiveStyleContext = mergeStyleContext(EMPTY_STYLE_CONTEXT, this.props.style)
-    this.propagateStyleContext(styleContextChangedMask(previous, this.effectiveStyleContext))
-    this.layoutDirty = true
+    const previous = this._effectiveStyleContext
+    this._effectiveStyleContext = mergeStyleContext(EMPTY_STYLE_CONTEXT, this.props.style)
+    this._propagateStyleContext(styleContextChangedMask(previous, this._effectiveStyleContext))
+    this._layoutDirty = true
     if (plan.candidates.size > 0 || plan.changedTokens.size > 0 || plan.changedRuleCount > 0 || plan.changedMediaAtoms.size > 0) {
       this.dirty({ update: true, render: true })
     }
@@ -838,14 +838,14 @@ export class Root<E extends EventList = Record<string, any>>
   /**
    * Применяет подготовленное состояние Root.
    */
-  private applyCascadeToNode(node: NovaUiStylableNode): void {
-    const rules = matchStyleRules(node, this.styleSheet, this.getMediaContext())
+  private _applyCascadeToNode(node: NovaUiStylableNode): void {
+    const rules = matchStyleRules(node, this._styleSheet, this._getMediaContext())
     const utilityDeclarations = resolveNovaUiClassUtilities(readNovaUiNodeProps(node).className)
     const declarations = mergeStyleDeclarations(utilityDeclarations, mergeRuleDeclarations(rules))
-    const patch = this.createCascadePatch(node, declarations)
+    const patch = this._createCascadePatch(node, declarations)
     setNovaUiNodeLayoutIntent(node, declarations.layout)
     if (declarations.layout) {
-      this.markLayoutAncestorsDirty(node)
+      this._markLayoutAncestorsDirty(node)
     }
     if (!patch) {
       return
@@ -853,18 +853,18 @@ export class Root<E extends EventList = Record<string, any>>
 
     node.setProps(patch)
     if ('display' in patch) {
-      this.markLayoutAncestorsDirty(node)
+      this._markLayoutAncestorsDirty(node)
     }
   }
 
   /**
    * Создает runtime-сущность Root.
    */
-  private createCascadePatch(
+  private _createCascadePatch(
     node: NovaUiStylableNode,
     declarations: NovaUiStyleDeclarations,
   ): Record<string, unknown> | null {
-    const state = this.resolveAppliedState(node)
+    const state = this._resolveAppliedState(node)
     const patch: Record<string, unknown> = {}
     const nextKeys = new Set<string>()
 
@@ -911,7 +911,7 @@ export class Root<E extends EventList = Record<string, any>>
       patch.cursor = declarations.cursor
     }
     if (declarations.animation !== undefined) {
-      this.applyKeyframeAnimation(node, declarations.animation)
+      this._applyKeyframeAnimation(node, declarations.animation)
     }
     if (supportsLayoutDeclarations(node)) {
       for (const key of ['gap', 'rowGap', 'columnGap'] as const) {
@@ -957,11 +957,11 @@ export class Root<E extends EventList = Record<string, any>>
   /**
    * Запускает class/keyframes animation один раз на стабильную signature.
    */
-  private applyKeyframeAnimation(
+  private _applyKeyframeAnimation(
     node: NovaUiStylableNode,
     animation: NonNullable<NovaUiStyleDeclarations['animation']>,
   ): void {
-    const keyframes = this.styleSheet.keyframes.get(animation.name)
+    const keyframes = this._styleSheet.keyframes.get(animation.name)
     if (!keyframes || keyframes.frames.length < 2) {
       return
     }
@@ -974,10 +974,10 @@ export class Root<E extends EventList = Record<string, any>>
 
     const signature = `${animation.name}:${animation.duration ?? 180}:${animation.delay ?? 0}:${animation.easing ?? 'outCubic'}`
     const persistentKey = node.componentId
-    if (this.appliedAnimationSignatures.get(persistentKey) === signature) {
+    if (this._appliedAnimationSignatures.get(persistentKey) === signature) {
       return
     }
-    const current = this.appliedAnimations.get(node)
+    const current = this._appliedAnimations.get(node)
     if (current?.signature === signature) {
       return
     }
@@ -995,15 +995,15 @@ export class Root<E extends EventList = Record<string, any>>
       delay: animation.delay ?? 0,
       easing: animation.easing ?? 'outCubic',
     })
-    this.appliedAnimations.set(node, { signature, playback })
-    this.appliedAnimationSignatures.set(persistentKey, signature)
+    this._appliedAnimations.set(node, { signature, playback })
+    this._appliedAnimationSignatures.set(persistentKey, signature)
   }
 
   /**
    * Нормализует и возвращает итоговое значение Root.
    */
-  private resolveAppliedState(node: NovaUiStylableNode): AppliedCascadeState {
-    const existing = this.appliedCascade.get(node)
+  private _resolveAppliedState(node: NovaUiStylableNode): AppliedCascadeState {
+    const existing = this._appliedCascade.get(node)
     if (existing) {
       return existing
     }
@@ -1034,33 +1034,33 @@ export class Root<E extends EventList = Record<string, any>>
       },
       keys: new Set(),
     }
-    this.appliedCascade.set(node, state)
+    this._appliedCascade.set(node, state)
     return state
   }
 
   /**
    * Синхронизирует актуальное состояние Root.
    */
-  private refreshMediaCascadeIfNeeded(): void {
-    const nextContext = this.getMediaContext()
-    const nextSignature = getNovaUiStyleMediaSignature(this.styleSheet, nextContext)
-    if (nextSignature === this.mediaSignature) {
+  private _refreshMediaCascadeIfNeeded(): void {
+    const nextContext = this._getMediaContext()
+    const nextSignature = getNovaUiStyleMediaSignature(this._styleSheet, nextContext)
+    if (nextSignature === this._mediaSignature) {
       return
     }
 
     bumpNovaUiStyleSheetVersion(this.nova)
     const registry = createNovaUiStyleIdentityRegistry(this)
-    const graph = this.styleSheetGraph ?? createNovaUiStyleSheetGraph(this.styleSheet)
-    this.styleSheetGraph = graph
-    this.applyCascadePlan(planNovaUiMediaInvalidation(graph, registry, this.mediaContext, nextContext, {
-      candidateFallbackThreshold: this.styleCandidateFallbackThreshold,
+    const graph = this._styleSheetGraph ?? createNovaUiStyleSheetGraph(this._styleSheet)
+    this._styleSheetGraph = graph
+    this._applyCascadePlan(planNovaUiMediaInvalidation(graph, registry, this._mediaContext, nextContext, {
+      candidateFallbackThreshold: this._styleCandidateFallbackThreshold,
     }))
   }
 
   /**
    * Возвращает значение состояния Root.
    */
-  private getMediaContext(): { width: number, height: number } {
+  private _getMediaContext(): { width: number, height: number } {
     return {
       width: this.width,
       height: this.height,
@@ -1070,26 +1070,26 @@ export class Root<E extends EventList = Record<string, any>>
   /**
    * Сравнивает resolved CSS token values и возвращает только реально изменившиеся atoms.
    */
-  private collectChangedResolvedTokens(): Array<string> {
-    const dependencies = this.rawStyleSheet.tokenDependencies ?? []
-    if (!this.tokenResolver || dependencies.length === 0) {
-      this.resolvedTokenValues.clear()
+  private _collectChangedResolvedTokens(): Array<string> {
+    const dependencies = this._rawStyleSheet.tokenDependencies ?? []
+    if (!this._tokenResolver || dependencies.length === 0) {
+      this._resolvedTokenValues.clear()
       return []
     }
 
     const changed: Array<string> = []
     const nextTokens = new Set(dependencies)
     for (const token of dependencies) {
-      const nextValue = this.tokenResolver.resolve(token, '') ?? ''
-      if (this.resolvedTokenValues.has(token) && this.resolvedTokenValues.get(token) !== nextValue) {
+      const nextValue = this._tokenResolver.resolve(token, '') ?? ''
+      if (this._resolvedTokenValues.has(token) && this._resolvedTokenValues.get(token) !== nextValue) {
         changed.push(token)
       }
-      this.resolvedTokenValues.set(token, nextValue)
+      this._resolvedTokenValues.set(token, nextValue)
     }
 
-    for (const token of [...this.resolvedTokenValues.keys()]) {
+    for (const token of [...this._resolvedTokenValues.keys()]) {
       if (!nextTokens.has(token)) {
-        this.resolvedTokenValues.delete(token)
+        this._resolvedTokenValues.delete(token)
       }
     }
     return changed
@@ -1098,7 +1098,7 @@ export class Root<E extends EventList = Record<string, any>>
   /**
    * Применяет подготовленное состояние Root.
    */
-  private applyDisplayState(): void {
+  private _applyDisplayState(): void {
     const displayed = this.props.display !== 'none'
     this.visible = displayed
     this.active = displayed
@@ -1107,14 +1107,14 @@ export class Root<E extends EventList = Record<string, any>>
   /**
    * Выполняет внутренний шаг markLayoutAncestorsDirty для Root.
    */
-  private markLayoutAncestorsDirty(node: { parent?: unknown }): void {
+  private _markLayoutAncestorsDirty(node: { parent?: unknown }): void {
     relayoutNovaUiLayoutAncestors(node)
   }
 
   /**
    * Выполняет внутренний шаг propagateStyleContext для Root.
    */
-  private propagateStyleContext(changedMask: NovaUiStyleMask): NovaUiStyleReceiveResult {
+  private _propagateStyleContext(changedMask: NovaUiStyleMask): NovaUiStyleReceiveResult {
     const result: NovaUiStyleReceiveResult = {
       update: false,
       render: false,
@@ -1134,7 +1134,7 @@ export class Root<E extends EventList = Record<string, any>>
         continue
       }
 
-      const childResult = child.receiveStyleContext(this.effectiveStyleContext, changedMask & childMask)
+      const childResult = child.receiveStyleContext(this._effectiveStyleContext, changedMask & childMask)
       result.update ||= childResult.update
       result.render ||= childResult.render
       result.layout ||= childResult.layout
@@ -1147,18 +1147,18 @@ export class Root<E extends EventList = Record<string, any>>
    * Освобождает runtime-ресурсы и подписки Root.
    */
   override dispose(): void {
-    this.disposeGlobalStylesSubscription()
-    for (const surface of [this.dialogSurface, this.overlaySurface, this.tooltipSurface]) {
+    this._disposeGlobalStylesSubscription()
+    for (const surface of [this._dialogSurface, this._overlaySurface, this._tooltipSurface]) {
       if (surface) {
         this.nova.removeSurface(surface)
       }
     }
-    this.dialogSurface = null
-    this.overlaySurface = null
-    this.tooltipSurface = null
-    this.dialogController = null
-    this.overlayController = null
-    this.tooltipController = null
+    this._dialogSurface = null
+    this._overlaySurface = null
+    this._tooltipSurface = null
+    this._dialogController = null
+    this._overlayController = null
+    this._tooltipController = null
     super.dispose()
   }
 }

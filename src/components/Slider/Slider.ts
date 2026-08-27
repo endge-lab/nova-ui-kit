@@ -17,8 +17,8 @@ import {
  */
 export class Slider<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<SliderResolvedProps, SliderApi, SliderProps, E> {
-  private dragging = false
-  private readonly api: SliderApi
+  private _dragging = false
+  private readonly _api: SliderApi
 
   /**
    * Создает экземпляр Slider и подготавливает базовое состояние.
@@ -31,13 +31,13 @@ export class Slider<E extends EventList = Record<string, any>>
     descriptor: SliderDescriptor = SLIDER_NODE_DESCRIPTOR,
   ) {
     super(app, surface, descriptor, normalizeSliderProps(props), options)
-    this.api = {
+    this._api = {
       setValue: (value, event) => this.setValue(value, event),
       setProps: patch => this.setProps(patch),
       getProps: () => this.props,
     }
     this.options({ interactive: !this.props.disabled })
-    this.setupEvents()
+    this._setupEvents()
   }
 
   /**
@@ -51,7 +51,7 @@ export class Slider<E extends EventList = Record<string, any>>
    * Возвращает значение состояния Slider.
    */
   override getApi(): SliderApi {
-    return this.api
+    return this._api
   }
 
   /**
@@ -79,9 +79,9 @@ export class Slider<E extends EventList = Record<string, any>>
     const schema: NovaSchema = []
     const horizontal = this.props.orientation === 'horizontal'
     const trackLength = Math.max(1, horizontal ? this.width - 20 : this.height - 20)
-    const percent = this.valuePercent()
+    const percent = this._valuePercent()
     const trackThickness = 4
-    const thumbRadius = this.dragging ? 8 : 7
+    const thumbRadius = this._dragging ? 8 : 7
     const trackX = horizontal ? 10 : (this.width - trackThickness) / 2
     const trackY = horizontal ? (this.height - trackThickness) / 2 : 10
     const fillLength = trackLength * percent
@@ -104,7 +104,7 @@ export class Slider<E extends EventList = Record<string, any>>
     })
 
     for (const mark of this.props.marks) {
-      const markPercent = this.percentForValue(mark.value)
+      const markPercent = this._percentForValue(mark.value)
       schema.push({
         type: 'circle',
         x: horizontal ? trackX + trackLength * markPercent : this.width / 2,
@@ -140,7 +140,7 @@ export class Slider<E extends EventList = Record<string, any>>
   /**
    * Обновляет значение состояния Slider.
    */
-  private setupEvents(): void {
+  private _setupEvents(): void {
     this.on('mouseenter', () => {
       if (this.props.disabled) {
         return
@@ -153,8 +153,8 @@ export class Slider<E extends EventList = Record<string, any>>
         return false
       }
       this.focus(event)
-      this.dragging = true
-      const next = this.valueFromEvent(event)
+      this._dragging = true
+      const next = this._valueFromEvent(event)
       this.props.onDragStart?.(this.props.value, event)
       this.props.onInput?.(next, event)
       this.setValue(next, event)
@@ -162,20 +162,20 @@ export class Slider<E extends EventList = Record<string, any>>
       return false
     })
     this.on('dragmove', (event) => {
-      if (!this.dragging) {
+      if (!this._dragging) {
         return false
       }
-      const next = this.valueFromEvent(event)
+      const next = this._valueFromEvent(event)
       this.props.onInput?.(next, event)
       this.setValue(next, event)
       return false
     })
     this.on('dragend', (event) => {
-      if (!this.dragging) {
+      if (!this._dragging) {
         return false
       }
-      this.dragging = false
-      const next = this.valueFromEvent(event)
+      this._dragging = false
+      const next = this._valueFromEvent(event)
       this.props.onInput?.(next, event)
       this.setValue(next, event)
       this.props.onDragEnd?.(this.props.value, event)
@@ -197,7 +197,7 @@ export class Slider<E extends EventList = Record<string, any>>
   /**
    * Выполняет внутренний шаг valueFromEvent для Slider.
    */
-  private valueFromEvent(event: MouseEvent): number {
+  private _valueFromEvent(event: MouseEvent): number {
     const { x, y } = this.events.getCanvasMousePosition(event)
     const [localX, localY] = this.toLocal(x, y)
     const horizontal = this.props.orientation === 'horizontal'
@@ -212,14 +212,14 @@ export class Slider<E extends EventList = Record<string, any>>
   /**
    * Выполняет внутренний шаг valuePercent для Slider.
    */
-  private valuePercent(): number {
-    return this.percentForValue(this.props.value)
+  private _valuePercent(): number {
+    return this._percentForValue(this.props.value)
   }
 
   /**
    * Выполняет внутренний шаг percentForValue для Slider.
    */
-  private percentForValue(value: number): number {
+  private _percentForValue(value: number): number {
     if (this.props.max === this.props.min) {
       return 0
     }

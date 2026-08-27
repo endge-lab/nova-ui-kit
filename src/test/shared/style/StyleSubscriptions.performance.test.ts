@@ -17,14 +17,14 @@ class BenchNode {
   constructor(
     readonly componentId: string,
     type: NovaUiStyleComponentName,
-    private readonly props: Record<string, unknown>,
+    private readonly _props: Record<string, unknown>,
   ) {
     this.descriptor = { name: type }
     this.__type = type
   }
 
   getProps(): Record<string, unknown> {
-    return this.props
+    return this._props
   }
 
   setProps(): void {}

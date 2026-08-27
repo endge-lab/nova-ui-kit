@@ -38,7 +38,7 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
     super(app, surface)
     this.__type = 'LazyResizer'
     this.options(opts)
-    this.setupEvents()
+    this._setupEvents()
   }
 
   /**
@@ -67,22 +67,22 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
       interactive: true,
       active: true,
       cursor: {
-        hover: this.getCursorByDirection(),
-        pressed: this.getCursorByDirection(),
-        dragging: this.getCursorByDirection(),
+        hover: this._getCursorByDirection(),
+        pressed: this._getCursorByDirection(),
+        dragging: this._getCursorByDirection(),
       },
       cursorContext: {
         axis: this._direction === 'left' || this._direction === 'right' ? 'x' : 'y',
       },
     })
-    this.updateHitBounds()
+    this._updateHitBounds()
     return this
   }
 
   /**
    * Обновляет runtime-состояние LazyResizer.
    */
-  private updateHitBounds(): void {
+  private _updateHitBounds(): void {
     const size = this._lineWidthHover
 
     switch (this._direction) {
@@ -104,7 +104,7 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
   /**
    * Обновляет значение состояния LazyResizer.
    */
-  private setupEvents(): void {
+  private _setupEvents(): void {
     this.on('dragstart', (e, meta: { startX: number, startY: number }) => {
       e.stopPropagation()
 
@@ -154,7 +154,7 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
       }
 
       this._isDragging = true
-      this.animateDragOverlay(1)
+      this._animateDragOverlay(1)
       this.dirty({ render: true })
       return false
     })
@@ -268,7 +268,7 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
       }
 
       this._isDragging = false
-      this.animateDragOverlay(0)
+      this._animateDragOverlay(0)
       this.dirty({ render: true })
       return false
     }
@@ -276,7 +276,7 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
     this.on('dragend', dragEnd)
 
     this.on('canvasleave', dragEnd)
-    this.on('canvasenter', () => this.resetState())
+    this.on('canvasenter', () => this._resetState())
 
     this.on('mousemove', (event: MouseEvent) => {
       const { x: gx, y: gy } = this.events.getCanvasMousePosition(event)
@@ -303,7 +303,7 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
       }
 
       this._isHover = isNearLine
-      this.animateHoverLine(isNearLine)
+      this._animateHoverLine(isNearLine)
       this.dirty({ render: true })
       return false
     })
@@ -314,7 +314,7 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
       }
 
       this._isHover = false
-      this.animateHoverLine(false)
+      this._animateHoverLine(false)
       this.dirty({ render: true })
       return false
     })
@@ -323,7 +323,7 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
   /**
    * Сбрасывает состояние к базовым значениям LazyResizer.
    */
-  private resetState(): void {
+  private _resetState(): void {
     if (!this._isDragging) {
       return
     }
@@ -499,7 +499,7 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
   /**
    * Выполняет внутренний шаг animateHoverLine для LazyResizer.
    */
-  private animateHoverLine(active: boolean): void {
+  private _animateHoverLine(active: boolean): void {
     if (!this._motionEnabled) {
       this._motionLineWidth = active ? this._lineWidthHover : this._lineWidth
       return
@@ -514,7 +514,7 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
   /**
    * Выполняет внутренний шаг animateDragOverlay для LazyResizer.
    */
-  private animateDragOverlay(opacity: number): void {
+  private _animateDragOverlay(opacity: number): void {
     if (!this._motionEnabled) {
       this._overlayOpacity = opacity
       return
@@ -528,7 +528,7 @@ export class LazyResizer<E extends EventList> extends NovaNode<E> {
   /**
    * Возвращает значение состояния LazyResizer.
    */
-  private getCursorByDirection(): string {
+  private _getCursorByDirection(): string {
     switch (this._direction) {
       case 'top':
       case 'bottom':

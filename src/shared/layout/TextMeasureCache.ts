@@ -2,33 +2,33 @@ const DEFAULT_TEXT_MEASURE_CACHE_LIMIT = 2000
 
 /** Небольшой bounded cache для измерения текста в layout hot path. */
 export class TextMeasureCache {
-  private readonly values = new Map<string, number>()
+  private readonly _values = new Map<string, number>()
 
   /**
    * Создает экземпляр TextMeasureCache и подготавливает базовое состояние.
    */
-  constructor(private readonly limit = DEFAULT_TEXT_MEASURE_CACHE_LIMIT) {}
+  constructor(private readonly _limit = DEFAULT_TEXT_MEASURE_CACHE_LIMIT) {}
 
   /** Возвращает cached width или вычисляет его через переданную функцию. */
   get(key: string, measure: () => number): number {
-    const cached = this.values.get(key)
+    const cached = this._values.get(key)
     if (cached !== undefined) {
       return cached
     }
 
     const value = measure()
-    if (this.values.size >= this.limit) {
-      const firstKey = this.values.keys().next().value
+    if (this._values.size >= this._limit) {
+      const firstKey = this._values.keys().next().value
       if (firstKey !== undefined) {
-        this.values.delete(firstKey)
+        this._values.delete(firstKey)
       }
     }
-    this.values.set(key, value)
+    this._values.set(key, value)
     return value
   }
 
   /** Очищает cache при смене renderer или принудительном сбросе компонента. */
   clear(): void {
-    this.values.clear()
+    this._values.clear()
   }
 }

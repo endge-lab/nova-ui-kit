@@ -23,9 +23,9 @@ import { borderRadiusToRendererValue } from '@/shared/style'
  */
 export class Image<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<ImageResolvedProps, ImageApi, ImageProps, E> {
-  private readonly api: ImageApi
-  private roundedCacheKey = ''
-  private roundedCache?: HTMLCanvasElement
+  private readonly _api: ImageApi
+  private _roundedCacheKey = ''
+  private _roundedCache?: HTMLCanvasElement
 
   /**
    * Создает экземпляр Image и подготавливает публичный API.
@@ -38,7 +38,7 @@ export class Image<E extends EventList = Record<string, any>>
     descriptor: ImageDescriptor = IMAGE_NODE_DESCRIPTOR,
   ) {
     super(app, surface, descriptor, normalizeImageProps(props), options)
-    this.api = {
+    this._api = {
       setSrc: src => this.setProps({ src }),
       setProps: patch => this.setProps(patch),
       getProps: () => this.props,
@@ -56,7 +56,7 @@ export class Image<E extends EventList = Record<string, any>>
    * Возвращает публичный API Image.
    */
   override getApi(): ImageApi {
-    return this.api
+    return this._api
   }
 
   /**
@@ -76,8 +76,8 @@ export class Image<E extends EventList = Record<string, any>>
     )
     schema.push(...backgroundSchema)
 
-    const source = this.resolveSource()
-    const drawable = source ? this.resolveDrawable(source) : undefined
+    const source = this._resolveSource()
+    const drawable = source ? this._resolveDrawable(source) : undefined
     if (drawable) {
       schema.push({
         type: 'icon',
@@ -117,22 +117,22 @@ export class Image<E extends EventList = Record<string, any>>
     this.props = normalizeImageProps(this.props)
     this.applyCommonPropsChanged(changedKeys)
     if (changedKeys.some(key => key === 'src' || key === 'source' || key === 'fit' || key === 'radius' || key === 'width' || key === 'height')) {
-      this.roundedCacheKey = ''
-      this.roundedCache = undefined
+      this._roundedCacheKey = ''
+      this._roundedCache = undefined
     }
   }
 
   /**
    * Возвращает активный source prop.
    */
-  private resolveSource(): NovaAssetDrawableInput {
+  private _resolveSource(): NovaAssetDrawableInput {
     return this.props.src ?? this.props.source
   }
 
   /**
    * Возвращает drawable, при необходимости rasterized в скругленный canvas.
    */
-  private resolveDrawable(source: NovaAssetDrawableInput): CanvasImageSource | undefined {
+  private _resolveDrawable(source: NovaAssetDrawableInput): CanvasImageSource | undefined {
     const drawable = this.nova.assets.resolveDrawable(source)
     if (!drawable) {
       return undefined
@@ -141,19 +141,19 @@ export class Image<E extends EventList = Record<string, any>>
     if (this.props.radius <= 0 && this.props.fit === 'fill') {
       return drawable
     }
-    return this.resolveRoundedDrawable(drawable, this.props.fit, this.props.radius)
+    return this._resolveRoundedDrawable(drawable, this.props.fit, this.props.radius)
   }
 
   /**
    * Создает cached canvas с учетом object-fit и radius.
    */
-  private resolveRoundedDrawable(source: CanvasImageSource, fit: ImageFit, radius: number): HTMLCanvasElement {
+  private _resolveRoundedDrawable(source: CanvasImageSource, fit: ImageFit, radius: number): HTMLCanvasElement {
     const width = Math.max(1, Math.round(this.width))
     const height = Math.max(1, Math.round(this.height))
-    const key = `${this.nova.assets.resolveDrawableKey('image', this.resolveSource(), () => 'inline')}:${width}:${height}:${fit}:${radius}`
+    const key = `${this.nova.assets.resolveDrawableKey('image', this._resolveSource(), () => 'inline')}:${width}:${height}:${fit}:${radius}`
 
-    if (this.roundedCache && this.roundedCacheKey === key) {
-      return this.roundedCache
+    if (this._roundedCache && this._roundedCacheKey === key) {
+      return this._roundedCache
     }
 
     const canvas = document.createElement('canvas')
@@ -170,8 +170,8 @@ export class Image<E extends EventList = Record<string, any>>
       ctx.drawImage(source, rect.sourceX, rect.sourceY, rect.sourceWidth, rect.sourceHeight, rect.x, rect.y, rect.width, rect.height)
     }
 
-    this.roundedCacheKey = key
-    this.roundedCache = canvas
+    this._roundedCacheKey = key
+    this._roundedCache = canvas
     return canvas
   }
 }

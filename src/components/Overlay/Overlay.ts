@@ -24,11 +24,11 @@ import { resolveNovaUiOverlayPosition } from '@/shared/overlay/overlay-position'
 /** Низкоуровневый anchored overlay surface с произвольным Nova UI body. */
 export class Overlay<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<OverlayResolvedProps, OverlayApi, OverlayProps, E> {
-  private readonly bodyNodes: Array<NovaNode<E>> = []
-  private readonly surfaceRect = createLayoutRect()
-  private readonly bodyRect = createLayoutRect()
-  private bodyLayoutReady = false
-  private readonly api: OverlayApi
+  private readonly _bodyNodes: Array<NovaNode<E>> = []
+  private readonly _surfaceRect = createLayoutRect()
+  private readonly _bodyRect = createLayoutRect()
+  private _bodyLayoutReady = false
+  private readonly _api: OverlayApi
 
   /** Создает overlay node и синхронизирует вложенный body. */
   constructor(
@@ -39,19 +39,19 @@ export class Overlay<E extends EventList = Record<string, any>>
     descriptor: OverlayDescriptor = OVERLAY_NODE_DESCRIPTOR,
   ) {
     super(app, surface, descriptor, normalizeOverlayProps(props), options)
-    this.api = {
-      open: event => this.setOpen(true, event),
-      close: event => this.setOpen(false, event),
-      toggle: event => this.setOpen(!this.props.open, event),
-      moveTo: (x, y, event) => this.moveTo(x, y, event),
+    this._api = {
+      open: event => this._setOpen(true, event),
+      close: event => this._setOpen(false, event),
+      toggle: event => this._setOpen(!this.props.open, event),
+      moveTo: (x, y, event) => this._moveTo(x, y, event),
       setAnchor: anchor => this.setProps({ anchor }),
       setProps: patch => this.setProps(patch),
       getProps: () => this.props,
     }
-    reconcileNovaTemplateChildren(this, this.bodyNodes, options.children ?? []).nodes.forEach(node => this.bodyNodes.push(node))
-    this.applyOpenState()
-    this.applyBodyOpenState()
-    this.setupEvents()
+    reconcileNovaTemplateChildren(this, this._bodyNodes, options.children ?? []).nodes.forEach(node => this._bodyNodes.push(node))
+    this._applyOpenState()
+    this._applyBodyOpenState()
+    this._setupEvents()
   }
 
   /** Обновляет props overlay. */
@@ -61,23 +61,23 @@ export class Overlay<E extends EventList = Record<string, any>>
 
   /** Возвращает публичный API overlay. */
   override getApi(): OverlayApi {
-    return this.api
+    return this._api
   }
 
   /** Раскладывает body в рассчитанный overlay rect. */
   update(): void {
     if (!this.props.open) {
-      this.bodyLayoutReady = false
-      this.applyBodyOpenState()
+      this._bodyLayoutReady = false
+      this._applyBodyOpenState()
       return
     }
 
-    this.resolveRects()
-    for (const child of this.bodyNodes) {
-      applyNodeLayoutRect(child as NovaNode<any>, this.bodyRect)
+    this._resolveRects()
+    for (const child of this._bodyNodes) {
+      applyNodeLayoutRect(child as NovaNode<any>, this._bodyRect)
     }
-    this.bodyLayoutReady = true
-    this.applyBodyOpenState()
+    this._bodyLayoutReady = true
+    this._applyBodyOpenState()
   }
 
   /** Рисует backdrop и поверхность overlay. */
@@ -87,7 +87,7 @@ export class Overlay<E extends EventList = Record<string, any>>
       return
     }
 
-    this.resolveRects()
+    this._resolveRects()
     const schema: NovaSchema = []
     if (this.props.modal || this.props.backdrop) {
       schema.push({
@@ -100,11 +100,11 @@ export class Overlay<E extends EventList = Record<string, any>>
       })
     }
 
-    const surface = buildBoxSchema(this.props, this.surfaceRect.width, this.surfaceRect.height, { resolveThemeValue: value => this.resolveThemeValue(value) })
+    const surface = buildBoxSchema(this.props, this._surfaceRect.width, this._surfaceRect.height, { resolveThemeValue: value => this.resolveThemeValue(value) })
     for (const item of surface) {
       const shape = item as Record<string, any>
-      shape.x = (shape.x ?? 0) + this.surfaceRect.x
-      shape.y = (shape.y ?? 0) + this.surfaceRect.y
+      shape.x = (shape.x ?? 0) + this._surfaceRect.x
+      shape.y = (shape.y ?? 0) + this._surfaceRect.y
       schema.push(item)
     }
     this.renderer.schema(schema)
@@ -116,15 +116,15 @@ export class Overlay<E extends EventList = Record<string, any>>
     this.applyCommonPropsChanged(changedKeys)
     if (changedKeys.includes('open') || changedKeys.includes('display')) {
       if (!this.props.open || this.props.display === 'none') {
-        this.bodyLayoutReady = false
+        this._bodyLayoutReady = false
       }
-      this.applyOpenState()
-      this.applyBodyOpenState()
+      this._applyOpenState()
+      this._applyBodyOpenState()
     }
   }
 
   /** Переключает открытость overlay. */
-  private setOpen(open: boolean, event?: Event): void {
+  private _setOpen(open: boolean, event?: Event): void {
     if (open === this.props.open) {
       return
     }
@@ -133,36 +133,36 @@ export class Overlay<E extends EventList = Record<string, any>>
   }
 
   /** Переносит overlay в pointer anchor. */
-  private moveTo(x: number, y: number, event?: Event): void {
+  private _moveTo(x: number, y: number, event?: Event): void {
     this.setProps({ anchor: { kind: 'pointer', x, y } })
     this.props.onOpenChange?.(true, event)
   }
 
   /** Настраивает dismiss-события overlay. */
-  private setupEvents(): void {
+  private _setupEvents(): void {
     this.on('mousedown', (event) => {
       const { x, y } = this.events.getCanvasMousePosition(event)
       const [localX, localY] = this.toLocal(x, y)
       if (
         this.props.dismiss.outside
-        && (localX < this.surfaceRect.x
-          || localX > this.surfaceRect.x + this.surfaceRect.width
-          || localY < this.surfaceRect.y
-          || localY > this.surfaceRect.y + this.surfaceRect.height)
+        && (localX < this._surfaceRect.x
+          || localX > this._surfaceRect.x + this._surfaceRect.width
+          || localY < this._surfaceRect.y
+          || localY > this._surfaceRect.y + this._surfaceRect.height)
       ) {
-        this.setOpen(false, event)
+        this._setOpen(false, event)
       }
       return false
     })
     this.on('keydown', (event) => {
       if (this.props.open && this.props.dismiss.escape && event.key === 'Escape') {
-        this.setOpen(false, event)
+        this._setOpen(false, event)
       }
     })
   }
 
   /** Синхронизирует интерактивность node с состоянием open. */
-  private applyOpenState(): void {
+  private _applyOpenState(): void {
     const displayed = this.props.display !== 'none' && this.props.open
     this.visible = displayed
     this.active = displayed
@@ -170,9 +170,9 @@ export class Overlay<E extends EventList = Record<string, any>>
   }
 
   /** Синхронизирует видимость body nodes после layout. */
-  private applyBodyOpenState(): void {
-    const displayed = this.props.display !== 'none' && this.props.open && this.bodyLayoutReady
-    for (const node of this.bodyNodes) {
+  private _applyBodyOpenState(): void {
+    const displayed = this.props.display !== 'none' && this.props.open && this._bodyLayoutReady
+    for (const node of this._bodyNodes) {
       node.visible = displayed
       node.active = displayed
       node.dirty({ update: true, render: true })
@@ -180,33 +180,33 @@ export class Overlay<E extends EventList = Record<string, any>>
   }
 
   /** Рассчитывает surface и body rect относительно Root. */
-  private resolveRects(): void {
+  private _resolveRects(): void {
     const root = { x: 0, y: 0, width: this.width, height: this.height }
     const position = resolveNovaUiOverlayPosition({
       root,
-      anchor: this.normalizeAnchor(this.props.anchor),
+      anchor: this._normalizeAnchor(this.props.anchor),
       overlay: { width: this.props.width, height: this.props.height },
       placement: this.props.placement,
       offset: this.props.offset,
       collision: this.props.collision,
     })
-    Object.assign(this.surfaceRect, {
+    Object.assign(this._surfaceRect, {
       x: position.x,
       y: position.y,
       width: this.props.width,
       height: this.props.height,
     })
     const padding = resolveSpacing(this.props.padding)
-    Object.assign(this.bodyRect, {
-      x: this.surfaceRect.x + padding.left,
-      y: this.surfaceRect.y + padding.top,
-      width: Math.max(0, this.surfaceRect.width - padding.left - padding.right),
-      height: Math.max(0, this.surfaceRect.height - padding.top - padding.bottom),
+    Object.assign(this._bodyRect, {
+      x: this._surfaceRect.x + padding.left,
+      y: this._surfaceRect.y + padding.top,
+      width: Math.max(0, this._surfaceRect.width - padding.left - padding.right),
+      height: Math.max(0, this._surfaceRect.height - padding.top - padding.bottom),
     })
   }
 
   /** Нормализует anchor в систему координат Root. */
-  private normalizeAnchor(anchor: NovaUiOverlayAnchor): NovaUiOverlayAnchor {
+  private _normalizeAnchor(anchor: NovaUiOverlayAnchor): NovaUiOverlayAnchor {
     if (anchor.kind === 'root') {
       return { kind: 'root' }
     }

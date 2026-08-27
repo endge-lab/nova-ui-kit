@@ -24,18 +24,18 @@ class TestStyleNode {
   constructor(
     readonly componentId: string,
     type: NovaUiStyleComponentName,
-    private props: Record<string, unknown> = {},
+    private _props: Record<string, unknown> = {},
   ) {
     this.descriptor = { name: type }
     this.__type = type
   }
 
   getProps(): Record<string, unknown> {
-    return this.props
+    return this._props
   }
 
   setProps(patch: Record<string, unknown>): void {
-    this.props = { ...this.props, ...patch }
+    this._props = { ...this._props, ...patch }
   }
 
   append(child: TestStyleNode): TestStyleNode {

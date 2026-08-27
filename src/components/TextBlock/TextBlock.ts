@@ -59,15 +59,15 @@ export class TextBlock<E extends EventList = Record<string, any>>
   readonly [NOVA_UI_LAYOUT_TARGET] = true as const
   readonly [NOVA_UI_STYLE_TARGET] = true as const
 
-  private readonly layoutRect = createLayoutRect()
-  private readonly textMeasureCache = new TextMeasureCache()
+  private readonly _layoutRect = createLayoutRect()
+  private readonly _textMeasureCache = new TextMeasureCache()
   private _layout: TextBlockLayout | null = null
   private readonly _api: TextBlockApi
-  private externalLayout = false
-  private inheritedStyleContext = EMPTY_STYLE_CONTEXT
-  private explicitTopLevelStyleMask = NovaUiStyleMask.None
-  private localStyleMask = NovaUiStyleMask.None
-  private effectiveTextStyle: NovaUiInheritedTextStyle = {}
+  private _externalLayout = false
+  private _inheritedStyleContext = EMPTY_STYLE_CONTEXT
+  private _explicitTopLevelStyleMask = NovaUiStyleMask.None
+  private _localStyleMask = NovaUiStyleMask.None
+  private _effectiveTextStyle: NovaUiInheritedTextStyle = {}
 
   /**
    * Создает экземпляр TextBlock и подготавливает базовое состояние.
@@ -87,23 +87,23 @@ export class TextBlock<E extends EventList = Record<string, any>>
     super(app, surface, descriptor, initialProps, options)
     this.addDisposer(app.theme.observe(this, { phase: 'render' }))
     this.__type = 'TextBlock'
-    this.applyDisplayState()
-    this.explicitTopLevelStyleMask = textBlockTopLevelStyleMask(props)
-    this.localStyleMask = inheritedTextStyleMask(resolvedProps.style)
-    this.effectiveTextStyle = resolveTextBlockEffectiveStyle(
+    this._applyDisplayState()
+    this._explicitTopLevelStyleMask = textBlockTopLevelStyleMask(props)
+    this._localStyleMask = inheritedTextStyleMask(resolvedProps.style)
+    this._effectiveTextStyle = resolveTextBlockEffectiveStyle(
       resolvedProps,
-      this.inheritedStyleContext,
-      this.explicitTopLevelStyleMask,
+      this._inheritedStyleContext,
+      this._explicitTopLevelStyleMask,
     )
-    this.applyInitialLayoutRect(resolvedProps)
-    this._layout = this.computeLayout()
+    this._applyInitialLayoutRect(resolvedProps)
+    this._layout = this._computeLayout()
     this._api = {
       setText: text => this.setProps({ text }),
       setProps: patch => this.setProps(patch),
-      getProps: () => this.resolveCurrentLayoutProps(),
-      measure: () => this.ensureLayout(),
-      getLines: () => this.ensureLayout().lines,
-      isOverflowed: () => this.ensureLayout().overflowed,
+      getProps: () => this._resolveCurrentLayoutProps(),
+      measure: () => this._ensureLayout(),
+      getLines: () => this._ensureLayout().lines,
+      isOverflowed: () => this._ensureLayout().overflowed,
     }
     if (isNovaUiMotionEnabled(props) && props.motion === 'fadeIn') {
       this.fadeIn({ to: resolvedProps.opacity })
@@ -114,7 +114,7 @@ export class TextBlock<E extends EventList = Record<string, any>>
    * Обновляет значение состояния TextBlock.
    */
   override setProps(patch: TextBlockProps): this {
-    this.explicitTopLevelStyleMask |= textBlockTopLevelStyleMask(patch)
+    this._explicitTopLevelStyleMask |= textBlockTopLevelStyleMask(patch)
     return super.setProps(patch as Partial<TextBlockResolvedProps>)
   }
 
@@ -153,15 +153,15 @@ export class TextBlock<E extends EventList = Record<string, any>>
 
   /** Принимает итоговый rect от Flex и сбрасывает layout cache только при изменении. */
   applyLayoutRect(rect: NovaUiLayoutRect): boolean {
-    this.externalLayout = true
-    return this.applyResolvedRect(rect)
+    this._externalLayout = true
+    return this._applyResolvedRect(rect)
   }
 
   /** Принимает inherited style context и выбирает update/render по bitmask. */
   receiveStyleContext(context: NovaUiStyleContext, changedMask: NovaUiStyleMask): NovaUiStyleReceiveResult {
-    this.inheritedStyleContext = context
-    const previousStyle = this.effectiveTextStyle
-    const nextStyle = resolveTextBlockEffectiveStyle(this.props, context, this.explicitTopLevelStyleMask)
+    this._inheritedStyleContext = context
+    const previousStyle = this._effectiveTextStyle
+    const nextStyle = resolveTextBlockEffectiveStyle(this.props, context, this._explicitTopLevelStyleMask)
     const affectedMask = changedMask & this.getSubtreeStyleMask()
     const effectiveChangedMask = diffInheritedTextStyle(previousStyle, nextStyle, affectedMask)
 
@@ -173,7 +173,7 @@ export class TextBlock<E extends EventList = Record<string, any>>
       }
     }
 
-    this.effectiveTextStyle = nextStyle
+    this._effectiveTextStyle = nextStyle
 
     if ((effectiveChangedMask & TEXT_BLOCK_LAYOUT_STYLE_MASK) !== 0) {
       this._layout = null
@@ -205,12 +205,12 @@ export class TextBlock<E extends EventList = Record<string, any>>
    * Возвращает значение состояния TextBlock.
    */
   getSubtreeStyleMask(): NovaUiStyleMask {
-    return TEXT_BLOCK_CONSUMED_STYLE_MASK & ~(this.explicitTopLevelStyleMask | this.localStyleMask)
+    return TEXT_BLOCK_CONSUMED_STYLE_MASK & ~(this._explicitTopLevelStyleMask | this._localStyleMask)
   }
 
   /** Измеряет preferred size для auto layout с учетом constraints. */
   measureLayout(constraints: NovaUiLayoutConstraints): NovaUiLayoutMeasure {
-    const fallbackWidth = this.layoutRect.width || this.props.width
+    const fallbackWidth = this._layoutRect.width || this.props.width
     const width = clampLayoutNumber(
       fallbackWidth,
       constraints.minWidth,
@@ -218,9 +218,9 @@ export class TextBlock<E extends EventList = Record<string, any>>
     )
     const heightLimit = Number.isFinite(constraints.maxHeight)
       ? constraints.maxHeight
-      : Math.max(this.layoutRect.height, this.props.height)
-    const props = this.resolveLayoutProps(width, heightLimit)
-    const layout = layoutTextBlock(props, this.measureText)
+      : Math.max(this._layoutRect.height, this.props.height)
+    const props = this._resolveLayoutProps(width, heightLimit)
+    const layout = layoutTextBlock(props, this._measureText)
     const measuredHeight = layout.contentHeight + props.padding.top + props.padding.bottom
 
     return {
@@ -237,32 +237,32 @@ export class TextBlock<E extends EventList = Record<string, any>>
    * Обновляет runtime-состояние TextBlock.
    */
   update(): void {
-    this._layout = this.computeLayout()
+    this._layout = this._computeLayout()
   }
 
   /**
    * Выполняет отрисовку TextBlock.
    */
   render(): void {
-    this.renderSchema(buildTextBlockSchema(this.resolveThemeLayoutProps(this.resolveCurrentLayoutProps()), this.measureText, 'node'))
+    this.renderSchema(buildTextBlockSchema(this._resolveThemeLayoutProps(this._resolveCurrentLayoutProps()), this._measureText, 'node'))
   }
 
   /**
    * Обрабатывает входящее событие TextBlock.
    */
   protected override onPropsChanged(changedKeys: Array<keyof TextBlockResolvedProps>): void {
-    const previousStyle = this.effectiveTextStyle
+    const previousStyle = this._effectiveTextStyle
     this.props = normalizeTextBlockProps(this.props)
-    this.localStyleMask = inheritedTextStyleMask(this.props.style)
-    this.effectiveTextStyle = resolveTextBlockEffectiveStyle(
+    this._localStyleMask = inheritedTextStyleMask(this.props.style)
+    this._effectiveTextStyle = resolveTextBlockEffectiveStyle(
       this.props,
-      this.inheritedStyleContext,
-      this.explicitTopLevelStyleMask,
+      this._inheritedStyleContext,
+      this._explicitTopLevelStyleMask,
     )
-    const styleChangedMask = diffInheritedTextStyle(previousStyle, this.effectiveTextStyle)
-    this.applyDisplayState()
+    const styleChangedMask = diffInheritedTextStyle(previousStyle, this._effectiveTextStyle)
+    this._applyDisplayState()
     if (changedKeys.includes('display')) {
-      this.markLayoutAncestorsDirty()
+      this._markLayoutAncestorsDirty()
     }
     if (hasTextBlockLayoutChanges(changedKeys) || (styleChangedMask & TEXT_BLOCK_LAYOUT_STYLE_MASK) !== 0) {
       this._layout = null
@@ -270,8 +270,8 @@ export class TextBlock<E extends EventList = Record<string, any>>
     if ((styleChangedMask & TEXT_BLOCK_LAYOUT_STYLE_MASK) !== 0) {
       this.dirty({ update: true, render: true })
     }
-    if (!this.externalLayout && hasGeometryChanges(changedKeys)) {
-      this.applyResolvedRect({
+    if (!this._externalLayout && hasGeometryChanges(changedKeys)) {
+      this._applyResolvedRect({
         x: this.props.x,
         y: this.props.y,
         width: this.props.width,
@@ -283,31 +283,31 @@ export class TextBlock<E extends EventList = Record<string, any>>
   /**
    * Применяет подготовленное состояние TextBlock.
    */
-  private applyInitialLayoutRect(props: TextBlockResolvedProps): void {
-    copyRect(this.layoutRect, {
+  private _applyInitialLayoutRect(props: TextBlockResolvedProps): void {
+    copyRect(this._layoutRect, {
       x: props.x,
       y: props.y,
       width: props.width,
       height: props.height,
     })
     super.options({
-      x: this.layoutRect.x,
-      y: this.layoutRect.y,
-      width: this.layoutRect.width,
-      height: this.layoutRect.height,
+      x: this._layoutRect.x,
+      y: this._layoutRect.y,
+      width: this._layoutRect.width,
+      height: this._layoutRect.height,
     })
   }
 
   /**
    * Применяет подготовленное состояние TextBlock.
    */
-  private applyResolvedRect(rect: NovaUiLayoutRect): boolean {
-    if (rectEquals(this.layoutRect, rect)) {
+  private _applyResolvedRect(rect: NovaUiLayoutRect): boolean {
+    if (rectEquals(this._layoutRect, rect)) {
       return false
     }
 
-    const sizeChanged = this.layoutRect.width !== rect.width || this.layoutRect.height !== rect.height
-    copyRect(this.layoutRect, rect)
+    const sizeChanged = this._layoutRect.width !== rect.width || this._layoutRect.height !== rect.height
+    copyRect(this._layoutRect, rect)
     super.options({
       x: rect.x,
       y: rect.y,
@@ -324,9 +324,9 @@ export class TextBlock<E extends EventList = Record<string, any>>
   /**
    * Выполняет внутренний шаг ensureLayout для TextBlock.
    */
-  private ensureLayout(): TextBlockLayout {
+  private _ensureLayout(): TextBlockLayout {
     if (!this._layout) {
-      this._layout = this.computeLayout()
+      this._layout = this._computeLayout()
     }
     return this._layout
   }
@@ -334,37 +334,37 @@ export class TextBlock<E extends EventList = Record<string, any>>
   /**
    * Вычисляет производное значение TextBlock.
    */
-  private computeLayout(): TextBlockLayout {
-    return layoutTextBlock(this.resolveCurrentLayoutProps(), this.measureText)
+  private _computeLayout(): TextBlockLayout {
+    return layoutTextBlock(this._resolveCurrentLayoutProps(), this._measureText)
   }
 
   /**
    * Нормализует и возвращает итоговое значение TextBlock.
    */
-  private resolveCurrentLayoutProps(): TextBlockResolvedProps {
-    return this.resolveLayoutProps(this.layoutRect.width, this.layoutRect.height)
+  private _resolveCurrentLayoutProps(): TextBlockResolvedProps {
+    return this._resolveLayoutProps(this._layoutRect.width, this._layoutRect.height)
   }
 
   /**
    * Нормализует и возвращает итоговое значение TextBlock.
    */
-  private resolveLayoutProps(width: number, height: number): TextBlockResolvedProps {
+  private _resolveLayoutProps(width: number, height: number): TextBlockResolvedProps {
     return {
       ...this.props,
       x: 0,
       y: 0,
       width: Math.max(0, width),
       height: Math.max(0, height),
-      color: this.effectiveTextStyle.color ?? this.props.color,
-      fontFamily: this.effectiveTextStyle.fontFamily ?? this.props.fontFamily,
-      fontSize: this.effectiveTextStyle.fontSize ?? this.props.fontSize,
-      fontWeight: this.effectiveTextStyle.fontWeight ?? this.props.fontWeight,
-      fontStyle: this.effectiveTextStyle.fontStyle ?? this.props.fontStyle,
-      lineHeight: this.effectiveTextStyle.lineHeight ?? this.props.lineHeight,
+      color: this._effectiveTextStyle.color ?? this.props.color,
+      fontFamily: this._effectiveTextStyle.fontFamily ?? this.props.fontFamily,
+      fontSize: this._effectiveTextStyle.fontSize ?? this.props.fontSize,
+      fontWeight: this._effectiveTextStyle.fontWeight ?? this.props.fontWeight,
+      fontStyle: this._effectiveTextStyle.fontStyle ?? this.props.fontStyle,
+      lineHeight: this._effectiveTextStyle.lineHeight ?? this.props.lineHeight,
     }
   }
 
-  private resolveThemeLayoutProps(props: TextBlockResolvedProps): TextBlockResolvedProps {
+  private _resolveThemeLayoutProps(props: TextBlockResolvedProps): TextBlockResolvedProps {
     return {
       ...props,
       color: resolveNovaUiThemeValue(this.nova, props.color) ?? props.color,
@@ -378,8 +378,8 @@ export class TextBlock<E extends EventList = Record<string, any>>
     }
   }
 
-  private readonly measureText: TextBlockMeasureFn = (text, options) => (
-    this.textMeasureCache.get(
+  private readonly _measureText: TextBlockMeasureFn = (text, options) => (
+    this._textMeasureCache.get(
       `${options.fontFamily}|${options.fontSize}|${options.fontWeight}|${options.fontStyle}|${text}`,
       () => measureNovaUiTextWidth(text, options),
     )
@@ -388,7 +388,7 @@ export class TextBlock<E extends EventList = Record<string, any>>
   /**
    * Применяет подготовленное состояние TextBlock.
    */
-  private applyDisplayState(): void {
+  private _applyDisplayState(): void {
     const displayed = this.props.display !== 'none'
     this.visible = displayed
     this.active = displayed
@@ -397,7 +397,7 @@ export class TextBlock<E extends EventList = Record<string, any>>
   /**
    * Выполняет внутренний шаг markLayoutAncestorsDirty для TextBlock.
    */
-  private markLayoutAncestorsDirty(): void {
+  private _markLayoutAncestorsDirty(): void {
     relayoutNovaUiLayoutAncestors(this)
   }
 }

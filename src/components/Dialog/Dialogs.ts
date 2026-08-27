@@ -18,8 +18,8 @@ import { NovaUiComponentNode } from '@/shared/component'
 /** Регистрирует набор dialog templates в ближайшем Root без участия layout. */
 export class Dialogs<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<DialogsResolvedProps, DialogsApi, DialogsProps, E> {
-  private readonly sourceId: string
-  private readonly api: DialogsApi
+  private readonly _sourceId: string
+  private readonly _api: DialogsApi
 
   /** Создает registry-node для dialog templates. */
   constructor(
@@ -30,9 +30,9 @@ export class Dialogs<E extends EventList = Record<string, any>>
     descriptor: DialogsDescriptor = DIALOGS_NODE_DESCRIPTOR,
   ) {
     super(app, surface, descriptor, normalizeDialogsProps(props), options)
-    this.sourceId = options.componentId ?? this.id
-    this.api = {
-      setDefinitions: definitions => this.setDefinitions(definitions),
+    this._sourceId = options.componentId ?? this.id
+    this._api = {
+      setDefinitions: definitions => this._setDefinitions(definitions),
       getDefinitions: () => this.props.definitions,
     }
     this.visible = false
@@ -46,7 +46,7 @@ export class Dialogs<E extends EventList = Record<string, any>>
 
   /** Возвращает публичный API registry-node. */
   override getApi(): DialogsApi {
-    return this.api
+    return this._api
   }
 
   /** Registry-node не участвует в update-фазе. */
@@ -58,12 +58,12 @@ export class Dialogs<E extends EventList = Record<string, any>>
   /** Регистрирует definitions после mount. */
   protected override onMount(): void {
     super.onMount()
-    this.syncRootDefinitions()
+    this._syncRootDefinitions()
   }
 
   /** Снимает definitions при удалении registry-node. */
   protected override onUnmount(): void {
-    findNovaUiRoot(this)?.getApi?.().unregisterDialogDefinitions?.(this.sourceId)
+    findNovaUiRoot(this)?.getApi?.().unregisterDialogDefinitions?.(this._sourceId)
   }
 
   /** Реагирует на замену definitions. */
@@ -73,17 +73,17 @@ export class Dialogs<E extends EventList = Record<string, any>>
     this.visible = false
     this.options({ interactive: false })
     if (changedKeys.includes('definitions')) {
-      this.syncRootDefinitions()
+      this._syncRootDefinitions()
     }
   }
 
   /** Заменяет definitions текущего source. */
-  private setDefinitions(definitions: Array<DialogDefinition>): void {
+  private _setDefinitions(definitions: Array<DialogDefinition>): void {
     this.setProps({ definitions })
   }
 
   /** Передает definitions ближайшему Root. */
-  private syncRootDefinitions(): void {
-    findNovaUiRoot(this)?.getApi?.().registerDialogDefinitions?.(this.sourceId, this.props.definitions)
+  private _syncRootDefinitions(): void {
+    findNovaUiRoot(this)?.getApi?.().registerDialogDefinitions?.(this._sourceId, this.props.definitions)
   }
 }

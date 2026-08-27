@@ -67,18 +67,18 @@ const DEFAULT_OVERLAY_PROPS: OverlayProps = {
 export class RootOverlayControllerNode<E extends EventList = Record<string, any>> extends NovaNode<E> {
   readonly [NOVA_UI_ROOT_TARGET] = true as const
 
-  private readonly sources = new Map<string, RegisteredOverlaySource>()
-  private readonly definitions = new Map<string, OverlayDefinition>()
-  private readonly managedChildren: Array<NovaNode<E>> = []
-  private readonly activeOverlays: Array<ActiveOverlay> = []
-  private nextOverlayId = 1
-  private dirtyScheduled = false
+  private readonly _sources = new Map<string, RegisteredOverlaySource>()
+  private readonly _definitions = new Map<string, OverlayDefinition>()
+  private readonly _managedChildren: Array<NovaNode<E>> = []
+  private readonly _activeOverlays: Array<ActiveOverlay> = []
+  private _nextOverlayId = 1
+  private _dirtyScheduled = false
 
   /** Создает controller-node и размещает его поверх Root. */
   constructor(
     app: NovaApp<E>,
     surface: NovaSurface<E>,
-    private readonly ownerRoot?: NovaNode<E> & NovaUiRootTarget,
+    private readonly _ownerRoot?: NovaNode<E> & NovaUiRootTarget,
   ) {
     super(app, surface)
     this.options({
@@ -93,15 +93,15 @@ export class RootOverlayControllerNode<E extends EventList = Record<string, any>
 
   /** Проксирует Root API для UI Kit компонентов внутри overlay portal. */
   getApi(): ReturnType<NovaUiRootTarget['getApi']> {
-    if (!this.ownerRoot) {
+    if (!this._ownerRoot) {
       throw new Error('[Nova UI Kit] Overlay portal is not attached to Root')
     }
-    return this.ownerRoot.getApi()
+    return this._ownerRoot.getApi()
   }
 
   /** Проксирует style cascade refresh для UI Kit компонентов внутри overlay portal. */
   refreshStyleCascade(): void {
-    this.ownerRoot?.refreshStyleCascade()
+    this._ownerRoot?.refreshStyleCascade()
   }
 
   /** Синхронизирует размер controller с Root. */
@@ -111,87 +111,87 @@ export class RootOverlayControllerNode<E extends EventList = Record<string, any>
 
   /** Регистрирует definitions из одного Overlays source. */
   registerDefinitions(sourceId: string, definitions: Array<OverlayDefinition>): void {
-    this.sources.set(sourceId, { sourceId, definitions })
-    this.rebuildDefinitions()
-    this.rebuildActiveOverlays()
+    this._sources.set(sourceId, { sourceId, definitions })
+    this._rebuildDefinitions()
+    this._rebuildActiveOverlays()
   }
 
   /** Удаляет definitions одного Overlays source. */
   unregisterDefinitions(sourceId: string): void {
-    this.sources.delete(sourceId)
-    this.rebuildDefinitions()
-    this.rebuildActiveOverlays()
+    this._sources.delete(sourceId)
+    this._rebuildDefinitions()
+    this._rebuildActiveOverlays()
   }
 
   /** Открывает overlay по type или object payload. */
   openOverlay(input: OverlayInput, payload: Record<string, unknown> = {}): string {
     const normalized = normalizeOverlayInput(input, payload)
-    const id = normalized.id ?? `overlay-${this.nextOverlayId++}`
+    const id = normalized.id ?? `overlay-${this._nextOverlayId++}`
     const type = normalized.type ?? 'default'
-    const existingIndex = this.activeOverlays.findIndex(overlay => overlay.id === id)
-    const active = this.createActiveOverlay(id, type, normalized)
+    const existingIndex = this._activeOverlays.findIndex(overlay => overlay.id === id)
+    const active = this._createActiveOverlay(id, type, normalized)
 
     if (existingIndex >= 0) {
-      this.activeOverlays.splice(existingIndex, 1, active)
+      this._activeOverlays.splice(existingIndex, 1, active)
     }
-    else { this.activeOverlays.push(active) }
+    else { this._activeOverlays.push(active) }
 
-    this.scheduleDirty()
+    this._scheduleDirty()
     return id
   }
 
   /** Закрывает один overlay или верхний overlay, если id не указан. */
   closeOverlay(id?: string, event?: Event): void {
     const index = id
-      ? this.activeOverlays.findIndex(overlay => overlay.id === id)
-      : this.activeOverlays.length - 1
+      ? this._activeOverlays.findIndex(overlay => overlay.id === id)
+      : this._activeOverlays.length - 1
     if (index < 0) {
       return
     }
 
-    const [overlay] = this.activeOverlays.splice(index, 1)
-    this.notifyOverlayOpenChange(overlay, false, event)
-    this.scheduleDirty()
+    const [overlay] = this._activeOverlays.splice(index, 1)
+    this._notifyOverlayOpenChange(overlay, false, event)
+    this._scheduleDirty()
   }
 
   /** Закрывает все открытые overlays. */
   closeOverlays(event?: Event): void {
-    if (this.activeOverlays.length === 0) {
+    if (this._activeOverlays.length === 0) {
       return
     }
-    const overlays = this.activeOverlays.splice(0)
+    const overlays = this._activeOverlays.splice(0)
     for (const overlay of overlays) {
-      this.notifyOverlayOpenChange(overlay, false, event)
+      this._notifyOverlayOpenChange(overlay, false, event)
     }
-    this.scheduleDirty()
+    this._scheduleDirty()
   }
 
   /** Обновляет props/payload открытого overlay. */
   updateOverlay(id: string, patch: OverlayProps & Record<string, unknown>): void {
-    const index = this.activeOverlays.findIndex(overlay => overlay.id === id)
+    const index = this._activeOverlays.findIndex(overlay => overlay.id === id)
     if (index < 0) {
       return
     }
 
-    const current = this.activeOverlays[index]
+    const current = this._activeOverlays[index]
     const nextPayload = { ...current.payload, ...patch, id, type: current.type }
-    this.activeOverlays.splice(index, 1, this.createActiveOverlay(id, current.type, nextPayload))
-    this.scheduleDirty()
+    this._activeOverlays.splice(index, 1, this._createActiveOverlay(id, current.type, nextPayload))
+    this._scheduleDirty()
   }
 
   /** Возвращает список открытых overlay ids. */
   getOpenOverlayIds(): Array<string> {
-    return this.activeOverlays.map(overlay => overlay.id)
+    return this._activeOverlays.map(overlay => overlay.id)
   }
 
   /** Обновляет subtree открытых overlays. */
   update(): void {
-    this.dirtyScheduled = false
-    const children = this.activeOverlays.map((overlay, index) => this.createOverlaySchema(overlay, index))
-    const reconciled = reconcileNovaTemplateChildren(this, this.managedChildren, children)
-    this.managedChildren.length = 0
-    this.managedChildren.push(...reconciled.nodes)
-    for (const child of this.managedChildren) {
+    this._dirtyScheduled = false
+    const children = this._activeOverlays.map((overlay, index) => this._createOverlaySchema(overlay, index))
+    const reconciled = reconcileNovaTemplateChildren(this, this._managedChildren, children)
+    this._managedChildren.length = 0
+    this._managedChildren.push(...reconciled.nodes)
+    for (const child of this._managedChildren) {
       applyNodeLayoutRect(child, {
         x: 0,
         y: 0,
@@ -207,27 +207,27 @@ export class RootOverlayControllerNode<E extends EventList = Record<string, any>
   }
 
   /** Пересобирает итоговую map с учетом порядка source registration. */
-  private rebuildDefinitions(): void {
-    this.definitions.clear()
-    for (const source of this.sources.values()) {
+  private _rebuildDefinitions(): void {
+    this._definitions.clear()
+    for (const source of this._sources.values()) {
       for (const definition of source.definitions) {
-        this.definitions.set(definition.type || 'default', definition)
+        this._definitions.set(definition.type || 'default', definition)
       }
     }
   }
 
   /** Пересчитывает props открытых overlays после изменения registry. */
-  private rebuildActiveOverlays(): void {
-    for (let index = 0; index < this.activeOverlays.length; index += 1) {
-      const current = this.activeOverlays[index]
-      this.activeOverlays[index] = this.createActiveOverlay(current.id, current.type, current.payload)
+  private _rebuildActiveOverlays(): void {
+    for (let index = 0; index < this._activeOverlays.length; index += 1) {
+      const current = this._activeOverlays[index]
+      this._activeOverlays[index] = this._createActiveOverlay(current.id, current.type, current.payload)
     }
-    this.scheduleDirty()
+    this._scheduleDirty()
   }
 
   /** Создает runtime-модель открытого overlay. */
-  private createActiveOverlay(id: string, type: string, payload: OverlayOpenOptions): ActiveOverlay {
-    const definition = this.definitions.get(type) ?? this.definitions.get('default')
+  private _createActiveOverlay(id: string, type: string, payload: OverlayOpenOptions): ActiveOverlay {
+    const definition = this._definitions.get(type) ?? this._definitions.get('default')
     return {
       id,
       type,
@@ -237,9 +237,9 @@ export class RootOverlayControllerNode<E extends EventList = Record<string, any>
   }
 
   /** Создает schema node для одного открытого overlay. */
-  private createOverlaySchema(overlay: ActiveOverlay, index: number): NovaElementSchema<any> {
-    const props = this.resolveOverlayProps(overlay)
-    const slot = this.createSlotContext(overlay, index, props)
+  private _createOverlaySchema(overlay: ActiveOverlay, index: number): NovaElementSchema<any> {
+    const props = this._resolveOverlayProps(overlay)
+    const slot = this._createSlotContext(overlay, index, props)
     const body = overlay.slot
       ? overlay.slot(slot)
       : createDefaultOverlayBody(slot)
@@ -263,7 +263,7 @@ export class RootOverlayControllerNode<E extends EventList = Record<string, any>
   }
 
   /** Создает implicit slot context для custom overlay template. */
-  private createSlotContext(overlay: ActiveOverlay, index: number, props: OverlayResolvedProps): OverlaySlotContext {
+  private _createSlotContext(overlay: ActiveOverlay, index: number, props: OverlayResolvedProps): OverlaySlotContext {
     return {
       ...overlay.payload,
       id: overlay.id,
@@ -283,8 +283,8 @@ export class RootOverlayControllerNode<E extends EventList = Record<string, any>
   }
 
   /** Разрешает итоговые props открытого overlay только перед reconcile. */
-  private resolveOverlayProps(overlay: ActiveOverlay): OverlayResolvedProps {
-    const definition = this.definitions.get(overlay.type) ?? this.definitions.get('default')
+  private _resolveOverlayProps(overlay: ActiveOverlay): OverlayResolvedProps {
+    const definition = this._definitions.get(overlay.type) ?? this._definitions.get('default')
     const payloadProps = overlay.payload as OverlayProps & Record<string, unknown>
     return normalizeOverlayProps({
       ...DEFAULT_OVERLAY_PROPS,
@@ -302,19 +302,19 @@ export class RootOverlayControllerNode<E extends EventList = Record<string, any>
   }
 
   /** Вызывает onOpenChange без полной normalization для overlays, закрытых до reconcile. */
-  private notifyOverlayOpenChange(overlay: ActiveOverlay, open: boolean, event?: Event): void {
-    const definition = this.definitions.get(overlay.type) ?? this.definitions.get('default')
+  private _notifyOverlayOpenChange(overlay: ActiveOverlay, open: boolean, event?: Event): void {
+    const definition = this._definitions.get(overlay.type) ?? this._definitions.get('default')
     const payloadOpenChange = (overlay.payload as OverlayProps).onOpenChange
     definition?.props?.onOpenChange?.(open, event)
     payloadOpenChange?.(open, event)
   }
 
   /** Коалесцирует invalidation для серийных API-вызовов в одном scheduler turn. */
-  private scheduleDirty(): void {
-    if (this.dirtyScheduled) {
+  private _scheduleDirty(): void {
+    if (this._dirtyScheduled) {
       return
     }
-    this.dirtyScheduled = true
+    this._dirtyScheduled = true
     this.dirty({ update: true, render: true })
   }
 }

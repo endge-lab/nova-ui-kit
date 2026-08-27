@@ -1,7 +1,7 @@
 {
   "name": "@endge/nova-ui-kit",
   "type": "module",
-  "version": "0.10.15",
+  "version": "0.10.16",
   "private": false,
   "sideEffects": false,
   "exports": {

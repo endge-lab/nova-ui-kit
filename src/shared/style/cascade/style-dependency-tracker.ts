@@ -32,12 +32,12 @@ let nextAppScopeId = 1
 
 /** Хранит owner -> token atoms и atom -> owner подписки для NovaCSS runtime reads. */
 export class NovaUiStyleDependencyTracker<E extends EventList = Record<string, any>> {
-  private readonly owners = new WeakMap<NovaNode<E>, OwnerState>()
-  private readonly atomOwners = new Map<string, Set<NovaNode<E>>>()
+  private readonly _owners = new WeakMap<NovaNode<E>, OwnerState>()
+  private readonly _atomOwners = new Map<string, Set<NovaNode<E>>>()
 
   /** Обновляет список token dependencies owner-а и перестраивает Raph subscriptions. */
   updateOwnerDependencies(owner: NovaNode<E>, reads: Iterable<NovaUiStyleTokenRead>): void {
-    const state = this.resolveOwnerState(owner)
+    const state = this._resolveOwnerState(owner)
     const nextReads = new Map<string, NovaUiStyleTokenRead>()
 
     for (const read of reads) {
@@ -52,7 +52,7 @@ export class NovaUiStyleDependencyTracker<E extends EventList = Record<string, a
       if (nextReads.has(key)) {
         continue
       }
-      this.unsubscribeOwnerAtom(owner, state, key)
+      this._unsubscribeOwnerAtom(owner, state, key)
     }
 
     for (const [key, read] of nextReads) {
@@ -62,37 +62,37 @@ export class NovaUiStyleDependencyTracker<E extends EventList = Record<string, a
       }
 
       if (previous) {
-        this.unsubscribeOwnerAtom(owner, state, key)
+        this._unsubscribeOwnerAtom(owner, state, key)
       }
       state.reads.set(key, read)
-      this.subscribeOwnerAtom(owner, state, key, read)
+      this._subscribeOwnerAtom(owner, state, key, read)
     }
   }
 
   /** Удаляет все подписки owner-а. */
   clearOwner(owner: NovaNode<E>): void {
-    const state = this.owners.get(owner)
+    const state = this._owners.get(owner)
     if (!state) {
       return
     }
 
     for (const key of [...state.reads.keys()]) {
-      this.unsubscribeOwnerAtom(owner, state, key)
+      this._unsubscribeOwnerAtom(owner, state, key)
     }
-    this.owners.delete(owner)
+    this._owners.delete(owner)
   }
 
   /** Возвращает количество активных owner subscriptions для benchmark/debug. */
   subscriptionCount(): number {
     let total = 0
-    for (const owners of this.atomOwners.values()) {
+    for (const owners of this._atomOwners.values()) {
       total += owners.size
     }
     return total
   }
 
-  private resolveOwnerState(owner: NovaNode<E>): OwnerState {
-    const existing = this.owners.get(owner)
+  private _resolveOwnerState(owner: NovaNode<E>): OwnerState {
+    const existing = this._owners.get(owner)
     if (existing) {
       return existing
     }
@@ -101,11 +101,11 @@ export class NovaUiStyleDependencyTracker<E extends EventList = Record<string, a
       reads: new Map(),
       disposers: new Map(),
     }
-    this.owners.set(owner, state)
+    this._owners.set(owner, state)
     return state
   }
 
-  private subscribeOwnerAtom(
+  private _subscribeOwnerAtom(
     owner: NovaNode<E>,
     state: OwnerState,
     key: string,
@@ -115,25 +115,25 @@ export class NovaUiStyleDependencyTracker<E extends EventList = Record<string, a
     const path = createNovaUiStyleTokenDataPath(owner.nova, read.token, read.scope)
     state.disposers.set(key, phases.map(phase => owner.observeData(path, { phase })))
 
-    let owners = this.atomOwners.get(key)
+    let owners = this._atomOwners.get(key)
     if (!owners) {
       owners = new Set()
-      this.atomOwners.set(key, owners)
+      this._atomOwners.set(key, owners)
     }
     owners.add(owner)
   }
 
-  private unsubscribeOwnerAtom(owner: NovaNode<E>, state: OwnerState, key: string): void {
+  private _unsubscribeOwnerAtom(owner: NovaNode<E>, state: OwnerState, key: string): void {
     for (const dispose of state.disposers.get(key) ?? []) {
       dispose()
     }
     state.disposers.delete(key)
     state.reads.delete(key)
 
-    const owners = this.atomOwners.get(key)
+    const owners = this._atomOwners.get(key)
     owners?.delete(owner)
     if (owners?.size === 0) {
-      this.atomOwners.delete(key)
+      this._atomOwners.delete(key)
     }
   }
 }
@@ -246,7 +246,7 @@ function normalizeDirtyPolicy(policy: NovaUiStyleDirtyPolicy = DEFAULT_TOKEN_DIR
   return {
     update: policy.update === true,
     matrix: policy.matrix === true,
-    render: policy.render !== false && (policy.render === true || !policy.update && !policy.matrix),
+    render: policy.render !== false && (policy.render === true || (!policy.update && !policy.matrix)),
   }
 }
 

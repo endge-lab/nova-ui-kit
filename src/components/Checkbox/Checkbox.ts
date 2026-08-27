@@ -20,9 +20,9 @@ import {
  */
 export class Checkbox<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<CheckboxResolvedProps, CheckboxApi, CheckboxProps, E> {
-  private hovered = false
-  private pressed = false
-  private readonly api: CheckboxApi
+  private _hovered = false
+  private _pressed = false
+  private readonly _api: CheckboxApi
 
   /**
    * Создает экземпляр Checkbox и подготавливает базовое состояние.
@@ -35,14 +35,14 @@ export class Checkbox<E extends EventList = Record<string, any>>
     descriptor: CheckboxDescriptor = CHECKBOX_NODE_DESCRIPTOR,
   ) {
     super(app, surface, descriptor, normalizeCheckboxProps(props), options)
-    this.api = {
+    this._api = {
       setChecked: checked => this.setProps({ checked, indeterminate: false }),
       toggle: event => this.toggle(event),
       setProps: patch => this.setProps(patch),
       getProps: () => this.props,
     }
     this.options({ interactive: !this.props.disabled })
-    this.setupEvents()
+    this._setupEvents()
   }
 
   /**
@@ -56,7 +56,7 @@ export class Checkbox<E extends EventList = Record<string, any>>
    * Возвращает значение состояния Checkbox.
    */
   override getApi(): CheckboxApi {
-    return this.api
+    return this._api
   }
 
   /**
@@ -86,7 +86,7 @@ export class Checkbox<E extends EventList = Record<string, any>>
       ...this.props,
       background: active
         ? this.props.accentColor ?? 'var(--nova-ui-accent, #2563eb)'
-        : resolveInteractionBackground(this.props, { hovered: this.hovered, pressed: this.pressed }, value => this.resolveThemeValue(value)),
+        : resolveInteractionBackground(this.props, { hovered: this._hovered, pressed: this._pressed }, value => this.resolveThemeValue(value)),
       border: active
         ? { color: this.props.accentColor ?? 'var(--nova-ui-accent, #2563eb)', width: 1, radius: 4 }
         : this.props.border,
@@ -123,18 +123,18 @@ export class Checkbox<E extends EventList = Record<string, any>>
   /**
    * Обновляет значение состояния Checkbox.
    */
-  private setupEvents(): void {
+  private _setupEvents(): void {
     this.on('mouseenter', () => {
       if (this.props.disabled) {
         return
       }
-      this.hovered = true
+      this._hovered = true
       this.playUiSound('hover')
       this.dirty({ render: true })
     })
     this.on('mouseleave', () => {
-      this.hovered = false
-      this.pressed = false
+      this._hovered = false
+      this._pressed = false
       this.dirty({ render: true })
     })
     this.on('mousedown', (event) => {
@@ -143,15 +143,15 @@ export class Checkbox<E extends EventList = Record<string, any>>
         return false
       }
       this.focus(event)
-      this.pressed = true
+      this._pressed = true
       this.dirty({ render: true })
       return false
     })
     this.on('mouseup', (event) => {
-      if (!this.pressed) {
+      if (!this._pressed) {
         return false
       }
-      this.pressed = false
+      this._pressed = false
       this.toggle(event)
       this.dirty({ render: true })
       return false

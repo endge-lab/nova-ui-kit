@@ -18,8 +18,8 @@ import { NovaUiComponentNode } from '@/shared/component'
 /** Регистрирует набор overlay templates в ближайшем Root без участия layout. */
 export class Overlays<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<OverlaysResolvedProps, OverlaysApi, OverlaysProps, E> {
-  private readonly sourceId: string
-  private readonly api: OverlaysApi
+  private readonly _sourceId: string
+  private readonly _api: OverlaysApi
 
   /** Создает registry-node для overlay templates. */
   constructor(
@@ -30,9 +30,9 @@ export class Overlays<E extends EventList = Record<string, any>>
     descriptor: OverlaysDescriptor = OVERLAYS_NODE_DESCRIPTOR,
   ) {
     super(app, surface, descriptor, normalizeOverlaysProps(props), options)
-    this.sourceId = options.componentId ?? this.id
-    this.api = {
-      setDefinitions: definitions => this.setDefinitions(definitions),
+    this._sourceId = options.componentId ?? this.id
+    this._api = {
+      setDefinitions: definitions => this._setDefinitions(definitions),
       getDefinitions: () => this.props.definitions,
     }
     this.visible = false
@@ -46,7 +46,7 @@ export class Overlays<E extends EventList = Record<string, any>>
 
   /** Возвращает публичный API registry-node. */
   override getApi(): OverlaysApi {
-    return this.api
+    return this._api
   }
 
   /** Registry-node не участвует в update-фазе. */
@@ -58,12 +58,12 @@ export class Overlays<E extends EventList = Record<string, any>>
   /** Регистрирует definitions после mount. */
   protected override onMount(): void {
     super.onMount()
-    this.syncRootDefinitions()
+    this._syncRootDefinitions()
   }
 
   /** Снимает definitions при удалении registry-node. */
   protected override onUnmount(): void {
-    findNovaUiRoot(this)?.getApi?.().unregisterOverlayDefinitions?.(this.sourceId)
+    findNovaUiRoot(this)?.getApi?.().unregisterOverlayDefinitions?.(this._sourceId)
   }
 
   /** Реагирует на замену definitions. */
@@ -73,17 +73,17 @@ export class Overlays<E extends EventList = Record<string, any>>
     this.visible = false
     this.options({ interactive: false })
     if (changedKeys.includes('definitions')) {
-      this.syncRootDefinitions()
+      this._syncRootDefinitions()
     }
   }
 
   /** Заменяет definitions текущего source. */
-  private setDefinitions(definitions: Array<OverlayDefinition>): void {
+  private _setDefinitions(definitions: Array<OverlayDefinition>): void {
     this.setProps({ definitions })
   }
 
   /** Передает definitions ближайшему Root. */
-  private syncRootDefinitions(): void {
-    findNovaUiRoot(this)?.getApi?.().registerOverlayDefinitions?.(this.sourceId, this.props.definitions)
+  private _syncRootDefinitions(): void {
+    findNovaUiRoot(this)?.getApi?.().registerOverlayDefinitions?.(this._sourceId, this.props.definitions)
   }
 }

@@ -78,10 +78,10 @@ export function compileGridChildLayout(layout: GridChildLayout = {}): CompiledGr
 
 /** Считает rect детей Grid без создания Nova nodes и без render side effects. */
 export class GridLayoutEngine {
-  private readonly sortedEntries: Array<GridChildEntry> = []
-  private readonly measuredItems: Array<GridMeasuredItem> = []
-  private readonly rowHeights: Array<number> = []
-  private readonly rowOffsets: Array<number> = []
+  private readonly _sortedEntries: Array<GridChildEntry> = []
+  private readonly _measuredItems: Array<GridMeasuredItem> = []
+  private readonly _rowHeights: Array<number> = []
+  private readonly _rowOffsets: Array<number> = []
 
   /**
    * Вычисляет производное значение GridLayoutEngine.
@@ -91,12 +91,12 @@ export class GridLayoutEngine {
     const padding = resolveSpacing(props.padding)
     const innerWidth = Math.max(0, context.width - padding.left - padding.right)
     const innerHeight = Math.max(0, context.height - padding.top - padding.bottom)
-    const columnCount = this.resolveColumnCount(props, innerWidth)
-    const columnWidth = this.resolveColumnWidth(innerWidth, columnCount, props.columnGap)
+    const columnCount = this._resolveColumnCount(props, innerWidth)
+    const columnWidth = this._resolveColumnWidth(innerWidth, columnCount, props.columnGap)
     const rowHeight = compileLayoutValue(props.rowHeight, 'auto')
 
-    this.prepareSortedEntries(context.entries)
-    this.collectMeasuredItems({
+    this._prepareSortedEntries(context.entries)
+    this._collectMeasuredItems({
       props,
       padding,
       innerHeight,
@@ -104,7 +104,7 @@ export class GridLayoutEngine {
       columnWidth,
       rowHeight,
     })
-    this.placeMeasuredItems({
+    this._placeMeasuredItems({
       props,
       padding,
       columnWidth,
@@ -113,22 +113,22 @@ export class GridLayoutEngine {
 
     return {
       columnCount,
-      rowCount: this.rowHeights.length,
+      rowCount: this._rowHeights.length,
     }
   }
 
   /**
    * Подготавливает данные к использованию GridLayoutEngine.
    */
-  private prepareSortedEntries(entries: Array<GridChildEntry>): void {
-    this.sortedEntries.length = 0
+  private _prepareSortedEntries(entries: Array<GridChildEntry>): void {
+    this._sortedEntries.length = 0
     if (isAlreadyOrdered(entries)) {
-      this.sortedEntries.push(...entries)
+      this._sortedEntries.push(...entries)
       return
     }
 
-    this.sortedEntries.push(...entries)
-    this.sortedEntries.sort((a, b) => {
+    this._sortedEntries.push(...entries)
+    this._sortedEntries.sort((a, b) => {
       const orderDiff = a.compiledLayout.order - b.compiledLayout.order
       if (orderDiff !== 0) {
         return orderDiff
@@ -140,7 +140,7 @@ export class GridLayoutEngine {
   /**
    * Выполняет внутренний шаг collectMeasuredItems для GridLayoutEngine.
    */
-  private collectMeasuredItems(context: {
+  private _collectMeasuredItems(context: {
     props: GridResolvedProps
     padding: NovaUiResolvedSpacing
     innerHeight: number
@@ -148,13 +148,13 @@ export class GridLayoutEngine {
     columnWidth: number
     rowHeight: NovaUiCompiledLayoutValue
   }): void {
-    this.rowHeights.length = 0
+    this._rowHeights.length = 0
 
     let row = 0
     let column = 0
     let itemIndex = 0
 
-    for (const entry of this.sortedEntries) {
+    for (const entry of this._sortedEntries) {
       const layout = entry.compiledLayout
       const colSpan = Math.min(context.columnCount, layout.colSpan)
 
@@ -165,11 +165,11 @@ export class GridLayoutEngine {
 
       const cellX = context.padding.left + column * (context.columnWidth + context.props.columnGap)
       const cellWidth = colSpan * context.columnWidth + Math.max(0, colSpan - 1) * context.props.columnGap
-      const preferredHeight = this.resolveItemHeight(entry, context.rowHeight, cellWidth, context.innerHeight)
+      const preferredHeight = this._resolveItemHeight(entry, context.rowHeight, cellWidth, context.innerHeight)
       const outerHeight = preferredHeight + layout.margin.top + layout.margin.bottom
-      const item = this.measuredItems[itemIndex] ?? createMeasuredItem()
+      const item = this._measuredItems[itemIndex] ?? createMeasuredItem()
 
-      this.rowHeights[row] = Math.max(this.rowHeights[row] ?? 0, outerHeight)
+      this._rowHeights[row] = Math.max(this._rowHeights[row] ?? 0, outerHeight)
       item.entry = entry
       item.row = row
       item.column = column
@@ -181,7 +181,7 @@ export class GridLayoutEngine {
       item.margin = layout.margin
       item.alignSelf = layout.alignSelf
       item.justifySelf = layout.justifySelf
-      this.measuredItems[itemIndex] = item
+      this._measuredItems[itemIndex] = item
       itemIndex += 1
 
       column += colSpan
@@ -191,31 +191,31 @@ export class GridLayoutEngine {
       }
     }
 
-    this.measuredItems.length = itemIndex
+    this._measuredItems.length = itemIndex
   }
 
   /**
    * Выполняет внутренний шаг placeMeasuredItems для GridLayoutEngine.
    */
-  private placeMeasuredItems(context: {
+  private _placeMeasuredItems(context: {
     props: GridResolvedProps
     padding: NovaUiResolvedSpacing
     columnWidth: number
     columnGap: number
   }): void {
-    this.resolveRowOffsets(context.props.rowGap)
+    this._resolveRowOffsets(context.props.rowGap)
 
-    for (const item of this.measuredItems) {
-      const rowY = context.padding.top + this.rowOffsets[item.row]
-      const rowHeight = this.rowHeights[item.row] ?? 0
+    for (const item of this._measuredItems) {
+      const rowY = context.padding.top + this._rowOffsets[item.row]
+      const rowHeight = this._rowHeights[item.row] ?? 0
       const align = item.alignSelf ?? context.props.alignItems
       const justify = item.justifySelf ?? context.props.justifyItems
       const innerCellWidth = Math.max(0, item.cellWidth - item.margin.left - item.margin.right)
       const innerRowHeight = Math.max(0, rowHeight - item.margin.top - item.margin.bottom)
       const targetWidth = justify === 'stretch' ? innerCellWidth : Math.min(item.preferredWidth, innerCellWidth)
       const targetHeight = align === 'stretch' ? innerRowHeight : Math.min(item.preferredHeight, innerRowHeight)
-      const xOffset = this.resolveOffset(justify, innerCellWidth, targetWidth)
-      const yOffset = this.resolveOffset(align, innerRowHeight, targetHeight)
+      const xOffset = this._resolveOffset(justify, innerCellWidth, targetWidth)
+      const yOffset = this._resolveOffset(align, innerRowHeight, targetHeight)
       const rect = item.entry.nextRect
 
       rect.x = item.cellX + item.margin.left + xOffset
@@ -228,7 +228,7 @@ export class GridLayoutEngine {
   /**
    * Нормализует и возвращает итоговое значение GridLayoutEngine.
    */
-  private resolveColumnCount(props: GridResolvedProps, innerWidth: number): number {
+  private _resolveColumnCount(props: GridResolvedProps, innerWidth: number): number {
     if (!props.responsive) {
       return Math.max(1, props.columns)
     }
@@ -247,7 +247,7 @@ export class GridLayoutEngine {
   /**
    * Нормализует и возвращает итоговое значение GridLayoutEngine.
    */
-  private resolveColumnWidth(innerWidth: number, columnCount: number, columnGap: number): number {
+  private _resolveColumnWidth(innerWidth: number, columnCount: number, columnGap: number): number {
     const gapTotal = Math.max(0, columnCount - 1) * columnGap
     return Math.max(0, (innerWidth - gapTotal) / columnCount)
   }
@@ -255,14 +255,14 @@ export class GridLayoutEngine {
   /**
    * Нормализует и возвращает итоговое значение GridLayoutEngine.
    */
-  private resolveItemHeight(
+  private _resolveItemHeight(
     entry: GridChildEntry,
     rowHeight: NovaUiCompiledLayoutValue,
     cellWidth: number,
     innerHeight: number,
   ): number {
     const layout = entry.compiledLayout
-    const measured = this.measureAutoItem(entry, cellWidth, innerHeight)
+    const measured = this._measureAutoItem(entry, cellWidth, innerHeight)
     const rawHeight = !isAutoLayoutValue(layout.height)
       ? resolveLayoutValue(layout.height, innerHeight, 0)
       : !isAutoLayoutValue(rowHeight)
@@ -275,7 +275,7 @@ export class GridLayoutEngine {
   /**
    * Измеряет layout или runtime-метрики GridLayoutEngine.
    */
-  private measureAutoItem(entry: GridChildEntry, cellWidth: number, innerHeight: number): { width: number, height: number } | undefined {
+  private _measureAutoItem(entry: GridChildEntry, cellWidth: number, innerHeight: number): { width: number, height: number } | undefined {
     const layout = entry.compiledLayout
 
     if (!isAutoLayoutValue(layout.height)) {
@@ -296,20 +296,20 @@ export class GridLayoutEngine {
   /**
    * Нормализует и возвращает итоговое значение GridLayoutEngine.
    */
-  private resolveRowOffsets(rowGap: number): void {
-    this.rowOffsets.length = this.rowHeights.length
+  private _resolveRowOffsets(rowGap: number): void {
+    this._rowOffsets.length = this._rowHeights.length
     let offset = 0
 
-    for (let index = 0; index < this.rowHeights.length; index += 1) {
-      this.rowOffsets[index] = offset
-      offset += (this.rowHeights[index] ?? 0) + rowGap
+    for (let index = 0; index < this._rowHeights.length; index += 1) {
+      this._rowOffsets[index] = offset
+      offset += (this._rowHeights[index] ?? 0) + rowGap
     }
   }
 
   /**
    * Нормализует и возвращает итоговое значение GridLayoutEngine.
    */
-  private resolveOffset(align: GridAlign, available: number, target: number): number {
+  private _resolveOffset(align: GridAlign, available: number, target: number): number {
     const free = Math.max(0, available - target)
     if (align === 'center') {
       return free / 2

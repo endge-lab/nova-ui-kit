@@ -8,16 +8,16 @@ import { resolveNovaUiMotionOptions } from '@/shared/motion'
  * Описывает ответственность ColResizer в архитектуре проекта.
  */
 export class ColResizer<E extends EventList> extends NovaNode<E> {
-  private color: string
-  private hoverColor: string
-  private activeColor: string
-  private overlayColor: string
-  private lineWidth: number
-  private hitSize: number
-  private isDragging = false
-  private isHover = false
-  private disabled = false
-  private motionEnabled = true
+  private _color: string
+  private _hoverColor: string
+  private _activeColor: string
+  private _overlayColor: string
+  private _lineWidth: number
+  private _hitSize: number
+  private _isDragging = false
+  private _isHover = false
+  private _disabled = false
+  private _motionEnabled = true
   private _onChangeStart: (e: MouseEvent) => void = () => {}
   private _onChangeMove: (e: MouseEvent, dx: number) => void = () => {}
   private _onChangeEnd: (e: MouseEvent) => void = () => {}
@@ -33,22 +33,22 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
   ) {
     super(app, surface)
     this.__type = 'ColResizer'
-    this.color = color
-    this.hoverColor = color
-    this.activeColor = color
-    this.overlayColor = 'rgba(37,99,235,0.14)'
-    this.lineWidth = lineWidth
-    this.hitSize = Math.max(6, lineWidth)
-    this.options({ width: this.hitSize, height: 0 })
-    this.setupEvents()
+    this._color = color
+    this._hoverColor = color
+    this._activeColor = color
+    this._overlayColor = 'rgba(37,99,235,0.14)'
+    this._lineWidth = lineWidth
+    this._hitSize = Math.max(6, lineWidth)
+    this.options({ width: this._hitSize, height: 0 })
+    this._setupEvents()
   }
 
   /**
    * Обновляет значение состояния ColResizer.
    */
-  private setupEvents(): void {
+  private _setupEvents(): void {
     this.on('dragstart', (e) => {
-      if (this.disabled) {
+      if (this._disabled) {
         return false
       }
       this._onChangeStart(e)
@@ -56,8 +56,8 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
         return false
       }
 
-      this.isDragging = true
-      if (this.motionEnabled) {
+      this._isDragging = true
+      if (this._motionEnabled) {
         this.nova.motion.to(this, { scaleX: 1.08, opacity: 0.85 }, resolveNovaUiMotionOptions('pressFeedback'))
       }
       this.nova.invalidate()
@@ -65,7 +65,7 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
     })
 
     this.on('dragmove', (e, dx) => {
-      if (this.disabled) {
+      if (this._disabled) {
         return false
       }
       this._onChangeMove(e, dx)
@@ -77,7 +77,7 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
     })
 
     this.on('dragend', (e) => {
-      if (this.disabled) {
+      if (this._disabled) {
         return false
       }
       this._onChangeEnd(e)
@@ -85,8 +85,8 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
         return false
       }
 
-      this.isDragging = false
-      if (this.motionEnabled) {
+      this._isDragging = false
+      if (this._motionEnabled) {
         this.nova.motion.to(this, { scaleX: 1, opacity: 1 }, resolveNovaUiMotionOptions('pressFeedback'))
       }
       this.nova.invalidate()
@@ -94,16 +94,16 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
     })
 
     this.on('mouseenter', () => {
-      if (this.disabled) {
+      if (this._disabled) {
         return
       }
-      this.isHover = true
+      this._isHover = true
       this.nova.invalidate()
     })
 
     this.on('mouseleave', () => {
-      this.isHover = false
-      if (!this.isDragging) {
+      this._isHover = false
+      if (!this._isDragging) {
         this.nova.invalidate()
       }
     })
@@ -149,9 +149,9 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
         x2: centerX,
         y2,
         styles: {
-          color: this.isDragging ? this.activeColor : this.isHover ? this.hoverColor : this.color,
-          width: this.lineWidth,
-          opacity: this.disabled ? 0.45 : 1,
+          color: this._isDragging ? this._activeColor : this._isHover ? this._hoverColor : this._color,
+          width: this._lineWidth,
+          opacity: this._disabled ? 0.45 : 1,
         },
       },
       {
@@ -160,8 +160,8 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
         y: 0,
         width: Math.max(0, centerX),
         height: this.height,
-        styles: { background: this.overlayColor },
-        active: this.isDragging,
+        styles: { background: this._overlayColor },
+        active: this._isDragging,
       },
     ])
   }
@@ -188,15 +188,15 @@ export class ColResizer<E extends EventList> extends NovaNode<E> {
       cursor: { hover: 'col-resize', pressed: 'col-resize', dragging: 'col-resize', disabled: 'not-allowed' },
       cursorContext: { axis: 'x', disabled: disabled === true },
     })
-    this.color = color ?? this.color
-    this.hoverColor = hoverColor ?? this.hoverColor ?? this.color
-    this.activeColor = activeColor ?? this.activeColor ?? this.hoverColor
-    this.overlayColor = overlayColor ?? this.overlayColor
-    this.lineWidth = lineWidth ?? this.lineWidth
-    this.hitSize = hitSize ?? this.hitSize
-    this.disabled = disabled ?? this.disabled
-    this.motionEnabled = motion !== false
-    this.setLocalRenderBounds({ x: 0, y: 0, width: Math.max(this.width, this.hitSize), height: this.height })
+    this._color = color ?? this._color
+    this._hoverColor = hoverColor ?? this._hoverColor ?? this._color
+    this._activeColor = activeColor ?? this._activeColor ?? this._hoverColor
+    this._overlayColor = overlayColor ?? this._overlayColor
+    this._lineWidth = lineWidth ?? this._lineWidth
+    this._hitSize = hitSize ?? this._hitSize
+    this._disabled = disabled ?? this._disabled
+    this._motionEnabled = motion !== false
+    this.setLocalRenderBounds({ x: 0, y: 0, width: Math.max(this.width, this._hitSize), height: this.height })
     return this
   }
 

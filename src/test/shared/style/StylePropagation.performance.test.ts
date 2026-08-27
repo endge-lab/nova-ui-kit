@@ -52,7 +52,7 @@ class BenchTextTarget implements NovaUiStyleTarget {
   /**
    * Создает экземпляр BenchTextTarget и подготавливает базовое состояние.
    */
-  constructor(private readonly explicitMask = NovaUiStyleMask.None) {}
+  constructor(private readonly _explicitMask = NovaUiStyleMask.None) {}
 
   /**
    * Выполняет действие receiveStyleContext в рамках ответственности BenchTextTarget.
@@ -83,7 +83,7 @@ class BenchTextTarget implements NovaUiStyleTarget {
    * Возвращает значение состояния BenchTextTarget.
    */
   getSubtreeStyleMask(): NovaUiStyleMask {
-    return NovaUiStyleMask.AllText & ~this.explicitMask
+    return NovaUiStyleMask.AllText & ~this._explicitMask
   }
 }
 
@@ -99,8 +99,8 @@ class BenchContainerTarget implements NovaUiStyleTarget {
    * Создает экземпляр BenchContainerTarget и подготавливает базовое состояние.
    */
   constructor(
-    private readonly children: Array<NovaUiStyleTarget>,
-    private readonly ownStyleMask = NovaUiStyleMask.None,
+    private readonly _children: Array<NovaUiStyleTarget>,
+    private readonly _ownStyleMask = NovaUiStyleMask.None,
   ) {}
 
   /**
@@ -110,7 +110,7 @@ class BenchContainerTarget implements NovaUiStyleTarget {
     this.receiveCount += 1
     const result: NovaUiStyleReceiveResult = { update: false, render: false, layout: false }
 
-    for (const child of this.children) {
+    for (const child of this._children) {
       const childMask = child.getSubtreeStyleMask()
       if ((changedMask & childMask) === 0) {
         this.skippedCount += 1
@@ -131,10 +131,10 @@ class BenchContainerTarget implements NovaUiStyleTarget {
    */
   getSubtreeStyleMask(): NovaUiStyleMask {
     let mask = NovaUiStyleMask.None
-    for (const child of this.children) {
+    for (const child of this._children) {
       mask |= child.getSubtreeStyleMask()
     }
-    return mask & ~this.ownStyleMask
+    return mask & ~this._ownStyleMask
   }
 }
 

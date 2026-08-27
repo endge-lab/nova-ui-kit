@@ -15,9 +15,9 @@ import {
 
 export class Chip<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<ChipResolvedProps, ChipApi, ChipProps, E> {
-  private hovered = false
-  private pressed = false
-  private readonly api: ChipApi
+  private _hovered = false
+  private _pressed = false
+  private readonly _api: ChipApi
 
   constructor(
     app: NovaApp<E>,
@@ -27,7 +27,7 @@ export class Chip<E extends EventList = Record<string, any>>
     descriptor: ChipDescriptor = CHIP_NODE_DESCRIPTOR,
   ) {
     super(app, surface, descriptor, normalizeChipProps(props), options)
-    this.api = {
+    this._api = {
       press: event => this.press(event),
       remove: event => this.remove(event),
       setProps: patch => this.setProps(patch),
@@ -35,7 +35,7 @@ export class Chip<E extends EventList = Record<string, any>>
       getProps: () => this.props,
     }
     this.options({ interactive: !this.props.disabled })
-    this.setupEvents()
+    this._setupEvents()
   }
 
   override setProps(patch: ChipProps): this {
@@ -43,7 +43,7 @@ export class Chip<E extends EventList = Record<string, any>>
   }
 
   override getApi(): ChipApi {
-    return this.api
+    return this._api
   }
 
   press(event?: Event): void {
@@ -61,8 +61,8 @@ export class Chip<E extends EventList = Record<string, any>>
   render(): void {
     const schema: NovaSchema = buildBoxSchema(this.props, this.width, this.height, {
       background: resolveInteractionBackground(this.props, {
-        hovered: this.hovered,
-        pressed: this.pressed,
+        hovered: this._hovered,
+        pressed: this._pressed,
         active: this.props.selected,
       }, value => this.resolveThemeValue(value)),
       resolveThemeValue: value => this.resolveThemeValue(value),
@@ -94,25 +94,25 @@ export class Chip<E extends EventList = Record<string, any>>
     this.applyCommonPropsChanged(changedKeys)
   }
 
-  private setupEvents(): void {
+  private _setupEvents(): void {
     this.on('mouseenter', () => {
-      this.hovered = true
+      this._hovered = true
       this.dirty({ render: true })
     })
     this.on('mouseleave', () => {
-      this.hovered = false
-      this.pressed = false
+      this._hovered = false
+      this._pressed = false
       this.dirty({ render: true })
     })
     this.on('mousedown', (event) => {
       this.focus(event)
-      this.pressed = true
+      this._pressed = true
       this.dirty({ render: true })
       return false
     })
     this.on('mouseup', (event) => {
-      this.pressed = false
-      if (this.removeHit(event)) {
+      this._pressed = false
+      if (this._removeHit(event)) {
         this.remove(event)
       }
       else { this.press(event) }
@@ -129,7 +129,7 @@ export class Chip<E extends EventList = Record<string, any>>
     })
   }
 
-  private removeHit(event: MouseEvent): boolean {
+  private _removeHit(event: MouseEvent): boolean {
     const { x, y } = this.events.getCanvasMousePosition(event)
     const [localX, localY] = this.toLocal(x, y)
     return this.props.removable && localY >= 0 && localY <= this.height && localX >= this.width - 32

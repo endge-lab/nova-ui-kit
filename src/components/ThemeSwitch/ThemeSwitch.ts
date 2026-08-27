@@ -33,10 +33,10 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
   extends NovaComponentNode<ThemeSwitchResolvedProps, ThemeSwitchApi, Record<string, never>, ThemeSwitchProps, E> {
   readonly [NOVA_UI_LAYOUT_TARGET] = true as const
 
-  private readonly api: ThemeSwitchApi
-  private hovered = false
-  private pressed = false
-  private externalLayout = false
+  private readonly _api: ThemeSwitchApi
+  private _hovered = false
+  private _pressed = false
+  private _externalLayout = false
 
   constructor(
     app: NovaApp<E>,
@@ -48,15 +48,15 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
     ensureNovaUIKitThemes(app)
     super(app, surface, descriptor, normalizeThemeSwitchProps(props), options)
     this.addDisposer(app.theme.observe(this, { phase: 'render' }))
-    this.api = {
-      next: () => this.nextTheme(),
+    this._api = {
+      next: () => this._nextTheme(),
       setValue: value => this.setProps({ value }),
       setProps: patch => this.setProps(patch),
       getProps: () => this.props,
     }
     this.options({ interactive: true, cursor: 'pointer', zIndex: 2001 })
-    this.setupEvents()
-    this.applyPlacement()
+    this._setupEvents()
+    this._applyPlacement()
   }
 
   override setProps(patch: ThemeSwitchProps): this {
@@ -64,18 +64,18 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
   }
 
   override getApi(): ThemeSwitchApi {
-    return this.api
+    return this._api
   }
 
   update(): void {
-    if (!this.externalLayout) {
-      this.applyPlacement()
+    if (!this._externalLayout) {
+      this._applyPlacement()
     }
   }
 
   /** Принимает rect от UI Kit layout-контейнера. */
   applyLayoutRect(rect: NovaUiLayoutRect): boolean {
-    this.externalLayout = true
+    this._externalLayout = true
     const sizeChanged = this.width !== rect.width || this.height !== rect.height
     const changed = this.x !== rect.x
       || this.y !== rect.y
@@ -106,7 +106,7 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
       return
     }
 
-    const theme = this.currentTheme()
+    const theme = this._currentTheme()
     const buttonProps = normalizeButtonProps({
       width: this.width,
       height: this.height,
@@ -121,64 +121,64 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
       mask: NovaUiStyleMask.None,
       version: 0,
     }, {
-      hovered: this.hovered,
-      pressed: this.pressed,
+      hovered: this._hovered,
+      pressed: this._pressed,
     }, value => resolveNovaUiThemeValue(this.nova, value)))
   }
 
   protected override onPropsChanged(): void {
     this.props = normalizeThemeSwitchProps(this.props)
     this.options({ interactive: this.props.visible, zIndex: this.props.zIndex })
-    if (!this.externalLayout) {
-      this.applyPlacement()
+    if (!this._externalLayout) {
+      this._applyPlacement()
     }
   }
 
-  private setupEvents(): void {
+  private _setupEvents(): void {
     this.on('mouseenter', () => {
       if (!this.props.visible) {
         return
       }
-      this.hovered = true
+      this._hovered = true
       this.dirty({ render: true })
     })
     this.on('mousedown', () => {
       if (!this.props.visible) {
         return false
       }
-      this.pressed = true
-      this.nextTheme()
+      this._pressed = true
+      this._nextTheme()
       this.dirty({ render: true })
       return false
     })
     this.on('mouseup', () => {
-      if (!this.pressed) {
+      if (!this._pressed) {
         return false
       }
-      this.pressed = false
+      this._pressed = false
       this.dirty({ render: true })
       return false
     })
     this.on('mouseleave', () => {
-      this.hovered = false
-      if (!this.pressed) {
+      this._hovered = false
+      if (!this._pressed) {
         return
       }
-      this.pressed = false
+      this._pressed = false
       this.dirty({ render: true })
     })
   }
 
-  private currentTheme(): ThemeSwitchTheme | undefined {
+  private _currentTheme(): ThemeSwitchTheme | undefined {
     const active = this.props.value ?? this.nova.theme.active()
     return this.props.themes.find(theme => theme.id === active) ?? this.props.themes[0]
   }
 
-  private nextTheme(): void {
+  private _nextTheme(): void {
     if (this.props.themes.length === 0) {
       return
     }
-    const current = this.currentTheme()
+    const current = this._currentTheme()
     const index = Math.max(0, this.props.themes.findIndex(theme => theme.id === current?.id))
     const next = this.props.themes[(index + 1) % this.props.themes.length]
     if (!next) {
@@ -196,7 +196,7 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
     this.props.onChange?.(next.id)
   }
 
-  private applyPlacement(): void {
+  private _applyPlacement(): void {
     const rect = resolveOverlayRect(this.surface.width, this.surface.height, this.props)
     const nextX = rect.x ?? this.x
     const nextY = rect.y ?? this.y

@@ -43,12 +43,12 @@ import {
 /** Базовый visual container UI Kit: фон, border, clip, padding и children. */
 export class Surface<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<SurfaceResolvedProps, SurfaceApi, SurfaceProps, E> {
-  private readonly managedChildren: Array<NovaNode<E>> = []
-  private readonly managedChildLayouts: Array<NovaUiPositionedLayout | undefined> = []
-  private readonly childRect = createLayoutRect()
-  private readonly api: SurfaceApi
-  private readonly motionPlaybacks: Array<NovaMotionPlayback> = []
-  private layoutDirty = true
+  private readonly _managedChildren: Array<NovaNode<E>> = []
+  private readonly _managedChildLayouts: Array<NovaUiPositionedLayout | undefined> = []
+  private readonly _childRect = createLayoutRect()
+  private readonly _api: SurfaceApi
+  private readonly _motionPlaybacks: Array<NovaMotionPlayback> = []
+  private _layoutDirty = true
 
   /**
    * Создает экземпляр Surface и подготавливает базовое состояние.
@@ -61,11 +61,11 @@ export class Surface<E extends EventList = Record<string, any>>
     descriptor: SurfaceDescriptor = SURFACE_NODE_DESCRIPTOR,
   ) {
     super(app, surface, descriptor, normalizeSurfaceProps(props), options)
-    this.api = {
+    this._api = {
       setProps: patch => this.setProps(patch),
       setChildren: children => this.setChildren(children),
       relayout: () => this.relayout(),
-      getChildRect: () => this.childRect,
+      getChildRect: () => this._childRect,
     }
     this.setChildren(options.children ?? [])
   }
@@ -81,7 +81,7 @@ export class Surface<E extends EventList = Record<string, any>>
    * Возвращает значение состояния Surface.
    */
   override getApi(): SurfaceApi {
-    return this.api
+    return this._api
   }
 
   /**
@@ -90,7 +90,7 @@ export class Surface<E extends EventList = Record<string, any>>
   override applyLayoutRect(rect: NovaUiLayoutRect): boolean {
     const changed = super.applyLayoutRect(rect)
     if (changed || hasActiveMotionTransform(this.props)) {
-      this.applyMotionTransform()
+      this._applyMotionTransform()
     }
     return changed
   }
@@ -99,13 +99,13 @@ export class Surface<E extends EventList = Record<string, any>>
    * Обновляет значение состояния Surface.
    */
   setChildren(children: Array<SurfaceChildSchema>): void {
-    const reconciled = reconcileNovaTemplateChildren(this, this.managedChildren, children)
-    this.managedChildren.length = 0
-    this.managedChildren.push(...reconciled.nodes)
-    this.managedChildLayouts.length = 0
-    this.managedChildLayouts.push(...children.map(child => child.layout))
+    const reconciled = reconcileNovaTemplateChildren(this, this._managedChildren, children)
+    this._managedChildren.length = 0
+    this._managedChildren.push(...reconciled.nodes)
+    this._managedChildLayouts.length = 0
+    this._managedChildLayouts.push(...children.map(child => child.layout))
 
-    this.propagateStyleContext(NovaUiStyleMask.AllText)
+    this._propagateStyleContext(NovaUiStyleMask.AllText)
     this.relayout()
   }
 
@@ -113,7 +113,7 @@ export class Surface<E extends EventList = Record<string, any>>
    * Выполняет действие relayout в рамках ответственности Surface.
    */
   relayout(): void {
-    this.layoutDirty = true
+    this._layoutDirty = true
     this.dirty({ update: true, render: true })
   }
 
@@ -125,7 +125,7 @@ export class Surface<E extends EventList = Record<string, any>>
     this.inheritedStyleContext = context
     const next = mergeStyleContext(context, this.props.style)
     const changedMask = styleContextChangedMask(previous, next)
-    const result = this.propagateStyleContext(changedMask || NovaUiStyleMask.AllText)
+    const result = this._propagateStyleContext(changedMask || NovaUiStyleMask.AllText)
     this.dirty({ render: true })
     return mergeStyleReceiveResult(result, { update: false, render: true, layout: result.layout })
   }
@@ -134,23 +134,23 @@ export class Surface<E extends EventList = Record<string, any>>
    * Обновляет runtime-состояние Surface.
    */
   update(): void {
-    if (!this.layoutDirty) {
+    if (!this._layoutDirty) {
       return
     }
 
     const padding = resolveSpacing(this.props.padding)
-    copyRect(this.childRect, {
+    copyRect(this._childRect, {
       x: padding.left,
       y: padding.top,
       width: Math.max(0, this.width - padding.left - padding.right),
       height: Math.max(0, this.height - padding.top - padding.bottom),
     })
 
-    this.managedChildren.forEach((child, index) => {
-      const layout = resolveNovaUiPositionedLayout(child, this.managedChildLayouts[index])
+    this._managedChildren.forEach((child, index) => {
+      const layout = resolveNovaUiPositionedLayout(child, this._managedChildLayouts[index])
       const rect = resolveNovaUiPositionedRect(
-        this.childRect,
-        this.childRect,
+        this._childRect,
+        this._childRect,
         layout,
         child,
       )
@@ -159,7 +159,7 @@ export class Surface<E extends EventList = Record<string, any>>
       child.dirty({ matrix: true, update: true, render: true })
     })
 
-    this.layoutDirty = false
+    this._layoutDirty = false
   }
 
   /**
@@ -180,14 +180,14 @@ export class Surface<E extends EventList = Record<string, any>>
    */
   protected override onMount(): void {
     super.onMount()
-    this.syncMotion()
+    this._syncMotion()
   }
 
   /**
    * Обрабатывает входящее событие Surface.
    */
   protected override onUnmount(): void {
-    this.stopMotion()
+    this._stopMotion()
   }
 
   /**
@@ -197,27 +197,27 @@ export class Surface<E extends EventList = Record<string, any>>
     this.props = normalizeSurfaceProps(this.props)
     this.applyCommonPropsChanged(changedKeys)
     if (hasMotionTransformChanges(changedKeys)) {
-      this.applyMotionTransform()
+      this._applyMotionTransform()
     }
     if (changedKeys.includes('padding')) {
       this.relayout()
     }
     if (changedKeys.includes('motion')) {
-      this.syncMotion()
+      this._syncMotion()
     }
   }
 
   /**
    * Выполняет внутренний шаг propagateStyleContext для Surface.
    */
-  private propagateStyleContext(changedMask: NovaUiStyleMask): NovaUiStyleReceiveResult {
+  private _propagateStyleContext(changedMask: NovaUiStyleMask): NovaUiStyleReceiveResult {
     const result: NovaUiStyleReceiveResult = { update: false, render: false, layout: false }
     if (changedMask === NovaUiStyleMask.None) {
       return result
     }
 
     const context = mergeStyleContext(this.inheritedStyleContext, this.props.style)
-    for (const child of this.managedChildren) {
+    for (const child of this._managedChildren) {
       if (!isNovaUiStyleTarget(child)) {
         continue
       }
@@ -233,13 +233,13 @@ export class Surface<E extends EventList = Record<string, any>>
   /**
    * Синхронизирует состояние между слоями Surface.
    */
-  private syncMotion(): void {
-    this.stopMotion(true)
+  private _syncMotion(): void {
+    this._stopMotion(true)
     const motions = resolveNovaUiMotionDeclarations(this.props.motion)
 
     for (const motion of motions) {
       if (motion.preset === 'shimmer') {
-        this.motionPlaybacks.push(this.transitionTo(
+        this._motionPlaybacks.push(this.transitionTo(
           {
             background: motion.config.background ?? this.props.accentColor ?? '#22d3ee',
             opacity: motion.config.opacity ?? 0.66,
@@ -255,7 +255,7 @@ export class Surface<E extends EventList = Record<string, any>>
 
       if (motion.preset === 'bounce') {
         const height = finiteMotionNumber(motion.config.height, 32)
-        this.motionPlaybacks.push(this.transitionTo(
+        this._motionPlaybacks.push(this.transitionTo(
           { motionOffsetY: -height },
           {
             ...motion.options,
@@ -266,7 +266,7 @@ export class Surface<E extends EventList = Record<string, any>>
       }
 
       if (motion.preset === 'spin') {
-        this.motionPlaybacks.push(this.transitionTo(
+        this._motionPlaybacks.push(this.transitionTo(
           { motionRotation: finiteMotionNumber(motion.config.angle, Math.PI * 2) },
           {
             ...motion.options,
@@ -280,15 +280,15 @@ export class Surface<E extends EventList = Record<string, any>>
   /**
    * Останавливает runtime-процесс Surface.
    */
-  private stopMotion(resetOffset = false): void {
-    for (const playback of this.motionPlaybacks) {
+  private _stopMotion(resetOffset = false): void {
+    for (const playback of this._motionPlaybacks) {
       playback.cancel()
     }
-    this.motionPlaybacks.length = 0
+    this._motionPlaybacks.length = 0
     if (resetOffset && (this.props.motionOffsetY !== 0 || this.props.motionRotation !== 0)) {
       this.props.motionOffsetY = 0
       this.props.motionRotation = 0
-      this.applyMotionTransform()
+      this._applyMotionTransform()
       this.dirty({ matrix: true, render: true })
     }
   }
@@ -296,7 +296,7 @@ export class Surface<E extends EventList = Record<string, any>>
   /**
    * Применяет подготовленное состояние Surface.
    */
-  private applyMotionTransform(): void {
+  private _applyMotionTransform(): void {
     const rotation = this.props.motionRotation
     const offsetY = this.props.motionOffsetY
     const centerX = this.layoutRect.width / 2

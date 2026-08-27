@@ -31,9 +31,9 @@ import {
  */
 export class Panel<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<PanelResolvedProps, PanelApi, PanelProps, E> {
-  private readonly childrenNodes: Array<NovaNode<E>> = []
-  private readonly bodyRect = createLayoutRect()
-  private readonly api: PanelApi
+  private readonly _childrenNodes: Array<NovaNode<E>> = []
+  private readonly _bodyRect = createLayoutRect()
+  private readonly _api: PanelApi
 
   /**
    * Создает экземпляр Panel и подготавливает базовое состояние.
@@ -46,11 +46,11 @@ export class Panel<E extends EventList = Record<string, any>>
     descriptor: PanelDescriptor = PANEL_NODE_DESCRIPTOR,
   ) {
     super(app, surface, descriptor, normalizePanelProps(props), options)
-    this.api = {
+    this._api = {
       setChildren: children => this.setChildren(children),
       setTitle: title => this.setProps({ title }),
       setProps: patch => this.setProps(patch),
-      getBodyRect: () => this.bodyRect,
+      getBodyRect: () => this._bodyRect,
       getProps: () => this.props,
     }
     this.setChildren(options.children ?? [])
@@ -67,16 +67,16 @@ export class Panel<E extends EventList = Record<string, any>>
    * Возвращает значение состояния Panel.
    */
   override getApi(): PanelApi {
-    return this.api
+    return this._api
   }
 
   /**
    * Обновляет значение состояния Panel.
    */
   setChildren(children: Array<PanelChildSchema>): void {
-    const reconciled = reconcileNovaTemplateChildren(this, this.childrenNodes, children)
-    this.childrenNodes.length = 0
-    this.childrenNodes.push(...reconciled.nodes)
+    const reconciled = reconcileNovaTemplateChildren(this, this._childrenNodes, children)
+    this._childrenNodes.length = 0
+    this._childrenNodes.push(...reconciled.nodes)
     this.dirty({ update: true, render: true })
   }
 
@@ -88,14 +88,14 @@ export class Panel<E extends EventList = Record<string, any>>
     const headerHeight = this.props.title || this.props.subtitle
       ? this.props.density === 'compact' ? 44 : this.props.density === 'spacious' ? 72 : 58
       : 0
-    copyRect(this.bodyRect, {
+    copyRect(this._bodyRect, {
       x: padding.left,
       y: padding.top + headerHeight,
       width: Math.max(0, this.width - padding.left - padding.right),
       height: Math.max(0, this.height - padding.top - padding.bottom - headerHeight),
     })
-    for (const child of this.childrenNodes) {
-      applyNodeLayoutRect(child as NovaNode<any>, this.bodyRect)
+    for (const child of this._childrenNodes) {
+      applyNodeLayoutRect(child as NovaNode<any>, this._bodyRect)
       child.dirty({ matrix: true, update: true, render: true })
     }
   }

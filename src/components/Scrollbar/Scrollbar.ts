@@ -26,9 +26,9 @@ import {
  */
 export class Scrollbar<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<ScrollbarResolvedProps, ScrollbarApi, ScrollbarProps, E> {
-  private dragging = false
-  private hovered = false
-  private readonly api: ScrollbarApi
+  private _dragging = false
+  private _hovered = false
+  private readonly _api: ScrollbarApi
 
   /**
    * Создает экземпляр Scrollbar и подготавливает базовое состояние.
@@ -41,14 +41,14 @@ export class Scrollbar<E extends EventList = Record<string, any>>
     descriptor: ScrollbarDescriptor = SCROLLBAR_NODE_DESCRIPTOR,
   ) {
     super(app, surface, descriptor, normalizeScrollbarProps(props), options)
-    this.api = {
+    this._api = {
       setValue: (value, event) => this.setValue(value, event),
       getScrollState: () => this.getScrollState(),
       setProps: patch => this.setProps(patch),
       getProps: () => this.props,
     }
     this.options({ interactive: !this.props.disabled })
-    this.setupEvents()
+    this._setupEvents()
   }
 
   /**
@@ -62,7 +62,7 @@ export class Scrollbar<E extends EventList = Record<string, any>>
    * Возвращает значение состояния Scrollbar.
    */
   override getApi(): ScrollbarApi {
-    return this.api
+    return this._api
   }
 
   /**
@@ -86,7 +86,7 @@ export class Scrollbar<E extends EventList = Record<string, any>>
   getScrollState(): ScrollbarState {
     return {
       value: this.props.value,
-      max: this.maxValue(),
+      max: this._maxValue(),
       viewportSize: this.props.viewportSize,
       contentSize: this.props.contentSize,
     }
@@ -122,8 +122,8 @@ export class Scrollbar<E extends EventList = Record<string, any>>
     })
     const schema: NovaSchema = createNovaScrollbarSchema(geometry, {
       alpha: this.props.opacity,
-      hoveredAxis: this.hovered ? this.props.orientation : null,
-      draggingAxis: this.dragging ? this.props.orientation : null,
+      hoveredAxis: this._hovered ? this.props.orientation : null,
+      draggingAxis: this._dragging ? this.props.orientation : null,
     })
     this.renderer.schema(schema)
   }
@@ -140,39 +140,39 @@ export class Scrollbar<E extends EventList = Record<string, any>>
   /**
    * Обновляет значение состояния Scrollbar.
    */
-  private setupEvents(): void {
+  private _setupEvents(): void {
     this.on('mouseenter', () => {
       if (this.props.disabled) {
         return
       }
-      this.hovered = true
+      this._hovered = true
       this.dirty({ render: true })
     })
     this.on('mouseleave', () => {
-      this.hovered = false
+      this._hovered = false
       this.dirty({ render: true })
     })
     this.on('mousedown', (event) => {
       if (this.props.disabled) {
         return false
       }
-      this.dragging = true
-      this.setValue(this.valueFromEvent(event), event)
+      this._dragging = true
+      this.setValue(this._valueFromEvent(event), event)
       return false
     })
     this.on('dragmove', (event) => {
-      if (!this.dragging) {
+      if (!this._dragging) {
         return false
       }
-      this.setValue(this.valueFromEvent(event), event)
+      this.setValue(this._valueFromEvent(event), event)
       return false
     })
     this.on('dragend', (event) => {
-      if (!this.dragging) {
+      if (!this._dragging) {
         return false
       }
-      this.dragging = false
-      this.setValue(this.valueFromEvent(event), event)
+      this._dragging = false
+      this.setValue(this._valueFromEvent(event), event)
       this.dirty({ render: true })
       return false
     })
@@ -181,7 +181,7 @@ export class Scrollbar<E extends EventList = Record<string, any>>
   /**
    * Выполняет внутренний шаг valueFromEvent для Scrollbar.
    */
-  private valueFromEvent(event: MouseEvent): number {
+  private _valueFromEvent(event: MouseEvent): number {
     const { x, y } = this.events.getCanvasMousePosition(event)
     const [localX, localY] = this.toLocal(x, y)
     const horizontal = this.props.orientation === 'horizontal'
@@ -189,13 +189,13 @@ export class Scrollbar<E extends EventList = Record<string, any>>
     const thumbLength = Math.max(this.props.minThumbSize, length * (this.props.viewportSize / Math.max(this.props.viewportSize, this.props.contentSize)))
     const travel = Math.max(1, length - thumbLength)
     const raw = horizontal ? localX - thumbLength / 2 : localY - thumbLength / 2
-    return clamp(raw / travel, 0, 1) * this.maxValue()
+    return clamp(raw / travel, 0, 1) * this._maxValue()
   }
 
   /**
    * Выполняет внутренний шаг maxValue для Scrollbar.
    */
-  private maxValue(): number {
+  private _maxValue(): number {
     return Math.max(0, this.props.contentSize - this.props.viewportSize)
   }
 }

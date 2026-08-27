@@ -19,8 +19,8 @@ import {
  */
 export class Toggle<E extends EventList = Record<string, any>>
   extends NovaUiComponentNode<ToggleResolvedProps, ToggleApi, ToggleProps, E> {
-  private pressed = false
-  private readonly api: ToggleApi
+  private _pressed = false
+  private readonly _api: ToggleApi
 
   /**
    * Создает экземпляр Toggle и подготавливает базовое состояние.
@@ -33,14 +33,14 @@ export class Toggle<E extends EventList = Record<string, any>>
     descriptor: ToggleDescriptor = TOGGLE_NODE_DESCRIPTOR,
   ) {
     super(app, surface, descriptor, normalizeToggleProps(props), options)
-    this.api = {
+    this._api = {
       setChecked: checked => this.setProps({ checked }),
       toggle: event => this.toggle(event),
       setProps: patch => this.setProps(patch),
       getProps: () => this.props,
     }
     this.options({ interactive: !this.props.disabled })
-    this.setupEvents()
+    this._setupEvents()
   }
 
   /**
@@ -54,7 +54,7 @@ export class Toggle<E extends EventList = Record<string, any>>
    * Возвращает значение состояния Toggle.
    */
   override getApi(): ToggleApi {
-    return this.api
+    return this._api
   }
 
   /**
@@ -101,7 +101,7 @@ export class Toggle<E extends EventList = Record<string, any>>
       radius: thumbSize / 2,
       styles: {
         background: this.resolveThemeValue(this.props.thumbColor ?? '#ffffff'),
-        opacity: this.pressed ? 0.86 : 1,
+        opacity: this._pressed ? 0.86 : 1,
         border: { color: this.resolveThemeValue('var(--nova-toggle-thumb-border-color, rgba(15,23,42,0.12))'), width: 1 },
       },
     })
@@ -121,7 +121,7 @@ export class Toggle<E extends EventList = Record<string, any>>
   /**
    * Обновляет значение состояния Toggle.
    */
-  private setupEvents(): void {
+  private _setupEvents(): void {
     this.on('mouseenter', () => {
       if (this.props.disabled) {
         return
@@ -129,7 +129,7 @@ export class Toggle<E extends EventList = Record<string, any>>
       this.playUiSound('hover')
     })
     this.on('mouseleave', () => {
-      this.pressed = false
+      this._pressed = false
       this.dirty({ render: true })
     })
     this.on('mousedown', (event) => {
@@ -138,15 +138,15 @@ export class Toggle<E extends EventList = Record<string, any>>
         return false
       }
       this.focus(event)
-      this.pressed = true
+      this._pressed = true
       this.dirty({ render: true })
       return false
     })
     this.on('mouseup', (event) => {
-      if (!this.pressed) {
+      if (!this._pressed) {
         return false
       }
-      this.pressed = false
+      this._pressed = false
       this.toggle(event)
       this.dirty({ render: true })
       return false
