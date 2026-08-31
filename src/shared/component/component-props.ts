@@ -122,6 +122,16 @@ export interface NovaUiCommonResolvedProps extends NovaUiStyleIdentityProps {
   tooltip?: TooltipInput
 }
 
+/** Базовый schema-контракт UI-node с расширяемым компонентным style. */
+export type NovaUiNodeSchemaProps = Omit<NovaUiCommonProps, 'style'> & {
+  style?: unknown
+}
+
+/** Базовый resolved-контракт UI-node с расширяемым компонентным style. */
+export type NovaUiNodeResolvedProps = Omit<NovaUiCommonResolvedProps, 'style'> & {
+  style?: unknown
+}
+
 export interface NovaUiInteractionState {
   hovered: boolean
   pressed: boolean
@@ -390,9 +400,12 @@ export function applyChildRect(
   return applyNodeLayoutRect(child as Parameters<typeof applyNodeLayoutRect>[0], rect)
 }
 
-export function commonMeasureBounds<TProps extends NovaUiCommonProps>(
+export function commonMeasureBounds<
+  TProps extends NovaUiNodeSchemaProps,
+  TResolvedProps extends NovaUiNodeResolvedProps,
+>(
   schema: NovaComponentSchema<TProps>,
-  normalize: (props: TProps) => NovaUiCommonResolvedProps,
+  normalize: (props: TProps) => TResolvedProps,
 ): NovaUiLayoutRect {
   const props = normalize((schema.props ?? {}) as TProps)
   return {
@@ -407,9 +420,9 @@ export function commonMeasureBounds<TProps extends NovaUiCommonProps>(
  * Описывает Nova-node NovaUiComponentNode и его runtime-поведение.
  */
 export abstract class NovaUiComponentNode<
-  TProps extends NovaUiCommonResolvedProps,
+  TProps extends NovaUiNodeResolvedProps,
   TApi,
-  TSchema extends NovaUiCommonProps,
+  TSchema extends NovaUiNodeSchemaProps,
   E extends EventList = Record<string, any>,
 > extends NovaComponentNode<TProps, TApi, Record<string, never>, TSchema, E>
   implements NovaUiLayoutTarget, NovaUiStyleTarget {
