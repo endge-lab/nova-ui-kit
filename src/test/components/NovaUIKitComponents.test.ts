@@ -196,14 +196,14 @@ function createApp(): NovaApp<TestEvents> {
   return app
 }
 
-describe('nova UI Kit components', () => {
+describe('компоненты Nova UI Kit', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
     document.body.innerHTML = ''
     installCanvasMocks()
   })
 
-  it('registers and exposes APIs for all new component schemas', () => {
+  it('регистрирует и предоставляет API всех новых схем компонентов', () => {
     const app = createApp()
     const surface = app.createSurface('components')
 
@@ -392,7 +392,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('normalizes and parses color picker values', () => {
+  it('нормализует и разбирает значения выбора цвета', () => {
     expect(normalizeColorPickerProps({ value: '#fff' })).toMatchObject({
       value: '#ffffff',
       customOpen: false,
@@ -409,7 +409,7 @@ describe('nova UI Kit components', () => {
     expect(normalizeNovaUiColor('rgba(12, 34, 56, 0.4)')).toBe('rgba(12, 34, 56, 0.4)')
   })
 
-  it('commits color picker presets and custom input', () => {
+  it('фиксирует presets выбора цвета и пользовательский input', () => {
     const commits = vi.fn()
     const customOpenChanges = vi.fn()
     const app = createApp()
@@ -445,7 +445,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('keeps closed popovers out of hit-test and hides their action children', () => {
+  it('исключает закрытые popovers из hit-test и скрывает их дочерние Actions', () => {
     const app = createApp()
     const surface = app.createSurface('popover-hit-test')
 
@@ -520,7 +520,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('manages registry overlays through Root API', () => {
+  it('управляет overlays реестра через API Root', () => {
     const app = createApp()
     const surface = app.createSurface('overlay-registry')
 
@@ -595,7 +595,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('dismisses registry overlays by outside click and escape', () => {
+  it('закрывает overlays реестра внешним кликом и Escape', () => {
     const app = createApp()
     const surface = app.createSurface('overlay-dismiss')
 
@@ -640,7 +640,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('keeps registry overlays above dialogs for menus opened from dialogs', () => {
+  it('сохраняет overlays реестра над диалогами для меню, открытых из диалогов', () => {
     const app = createApp()
     const surface = app.createSurface('dialog-overlay-stack')
 
@@ -687,7 +687,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('resolves overlay pointer and rect anchor positions', () => {
+  it('разрешает позиции pointer и прямоугольного anchor для overlay', () => {
     expect(resolveNovaUiOverlayPosition({
       root: { x: 0, y: 0, width: 320, height: 240 },
       anchor: { kind: 'pointer', x: 120, y: 80 },
@@ -716,7 +716,7 @@ describe('nova UI Kit components', () => {
     })).toMatchObject({ x: 120, y: 102 })
   })
 
-  it('opens a default dialog through Root dialog API without a Dialogs registry', () => {
+  it('открывает стандартный диалог через API диалогов Root без реестра Dialogs', () => {
     const app = createApp()
     const surface = app.createSurface('dialog-default-registry')
 
@@ -809,7 +809,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('resolves custom dialog definitions, payload and local overrides through slot context', () => {
+  it('разрешает пользовательские определения диалогов, payload и локальные переопределения через контекст slot', () => {
     const app = createApp()
     const surface = app.createSurface('dialog-custom-registry')
     const contexts: Array<Record<string, any>> = []
@@ -910,7 +910,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('keeps dialog controller single and stable across 1k open-close operations', () => {
+  it('сохраняет единственный стабильный контроллер диалогов в 1000 операциях открытия и закрытия', () => {
     const app = createApp()
     const surface = app.createSurface('dialog-open-close-bench')
 
@@ -965,7 +965,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('accepts mixed constructor and string children inside Root, Panel and SplitPane containers', () => {
+  it('принимает смешанные children-конструкторы и строки в контейнерах Root, Panel и SplitPane', () => {
     const app = createApp()
     const surface = app.createSurface('mixed-children')
     Nova.registerComponents(app.schema, InspectorCardNode)
@@ -998,7 +998,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('supports decorated props watchers and commands through UI Kit registry', () => {
+  it('поддерживает декорированные watchers props и команды через реестр UI Kit', () => {
     const app = createApp()
     const surface = app.createSurface('decorated-ui-kit')
     Nova.registerComponents(app.schema, DecoratedUiKitCardNode as never)
@@ -1019,7 +1019,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('renders ScrollArea default chrome and custom thumb slots without replacing slot identity', () => {
+  it('отрисовывает стандартную оболочку ScrollArea и пользовательские slots thumb без замены identity slot', () => {
     const app = createApp()
     const surface = app.createSurface('scroll-area-slots')
 
@@ -1081,7 +1081,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('keeps sibling ScrollArea scroll offsets independent on wheel input', () => {
+  it('сохраняет независимость смещений прокрутки соседних ScrollArea при wheel input', () => {
     const app = createApp()
     const surface = app.createSurface('scroll-area-siblings')
 
@@ -1131,7 +1131,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('supports full ScrollArea scrollbar-y slots and active idle visibility', () => {
+  it('поддерживает полные slots scrollbar-y ScrollArea и видимость active/idle', () => {
     vi.useFakeTimers()
     const app = createApp()
     const surface = app.createSurface('scroll-area-active')
@@ -1199,7 +1199,7 @@ describe('nova UI Kit components', () => {
     vi.useRealTimers()
   })
 
-  it('opens a default tooltip from common tooltip props without a Tooltips registry', () => {
+  it('открывает стандартный tooltip из общих props без реестра Tooltips', () => {
     vi.useFakeTimers()
     const app = createApp()
     const surface = app.createSurface('tooltip-default-registry')
@@ -1246,7 +1246,7 @@ describe('nova UI Kit components', () => {
     vi.useRealTimers()
   })
 
-  it('resolves custom tooltip definitions, payload and local overrides through slot context', () => {
+  it('разрешает пользовательские определения tooltip, payload и локальные переопределения через контекст slot', () => {
     vi.useFakeTimers()
     const app = createApp()
     const surface = app.createSurface('tooltip-custom-registry')
@@ -1348,7 +1348,7 @@ describe('nova UI Kit components', () => {
     vi.useRealTimers()
   })
 
-  it('supports markdown tooltip shortcut and keeps legacy Tooltip wrapper API intact', () => {
+  it('поддерживает сокращение tooltip Markdown и сохраняет legacy API оболочки Tooltip', () => {
     const markdown = normalizeTooltipProps({
       contentMode: 'markdown',
       content: { markdown: '**Ready**' },
@@ -1381,7 +1381,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('keeps tooltip controller single and stable across 10k pointer moves', () => {
+  it('сохраняет единственный стабильный контроллер tooltip при 10 тысячах движений pointer', () => {
     vi.useFakeTimers()
     const app = createApp()
     const surface = app.createSurface('tooltip-pointer-bench')
@@ -1441,7 +1441,7 @@ describe('nova UI Kit components', () => {
     vi.useRealTimers()
   })
 
-  it('supports ScrollArea track, thumb, corner slots and exposes public slot context only', () => {
+  it('поддерживает slots track, thumb и corner ScrollArea и предоставляет только публичный контекст slot', () => {
     const app = createApp()
     const surface = app.createSurface('scroll-area-composed-slots')
     const contexts: Array<Record<string, any>> = []
@@ -1541,7 +1541,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('supports ScrollArea hidden visibility, axis and wheelMultiplier', () => {
+  it('поддерживает hidden-видимость, axis и wheelMultiplier ScrollArea', () => {
     const app = createApp()
     const surface = app.createSurface('scroll-area-axis')
 
@@ -1605,7 +1605,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('emits semantic events for Button, checkbox/toggle value changes, Slider drag and SplitPane resize', () => {
+  it('отправляет семантические события Button, изменений checkbox/toggle, drag Slider и resize SplitPane', () => {
     const app = createApp()
     const surface = app.createSurface('semantic-events')
     const buttonPress = vi.fn()
@@ -1703,7 +1703,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('routes SearchInput canvas keyboard input through DOM focus and callbacks', () => {
+  it('направляет клавиатурный input SearchInput canvas через DOM-фокус и callbacks', () => {
     const app = createApp()
     const surface = app.createSurface('search-input-events')
     const valueChange = vi.fn()
@@ -1749,7 +1749,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('keeps SearchInput proxy input callbacks on textarea events', () => {
+  it('сохраняет callbacks proxy input SearchInput на событиях textarea', () => {
     const app = createApp()
     const surface = app.createSurface('search-input-proxy-events')
     const valueChange = vi.fn()
@@ -1791,7 +1791,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('reflows UI Kit layout-target panes when SplitPane sizes change', () => {
+  it('перекомпоновывает panes UI Kit с layout-target при изменении размеров SplitPane', () => {
     const app = createApp()
     const surface = app.createSurface('split-pane-layout-target')
 
@@ -1855,7 +1855,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('uses the full rect without resizer when SplitPane has one pane', () => {
+  it('использует полный прямоугольник без resizer, когда SplitPane содержит одну pane', () => {
     const app = createApp()
     const surface = app.createSurface('split-pane-single-pane')
 
@@ -1894,7 +1894,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('reflows the first pane to the full rect when the second SplitPane child is removed', () => {
+  it('перекомпоновывает первую pane на полный прямоугольник при удалении второго child SplitPane', () => {
     const app = createApp()
     const surface = app.createSurface('split-pane-dynamic-single-pane')
 
@@ -1943,7 +1943,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('treats SplitPane children with display none as inactive panes without unmounting them', () => {
+  it('считает children SplitPane с display:none неактивными panes без их unmount', () => {
     const app = createApp()
     const surface = app.createSurface('split-pane-hidden-pane')
 
@@ -2008,7 +2008,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('collapses inactive SplitPane children even when child does not implement common display props', () => {
+  it('сворачивает неактивных children SplitPane, даже если child не реализует общие props display', () => {
     const app = createApp()
     const surface = app.createSurface('split-pane-custom-hidden-pane')
     Nova.registerComponents(app.schema, InspectorCardNode)
@@ -2074,7 +2074,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('resizes SplitPane panes on drag without requiring onResize callback', () => {
+  it('изменяет размеры panes SplitPane через drag без обязательного callback onResize', () => {
     const app = createApp()
     const surface = app.createSurface('split-pane-drag-default')
 
@@ -2116,7 +2116,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('reports current pane rects while SplitPane is resized', () => {
+  it('сообщает текущие прямоугольники panes во время resize SplitPane', () => {
     const app = createApp()
     const surface = app.createSurface('split-pane-resize-payload')
     const payloads: Array<SplitPaneResizePayload> = []
@@ -2161,7 +2161,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('previews SplitPane resizer position and commits pane sizes at drag end in lazy mode', () => {
+  it('показывает preview позиции resizer SplitPane и фиксирует размеры panes в конце drag в ленивом режиме', () => {
     const app = createApp()
     const surface = app.createSurface('split-pane-lazy-drag')
     const onResize = vi.fn()
@@ -2218,7 +2218,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('emits ScrollArea semantic scroll lifecycle and fallback part clicks without duplicating slot chrome clicks', () => {
+  it('отправляет семантический lifecycle прокрутки ScrollArea и клики fallback-частей без дублирования кликов оболочки slot', () => {
     vi.useFakeTimers()
     const app = createApp()
     const surface = app.createSurface('scroll-area-semantic-events')
@@ -2305,7 +2305,7 @@ describe('nova UI Kit components', () => {
     vi.useRealTimers()
   })
 
-  it('keeps fallback ScrollArea part hit-tests under budget without child growth', () => {
+  it('удерживает hit-test fallback-частей ScrollArea в рамках бюджета без роста children', () => {
     const app = createApp()
     const surface = app.createSurface('scroll-area-part-hit-bench')
     const onThumbClick = vi.fn()
@@ -2348,7 +2348,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('keeps Slider drag updates under budget', () => {
+  it('удерживает обновления drag Slider в рамках бюджета', () => {
     const app = createApp()
     const surface = app.createSurface('slider-drag-bench')
 
@@ -2387,7 +2387,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it.skip('keeps a mixed 500-node UI Kit scene with slots and 50 ScrollAreas inside the event budget', () => {
+  it.skip('удерживает смешанную сцену UI Kit из 500 узлов со slots и 50 ScrollArea в рамках бюджета событий', () => {
     const app = createApp()
     const surface = app.createSurface('complex-ui-scene-bench')
     const children: Array<Record<string, any>> = []
@@ -2479,7 +2479,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('keeps ScrollArea custom thumb slot scroll updates under budget without child growth', () => {
+  it('удерживает обновления прокрутки пользовательского slot thumb ScrollArea в рамках бюджета без роста children', () => {
     const app = createApp()
     const surface = app.createSurface('scroll-area-slot-perf')
 
@@ -2536,7 +2536,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('keeps ScrollArea active visibility cycles under budget without fallback recreation', () => {
+  it('удерживает циклы active-видимости ScrollArea в рамках бюджета без пересоздания fallback', () => {
     const app = createApp()
     const surface = app.createSurface('scroll-area-active-perf')
 
@@ -2598,7 +2598,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('preserves keyed children and forwards schema context through UI Kit containers', () => {
+  it('сохраняет children с ключами и передаёт контекст схемы через контейнеры UI Kit', () => {
     const app = createApp()
     const surface = app.createSurface('context')
 
@@ -2643,7 +2643,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('applies global styles to multiple Root trees', () => {
+  it('применяет глобальные стили к нескольким деревьям Root', () => {
     const app = createApp()
     const validation = validateNovaUiStyleSheetSource(`
       Button.global-action {
@@ -2683,7 +2683,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('refreshes NovaCSS theme tokens through Nova Raph theme events', () => {
+  it('обновляет tokens темы NovaCSS через события темы Nova Raph', () => {
     const app = createApp()
     app.theme.registerMany([
       {
@@ -2744,7 +2744,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('applies active @theme stylesheet rules without requiring theme classes', () => {
+  it('применяет активные правила stylesheet @theme без обязательных classes темы', () => {
     const app = createApp()
     app.theme.registerMany([
       { id: 'light', tokens: {} },
@@ -2810,7 +2810,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('normalizes component props and stylesheet declarations under load', () => {
+  it('нормализует props компонентов и объявления stylesheet под нагрузкой', () => {
     const cursor = {
       hover: 'pointer',
       dragging: { type: 'component', component: 'ResizeCursor', props: { axis: 'x' }, hotspot: { x: 8, y: 8 } },
@@ -2883,7 +2883,7 @@ describe('nova UI Kit components', () => {
     expect(validation.styleSheet?.rules.length).toBe(4)
   })
 
-  it('creates schema nodes with common cursor props', () => {
+  it('создаёт узлы схемы с общими props курсора', () => {
     const app = createApp()
     const surface = app.createSurface('cursor-props')
     app.schema.createNode(surface, {
@@ -2918,7 +2918,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('plays declarative sound props for core controls', async () => {
+  it('воспроизводит декларативные звуковые props основных элементов управления', async () => {
     vi.useFakeTimers()
     const app = createApp()
     const surface = app.createSurface('sound-props')
@@ -2992,7 +2992,7 @@ describe('nova UI Kit components', () => {
     vi.useRealTimers()
   })
 
-  it('relayouts layout-target children inside visual containers', () => {
+  it('перекомпоновывает children с layout-target внутри визуальных контейнеров', () => {
     const app = createApp()
     const surface = app.createSurface('containers')
 
@@ -3029,7 +3029,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('uses built-in light and dark icons for ThemeSwitch defaults', () => {
+  it('использует встроенные светлую и тёмную иконки как стандартные значения ThemeSwitch', () => {
     const app = createApp()
     const surface = app.createSurface('theme-switch-defaults')
 
@@ -3048,7 +3048,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('commits ThemeSwitch theme change on pointer down', () => {
+  it('фиксирует изменение темы ThemeSwitch при pointer down', () => {
     const app = createApp()
     const surface = app.createSurface('theme-switch-pointer-down')
 
@@ -3074,7 +3074,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('commits toolbar Button and ZoomControls actions on pointer down', () => {
+  it('фиксирует Actions Button панели инструментов и ZoomControls при pointer down', () => {
     const app = createApp()
     const surface = app.createSurface('toolbar-pointer-down-actions')
     const buttonPress = vi.fn()
@@ -3127,7 +3127,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('registers built-in light and dark NovaUIKit theme tokens on first component use', () => {
+  it('регистрирует встроенные tokens светлой и тёмной темы NovaUIKit при первом использовании компонента', () => {
     const app = createApp()
     const surface = app.createSurface('built-in-theme-tokens')
 
@@ -3148,7 +3148,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('uses pointer cursor for buttons by default', () => {
+  it('по умолчанию использует курсор pointer для кнопок', () => {
     const app = createApp()
     const surface = app.createSurface('button-cursor')
     app.schema.createNode(surface, {
@@ -3170,7 +3170,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('supports CSS-like absolute and flow positioning in UI Kit containers', () => {
+  it('поддерживает CSS-подобное абсолютное и потоковое позиционирование в контейнерах UI Kit', () => {
     const app = createApp()
     const surface = app.createSurface('positioned-layout')
 
@@ -3234,13 +3234,13 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('uses rAF FPS by default but keeps the public FPS label', () => {
+  it('по умолчанию использует FPS rAF, сохраняя публичную метку FPS', () => {
     expect(resolveFpsMeterReading({ fps: 72, rFps: 30 })).toEqual({ value: 30, label: 'FPS' })
     expect(resolveFpsMeterReading({ fps: 72, rFps: 30 }, 'render')).toEqual({ value: 72, label: 'FPS' })
     expect(resolveFpsMeterReading({ fps: 1200, rFps: -10 })).toEqual({ value: 0, label: 'FPS' })
   })
 
-  it('keeps fixed toolbar controls hit-testable with canvas event coordinates', () => {
+  it('сохраняет hit-test фиксированных элементов панели инструментов по координатам событий canvas', () => {
     const app = createApp()
     const surface = app.createSurface('fixed-toolbar-zoom-hit')
     const onChange = vi.fn()
@@ -3329,7 +3329,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('applies fixed Flex layout synchronously when template children are patched', () => {
+  it('синхронно применяет фиксированный layout Flex при изменении children шаблона', () => {
     const app = createApp()
     const surface = app.createSurface('fixed-toolbar-sync-layout')
     const compactToolbar = {
@@ -3389,7 +3389,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('plays class keyframe animation once for stable component ids', () => {
+  it('однократно воспроизводит keyframe-анимацию class для стабильных ID компонентов', () => {
     const app = createApp()
     const motionSpy = vi.spyOn(app.motion, 'to')
     const surface = app.createSurface('class-animation')
@@ -3421,7 +3421,7 @@ describe('nova UI Kit components', () => {
     app.destroy()
   })
 
-  it('keeps RowResizer and ColResizer legacy creation signatures while accepting professional options', () => {
+  it('сохраняет legacy-сигнатуры создания RowResizer и ColResizer, принимая профессиональные параметры', () => {
     const app = createApp()
     const surface = app.createSurface('resizers')
     const row = RowResizer.create(app, surface, {

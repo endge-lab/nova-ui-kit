@@ -112,14 +112,14 @@ function inputApi(app: NovaApp<TestEvents>, id: string): InputApi {
   return app.components.requireApi<InputApi>(id)
 }
 
-describe('nova UI style propagation', () => {
+describe('распространение стилей Nova UI', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
     document.body.innerHTML = ''
     installCanvasMocks()
   })
 
-  it('propagates color as render-only style and skips explicit color overrides', () => {
+  it('распространяет цвет как стиль только render и пропускает явные переопределения', () => {
     const app = createApp()
     const surface = app.createSurface('style')
     const root = app.schema.createNode(surface, {
@@ -160,7 +160,7 @@ describe('nova UI style propagation', () => {
     app.destroy()
   })
 
-  it('allows standalone UI Kit components with default styling', () => {
+  it('разрешает самостоятельные компоненты UI Kit со стандартными стилями', () => {
     const app = createApp()
     const surface = app.createSurface('style')
 
@@ -173,7 +173,7 @@ describe('nova UI style propagation', () => {
     app.destroy()
   })
 
-  it('applies selector stylesheet by specificity', () => {
+  it('применяет stylesheet selector по специфичности', () => {
     const app = createApp()
     const surface = app.createSurface('style')
 
@@ -205,7 +205,7 @@ describe('nova UI style propagation', () => {
     app.destroy()
   })
 
-  it('applies placeholderColor through stylesheet visual declarations', () => {
+  it('применяет placeholderColor через визуальные объявления stylesheet', () => {
     const app = createApp()
     const surface = app.createSurface('style')
 
@@ -235,7 +235,7 @@ describe('nova UI style propagation', () => {
     app.destroy()
   })
 
-  it('compiles pseudo cursor rules into node cursor declarations', () => {
+  it('компилирует pseudo-правила курсора в объявления курсора узла', () => {
     const app = createApp()
     const surface = app.createSurface('style')
 
@@ -282,7 +282,7 @@ describe('nova UI style propagation', () => {
     app.destroy()
   })
 
-  it('applies descendant and direct-child selectors', () => {
+  it('применяет selectors потомков и прямых детей', () => {
     const app = createApp()
     const surface = app.createSurface('style')
 
@@ -323,7 +323,7 @@ describe('nova UI style propagation', () => {
     app.destroy()
   })
 
-  it('applies automatic responsive class variants against root width', () => {
+  it('применяет автоматические адаптивные варианты class относительно ширины корня', () => {
     const app = createApp()
     const surface = app.createSurface('style')
     const root = app.schema.createNode(surface, {
@@ -369,7 +369,7 @@ describe('nova UI style propagation', () => {
     app.destroy()
   })
 
-  it('supports display utilities and excludes hidden children from Flex layout without churn', () => {
+  it('поддерживает utilities display и исключает скрытых children из layout Flex без churn', () => {
     const app = createApp()
     const surface = app.createSurface('style')
     const root = app.schema.createNode(surface, {
@@ -435,7 +435,7 @@ describe('nova UI style propagation', () => {
     app.destroy()
   })
 
-  it('resolves utility classes and NovaCSS layout intent for Flex children', () => {
+  it('разрешает utility classes и intent layout NovaCSS для children Flex', () => {
     const app = createApp()
     const surface = app.createSurface('style')
     const root = app.schema.createNode(surface, {
@@ -497,7 +497,7 @@ describe('nova UI style propagation', () => {
     app.destroy()
   })
 
-  it('ignores invalid selector stylesheet and exposes diagnostics', () => {
+  it('игнорирует некорректный stylesheet selector и предоставляет диагностику', () => {
     const app = createApp()
     const surface = app.createSurface('style')
     const root = app.schema.createNode(surface, {
@@ -521,7 +521,7 @@ describe('nova UI style propagation', () => {
     app.destroy()
   })
 
-  it('propagates font size as layout-affecting style', () => {
+  it('распространяет размер шрифта как стиль, влияющий на layout', () => {
     const app = createApp()
     const surface = app.createSurface('style')
     const root = app.schema.createNode(surface, {
@@ -556,7 +556,7 @@ describe('nova UI style propagation', () => {
     app.destroy()
   })
 
-  it('propagates style through Grid children', () => {
+  it('распространяет стиль через children Grid', () => {
     const app = createApp()
     const surface = app.createSurface('style')
 
@@ -587,7 +587,7 @@ describe('nova UI style propagation', () => {
     app.destroy()
   })
 
-  it('skips subtree when nested container overrides changed style key', () => {
+  it('пропускает поддерево, когда вложенный контейнер переопределяет изменённый ключ стиля', () => {
     const app = createApp()
     const surface = app.createSurface('style')
     const root = app.schema.createNode(surface, {

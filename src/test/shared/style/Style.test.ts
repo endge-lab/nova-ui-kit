@@ -10,8 +10,8 @@ import {
   validateNovaUiStyleSheetSource,
 } from '@/shared/style'
 
-describe('nova UI style primitives', () => {
-  it('normalizes border radius number and corner object', () => {
+describe('примитивы стилей Nova UI', () => {
+  it('нормализует число радиуса border и объект углов', () => {
     expect(normalizeBorderRadius(12)).toBe(12)
     expect(normalizeBorderRadius({
       topLeft: 12,
@@ -32,7 +32,7 @@ describe('nova UI style primitives', () => {
     })).toBe(12)
   })
 
-  it('builds style masks from inherited text style', () => {
+  it('строит маски стиля из унаследованного стиля текста', () => {
     expect(inheritedTextStyleMask({
       color: '#fff',
       fontSize: 14,
@@ -40,7 +40,7 @@ describe('nova UI style primitives', () => {
     })).toBe(NovaUiStyleMask.Color | NovaUiStyleMask.FontSize | NovaUiStyleMask.LineHeight)
   })
 
-  it('diffs only changed style keys inside mask', () => {
+  it('сравнивает только изменённые ключи стиля внутри маски', () => {
     expect(diffInheritedTextStyle(
       { color: '#111', fontSize: 14, fontWeight: '400' },
       { color: '#222', fontSize: 14, fontWeight: '700' },
@@ -48,7 +48,7 @@ describe('nova UI style primitives', () => {
     )).toBe(NovaUiStyleMask.Color)
   })
 
-  it('merges local style into parent context and reports changed keys', () => {
+  it('объединяет локальный стиль с родительским контекстом и сообщает изменённые ключи', () => {
     const parent = {
       values: {
         color: '#111',
@@ -71,7 +71,7 @@ describe('nova UI style primitives', () => {
     expect(styleContextChangedMask(parent, next)).toBe(NovaUiStyleMask.Color | NovaUiStyleMask.FontFamily)
   })
 
-  it('parses cursor declarations and right-most pseudo selectors', () => {
+  it('разбирает объявления курсора и крайние правые pseudo-selectors', () => {
     const result = validateNovaUiStyleSheetSource(`
       Root {
         cursor: url("/cursors/cursor-pointer.svg", 2 2, default);

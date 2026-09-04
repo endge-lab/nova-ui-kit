@@ -31,8 +31,8 @@ function createMeasuredEntry(id: string, layout: FlexChildLayout, width: number,
   return createFlexChildEntry(id, node, layout)
 }
 
-describe('flexLayoutEngine', () => {
-  it('resolves child width 100 percent against inner width', () => {
+describe('движок layout Flex', () => {
+  it('разрешает ширину дочернего узла 100 процентов относительно внутренней ширины', () => {
     const engine = new FlexLayoutEngine()
     const entry = createEntry('full', { width: '100%', height: 40 })
 
@@ -46,7 +46,7 @@ describe('flexLayoutEngine', () => {
     expect(entry.nextRect).toEqual({ x: 10, y: 10, width: 480, height: 40 })
   })
 
-  it('distributes free space with flexGrow', () => {
+  it('распределяет свободное пространство через flexGrow', () => {
     const engine = new FlexLayoutEngine()
     const first = createEntry('first', { flexBasis: 100, height: 40, flexGrow: 1 })
     const second = createEntry('second', { flexBasis: 100, height: 40, flexGrow: 1 })
@@ -62,7 +62,7 @@ describe('flexLayoutEngine', () => {
     expect(second.nextRect).toEqual({ x: 405, y: 0, width: 395, height: 40 })
   })
 
-  it('wraps entries into new rows with row gap', () => {
+  it('переносит элементы в новые строки с row gap', () => {
     const engine = new FlexLayoutEngine()
     const first = createEntry('first', { flexBasis: 320, height: 40 })
     const second = createEntry('second', { flexBasis: 320, height: 40 })
@@ -80,7 +80,7 @@ describe('flexLayoutEngine', () => {
     expect(third.nextRect).toEqual({ x: 0, y: 50, width: 320, height: 40 })
   })
 
-  it('shrinks overflowing entries with flexShrink', () => {
+  it('уменьшает переполняющие элементы через flexShrink', () => {
     const engine = new FlexLayoutEngine()
     const first = createEntry('first', { flexBasis: 200, height: 40, flexShrink: 1 })
     const second = createEntry('second', { flexBasis: 200, height: 40, flexShrink: 1 })
@@ -96,7 +96,7 @@ describe('flexLayoutEngine', () => {
     expect(second.nextRect).toEqual({ x: 160, y: 0, width: 150, height: 40 })
   })
 
-  it('uses measureLayout for auto item size', () => {
+  it('использует measureLayout для автоматического размера элемента', () => {
     const engine = new FlexLayoutEngine()
     const entry = createMeasuredEntry('auto', { width: 'auto', height: 'auto' }, 180, 44)
 

@@ -31,8 +31,8 @@ function createMeasuredEntry(id: string, layout: GridChildLayout, width: number,
   return createGridChildEntry(id, node, layout)
 }
 
-describe('gridLayoutEngine', () => {
-  it('places children into fixed columns with padding and gap', () => {
+describe('движок layout Grid', () => {
+  it('размещает children в фиксированных столбцах с padding и gap', () => {
     const engine = new GridLayoutEngine()
     const first = createEntry('first', {})
     const second = createEntry('second', {})
@@ -53,7 +53,7 @@ describe('gridLayoutEngine', () => {
     expect(fourth.nextRect).toEqual({ x: 24, y: 138, width: 298, height: 96 })
   })
 
-  it('changes column count in responsive mode', () => {
+  it('изменяет число столбцов в адаптивном режиме', () => {
     const engine = new GridLayoutEngine()
     const entry = createEntry('first', {})
     const props = normalizeGridProps({
@@ -74,7 +74,7 @@ describe('gridLayoutEngine', () => {
     expect(entry.nextRect).toEqual({ x: 0, y: 0, width: 300, height: 80 })
   })
 
-  it('supports colSpan and wraps to a new row when the span does not fit', () => {
+  it('поддерживает colSpan и переносит в новую строку, если span не помещается', () => {
     const engine = new GridLayoutEngine()
     const first = createEntry('first', { colSpan: 2 })
     const second = createEntry('second', {})
@@ -92,7 +92,7 @@ describe('gridLayoutEngine', () => {
     expect(third.nextRect).toEqual({ x: 0, y: 60, width: 300, height: 50 })
   })
 
-  it('uses measured auto height and stretches items to the row height', () => {
+  it('использует измеренную автоматическую высоту и растягивает элементы до высоты строки', () => {
     const engine = new GridLayoutEngine()
     const first = createMeasuredEntry('first', { height: 'auto' }, 180, 44)
     const second = createMeasuredEntry('second', { height: 'auto' }, 180, 80)

@@ -8,7 +8,7 @@ import { NovaUIKit, registerNovaUIKit } from '@/index'
 const apps: Array<NovaApp<Record<string, any>>> = []
 let app: NovaApp<Record<string, any>>
 
-describe('nova UI Kit FPS meter benchmark', () => {
+describe('бенчмарк счётчика FPS Nova UI Kit', () => {
   bench('render 1000 fps meter frame updates', () => {
     const node = app.components.require('fps-bench') as unknown as NovaNode<Record<string, any>>
     for (let index = 0; index < 1_000; index += 1) {

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { validateNovaUiStyleSheetSource } from '@/shared/style/validation'
 
-describe('nova UI stylesheet validator', () => {
-  it('parses comments, selector syntax and supported declarations', () => {
+describe('валидатор stylesheet Nova UI', () => {
+  it('разбирает комментарии, синтаксис selectors и поддерживаемые объявления', () => {
     const result = validateNovaUiStyleSheetSource(`
       /* Комментарии не мешают позициям diagnostics. */
       Root {
@@ -22,7 +22,7 @@ describe('nova UI stylesheet validator', () => {
     expect(result.diagnostics).toHaveLength(0)
   })
 
-  it('returns warning for unknown declaration without breaking valid rule', () => {
+  it('возвращает предупреждение для неизвестного объявления без нарушения корректного правила', () => {
     const result = validateNovaUiStyleSheetSource(`
       TextBlock {
         unknownValue: 10;
@@ -36,7 +36,7 @@ describe('nova UI stylesheet validator', () => {
     expect(result.diagnostics[0]?.code).toBe('unknown-declaration')
   })
 
-  it('returns error for invalid values and drops compiled stylesheet', () => {
+  it('возвращает ошибку для некорректных значений и отбрасывает скомпилированный stylesheet', () => {
     const result = validateNovaUiStyleSheetSource(`
       TextBlock {
         fontSize: nope;
@@ -50,7 +50,7 @@ describe('nova UI stylesheet validator', () => {
     expect(result.diagnostics[0]?.column).toBeGreaterThan(0)
   })
 
-  it('returns error for unknown component selector type', () => {
+  it('возвращает ошибку для неизвестного типа selector компонента', () => {
     const result = validateNovaUiStyleSheetSource(`
       UnknownComponent {
         color: #111111;
@@ -62,7 +62,7 @@ describe('nova UI stylesheet validator', () => {
     expect(result.diagnostics[0]?.code).toBe('invalid-selector-part')
   })
 
-  it('parses canvas media queries, display declarations and escaped class selectors', () => {
+  it('разбирает media-запросы canvas, объявления display и экранированные selectors class', () => {
     const result = validateNovaUiStyleSheetSource(`
       .hidden { display: none; }
       .shown { display: normal; }
@@ -87,7 +87,7 @@ describe('nova UI stylesheet validator', () => {
     ])
   })
 
-  it('parses keyframes and animation declarations', () => {
+  it('разбирает keyframes и объявления анимаций', () => {
     const result = validateNovaUiStyleSheetSource(`
       @keyframes fade-slide-in {
         from {
@@ -119,7 +119,7 @@ describe('nova UI stylesheet validator', () => {
     })
   })
 
-  it('diagnoses unsupported display values', () => {
+  it('диагностирует неподдерживаемые значения display', () => {
     const result = validateNovaUiStyleSheetSource(`
       Flex {
         display: flex;

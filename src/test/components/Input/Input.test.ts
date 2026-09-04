@@ -26,12 +26,12 @@ import {
   registerNovaUIKit,
 } from '@/index'
 
-describe('nova UI Kit input components', () => {
+describe('компоненты input Nova UI Kit', () => {
   afterEach(() => {
     vi.restoreAllMocks()
   })
 
-  it('normalizes common input defaults', () => {
+  it('нормализует общие параметры input по умолчанию', () => {
     const props = normalizeInputProps({ placeholder: 'Name' })
 
     expect(props.inputEngine).toBe('auto')
@@ -41,7 +41,7 @@ describe('nova UI Kit input components', () => {
     expect(props.clearable).toBe(false)
   })
 
-  it('normalizes search, number and textarea specifics', () => {
+  it('нормализует особенности search, number и textarea', () => {
     expect(normalizeInputProps({}, 'search').clearable).toBe(true)
     expect(normalizeInputProps({ step: 5 }, 'number').step).toBe(5)
     expect(normalizeInputProps({ minRows: 2, maxRows: 5 }, 'textarea')).toMatchObject({
@@ -51,7 +51,7 @@ describe('nova UI Kit input components', () => {
     })
   })
 
-  it('registers all input descriptors through UI Kit registration', () => {
+  it('регистрирует все descriptors input через регистрацию UI Kit', () => {
     const registered: Array<string> = []
     const registry = {
       reserveTag: (_name: string) => {},
@@ -68,7 +68,7 @@ describe('nova UI Kit input components', () => {
     expect(NovaUIKit.TextArea).toBe(TEXT_AREA_DESCRIPTOR.type)
   })
 
-  it('places caret and insertion index on the rendered centered proportional text', () => {
+  it('размещает каретку и индекс вставки на отрисованном центрированном пропорциональном тексте', () => {
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation((type: string) => {
       if (type === RendererType.Web2D || type === '2d') {
         return create2DContextStub({ 'W': 12, 'i': 3, '.': 4, 'X': 9 })

@@ -52,8 +52,8 @@ class TestStyleNode {
   }
 }
 
-describe('novaCSS style subscriptions graph', () => {
-  it('selects exact candidates for id, class, type and attr selector changes', () => {
+describe('граф подписок стилей NovaCSS', () => {
+  it('выбирает точных кандидатов при изменениях selectors ID, class, type и attr', () => {
     const root = new TestStyleNode('root', 'Root')
     const byClass = root.append(new TestStyleNode('class-node', 'TextBlock', { className: 'featured' }))
     const byAttr = root.append(new TestStyleNode('attr-node', 'TextBlock', { attrs: { role: 'title' } }))
@@ -72,7 +72,7 @@ describe('novaCSS style subscriptions graph', () => {
     expect(plan.candidates).toEqual(new Set([byClass, byAttr, byType]))
   })
 
-  it('expands ancestor selector changes to matching descendants', () => {
+  it('распространяет изменения selector предка на соответствующих потомков', () => {
     const root = new TestStyleNode('root', 'Root')
     const panel = root.append(new TestStyleNode('panel', 'Flex', { className: 'panel' }))
     const target = panel.append(new TestStyleNode('title', 'TextBlock'))
@@ -90,7 +90,7 @@ describe('novaCSS style subscriptions graph', () => {
     expect(plan.candidates.has(panel)).toBe(false)
   })
 
-  it('plans media candidate invalidation only for media rules', () => {
+  it('планирует invalidation media-кандидатов только для media-правил', () => {
     const root = new TestStyleNode('root', 'Root')
     const target = root.append(new TestStyleNode('target', 'TextBlock', { className: 'title' }))
     root.append(new TestStyleNode('plain', 'Button'))
@@ -109,7 +109,7 @@ describe('novaCSS style subscriptions graph', () => {
     expect(plan.candidates).toEqual(new Set([target]))
   })
 
-  it('matches single-part selectors against virtual primitives without registering nodes', () => {
+  it('сопоставляет односоставные selectors с виртуальными примитивами без регистрации узлов', () => {
     const styleSheet = validateNovaUiStyleSheetSource(`
       Rect.test-bg { background: #ff0000; opacity: 0.75; }
       .unused { background: #00ff00; }
@@ -125,7 +125,7 @@ describe('novaCSS style subscriptions graph', () => {
     expect(declarations.box?.opacity).toBe(0.75)
   })
 
-  it('matches descendant and child selectors for virtual primitives through the owner chain', () => {
+  it('сопоставляет selectors потомков и детей виртуальных примитивов через цепочку владельцев', () => {
     const root = new TestStyleNode('root', 'Root', { className: 'dark' })
     const timeline = root.append(new TestStyleNode('timeline', 'TimelineChart'))
     const internalLayer = { parent: timeline }
@@ -145,8 +145,8 @@ describe('novaCSS style subscriptions graph', () => {
   })
 })
 
-describe('novaCSS Raph dependency tracker', () => {
-  it('collapses repeated token reads and removes stale owner subscriptions', () => {
+describe('трекер зависимостей NovaCSS в Raph', () => {
+  it('объединяет повторные чтения tokens и удаляет устаревшие подписки владельцев', () => {
     const observed: Array<{ path: string, phase?: string }> = []
     const disposed: Array<string> = []
     const app = { raph: { kernel: { transaction: (cb: () => void) => cb(), get: () => 0, set: () => {} } } } as unknown as NovaApp
@@ -174,7 +174,7 @@ describe('novaCSS Raph dependency tracker', () => {
     expect(tracker.subscriptionCount()).toBe(0)
   })
 
-  it('creates app-local stylesheet atoms for virtual primitive owners', () => {
+  it('создаёт локальные для приложения atoms stylesheet для владельцев виртуальных примитивов', () => {
     const app = { raph: { kernel: { get: () => 0, set: () => {} } } } as unknown as NovaApp
 
     expect(createNovaUiStyleSheetDataPath(app)).toMatch(/^nova\.ui\.styles\.apps\.a_[a-z0-9]+\.sheet\.version$/)

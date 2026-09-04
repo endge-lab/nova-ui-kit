@@ -13,22 +13,22 @@ import {
   resolveSpacing,
 } from '@/shared/layout'
 
-describe('nova UI layout primitives', () => {
-  it('compiles and resolves percent, fill and px values', () => {
+describe('примитивы layout Nova UI', () => {
+  it('компилирует и разрешает значения percent, fill и px', () => {
     expect(resolveLayoutValue(compileLayoutValue('100%', 0), 320, 0)).toBe(320)
     expect(resolveLayoutValue(compileLayoutValue('50%', 0), 320, 0)).toBe(160)
     expect(resolveLayoutValue(compileLayoutValue('fill', 0), 320, 0)).toBe(320)
     expect(resolveLayoutValue(compileLayoutValue(42, 0), 320, 0)).toBe(42)
   })
 
-  it('normalizes spacing shorthands', () => {
+  it('нормализует сокращения отступов', () => {
     expect(resolveSpacing(12)).toEqual({ left: 12, right: 12, top: 12, bottom: 12 })
     expect(resolveSpacing({ all: 8 })).toEqual({ left: 8, right: 8, top: 8, bottom: 8 })
     expect(resolveSpacing({ horizontal: 10, vertical: 4 })).toEqual({ left: 10, right: 10, top: 4, bottom: 4 })
     expect(resolveSpacing({ left: 1, right: 2, top: 3, bottom: 4 })).toEqual({ left: 1, right: 2, top: 3, bottom: 4 })
   })
 
-  it('reuses rect objects and detects equality', () => {
+  it('повторно использует объекты прямоугольников и определяет равенство', () => {
     const target = createLayoutRect()
     const source = { x: 1, y: 2, width: 3, height: 4 }
 
@@ -39,7 +39,7 @@ describe('nova UI layout primitives', () => {
     expect(rectEquals(target, { ...source, width: 5 })).toBe(false)
   })
 
-  it('does not call options when fallback node rect is unchanged', () => {
+  it('не вызывает options при неизменном прямоугольнике fallback-узла', () => {
     const options = vi.fn()
     const node = {
       x: 1,
@@ -56,7 +56,7 @@ describe('nova UI layout primitives', () => {
     expect(options).toHaveBeenCalledWith({ x: 1, y: 2, width: 5, height: 4 })
   })
 
-  it('syncs generated component props and node geometry for layout rects', () => {
+  it('синхронизирует сгенерированные props компонента и геометрию узла для прямоугольников layout', () => {
     const setProps = vi.fn()
     const options = vi.fn()
     const node = {
@@ -73,7 +73,7 @@ describe('nova UI layout primitives', () => {
     expect(options).toHaveBeenCalledWith({ x: 4, y: 8, width: 120, height: 48 })
   })
 
-  it('reads generated Nova SFC props when getProps is unavailable', () => {
+  it('читает сгенерированные props SFC Nova при недоступном getProps', () => {
     const node = {
       props: {
         className: 'h-48 shrink-0',
@@ -83,7 +83,7 @@ describe('nova UI layout primitives', () => {
     expect(readNovaUiNodeProps(node)).toEqual({ className: 'h-48 shrink-0' })
   })
 
-  it('resolves CSS-like positioned rects without affecting flow semantics', () => {
+  it('разрешает CSS-подобно позиционированные прямоугольники без влияния на потоковую семантику', () => {
     const container = { x: 10, y: 20, width: 300, height: 200 }
     const fallback = { x: 30, y: 40, width: 80, height: 50 }
 

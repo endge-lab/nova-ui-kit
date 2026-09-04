@@ -147,8 +147,8 @@ class BenchContainerTarget implements NovaUiStyleTarget {
 }
 const BENCH_ITERATIONS = 6
 
-describe('nova UI style propagation performance', () => {
-  it('benchmarks stylesheet compile hot path', () => {
+describe('производительность распространения стилей Nova UI', () => {
+  it('измеряет hot path компиляции stylesheet', () => {
     const results = [100, 1_000].map((size) => {
       const source = createBenchmarkStyleSource(size)
       return measureBench(`stylesheet compile ${size}`, size, () => {
@@ -169,7 +169,7 @@ describe('nova UI style propagation performance', () => {
     }
   })
 
-  it('benchmarks NovaCSS theme token resolution hot path', () => {
+  it('измеряет hot path разрешения tokens темы NovaCSS', () => {
     const size = 100
     const sheet = validateNovaUiStyleSheetSource(createBenchmarkTokenStyleSource(size)).styleSheet as NovaUiCompiledStyleSheet
     const resolver = createBenchmarkTokenResolver()
@@ -188,7 +188,7 @@ describe('nova UI style propagation performance', () => {
     expect(result.averageMs).toBeLessThan(150)
   })
 
-  it('benchmarks invalid stylesheet validation', () => {
+  it('измеряет проверку некорректного stylesheet', () => {
     const size = 1_000
     const source = Array.from({ length: size }, (_item, index) => (
       `TextBlock.invalid-${index} { fontSize: nope; }`
@@ -207,7 +207,7 @@ describe('nova UI style propagation performance', () => {
     expect(result.averageMs).toBeLessThan(100)
   })
 
-  it('benchmarks selector matching for indexed rules', () => {
+  it('измеряет сопоставление selectors для индексированных правил', () => {
     const source = createBenchmarkStyleSource(1_000)
     const sheet = validateNovaUiStyleSheetSource(source).styleSheet!
     const results = [1_000, 5_000, 10_000].map((size) => {
@@ -232,7 +232,7 @@ describe('nova UI style propagation performance', () => {
     }
   })
 
-  it('benchmarks cursor pseudo selector compile and matching', () => {
+  it('измеряет компиляцию и сопоставление pseudo-selector курсора', () => {
     const source = Array.from({ length: 1_000 }, (_item, index) => (
       `TextBlock.item-${index}:hover { cursor: component("ResizeCursor", { "axis": "x" }, 8 8); }`
     )).join('\n')
@@ -259,7 +259,7 @@ describe('nova UI style propagation performance', () => {
     expect(result.averageMs).toBeLessThan(100)
   })
 
-  it('benchmarks selector cascade style diff budget', () => {
+  it('измеряет бюджет сравнения стилей каскада selectors', () => {
     const size = 10_000
     const sheet = validateNovaUiStyleSheetSource('TextBlock.item { color: #123456; }').styleSheet as NovaUiCompiledStyleSheet
     const nodes = createBenchmarkStyleNodes(size, 'item')
@@ -283,7 +283,7 @@ describe('nova UI style propagation performance', () => {
     expect(result.averageMs).toBeLessThan(100)
   })
 
-  it('benchmarks responsive variant matching for 10k styled nodes', () => {
+  it('измеряет сопоставление адаптивных вариантов для 10 тысяч стилизованных узлов', () => {
     const source = Array.from({ length: 1_000 }, (_item, index) => (
       `.box-${index} { background: #123456; }`
     )).join('\n')
@@ -306,7 +306,7 @@ describe('nova UI style propagation performance', () => {
     expect(result.averageMs).toBeLessThan(120)
   })
 
-  it('benchmarks media signature resize skip inside the same breakpoint', () => {
+  it('измеряет пропуск resize по media-сигнатуре внутри одного breakpoint', () => {
     const sheet = validateNovaUiStyleSheetSource(`
       .box { background: #123456; }
       @media (min-width: 900px) { .box { background: #abcdef; } }
@@ -339,7 +339,7 @@ describe('nova UI style propagation performance', () => {
     expect(result.averageMs).toBeLessThan(80)
   })
 
-  it('benchmarks render-only inherited color propagation', () => {
+  it('измеряет распространение унаследованного цвета только для render', () => {
     const results = [1_000, 5_000, 10_000].map((size) => {
       const targets = Array.from({ length: size }, () => new BenchTextTarget())
       const root = new BenchContainerTarget(targets)
@@ -358,7 +358,7 @@ describe('nova UI style propagation performance', () => {
     }
   })
 
-  it('benchmarks layout-affecting inherited font propagation', () => {
+  it('измеряет распространение унаследованного шрифта, влияющего на layout', () => {
     const results = [1_000, 5_000].map((size) => {
       const targets = Array.from({ length: size }, () => new BenchTextTarget())
       const root = new BenchContainerTarget(targets)
@@ -377,7 +377,7 @@ describe('nova UI style propagation performance', () => {
     }
   })
 
-  it('benchmarks explicit override skip for inherited color', () => {
+  it('измеряет пропуск унаследованного цвета при явном переопределении', () => {
     const size = 10_000
     const explicitCount = 8_000
     const targets = Array.from({ length: size }, (_item, index) => (
@@ -397,7 +397,7 @@ describe('nova UI style propagation performance', () => {
     expect(result.averageMs).toBeLessThan(100)
   })
 
-  it('benchmarks subtree skip for overridden branch style', () => {
+  it('измеряет пропуск поддерева для переопределённого стиля ветви', () => {
     const branchCount = 10
     const branchSize = 1_000
     const branches: Array<BenchContainerTarget> = []
@@ -441,7 +441,7 @@ describe('nova UI style propagation performance', () => {
     expect(result.averageMs).toBeLessThan(100)
   })
 
-  it('benchmarks responsive grid resize hot path and unchanged rect skip', () => {
+  it('измеряет hot path resize адаптивной сетки и пропуск неизменного прямоугольника', () => {
     const size = 5_000
     const engine = new GridLayoutEngine()
     const entries = Array.from({ length: size }, (item, index) => (
@@ -502,7 +502,7 @@ describe('nova UI style propagation performance', () => {
     expect(result.averageMs).toBeLessThan(100)
   })
 
-  it('benchmarks Flex layout with hidden children without node churn', () => {
+  it('измеряет layout Flex со скрытыми children без churn узлов', () => {
     const size = 500
     const hiddenCount = 100
     const engine = new FlexLayoutEngine()

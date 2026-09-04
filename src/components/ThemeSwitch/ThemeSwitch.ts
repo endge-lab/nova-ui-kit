@@ -190,7 +190,7 @@ export class ThemeSwitch<E extends EventList = Record<string, any>>
         this.nova.theme.use(next.id)
       }
       catch {
-        // ThemeSwitch can still work as controlled component when theme service has no such id.
+        // ThemeSwitch может работать как управляемый компонент, даже если в сервисе тем нет такого id.
       }
     }
     this.props.onChange?.(next.id)

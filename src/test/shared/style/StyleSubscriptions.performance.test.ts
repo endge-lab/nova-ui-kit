@@ -42,8 +42,8 @@ class BenchNode {
   }
 }
 
-describe('novaCSS style subscription performance', () => {
-  it('prints exact selector invalidation report for 10k nodes', () => {
+describe('производительность подписок стилей NovaCSS', () => {
+  it('выводит точный отчёт invalidation selector для 10 тысяч узлов', () => {
     const root = new BenchNode('root', 'Root', {})
     for (let index = 0; index < 10_000; index += 1) {
       root.append(new BenchNode(`node-${index}`, index % 2 === 0 ? 'TextBlock' : 'Button', {

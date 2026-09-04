@@ -3,8 +3,8 @@ import { buildButtonSchema } from '@/components/Button/button-render'
 import { normalizeButtonProps } from '@/components/Button/button.config'
 import { EMPTY_STYLE_CONTEXT } from '@/shared/style'
 
-describe('button render schema', () => {
-  it('clamps icon-only glyph to button bounds', () => {
+describe('схема render кнопки', () => {
+  it('ограничивает glyph без текста границами кнопки', () => {
     const schema = buildButtonSchema(normalizeButtonProps({
       width: 12,
       height: 10,
@@ -15,7 +15,7 @@ describe('button render schema', () => {
     expect(icon).toBeUndefined()
   })
 
-  it('keeps icon-only glyph inside content box', () => {
+  it('удерживает glyph без текста внутри области содержимого', () => {
     const schema = buildButtonSchema(normalizeButtonProps({
       width: 36,
       height: 36,

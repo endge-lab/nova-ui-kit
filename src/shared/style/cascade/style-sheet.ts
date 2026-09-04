@@ -201,7 +201,7 @@ export interface NovaUiCompiledStyleSheet {
   tokenDependencies?: Array<string>
 }
 
-/** Theme block, extracted from `.novacss @theme`. */
+/** Блок темы, извлечённый из `.novacss @theme`. */
 export interface NovaUiStyleThemeDefinition {
   id: string
   tokens: Record<`--${string}`, string | number>

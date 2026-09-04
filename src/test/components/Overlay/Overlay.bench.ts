@@ -10,7 +10,7 @@ import { NovaUIKit, registerNovaUIKit } from '@/index'
 const apps: Array<NovaApp<Record<string, any>>> = []
 let root: Root<Record<string, any>>
 
-describe('nova UI Kit overlay registry benchmark', () => {
+describe('бенчмарк реестра overlay Nova UI Kit', () => {
   bench('open/update/close 1000 lightweight overlays', () => {
     const api = root.getApi() as RootApi
     for (let index = 0; index < 1_000; index += 1) {

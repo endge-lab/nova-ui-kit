@@ -56,14 +56,14 @@ function createApp(): NovaApp<TestEvents> {
   return app
 }
 
-describe('nova UI Kit sync ports', () => {
+describe('порты синхронизации Nova UI Kit', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
     document.body.innerHTML = ''
     installCanvasMocks()
   })
 
-  it('exposes common ports on UI Kit components and syncs props', () => {
+  it('предоставляет общие порты компонентов UI Kit и синхронизирует props', () => {
     const app = createApp()
     const surface = app.createSurface('sync-uikit')
 
@@ -99,7 +99,7 @@ describe('nova UI Kit sync ports', () => {
     app.destroy()
   })
 
-  it('syncs external layout rect updates without losing dirty invalidation', () => {
+  it('синхронизирует внешние обновления прямоугольника layout без потери invalidation', () => {
     const app = createApp()
     const surface = app.createSurface('sync-layout')
 

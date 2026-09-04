@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { createProgressRingSchema } from '@/components/ProgressRing/progress-ring.schema'
 
-describe('progressRing schema', () => {
-  it('builds track and value arcs from percent value', () => {
+describe('схема ProgressRing', () => {
+  it('строит дуги track и значения из процентов', () => {
     const schema = createProgressRingSchema({
       x: 10,
       y: 20,
@@ -37,7 +37,7 @@ describe('progressRing schema', () => {
     })
   })
 
-  it('clamps empty values to track only', () => {
+  it('ограничивает пустые значения только track', () => {
     const schema = createProgressRingSchema({
       x: 0,
       y: 0,

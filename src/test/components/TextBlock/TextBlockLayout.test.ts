@@ -4,8 +4,8 @@ import { layoutTextBlock, normalizeTextBlockProps } from '@/components/TextBlock
 
 const measureText: TextBlockMeasureFn = text => text.length * 8
 
-describe('textBlock layout', () => {
-  it('wraps normal text into stable lines', () => {
+describe('компоновка TextBlock', () => {
+  it('переносит обычный текст в стабильные строки', () => {
     const props = normalizeTextBlockProps({
       text: 'alpha beta gamma',
       width: 76,
@@ -21,7 +21,7 @@ describe('textBlock layout', () => {
     expect(layout.overflowed).toBe(false)
   })
 
-  it('clips nowrap text with ellipsis', () => {
+  it('обрезает nowrap-текст многоточием', () => {
     const props = normalizeTextBlockProps({
       text: 'abcdefghij',
       width: 52,
@@ -39,7 +39,7 @@ describe('textBlock layout', () => {
     expect(layout.overflowed).toBe(true)
   })
 
-  it('preserves newlines with pre-wrap', () => {
+  it('сохраняет переносы строк с pre-wrap', () => {
     const props = normalizeTextBlockProps({
       text: 'first\nsecond line',
       width: 120,
@@ -54,7 +54,7 @@ describe('textBlock layout', () => {
     expect(layout.lines[1].text).toBe('second line')
   })
 
-  it('respects maxLines and marks overflow', () => {
+  it('учитывает maxLines и отмечает переполнение', () => {
     const props = normalizeTextBlockProps({
       text: 'one two three four five six',
       width: 72,
